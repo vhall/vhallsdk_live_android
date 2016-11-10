@@ -1,0 +1,99 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/contentVideo"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"></FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_detail"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.5"
+        android:orientation="vertical">
+
+        <RadioGroup
+            android:id="@+id/rg_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/radiogroup_bg"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_doc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="文档"
+                android:textColor="@drawable/tabs_color_selector"
+                android:textSize="15dp"
+                android:visibility="visible" />
+
+            <RadioButton
+                android:id="@+id/rb_chat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="聊天"
+                android:textColor="@drawable/tabs_color_selector"
+                android:textSize="15dp"
+                android:visibility="gone" />
+
+            <RadioButton
+                android:id="@+id/rb_question"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="问答"
+                android:textColor="@drawable/tabs_color_selector"
+                android:textSize="15dp"
+                android:visibility="gone" />
+
+            <RadioButton
+                android:id="@+id/rb_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="详情"
+                android:textColor="@drawable/tabs_color_selector"
+                android:textSize="15dp" />
+        </RadioGroup>
+
+        <FrameLayout
+            android:id="@+id/contentDoc"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"></FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/contentChat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"></FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/contentQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"></FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/contentDetail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"></FrameLayout>
+    </LinearLayout>
+</LinearLayout>

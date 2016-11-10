@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.vhall.business.widget.ContainerLayout
+        android:id="@+id/rl_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_click_show_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:text="视频"
+            android:textColor="#e60000"
+            android:background="@drawable/bg_btn_radis_alpha" />
+
+        <Button
+            android:id="@+id/btn_click_show_aduio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_click_show_video"
+            android:text="音频"
+            android:textColor="#e60000"
+            android:background="@drawable/bg_btn_radis_alpha"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentBottom="true">
+
+        <ImageView
+            android:id="@+id/click_rtmp_watch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/play" />
+
+        <ImageView
+            android:id="@+id/click_rtmp_orientation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/icon_round_fullscreen" />
+
+        <RadioGroup
+            android:id="@+id/radio_choose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radio_btn_sd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="标清"
+                android:textSize="8dp"
+                android:visibility="invisible" />
+
+            <RadioButton
+                android:id="@+id/radio_btn_hd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="高清"
+                android:textSize="8dp"
+                android:visibility="invisible" />
+
+
+            <RadioButton
+                android:id="@+id/radio_btn_uhd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="超高清"
+                android:textSize="8dp"
+                android:visibility="invisible" />
+
+        </RadioGroup>
+
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_change_scaletype"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/bg_btn_radis_alpha"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/fragment_download_speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textColor="#E60000"
+        android:textSize="18sp" />
+
+
+</RelativeLayout>

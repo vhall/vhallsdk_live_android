@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+
+    <TextView
+        android:id="@+id/tv_set"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="right"
+        android:padding="10dp"
+        android:text="设置参数" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_start_potrait"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="竖屏发起"
+            android:textSize="12dp" />
+
+        <Button
+            android:id="@+id/btn_start_landspace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="横屏发起"
+            android:textSize="12dp" />
+
+        <Button
+            android:id="@+id/btn_watch_rtmp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="观看直播"
+            android:textSize="12dp" />
+
+        <Button
+            android:id="@+id/btn_watch_hls"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="观看回放"
+            android:textSize="12dp" />
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="登录" />
+
+    </LinearLayout>
+</RelativeLayout>

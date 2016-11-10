@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="vhall_value_room_id"></string>
+    <string name="vhall_value_room_token"></string>
+
+    <string name="vhall_login_input_username"></string>
+    <string name="vhall_login_input_userpass"></string>
+
+    <string name="vhall_app_key"></string>
+    <string name="vhall_app_secret_key"></string>
+
+</resources>

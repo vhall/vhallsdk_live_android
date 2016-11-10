@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.vhall.business.VhallCameraView
+        android:id="@+id/cameraview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/btn_publish"
+        style="@style/broadcastOnclick"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:text="@string/vhall_button_broadcast_start" />
+
+    <LinearLayout
+        android:id="@+id/ll_fuc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_changeCamera"
+            style="@style/broadcastOnclick"
+            android:text="切换摄像头" />
+
+        <Button
+            android:id="@+id/btn_changeFlash"
+            style="@style/broadcastOnclick"
+            android:text="闪光灯" />
+
+        <Button
+            android:id="@+id/btn_changeAudio"
+            style="@style/broadcastOnclick"
+            android:text="切换静音" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tv_upload_speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_fuc"
+        android:layout_marginLeft="10dp"
+        android:padding="5dp"
+        android:text=""
+        android:textColor="#e60000" />
+
+</RelativeLayout>

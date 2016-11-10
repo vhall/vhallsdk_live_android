@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">VhallSDKSelfServiceDemo</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_broadcast">BroadcastActivity</string>
+    <string name="title_activity_watch">WatchActivity</string>
+    <string name="title_activity_broadcast_land">BroadcastLandActivity</string>
+    <string name="title_activity_watch_land">WatchLandActivity</string>
+
+    <string name="vhall_copyright">Copyright (c) 2015 北京微吼时代科技有限公司. All rights reserved.</string>
+
+
+
+    <string name="vhall_button_broadcast_start">开始直播</string>
+    <string name="vhall_button_watch">观看</string>
+    <string name="vhall_button_orientation">横竖屏切换</string>
+    <string name="vhall_button_back">返回</string>
+    <string name="vhall_login_username">账号:</string>
+    <string name="vhall_login_userpass">密码:</string>
+
+    <string name="test">test</string>
+    
+    <string name="pay_hint_fee">打赏金额</string>
+    <string name="pay_hint_note">打赏说明</string>
+    <string name="pay_hint_type">支付类型:</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    
+</resources>
