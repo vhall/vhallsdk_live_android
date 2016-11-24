@@ -27,4 +27,5 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
     compile files('libs/vhallsdk2.5.0.jar')
+    compile files('libs/vhallbusiness2.5.0.jar')
 }
