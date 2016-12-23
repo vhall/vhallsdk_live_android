@@ -7,4 +7,5 @@
 
     <color name="radiogroup_bg">#18181C</color>
     <color name="gray_normal">#9c9ca0</color>
+    <color name="red_main">#ff3333</color>
 </resources>

@@ -7,16 +7,19 @@ import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import com.vhall.business.ChatServer;
 import com.vhall.business.VhallPPT;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.WatchLive;
 import com.vhall.business.WatchPlayback;
 import com.vhall.business.utils.ErrorCode;
 import com.vhall.live.VhallApplication;
+import com.vhall.live.chat.ChatContract;
 import com.vhall.live.data.Param;
 import com.vhall.live.utils.VhallUtil;
 import com.vhall.playersdk.player.impl.VhallHlsPlayer;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,12 +27,16 @@ import java.util.TimerTask;
 /**
  * 观看回放的Presenter
  */
-public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter {
+public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, ChatContract.ChatPresenter {
     private static final String TAG = "PlaybackPresenter";
     private Param param;
     WatchContract.PlaybackView playbackView;
     WatchContract.DocumentView documentView;
     WatchContract.WatchView watchView;
+    ChatContract.ChatView chatView;
+    private int limit = 5;
+    private int pos = 0;
+
 
     private WatchPlayback watchPlayback;
     private VhallPPT ppt;
@@ -60,12 +67,14 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter {
         }
     };
 
-    public WatchPlaybackPresenter(WatchContract.PlaybackView playbackView, WatchContract.DocumentView documentView, WatchContract.WatchView watchView, Param param) {
+    public WatchPlaybackPresenter(WatchContract.PlaybackView playbackView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, WatchContract.WatchView watchView, Param param) {
         this.playbackView = playbackView;
         this.documentView = documentView;
         this.watchView = watchView;
+        this.chatView = chatView;
         this.param = param;
         this.playbackView.setPresenter(this);
+        this.chatView.setPresenter(this);
     }
 
     @Override
@@ -74,17 +83,33 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter {
         initWatch();
     }
 
-    private void initWatch() {
-        VhallSDK.getInstance().initWatch(param.id, "test", "test@vhall.com", VhallApplication.user_vhall_id, param.k, getWatchPlayback(), new VhallSDK.RequestCallback() {
-
+    private void initCommentData(int pos) {
+        watchPlayback.requestCommentHistory(param.id, limit, pos, new ChatServer.ChatRecordCallback() {
             @Override
-            public void success() {
-                handlePosition();
-                setPPT();
+            public void onDataLoaded(List<ChatServer.ChatInfo> list) {
+                chatView.notifyDataChanged(list);
+                chatView.clearInputContent();
             }
 
             @Override
-            public void failed(int errorCode, String reason) {
+            public void onFailed(int errorcode, String messaage) {
+                Toast.makeText(VhallApplication.getApp(), messaage, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void initWatch() {
+        VhallSDK.getInstance().initWatch(param.id, "test", "test@vhall.com", VhallApplication.user_vhall_id, param.k, getWatchPlayback(), new VhallSDK.RequestCallback() {
+            @Override
+            public void onSuccess() {
+                handlePosition();
+                setPPT();
+                pos = 0;
+                initCommentData(pos);
+            }
+
+            @Override
+            public void onError(int errorCode, String reason) {
                 Toast.makeText(VhallApplication.getApp(), reason, Toast.LENGTH_SHORT).show();
             }
         });
@@ -107,8 +132,9 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter {
     public void startPlay() {
         if (!getWatchPlayback().isAvaliable())
             return;
-        getWatchPlayback().start();
         playbackView.setPlayIcon(false);
+        getWatchPlayback().start();
+
     }
 
     @Override
@@ -174,6 +200,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter {
             WatchPlayback.Builder builder = new WatchPlayback.Builder().context(playbackView.getmActivity()).containerLayout(playbackView.getContainer()).callback(new WatchPlayback.WatchEventCallback() {
                 @Override
                 public void onStartFailed(String reason) {//开始播放失败
+                    Toast.makeText(playbackView.getmActivity(), reason, Toast.LENGTH_SHORT).show();
                     playbackView.setPlayIcon(true);
                 }
 
@@ -240,5 +267,38 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter {
         if (ppt == null)
             ppt = new VhallPPT();
         getWatchPlayback().setVhallPPT(ppt);
+    }
+
+    @Override
+    public void sendChat(final String text, final String user_id) {
+        getWatchPlayback().sendComment(text, user_id, new VhallSDK.RequestCallback() {
+            @Override
+            public void onSuccess() {
+                chatView.clearChatData();
+                initCommentData(pos = 0);
+                chatView.clearInputContent();
+            }
+
+            @Override
+            public void onError(int errorCode, String reason) {
+                Toast.makeText(VhallApplication.getApp(), reason, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void sendQuestion(String content, String vhall_id) {
+
+    }
+
+    @Override
+    public void onLoginReturn() {
+
+    }
+
+    @Override
+    public void onFreshData() {
+        pos = pos + limit;
+        initCommentData(pos);
     }
 }

@@ -35,6 +35,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView, Vie
     public final int RequestLogin = 0;
     ListView lv_chat;
     Button btnSendMsg;
+    Button btnFresh;
     EditText editContent;
     List<ChatServer.ChatInfo> chatData = new ArrayList<ChatServer.ChatInfo>();
     ChatAdapter chatAdapter = new ChatAdapter();
@@ -42,7 +43,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView, Vie
     boolean isquestion = false;
     int status = -1;
 
-    public static ChatFragment newInstance(int status , boolean isquestion) {
+    public static ChatFragment newInstance(int status, boolean isquestion) {
         ChatFragment chatFragment = new ChatFragment();
         Bundle bundle = new Bundle();
         bundle.putBoolean("question", isquestion);
@@ -69,13 +70,22 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView, Vie
         editContent = (EditText) getView().findViewById(R.id.edit_content);
         btnSendMsg = (Button) getView().findViewById(R.id.btn_send_msg);
         btnSendMsg.setOnClickListener(this);
-
+        btnFresh = (Button) getView().findViewById(R.id.btn_fresh);
+        btnFresh.setOnClickListener(this);
+        btnFresh.setVisibility(View.GONE);
         isquestion = getArguments().getBoolean("question");
         status = getArguments().getInt("state");
         if (isquestion) {
             lv_chat.setAdapter(questionAdapter);
         } else {
             lv_chat.setAdapter(chatAdapter);
+        }
+        init();
+    }
+
+    private void init() {
+        if (status == Param.WATCH_PLAYBACK) {
+            btnFresh.setVisibility(View.VISIBLE);
         }
     }
 
@@ -98,6 +108,8 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView, Vie
             chatAdapter.notifyDataSetChanged();
     }
 
+
+
     @Override
     public void showToast(String content) {
         Toast.makeText(VhallApplication.getApp(), content, Toast.LENGTH_SHORT).show();
@@ -108,23 +120,46 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView, Vie
         editContent.setText("");
     }
 
+    @Override
+    public void clearChatData() {
+        if (chatData != null) {
+            chatData.clear();
+        }
+    }
+
 
     @Override
     public void onClick(View view) {
+        String content = editContent.getText().toString();
         switch (view.getId()) {
             case R.id.btn_send_msg:
-                if (status == Param.BROADCAST || !TextUtils.isEmpty(VhallApplication.user_vhall_id)) {
-                    String content = editContent.getText().toString();
-                    if (isquestion) {
-                        mPresenter.sendQuestion(content, VhallApplication.user_vhall_id);
-                    } else
-                        mPresenter.sendChat(content);
-                } else {
-                    Intent intent = new Intent(getActivity(), LoginActivity.class);
-                    startActivityForResult(intent, RequestLogin);
+                switch (status) {
+                    case Param.BROADCAST://直播界面只能发聊天
+                        mPresenter.sendChat(content, VhallApplication.user_vhall_id);
+                        break;
+                    case Param.WATCH_LIVE://观看直播界面发聊天和问答
+                        if (!TextUtils.isEmpty(VhallApplication.user_vhall_id)) {
+                            if (isquestion) {
+                                mPresenter.sendQuestion(content, VhallApplication.user_vhall_id);
+                            } else
+                                mPresenter.sendChat(content, VhallApplication.user_vhall_id);
+                        } else {
+                            Intent intent = new Intent(getActivity(), LoginActivity.class);
+                            startActivityForResult(intent, RequestLogin);
+                        }
+                        break;
+                    case Param.WATCH_PLAYBACK://回放界面只能发评论(发评论必须保证登陆)
+                        if (TextUtils.isEmpty(VhallApplication.user_vhall_id)) {
+                            Toast.makeText(getActivity(), "请先登录", Toast.LENGTH_LONG).show();
+                            return;
+                        }
+                        mPresenter.sendChat(content, VhallApplication.user_vhall_id);
+                        break;
                 }
                 break;
-            default:
+            case R.id.btn_fresh:
+                mPresenter.onFreshData();
+                break;
         }
     }
 

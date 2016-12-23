@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.vhall.business.VhallCameraView
+    <com.vinny.vinnylive.CameraFilterView
         android:id="@+id/cameraview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -36,7 +36,22 @@
             style="@style/broadcastOnclick"
             android:text="切换静音" />
 
+        <Button
+            android:id="@+id/btn_changeFilter"
+            style="@style/broadcastOnclick"
+            android:text="切换美颜" />
+
     </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/boradcast_seekbar_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_fuc"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="10dp"
+        android:visibility="invisible" />
 
 
     <TextView

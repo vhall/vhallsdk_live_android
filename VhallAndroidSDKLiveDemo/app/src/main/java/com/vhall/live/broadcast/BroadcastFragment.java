@@ -7,12 +7,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vhall.business.VhallCameraView;
+import com.vhall.gpuimage.GPUImageRenderer;
 import com.vhall.live.R;
 import com.vhall.live.VhallApplication;
+import com.vinny.vinnylive.CameraFilterView;
 
 /**
  * 发直播的Fragment
@@ -20,9 +22,11 @@ import com.vhall.live.VhallApplication;
 public class BroadcastFragment extends Fragment implements BroadcastContract.View, View.OnClickListener {
 
     private BroadcastContract.Presenter mPresenter;
-    private VhallCameraView cameraview;
+    private CameraFilterView cameraview;
     private TextView mSpeed;
-    private Button mPublish, mChangeCamera, mChangeFlash, mChangeAudio;
+    private Button mPublish, mChangeCamera, mChangeFlash, mChangeAudio, mChangeFilter;
+
+    private SeekBar seekBar;
 
     public static BroadcastFragment newInstance() {
         return new BroadcastFragment();
@@ -42,7 +46,7 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        cameraview = (VhallCameraView) getView().findViewById(R.id.cameraview);
+        cameraview = (CameraFilterView) getView().findViewById(R.id.cameraview);
         mSpeed = (TextView) getView().findViewById(R.id.tv_upload_speed);
         mPublish = (Button) getView().findViewById(R.id.btn_publish);
         mPublish.setOnClickListener(this);
@@ -52,9 +56,48 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         mChangeFlash.setOnClickListener(this);
         mChangeAudio = (Button) getView().findViewById(R.id.btn_changeAudio);
         mChangeAudio.setOnClickListener(this);
+        mChangeFilter = (Button) getView().findViewById(R.id.btn_changeFilter);
+        mChangeFilter.setOnClickListener(this);
+
+        seekBar = (SeekBar) getView().findViewById(R.id.boradcast_seekbar_filter);
+        seekBar.setProgress(0);
+        seekBar.setMax(100);
+        seekBar.setOnSeekBarChangeListener(new BroadCastSeekBarListener());
+
+        cameraview.setAutoCloseFilterCallback(new GPUImageRenderer.AutoCloseBaeutyFilter() {
+            @Override
+            public void onAutoCloseBaeutyFilter() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mPresenter.switchFilter(true);
+                    }
+                });
+            }
+        });
+
         mPresenter.start();
     }
 
+    private class BroadCastSeekBarListener implements SeekBar.OnSeekBarChangeListener {
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            if (cameraview.isShowFilter() && cameraview.canFilterAdjuster()) {
+                cameraview.setFilterAdjuster(i);
+            }
+        }
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+            seekBar.setProgress(10);
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
+    }
 
     @Override
     public void onClick(View v) {
@@ -71,13 +114,16 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
             case R.id.btn_changeFlash:
                 mPresenter.changeFlash();
                 break;
+            case R.id.btn_changeFilter:
+                mPresenter.switchFilter(false);
+                break;
             default:
                 break;
         }
     }
 
     @Override
-    public VhallCameraView getCameraView() {
+    public CameraFilterView getCameraView() {
         return cameraview;
     }
 
@@ -112,14 +158,29 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     }
 
     @Override
+    public void showSeekbar(boolean show) {
+        if (show)
+            seekBar.setVisibility(View.VISIBLE);
+        else
+            seekBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void setSeekbarPro(int progress) {
+        seekBar.setProgress(progress);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
+        cameraview.pause();
         mPresenter.onPause();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        cameraview.resume();
         mPresenter.onResume();
     }
 

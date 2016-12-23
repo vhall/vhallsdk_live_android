@@ -45,7 +45,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     docFragment, R.id.contentDoc);
         }
-        if (chatFragment == null && param.watch_type == Param.WATCH_LIVE) {
+        if (chatFragment == null) {
             chatFragment = ChatFragment.newInstance(param.watch_type, false);
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     chatFragment, R.id.contentChat);
@@ -72,7 +72,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             playbackFragment = WatchPlaybackFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     playbackFragment, R.id.contentVideo);
-            new WatchPlaybackPresenter(playbackFragment, docFragment, this, param);
+            new WatchPlaybackPresenter(playbackFragment, docFragment, chatFragment,this, param);
         }
 
     }
@@ -87,8 +87,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         questionRadioButton = (RadioButton) findViewById(R.id.rb_question);
 
         if (param.watch_type == Param.WATCH_LIVE) {
-            chatRadioButton.setVisibility(View.VISIBLE);
             questionRadioButton.setVisibility(View.VISIBLE);
+            chatRadioButton.setText("聊天");
+        }
+        if (param.watch_type == Param.WATCH_PLAYBACK) {
+            chatRadioButton.setText("评论");
+            questionRadioButton.setVisibility(View.GONE);
         }
         rg_tabs = (RadioGroup) findViewById(R.id.rg_tabs);
         rg_tabs.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {

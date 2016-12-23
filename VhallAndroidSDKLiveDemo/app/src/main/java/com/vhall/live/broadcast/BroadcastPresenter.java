@@ -3,11 +3,13 @@ package com.vhall.live.broadcast;
 import android.hardware.Camera;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.vhall.business.Broadcast;
 import com.vhall.business.ChatServer;
 import com.vhall.business.VhallSDK;
+import com.vhall.live.VhallApplication;
 import com.vhall.live.chat.ChatContract;
 import com.vhall.live.data.Param;
 
@@ -39,13 +41,13 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         mView.getCameraView().init(param.pixel_type, mView.getmActivity(),
                 new RelativeLayout.LayoutParams(0, 0));
         //获取摄像头个数，如果是1个，禁止切换摄像头
-        if (mView.getCameraView().getCameraCount() > 1)
+        if (mView.getCameraView().getNumberOfCameras() > 1)
             mView.setChangeCameraEnable(true);
         else
             mView.setChangeCameraEnable(false);
 
         getBroadcast().setAudioing(true);
-        VhallSDK.getInstance().setLogEnable(false);
+        VhallSDK.getInstance().setLogEnable(true);
     }
 
 
@@ -64,16 +66,15 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void initBroadcast() {
-        VhallSDK.getInstance().initBroadcast(param.id, param.token, "", getBroadcast(), new VhallSDK.RequestCallback() {
+        VhallSDK.getInstance().initBroadcast(param.id, param.token, VhallApplication.user_vhall_id, getBroadcast(), new VhallSDK.RequestCallback() {
             @Override
-            public void success() {
+            public void onSuccess() {
                 isFinish = false;
                 startBroadcast();
-//                getChatHistory();
             }
 
             @Override
-            public void failed(int errorCode, String reason) {
+            public void onError(int errorCode, String reason) {
                 mView.showMsg("initBroadcastFailed：" + reason);
             }
         });
@@ -93,13 +94,13 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     public void finishBroadcast() {
         VhallSDK.getInstance().finishBroadcast(param.id, param.token, getBroadcast(), new VhallSDK.RequestCallback() {
             @Override
-            public void success() {
+            public void onSuccess() {
                 Log.e(TAG, "finishSuccess");
                 isFinish = true;
             }
 
             @Override
-            public void failed(int errorCode, String reason) {
+            public void onError(int errorCode, String reason) {
                 Log.e(TAG, "finishFailed：" + reason);
             }
         });
@@ -126,6 +127,23 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     public void changeAudio() {
         boolean isAudioRecord = getBroadcast().isAudioing();
         getBroadcast().setAudioing(!isAudioRecord);
+    }
+
+    @Override
+    public void switchFilter(boolean close) {
+        if (close) {
+            mView.getCameraView().setFilterToBeauty(false);
+            mView.showSeekbar(false);
+            return;
+        }
+        if (mView.getCameraView().isShowFilter()) {
+            mView.getCameraView().setFilterToBeauty(false);
+            mView.showSeekbar(false);
+        } else {
+            mView.getCameraView().setFilterToBeauty(true);
+            mView.showSeekbar(true);
+            mView.setSeekbarPro(0);
+        }
     }
 
 
@@ -161,17 +179,17 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     }
 
     @Override
-    public void sendChat(String text) {
+    public void sendChat(String text, String user_id) {
         if (TextUtils.isEmpty(text))
             return;
         getBroadcast().sendChat(text, new VhallSDK.RequestCallback() {
             @Override
-            public void success() {
+            public void onSuccess() {
                 chatView.clearInputContent();
             }
 
             @Override
-            public void failed(int errorCode, String reason) {
+            public void onError(int errorCode, String reason) {
                 chatView.showToast(reason);
             }
         });
@@ -183,6 +201,11 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void onLoginReturn() {
+
+    }
+
+    @Override
+    public void onFreshData() {
 
     }
 

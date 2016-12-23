@@ -73,34 +73,31 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     @Override
-    public void sendChat(String text) {
-        if (TextUtils.isEmpty(text))
-            return;
+    public void sendChat(String text, String vhall_id) {
         getWatchLive().sendChat(text, new VhallSDK.RequestCallback() {
             @Override
-            public void success() {
+            public void onSuccess() {
                 chatView.clearInputContent();
             }
 
             @Override
-            public void failed(int errorCode, String reason) {
+            public void onError(int errorCode, String reason) {
                 chatView.showToast(reason);
             }
         });
+        getWatchLive().sendChat("", null);
     }
 
     @Override
     public void sendQuestion(String content, String vhall_id) {
-        if (TextUtils.isEmpty(content))
-            return;
         getWatchLive().sendQuestion(content, vhall_id, new VhallSDK.RequestCallback() {
             @Override
-            public void success() {
+            public void onSuccess() {
                 questionView.clearInputContent();
             }
 
             @Override
-            public void failed(int errorCode, String reason) {
+            public void onError(int errorCode, String reason) {
                 questionView.showToast(reason);
             }
         });
@@ -109,6 +106,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     @Override
     public void onLoginReturn() {
         initWatch();
+    }
+
+    @Override
+    public void onFreshData() {
+
     }
 
     @Override
@@ -165,12 +167,12 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         if (!TextUtils.isEmpty(messageServer.id) && !TextUtils.isEmpty(messageServer.lottery_id)) {
             VhallSDK.getInstance().submitLotteryInfo(messageServer.id, messageServer.lottery_id, nickname, phone, new VhallSDK.RequestCallback() {
                 @Override
-                public void success() {
+                public void onSuccess() {
                     liveView.showToast("信息提交成功");
                 }
 
                 @Override
-                public void failed(int errorCode, String reason) {
+                public void onError(int errorCode, String reason) {
 
                 }
             });
@@ -179,15 +181,16 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     @Override
     public void initWatch() {
-        VhallSDK.getInstance().initWatch(params.id,  "test", "test@vhall.com", VhallApplication.user_vhall_id, params.k, getWatchLive(), new VhallSDK.RequestCallback() {
+        VhallSDK.getInstance().initWatch(params.id, "test", "test@vhall.com", VhallApplication.user_vhall_id, params.k, getWatchLive(), new VhallSDK.RequestCallback() {
             @Override
-            public void success() {
+            public void onSuccess() {
                 liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
+                chatView.clearChatData();
                 getChatHistory();
             }
 
             @Override
-            public void failed(int errorCode, String msg) {
+            public void onError(int errorCode, String msg) {
                 Toast.makeText(VhallApplication.getApp(), msg, Toast.LENGTH_SHORT).show();
             }
 
@@ -249,6 +252,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     liveView.setPlayPicture(isWatching);
                     break;
                 case WatchLive.STATE_BUFFER_START:
+                    Log.e(TAG, "STATE_BUFFER_START  ");
                     if (isWatching)
                         liveView.showLoading(true);
                     break;

@@ -72,6 +72,15 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        /** 初始化Dialog*/
+        mProcessDialog = new ProgressDialog(activity);
+        mProcessDialog.setCancelable(true);
+        mProcessDialog.setCanceledOnTouchOutside(false);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.watch_live_fragment, container, false);
@@ -110,10 +119,6 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
         btn_change_scaletype = (Button) root.findViewById(R.id.btn_change_scaletype);
         btn_change_scaletype.setOnClickListener(this);
-        /** 初始化Dialog*/
-        mProcessDialog = new ProgressDialog(this.getActivity());
-        mProcessDialog.setCancelable(true);
-        mProcessDialog.setCanceledOnTouchOutside(false);
         mPresenter.start();
     }
 
@@ -143,10 +148,11 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
     @Override
     public void showLoading(boolean isShow) {
-        if (isShow) {
-            mProcessDialog.show();
-        } else {
+        if (mProcessDialog != null) {
             mProcessDialog.dismiss();
+            if (isShow) {
+                mProcessDialog.show();
+            }
         }
     }
 
@@ -251,13 +257,14 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
                         .setTitle(lotteryStr)
                         .setItems(nameList, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(DialogInterface dialog, int which) {}
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
                         })
                         .setPositiveButton("下一步", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (isLottery) {
-                                    showDialogStatus(3 , isLottery , null);
+                                    showDialogStatus(3, isLottery, null);
                                 }
                             }
                         }).create();

@@ -107,9 +107,9 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     @Override
     public void setPlayIcon(boolean isStop) {
         if (isStop) {
-            iv_play.setImageResource(R.drawable.icon_play_play);
+            iv_play.setImageResource(R.drawable.play);
         } else {
-            iv_play.setImageResource(R.drawable.icon_play_pause);
+            iv_play.setImageResource(R.drawable.pause);
         }
     }
 

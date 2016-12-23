@@ -33,7 +33,7 @@
                 android:id="@+id/iv_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/icon_play_play"
+                android:src="@drawable/play"
                 android:visibility="visible" />
 
             <SeekBar
@@ -55,9 +55,7 @@
                 android:id="@+id/iv_fullscreen"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/icon_round_fullscreen"
-
-                />
+                android:src="@drawable/icon_round_fullscreen" />
         </LinearLayout>
 
         <TextView
@@ -72,5 +70,8 @@
     <Button
         android:id="@+id/btn_changescaletype"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/bg_btn_radis_alpha"
+        android:textColor="@android:color/white" />
 </RelativeLayout>

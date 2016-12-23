@@ -19,15 +19,19 @@ public class ChatContract {
         void showToast(String content);
 
         void clearInputContent();
+
+        void clearChatData();
     }
 
     public interface ChatPresenter extends BasePresenter {
 
-        void sendChat(String text);
+        void sendChat(String text,String vhall_id);
 
         void sendQuestion(String content, String vhall_id);
 
         void onLoginReturn();
+
+        void onFreshData();
 
     }
 

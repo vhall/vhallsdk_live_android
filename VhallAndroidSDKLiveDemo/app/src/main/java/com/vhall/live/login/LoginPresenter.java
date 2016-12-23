@@ -24,14 +24,14 @@ public class LoginPresenter implements LoginContract.Presenter {
     public void login(String username, String userpass) {
         VhallSDK.getInstance().login(username, userpass, new VhallSDK.LoginResponseParamCallback() {
             @Override
-            public void success(String vhall_id, String customer_id) {
+            public void onSuccess(String vhall_id, String customer_id) {
                 VhallApplication.user_vhall_id = vhall_id;
                 VhallApplication.user_customer_id = customer_id;
                 loginView.backReslt();
             }
 
             @Override
-            public void failed(int errorCode, String reason) {
+            public void onError(int errorCode, String reason) {
                 loginView.showToast(reason);
             }
         });

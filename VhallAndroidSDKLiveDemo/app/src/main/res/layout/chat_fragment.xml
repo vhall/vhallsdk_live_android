@@ -17,14 +17,20 @@
             android:id="@+id/edit_content"
             android:layout_width="0dp"
             style="@style/broadcastOnclick"
-            android:layout_weight="0.8" />
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/btn_send_msg"
-            android:layout_width="0dp"
+            android:layout_width="50dp"
             style="@style/broadcastOnclick"
-            android:layout_weight="0.2"
             android:text="发送" />
+
+        <Button
+            android:id="@+id/btn_fresh"
+            android:layout_width="50dp"
+            style="@style/broadcastOnclick"
+            android:visibility="gone"
+            android:text="刷新" />
 
     </LinearLayout>
 
@@ -34,4 +40,5 @@
         android:layout_height="match_parent"
         android:layout_above="@id/layout_group"
         android:transcriptMode="alwaysScroll"></ListView>
+
 </RelativeLayout>
