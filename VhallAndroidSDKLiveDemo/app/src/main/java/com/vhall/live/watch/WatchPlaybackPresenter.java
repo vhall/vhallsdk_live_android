@@ -12,12 +12,11 @@ import com.vhall.business.VhallPPT;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.WatchLive;
 import com.vhall.business.WatchPlayback;
-import com.vhall.business.utils.ErrorCode;
 import com.vhall.live.VhallApplication;
 import com.vhall.live.chat.ChatContract;
 import com.vhall.live.data.Param;
 import com.vhall.live.utils.VhallUtil;
-import com.vhall.playersdk.player.impl.VhallHlsPlayer;
+import com.vhall.playersdk.player.vhallplayer.VHallPlayer;
 
 import java.util.List;
 import java.util.Timer;
@@ -207,25 +206,25 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 @Override
                 public void onStateChanged(boolean playWhenReady, int playbackState) {//播放过程中的状态信息
                     switch (playbackState) {
-                        case VhallHlsPlayer.STATE_IDLE:
+                        case VHallPlayer.STATE_IDLE:
                             Log.e(TAG, "STATE_IDLE");
                             break;
-                        case VhallHlsPlayer.STATE_PREPARING:
+                        case VHallPlayer.STATE_PREPARING:
                             Log.e(TAG, "STATE_PREPARING");
                             playbackView.showProgressbar(true);
                             break;
-                        case VhallHlsPlayer.STATE_BUFFERING:
+                        case VHallPlayer.STATE_BUFFERING:
                             Log.e(TAG, "STATE_BUFFERING");
                             playbackView.showProgressbar(true);
                             break;
-                        case VhallHlsPlayer.STATE_READY:
+                        case VHallPlayer.STATE_READY:
                             playbackView.showProgressbar(false);
                             playerDuration = getWatchPlayback().getDuration();
                             playerDurationTimeStr = VhallUtil.converLongTimeToStr(playerDuration);
                             playbackView.setSeekbarMax((int) playerDuration);
                             Log.e(TAG, "STATE_READY");
                             break;
-                        case VhallHlsPlayer.STATE_ENDED:
+                        case VHallPlayer.STATE_ENDED:
                             playbackView.showProgressbar(false);
                             Log.e(TAG, "STATE_ENDED");
                             stopPlay();
