@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="vhall_value_room_id">526390495</string>
-    <string name="vhall_value_room_token">75d22e71d4f2673cabf2e64aefb7816c</string>
+    <string name="vhall_value_room_id"></string>
+    <string name="vhall_value_room_token"></string>
 
     <string name="vhall_login_input_username"></string>
     <string name="vhall_login_input_userpass"></string>
 
-    <string name="vhall_app_key">e53f769ab2e128c9d8f3200bd739f80d</string>
-    <string name="vhall_app_secret_key">a469b1f66cdd96a73367b3908f264f56</string>
+    <string name="vhall_app_key"></string>
+    <string name="vhall_app_secret_key"></string>
 
     </resources>
