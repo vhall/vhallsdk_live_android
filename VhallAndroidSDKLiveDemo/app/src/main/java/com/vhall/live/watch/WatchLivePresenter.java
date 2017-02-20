@@ -85,7 +85,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 chatView.showToast(reason);
             }
         });
-        getWatchLive().sendChat("", null);
+//        getWatchLive().sendChat("", null);
     }
 
     @Override
