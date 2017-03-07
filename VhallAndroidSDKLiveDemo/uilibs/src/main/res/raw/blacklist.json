@@ -1,0 +1,36 @@
+{
+  "MI 4LTE" : {
+    "1080p" : {
+      "10fps" : false,
+      "15fps" : false,
+      "25fps" : false
+    },
+    "480p" : {
+      "10fps" : true,
+      "15fps" : true,
+      "25fps" : false
+    },
+    "720p" : {
+      "10fps" : true,
+      "15fps" : false,
+      "25fps" : false
+    }
+  },
+  "HUAWEI P7-L07" : {
+    "1080p" : {
+      "10fps" : false,
+      "15fps" : false,
+      "25fps" : false
+    },
+    "480p" : {
+      "10fps" : true,
+      "15fps" : true,
+      "25fps" : false
+    },
+    "720p" : {
+      "10fps" : false,
+      "15fps" : false,
+      "25fps" : false
+    }
+  }
+}

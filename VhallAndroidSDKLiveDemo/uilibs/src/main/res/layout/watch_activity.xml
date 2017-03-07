@@ -1,0 +1,184 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/contentVideo"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"></FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_detail"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.5"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <RadioGroup
+            android:id="@+id/radio_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/common_viewpager_tab_height"
+            android:background="@color/white"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_chat"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_weight="1.0"
+                android:background="@drawable/bg_radiobutton_selector"
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="聊天"
+                android:textColor="@drawable/tabs_red_color_selector"
+                android:textSize="@dimen/common_content_size_16" />
+
+            <ImageView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/common_content_color" />
+
+            <RadioButton
+                android:id="@+id/rb_doc"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_weight="1.0"
+                android:background="@drawable/bg_radiobutton_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="文档"
+                android:textColor="@drawable/tabs_red_color_selector"
+                android:textSize="@dimen/common_content_size_16" />
+
+
+            <ImageView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/common_content_color" />
+
+            <RadioButton
+                android:id="@+id/rb_question"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_weight="1.0"
+                android:background="@drawable/bg_radiobutton_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="问答"
+                android:textColor="@drawable/tabs_red_color_selector"
+                android:textSize="@dimen/common_content_size_16"
+                android:visibility="gone" />
+
+
+            <ImageView
+                android:id="@+id/image_line_show"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/common_content_color"
+                android:visibility="gone" />
+
+            <RadioButton
+                android:id="@+id/rb_detail"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_centerVertical="true"
+                android:layout_weight="1"
+                android:background="@drawable/bg_radiobutton_selector"
+                android:button="@null"
+                android:gravity="center"
+                android:padding="8dp"
+                android:text="详情"
+                android:textColor="@drawable/tabs_red_color_selector"
+                android:textSize="@dimen/common_content_size_16" />
+
+
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/layout_only_notice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#f5f5f5"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:src="@drawable/vhall_icon_notice" />
+
+            <com.vhall.uilibs.util.MarqueeView
+                android:id="@+id/mMarqueeView"
+                android:layout_width="0dp"
+                android:layout_height="30dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:padding="3dp"
+                app:direction="left"
+                app:isRepeat="true"
+                app:startPoint="end"
+                app:textSize="14sp"
+                app:textcolor="#646464" />
+
+            <ImageView
+                android:id="@+id/image_marquee_close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="performMarqueeClose"
+                android:padding="10dp"
+                android:src="@drawable/vhall_icon_marquee_close" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/contentChat"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"></FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/contentDoc"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"></FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/contentQuestion"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"></FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/contentDetail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"></FrameLayout>
+
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+</LinearLayout>

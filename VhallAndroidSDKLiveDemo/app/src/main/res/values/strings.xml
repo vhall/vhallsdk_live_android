@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_settings">Settings</string>
+    <string name="vhall_copyright">Copyright (c) 2017Vhall.All rights reserved.</string>
+    <string name="app_name">微吼小直播</string>
+    <string name="vhall_hint">用 直 播 创 造 价 值</string>
+    <string name="login">登 录</string>
+    <string name="app_set">参数设置</string>
+    <string name="app_title_hint">使用聊天、问答等功能必须登录</string>
+    <string name="app_settings_str_broadcast">直播设置</string>
+    <string name="app_settings_str_watch">观看直播/回放</string>
+    <string name="app_settings_string_token">直播Token</string>
+    <string name="app_settings_string_id">活动ID</string>
+    <string name="app_settings_string_dp">分辨率</string>
+    <string name="app_settings_string_code">视频码率(kbps)</string>
+    <string name="app_settings_string_framerate">视频帧率(fps)</string>
+    <string name="app_settings_string_k">K值</string>
+    <string name="app_settings_string_delay">缓冲时间</string>
+
+    <string name="setting_otherset">其他设置</string>
+    <string name="setting_userid">用户ID</string>
+    <string name="setting_nickname">昵称</string>
+
+    <string name="regist_phone_number">注册热线：%1$s</string>
+    <string name="phone_number">400-682-6882</string>
+    <string name="phone_number_uri">tel:%1$s</string>
+    <string name="cancel">取消</string>
+    <string name="delete">删除</string>
+    <string name="call">拨打</string>
+
+</resources>

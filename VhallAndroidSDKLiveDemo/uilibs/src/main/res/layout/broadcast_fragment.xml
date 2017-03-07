@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.vinny.vinnylive.CameraFilterView
+        android:id="@+id/cameraview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:id="@+id/btn_publish"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="5dp"
+        android:background="@drawable/icon_start_bro" />
+
+    <LinearLayout
+        android:id="@+id/ll_fuc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:padding="5dp">
+
+            <Button
+                android:id="@+id/btn_back"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/icon_round_back"
+                android:padding="5dp" />
+
+            <TextView
+                android:id="@+id/tv_upload_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ll_fuc"
+                android:layout_marginLeft="10dp"
+                android:padding="5dp"
+                android:text="0kb/s"
+                android:textColor="#e60000" />
+
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_changeFlash"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/img_round_flash_close" />
+
+        <Button
+            android:id="@+id/btn_changeFilter"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/img_beautify" />
+
+        <Button
+            android:id="@+id/btn_changeCamera"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/img_round_camera" />
+
+        <Button
+            android:id="@+id/btn_changeAudio"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/img_round_audio_open" />
+
+    </LinearLayout>
+
+</RelativeLayout>

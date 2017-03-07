@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="6dp">
+
+    <ImageView
+        android:id="@+id/iv_chat_avatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/icon_vhall" />
+
+    <RelativeLayout
+        android:id="@+id/ll_item_chat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/tv_chat_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:layout_alignParentLeft="true"
+            android:singleLine="true"
+            android:textColor="@color/background_floating_material_dark"
+            android:padding="2dp"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/tv_chat_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_chat_name"
+            android:gravity="right"
+            android:layout_alignParentRight="true"
+            android:text="00:00"
+            android:singleLine="true"
+            android:padding="2dp"
+            android:textSize="14dp"/>
+
+        <TextView
+            android:layout_below="@id/tv_chat_name"
+            android:id="@+id/tv_chat_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="2dp"
+            android:text=""
+            android:textSize="@dimen/common_content_size_16" />
+
+    </RelativeLayout>
+
+</LinearLayout>

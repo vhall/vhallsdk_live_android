@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/layout_common_head"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:clickable="true"
+            android:onClick="backClick"
+            android:padding="10dp"
+            android:src="@drawable/icon_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:ellipsize="end"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:text="@string/app_set"
+            android:textColor="@color/gray_edit_text"
+            android:textSize="@dimen/common_title_size" />
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/pink_background"
+        android:gravity="center"
+        android:padding="@dimen/space_size_10">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@color/pink_background"
+            android:drawableLeft="@drawable/abc_icon_notice"
+            android:drawablePadding="@dimen/common_line_padding"
+            android:gravity="center"
+            android:text="@string/app_title_hint"
+            android:textColor="@color/red_deep_background" />
+
+    </LinearLayout>
+
+
+    <TextView
+        style="@style/AppBackTheme"
+        android:text="@string/app_settings_str_broadcast" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/app_settings_string_token" />
+
+        <EditText
+            android:id="@+id/et_bro_token"
+            style="@style/AppLineEditInputTheme"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/app_settings_string_id" />
+
+        <EditText
+            android:id="@+id/et_bro_id"
+            style="@style/AppLineEditInputTheme"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_settings_string_dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="right"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_hdpi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/common_line_padding"
+                android:checked="true"
+                android:text="640*480"
+                android:textSize="10dp" />
+
+            <RadioButton
+                android:id="@+id/rb_xhdpi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/common_line_padding"
+                android:text="1280*720"
+                android:textSize="10dp"
+                android:visibility="visible" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/app_settings_string_code" />
+
+        <EditText
+            android:id="@+id/et_video_bitrate"
+            style="@style/AppLineEditInputTheme"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/app_settings_string_framerate" />
+
+        <EditText
+            android:id="@+id/et_video_framerate"
+            style="@style/AppLineEditInputTheme"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5" />
+    </LinearLayout>
+
+    <TextView
+        style="@style/AppBackTheme"
+        android:text="@string/app_settings_str_watch" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/app_settings_string_id" />
+
+        <EditText
+            android:id="@+id/et_watch_id"
+            style="@style/AppLineEditInputTheme"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/app_settings_string_k" />
+
+        <EditText
+            android:id="@+id/et_key"
+            style="@style/AppLineEditInputTheme"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/app_settings_string_delay" />
+
+        <EditText
+            android:id="@+id/et_buffersecond"
+            style="@style/AppLineEditInputTheme"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7" />
+    </LinearLayout>
+
+    <TextView
+        style="@style/AppBackTheme"
+        android:text="@string/setting_otherset" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/setting_userid" />
+
+        <TextView
+            android:id="@+id/et_userid"
+            style="@style/AppLineEditInputTheme"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/setting_nickname" />
+
+        <TextView
+            android:id="@+id/et_usernickname"
+            style="@style/AppLineEditInputTheme"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7" />
+    </LinearLayout>
+
+</LinearLayout>
