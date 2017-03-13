@@ -24,7 +24,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 
-
 import com.vhall.uilibs.R;
 
 import java.lang.reflect.Field;

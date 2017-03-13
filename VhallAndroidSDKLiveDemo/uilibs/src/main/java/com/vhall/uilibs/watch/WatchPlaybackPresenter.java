@@ -13,17 +13,16 @@ import com.vhall.business.VhallPPT;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.WatchLive;
 import com.vhall.business.WatchPlayback;
+import com.vhall.playersdk.player.vhallplayer.VHallPlayer;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.chat.ChatContract;
+import com.vhall.uilibs.util.VhallUtil;
+import com.vhall.uilibs.util.emoji.InputUser;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.vhall.playersdk.player.vhallplayer.VHallPlayer;
-import com.vhall.uilibs.util.emoji.InputUser;
 
 /**
  * 观看回放的Presenter
@@ -313,5 +312,10 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     public void onFreshData() {
         pos = pos + limit;
         initCommentData(pos);
+    }
+
+    @Override
+    public void showSurvey(String surveyid) {
+
     }
 }

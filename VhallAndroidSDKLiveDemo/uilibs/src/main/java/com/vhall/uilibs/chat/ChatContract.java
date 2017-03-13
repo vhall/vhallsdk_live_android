@@ -21,7 +21,7 @@ public class ChatContract {
 
         void clearChatData();
 
-        void performSend(String content ,int chatEvent);
+        void performSend(String content, int chatEvent);
     }
 
     public interface ChatPresenter extends BasePresenter {
@@ -35,6 +35,8 @@ public class ChatContract {
         void onLoginReturn();
 
         void onFreshData();
+
+        void showSurvey(String surveyid);
 
     }
 

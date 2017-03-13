@@ -8,14 +8,13 @@ import android.support.v4.app.FragmentActivity;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.vhall.uilibs.Param;
+import com.vhall.uilibs.broadcast.BroadcastActivity;
 import com.vhall.uilibs.util.CircleImageView;
 import com.vhall.uilibs.util.VhallUtil;
-import com.vhall.uilibs.broadcast.BroadcastActivity;
 import com.vhall.uilibs.watch.WatchActivity;
 
 /**
@@ -48,7 +47,7 @@ public class MainActivity extends FragmentActivity {
                     TelephonyManager telephonyMgr = (TelephonyManager) MainActivity.this.getSystemService(TELEPHONY_SERVICE);
                     param.userVhallId = "";
                     param.userAvatar = "";
-                    param.userName = Build.BRAND + "手机用户";
+                    param.userName = Build.BRAND + getResources().getString(R.string.phone_user);
                     param.userCustomId = telephonyMgr.getDeviceId();
                     VhallApplication.setParam(param);
                     initPage();
@@ -70,9 +69,9 @@ public class MainActivity extends FragmentActivity {
         //Glide.with(this).load(param.userAvatar).placeholder(R.drawable.icon_default_avatar).into(mCircleViewAvatar);
         Glide.with(this).load(param.userAvatar).into(mCircleViewAvatar);
         if (TextUtils.isEmpty(param.userVhallId)) {
-            tv_login.setText("登录");
+            tv_login.setText(R.string.login);
         } else {
-            tv_login.setText("退出登录");
+            tv_login.setText(R.string.logoff);
             mCircleViewAvatar.setBackground(getResources().getDrawable(R.drawable.icon_default_avatar));
         }
     }

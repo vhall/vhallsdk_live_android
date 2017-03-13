@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -315,7 +314,6 @@ public class InputView {
                             params.setMargins(0,0,0,keyboardHeight);
                         }
                         contentView.setLayoutParams(params);
-                    Log.e(TAG, "rect.bottom:" + rect.bottom + "rect.top:" + rect.top + "displayHeight:" + displayHeight + "height:" + height + "keyboardHeight:" + keyboardHeight);
                     }
                 }
                 previousKeyboardHeight = keyboardHeight;

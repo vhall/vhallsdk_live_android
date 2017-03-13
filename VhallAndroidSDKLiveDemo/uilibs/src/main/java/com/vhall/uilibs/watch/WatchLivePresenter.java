@@ -9,8 +9,9 @@ import android.widget.Toast;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
-import com.vhall.business.Watch;
 import com.vhall.business.WatchLive;
+import com.vhall.business.data.Survey;
+import com.vhall.business.data.source.SurveyDataSource;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
@@ -22,7 +23,7 @@ import java.util.List;
 /**
  * 观看直播的Presenter
  */
-public class WatchLivePresenter implements WatchContract.LivePresenter, ChatContract.ChatPresenter {
+public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchContract.LivePresenter, ChatContract.ChatPresenter {
     private static final String TAG = "WatchLivePresenter";
     private Param params;
     private WatchContract.LiveView liveView;
@@ -47,6 +48,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         this.watchView = watchView;
         this.questionView = questionView;
         this.chatView = chatView;
+        this.watchView.setPresenter(this);
         this.liveView.setPresenter(this);
         this.chatView.setPresenter(this);
         this.questionView.setPresenter(this);
@@ -55,7 +57,6 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     @Override
     public void start() {
-        VhallSDK.getInstance().setLogEnable(true);
         initWatch();
     }
 
@@ -117,6 +118,25 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     @Override
     public void onFreshData() {
 
+    }
+
+    @Override
+    public void showSurvey(String surveyid) {
+        if (TextUtils.isEmpty(params.userVhallId)) {
+            liveView.showToast("请先登录！");
+            return;
+        }
+        VhallSDK.getInstance().getSurveyInfo(surveyid, new SurveyDataSource.SurveyInfoCallback() {
+            @Override
+            public void onSuccess(Survey survey) {
+                watchView.showSurvey(survey);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                chatView.showToast(errorMsg);
+            }
+        });
     }
 
     @Override
@@ -206,7 +226,6 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
                 chatView.clearChatData();
                 getChatHistory();
-
             }
 
             @Override
@@ -244,6 +263,37 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             watchLive = builder.build();
         }
         return watchLive;
+    }
+
+    //签到
+    @Override
+    public void signIn(String signId) {
+
+    }
+
+    //提交问卷 需要先登录且watch已初始化完成
+    @Override
+    public void submitSurvey(Survey survey, String result) {
+        if (survey == null)
+            return;
+        if (TextUtils.isEmpty(params.userVhallId)) {
+            liveView.showToast("请先登录！");
+            return;
+        }
+        VhallSDK.getInstance().submitSurveyInfo(params.userVhallId, getWatchLive(), survey.surveyid, result, new VhallSDK.RequestCallback() {
+            @Override
+            public void onSuccess() {
+                liveView.showToast("提交成功！");
+                watchView.dismissSurvey();
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                liveView.showToast(errorMsg);
+                if (errorCode == 10821)
+                    watchView.dismissSurvey();
+            }
+        });
     }
 
     /**
@@ -341,6 +391,13 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     }
                     break;
                 case MessageServer.EVENT_QUESTION: // 问答开关
+                    liveView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
+                    break;
+                case MessageServer.EVENT_SURVEY://问卷
+                    ChatServer.ChatInfo chatInfo = new ChatServer.ChatInfo();
+                    chatInfo.event = "survey";
+                    chatInfo.id = messageInfo.survey_id;
+                    chatView.notifyDataChanged(chatInfo);
                     break;
             }
 

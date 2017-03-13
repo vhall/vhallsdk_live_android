@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -101,11 +100,6 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
             getActivity().finish();
         } else {
         }
-    }
-
-    @Override
-    public Activity getmActivity() {
-        return mActivity;
     }
 
     @Override

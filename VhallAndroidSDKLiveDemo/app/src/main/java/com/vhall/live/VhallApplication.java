@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.telephony.TelephonyManager;
-import android.text.TextUtils;
 
 import com.vhall.business.VhallSDK;
 import com.vhall.uilibs.Param;
@@ -26,6 +25,7 @@ public class VhallApplication extends Application {
         context = this;
         getParam();
         VhallSDK.init(this, getResources().getString(R.string.vhall_app_key), getResources().getString(R.string.vhall_app_secret_key));
+        VhallSDK.setLogEnable(true);
     }
 
     public Param getParam() {
@@ -33,19 +33,19 @@ public class VhallApplication extends Application {
             param = new Param();
             SharedPreferences sp = this.getSharedPreferences("set", MODE_PRIVATE);
             TelephonyManager telephonyMgr = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
-            param.broId = sp.getString("broid", "");
-            param.broToken = sp.getString("brotoken", "");
+            param.broId = sp.getString("broid", "526390495");
+            param.broToken = sp.getString("brotoken", "afdf316cc729d070e0e4371976881b32");
             param.pixel_type = sp.getInt("pixeltype", CameraFilterView.TYPE_HDPI);
             param.videoBitrate = sp.getInt("videobitrate", 500);
             param.videoFrameRate = sp.getInt("videoframerate", 20);
 
-            param.watchId = sp.getString("watchid", "");
+            param.watchId = sp.getString("watchid", "526390495");
             param.key = sp.getString("key", "");
             param.bufferSecond = sp.getInt("buffersecond", 2);
 
             param.userVhallId = sp.getString("uservhallid", "");
             param.userCustomId = sp.getString("usercustomid", telephonyMgr.getDeviceId());
-            param.userName = sp.getString("username", Build.BRAND + "手机用户");
+            param.userName = sp.getString("username", Build.BRAND + getString(R.string.phone_user));
             param.userAvatar = sp.getString("useravatar", "");
 
         }

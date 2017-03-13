@@ -8,15 +8,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.chat.ChatFragment;
+import com.vhall.uilibs.util.ActivityUtils;
+import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
-import com.vhall.uilibs.watch.WatchActivity;
 
 
 /**
@@ -53,7 +52,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             @Override
             public void onSendClick(String msg, InputUser user) {
                 if (chatFragment != null)
-                    chatFragment.performSend(msg , ChatFragment.CHAT_EVENT_CHAT);
+                    chatFragment.performSend(msg, ChatFragment.CHAT_EVENT_CHAT);
             }
         });
         inputView.setOnHeightReceivedListener(new InputView.KeyboardHeightListener() {
@@ -61,10 +60,8 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             public void onHeightReceived(int screenOri, int height) {
                 if (screenOri == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                     KeyBoardManager.setKeyboardHeight(BroadcastActivity.this, height);
-//                    app.getParameterManager().setKeyboardHeightProtrait(height);
                 } else {
                     KeyBoardManager.setKeyboardHeightLandspace(BroadcastActivity.this, height);
-//                    app.getParameterManager().setKeyboardHeightLandSpace(height);
                 }
             }
         });
@@ -115,7 +112,6 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
         if (view.getVisibility() == View.GONE)
             return false;
         int[] leftTop = {0, 0};
-        //获取输入框当前的location位置
         inputView.getContentView().getLocationInWindow(leftTop);
         int left = leftTop[0];
         int top = leftTop[1];

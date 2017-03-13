@@ -3,6 +3,8 @@ package com.vhall.uilibs.watch;
 import android.app.Activity;
 import android.widget.SeekBar;
 
+import com.vhall.business.MessageServer;
+import com.vhall.business.data.Survey;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
@@ -15,7 +17,7 @@ import java.util.HashMap;
  */
 public class WatchContract {
 
-    interface WatchView extends BaseView<BasePresenter> {
+    interface WatchView extends BaseView<WatchPresenter> {
         void setShowDetail(boolean isShow);
 
         void showNotice(String content);
@@ -23,10 +25,16 @@ public class WatchContract {
         void showSingIn(String signId, int startTime);
 
         void showChatView(boolean emoji, InputUser user, int limit);
+
+        void showSurvey(Survey survey);
+
+        void dismissSurvey();
     }
 
     interface DocumentView extends BaseView<BasePresenter> {
         void showDoc(String docUrl);
+
+        void rePainBoard(MessageServer.MsgInfo msgInfo);
     }
 
     interface DetailView extends BaseView<BasePresenter> {
@@ -124,7 +132,12 @@ public class WatchContract {
         int getCurrentPixel();
 
         int getScaleType();
+    }
 
+    interface WatchPresenter extends BasePresenter {
 
+        void signIn(String signId);
+
+        void submitSurvey(Survey survey, String result);
     }
 }

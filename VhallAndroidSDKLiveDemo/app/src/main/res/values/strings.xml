@@ -6,6 +6,8 @@
     <string name="app_name">微吼小直播</string>
     <string name="vhall_hint">用 直 播 创 造 价 值</string>
     <string name="login">登 录</string>
+    <string name="login_success">登录成功</string>
+    <string name="logoff">退出登录</string>
     <string name="app_set">参数设置</string>
     <string name="app_title_hint">使用聊天、问答等功能必须登录</string>
     <string name="app_settings_str_broadcast">直播设置</string>
@@ -28,5 +30,7 @@
     <string name="cancel">取消</string>
     <string name="delete">删除</string>
     <string name="call">拨打</string>
+
+    <string name="phone_user">手机用户</string>
 
 </resources>

@@ -26,7 +26,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     private boolean isPublishing = false;
     private boolean isFinish = true;
 
-    public BroadcastPresenter(Param params,BroadcastContract.BraodcastView mBraodcastView , BroadcastContract.View mView, ChatContract.ChatView chatView) {
+    public BroadcastPresenter(Param params, BroadcastContract.BraodcastView mBraodcastView , BroadcastContract.View mView, ChatContract.ChatView chatView) {
         this.param = params;
         this.mView = mView;
         this.mBraodcastView = mBraodcastView;
@@ -40,7 +40,6 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         //初始化，必须
         mView.initCamera(param.pixel_type);
         getBroadcast().setAudioing(true);
-        VhallSDK.getInstance().setLogEnable(true);
     }
 
 
@@ -186,6 +185,11 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void onFreshData() {
+
+    }
+
+    @Override
+    public void showSurvey(String surveyid) {
 
     }
 

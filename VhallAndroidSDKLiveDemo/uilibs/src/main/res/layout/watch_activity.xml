@@ -14,7 +14,7 @@
         android:id="@+id/ll_detail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.5"
+        android:layout_weight="1.8"
         android:orientation="vertical"
         android:visibility="visible">
 

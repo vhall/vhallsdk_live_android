@@ -4,12 +4,11 @@ import android.app.AlertDialog;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
-import android.inputmethodservice.Keyboard;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -24,13 +23,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vhall.business.VhallSDK;
-import com.vhall.uilibs.util.ActivityUtils;
-import com.vhall.uilibs.BasePresenter;
+import com.vhall.business.data.Survey;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.util.MarqueeView;
-import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.chat.ChatFragment;
+import com.vhall.uilibs.util.ActivityUtils;
+import com.vhall.uilibs.util.MarqueeView;
+import com.vhall.uilibs.util.SurveyPopu;
+import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
@@ -57,11 +57,13 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     public WatchLiveFragment liveFragment;
     private AlertDialog alertDialog;
     public ChatFragment chatFragment;
-    public ChatFragment questionFragment ;
-    public String  mNoticeContentStr ;
+    public ChatFragment questionFragment;
+    public String mNoticeContentStr;
     InputView inputView;
     public int chatEvent = ChatFragment.CHAT_EVENT_CHAT;
     private boolean isClickNoticeClose = false;  //是否点击公告关闭按钮
+    WatchContract.WatchPresenter mPresenter;
+    SurveyPopu popu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,10 +160,10 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         inputView.setOnSendClickListener(new InputView.SendMsgClickListener() {
             @Override
             public void onSendClick(String msg, InputUser user) {
-                if (chatFragment != null && chatEvent == ChatFragment.CHAT_EVENT_CHAT){
-                    chatFragment.performSend(msg , chatEvent);
+                if (chatFragment != null && chatEvent == ChatFragment.CHAT_EVENT_CHAT) {
+                    chatFragment.performSend(msg, chatEvent);
                 } else if (questionFragment != null && chatEvent == ChatFragment.CHAT_EVENT_QUESTION) {
-                    questionFragment.performSend(msg , chatEvent);
+                    questionFragment.performSend(msg, chatEvent);
                 }
             }
         });
@@ -170,10 +172,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             public void onHeightReceived(int screenOri, int height) {
                 if (screenOri == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                     KeyBoardManager.setKeyboardHeight(WatchActivity.this, height);
-//                    app.getParameterManager().setKeyboardHeightProtrait(height);
                 } else {
                     KeyBoardManager.setKeyboardHeightLandspace(WatchActivity.this, height);
-//                    app.getParameterManager().setKeyboardHeightLandSpace(height);
                 }
             }
         });
@@ -233,6 +233,27 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         if (contentLengthLimit > 0)
             inputView.setLimitNo(contentLengthLimit);
         inputView.show(isShowEmoji, user);
+    }
+
+    @Override
+    public void showSurvey(Survey survey) {
+        if (popu == null) {
+            popu = new SurveyPopu(this);
+            popu.setOnSubmitClickListener(new SurveyPopu.OnSubmitClickListener() {
+                @Override
+                public void onSubmitClick(Survey survey1, String result) {
+                    mPresenter.submitSurvey(survey1, result);
+                }
+            });
+        }
+        popu.setSurvey(survey);
+        popu.showAtLocation(getWindow().getDecorView().findViewById(android.R.id.content), Gravity.NO_GRAVITY, 0, 0);
+    }
+
+    @Override
+    public void dismissSurvey() {
+        if (popu != null)
+            popu.dismiss();
     }
 
     @Override
@@ -337,7 +358,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
-    public void setPresenter(BasePresenter presenter) {
+    public void setPresenter(WatchContract.WatchPresenter presenter) {
+        mPresenter = presenter;
     }
 
     /* 定义一个倒计时的内部类 */

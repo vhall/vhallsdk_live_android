@@ -9,12 +9,12 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.UserInfo;
+import com.vhall.business.data.source.UserInfoDataSource;
 import com.vhall.uilibs.Param;
 
 /**
@@ -36,10 +36,10 @@ public class LoginActivity extends Activity {
     }
 
     public void login(String username, String userpass) {
-        VhallSDK.getInstance().login(username, userpass, new VhallSDK.LoginResponseParamCallback() {
+        VhallSDK.getInstance().login(username, userpass, new UserInfoDataSource.UserInfoCallback() {
             @Override
             public void onSuccess(UserInfo userInfo) {
-                Toast.makeText(LoginActivity.this, "登陆成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
                 if (userInfo != null) {
                     Param param = VhallApplication.param;
                     param.userAvatar = userInfo.avatar;

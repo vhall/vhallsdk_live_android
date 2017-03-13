@@ -1,18 +1,13 @@
 package com.vhall.uilibs.chat;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Spannable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -24,10 +19,6 @@ import com.vhall.business.ChatServer;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
-import com.vhall.uilibs.util.emoji.InputUser;
-import com.vhall.uilibs.util.emoji.InputView;
-import com.vhall.uilibs.util.emoji.KeyBoardManager;
-import com.vhall.uilibs.watch.WatchActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +30,9 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
 
     public static final int CHAT_EVENT_CHAT = 1;
     public static final int CHAT_EVENT_QUESTION = 2;
+
+    public static final int CHAT_NORMAL = 0x00;
+    public static final int CHAT_SURVEY = 0x01;
     private ChatContract.ChatPresenter mPresenter;
     public final int RequestLogin = 0;
     ListView lv_chat;
@@ -133,8 +127,8 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
 
     @Override
     public void showToast(String content) {
-        if(this.isAdded())
-        Toast.makeText(getActivity(), content, Toast.LENGTH_SHORT).show();
+        if (this.isAdded())
+            Toast.makeText(getActivity(), content, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -181,6 +175,20 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     class ChatAdapter extends BaseAdapter {
 
         @Override
+        public int getItemViewType(int position) {
+            if ("survey".equals(chatData.get(position).event)) {
+                return CHAT_SURVEY;
+            } else {
+                return CHAT_NORMAL;
+            }
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 2;
+        }
+
+        @Override
         public int getCount() {
             return chatData.size();
         }
@@ -196,37 +204,59 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
-            if (convertView == null) {
-                convertView = View.inflate(getActivity(), R.layout.chat_item, null);
-                viewHolder = new ViewHolder();
-                viewHolder.iv_chat_avatar = (ImageView) convertView.findViewById(R.id.iv_chat_avatar);
-                viewHolder.tv_chat_content = (TextView) convertView.findViewById(R.id.tv_chat_content);
-                viewHolder.tv_chat_name = (TextView) convertView.findViewById(R.id.tv_chat_name);
-                viewHolder.tv_chat_time = (TextView) convertView.findViewById(R.id.tv_chat_time);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
+            ChatSurveyHolder surveyHolder;
+            final ChatServer.ChatInfo data = chatData.get(position);
+            switch (getItemViewType(position)) {
+                case CHAT_NORMAL:
+                    if (convertView == null) {
+                        convertView = View.inflate(getActivity(), R.layout.chat_item, null);
+                        viewHolder = new ViewHolder();
+                        viewHolder.iv_chat_avatar = (ImageView) convertView.findViewById(R.id.iv_chat_avatar);
+                        viewHolder.tv_chat_content = (TextView) convertView.findViewById(R.id.tv_chat_content);
+                        viewHolder.tv_chat_name = (TextView) convertView.findViewById(R.id.tv_chat_name);
+                        viewHolder.tv_chat_time = (TextView) convertView.findViewById(R.id.tv_chat_time);
+                        convertView.setTag(viewHolder);
+                    } else {
+                        viewHolder = (ViewHolder) convertView.getTag();
+                    }
+
+                    Glide.with(getActivity()).load(data.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_chat_avatar);
+                    switch (data.event) {
+                        case ChatServer.eventMsgKey:
+                            viewHolder.tv_chat_content.setVisibility(View.VISIBLE);
+                            viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.msgData.text), TextView.BufferType.SPANNABLE);
+                            viewHolder.tv_chat_name.setText(data.user_name);
+                            break;
+                        case ChatServer.eventOnlineKey:
+                            viewHolder.tv_chat_name.setText(data.user_name + "上线了！");
+                            viewHolder.tv_chat_content.setVisibility(View.INVISIBLE);
+                            break;
+                        case ChatServer.eventOfflineKey:
+                            viewHolder.tv_chat_name.setText(data.user_name + "下线了！");
+                            viewHolder.tv_chat_content.setVisibility(View.INVISIBLE);
+                            break;
+                    }
+                    viewHolder.tv_chat_time.setText(data.time);
+                    break;
+                case CHAT_SURVEY:
+                    if (convertView == null) {
+                        convertView = View.inflate(getActivity(), R.layout.chat_item_survey, null);
+                        surveyHolder = new ChatSurveyHolder();
+                        surveyHolder.tv_join = (TextView) convertView.findViewById(R.id.tv_join);
+                        convertView.setTag(surveyHolder);
+                    } else {
+                        surveyHolder = (ChatSurveyHolder) convertView.getTag();
+                    }
+                    surveyHolder.tv_join.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mPresenter.showSurvey(data.id);
+                        }
+                    });
+                    break;
             }
-            ChatServer.ChatInfo data = chatData.get(position);
-            Glide.with(getActivity()).load(data.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_chat_avatar);
-            switch (data.event) {
-                case ChatServer.eventMsgKey:
-                    viewHolder.tv_chat_content.setVisibility(View.VISIBLE);
-                    viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.msgData.text), TextView.BufferType.SPANNABLE);
-                    viewHolder.tv_chat_name.setText(data.user_name);
-                    break;
-                case ChatServer.eventOnlineKey:
-                    viewHolder.tv_chat_name.setText(data.user_name + "上线了！");
-                    viewHolder.tv_chat_content.setVisibility(View.INVISIBLE);
-                    break;
-                case ChatServer.eventOfflineKey:
-                    viewHolder.tv_chat_name.setText(data.user_name + "下线了！");
-                    viewHolder.tv_chat_content.setVisibility(View.INVISIBLE);
-                    break;
-            }
-            viewHolder.tv_chat_time.setText(data.time);
             return convertView;
         }
     }
@@ -292,6 +322,10 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
         TextView tv_chat_content;
         TextView tv_chat_name;
         TextView tv_chat_time;
+    }
+
+    static class ChatSurveyHolder {
+        TextView tv_join;
     }
 
     static class Holder {

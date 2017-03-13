@@ -1,7 +1,5 @@
 package com.vhall.uilibs.broadcast;
 
-import android.app.Activity;
-
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
@@ -17,8 +15,6 @@ public class BroadcastContract {
     }
 
     interface View extends BaseView<Presenter> {
-        //        CameraFilterView getCameraView();
-        Activity getmActivity();
 
         CameraFilterView getCameraView();
 
