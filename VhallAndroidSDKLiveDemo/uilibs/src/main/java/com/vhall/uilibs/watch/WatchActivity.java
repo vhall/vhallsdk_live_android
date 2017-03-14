@@ -1,34 +1,26 @@
 package com.vhall.uilibs.watch;
 
-import android.app.AlertDialog;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
-import android.text.TextUtils;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.vhall.business.VhallSDK;
 import com.vhall.business.data.Survey;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.ActivityUtils;
-import com.vhall.uilibs.util.MarqueeView;
+import com.vhall.uilibs.util.ExtendTextView;
+import com.vhall.uilibs.util.SignInDialog;
 import com.vhall.uilibs.util.SurveyPopu;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
@@ -40,30 +32,27 @@ import com.vhall.uilibs.util.emoji.KeyBoardManager;
  * 观看页的Activity
  */
 public class WatchActivity extends FragmentActivity implements WatchContract.WatchView {
+
     private FrameLayout contentDoc, contentDetail, contentChat, contentQuestion;
     private RadioGroup radio_tabs;
-    private RadioButton chatRadioButton, questionRadioButton;
+    private RadioButton questionBtn, chatBtn;
     private LinearLayout ll_detail;
-    private LinearLayout mLayoutOnlyNotice;
-    private ImageView image_line_show;
-    private ImageView mImageSignClose;
-    private MarqueeView mMarqueeNotice;
-    private TextView mTextSignInContent;
+    ExtendTextView tv_notice;
     private Param param;
-    private String mSignId;
-    private MyCount myCount;
     private int type;
+
     public WatchPlaybackFragment playbackFragment;
     public WatchLiveFragment liveFragment;
-    private AlertDialog alertDialog;
     public ChatFragment chatFragment;
     public ChatFragment questionFragment;
-    public String mNoticeContentStr;
+
+
     InputView inputView;
     public int chatEvent = ChatFragment.CHAT_EVENT_CHAT;
-    private boolean isClickNoticeClose = false;  //是否点击公告关闭按钮
+    private SurveyPopu popu;
+    private SignInDialog signInDialog;
+
     WatchContract.WatchPresenter mPresenter;
-    SurveyPopu popu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,20 +171,28 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         contentDetail = (FrameLayout) findViewById(R.id.contentDetail);
         contentChat = (FrameLayout) findViewById(R.id.contentChat);
         contentQuestion = (FrameLayout) findViewById(R.id.contentQuestion);
-        chatRadioButton = (RadioButton) findViewById(R.id.rb_chat);
-        questionRadioButton = (RadioButton) findViewById(R.id.rb_question);
-        image_line_show = (ImageView) findViewById(R.id.image_line_show);
-        mLayoutOnlyNotice = (LinearLayout) findViewById(R.id.layout_only_notice);
 
-        mMarqueeNotice = (MarqueeView) findViewById(R.id.mMarqueeView);
+        questionBtn = (RadioButton) this.findViewById(R.id.rb_question);
+        chatBtn = (RadioButton) this.findViewById(R.id.rb_chat);
+
+        tv_notice = (ExtendTextView) this.findViewById(R.id.tv_notice);
+        tv_notice.setDrawableClickListener(new ExtendTextView.DrawableClickListener() {
+            @Override
+            public void onDrawableClick(int position) {
+                switch (position) {
+                    case ExtendTextView.DRAWABLE_RIGHT:
+                        dismissNotice();
+                        break;
+                }
+            }
+        });
         if (type == VhallUtil.WATCH_LIVE) {
-            questionRadioButton.setVisibility(View.VISIBLE);
+            questionBtn.setVisibility(View.VISIBLE);
             contentChat.setVisibility(View.VISIBLE);
-            image_line_show.setVisibility(View.VISIBLE);
-            chatRadioButton.setText("聊天");
+            chatBtn.setText("聊天");
         }
         if (type == VhallUtil.WATCH_PLAYBACK) {
-            chatRadioButton.setText("评论");
+            chatBtn.setText("评论");
             contentChat.setVisibility(View.VISIBLE);
         }
         radio_tabs = (RadioGroup) findViewById(R.id.radio_tabs);
@@ -236,6 +233,28 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
+    public void showSignIn(String signId, int startTime) {
+        if (signInDialog == null) {
+            signInDialog = new SignInDialog(this);
+        }
+        signInDialog.setSignInId(signId);
+        signInDialog.setCountDownTime(startTime);
+        signInDialog.setOnSignInClickListener(new SignInDialog.OnSignInClickListener() {
+            @Override
+            public void signIn(String signId) {
+                mPresenter.signIn(signId);
+            }
+        });
+        signInDialog.show();
+    }
+
+    @Override
+    public void dismissSignIn() {
+        if (signInDialog != null)
+            signInDialog.dismiss();
+    }
+
+    @Override
     public void showSurvey(Survey survey) {
         if (popu == null) {
             popu = new SurveyPopu(this);
@@ -260,32 +279,20 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     public void setShowDetail(boolean isShow) {
         if (isShow) {
             ll_detail.setVisibility(View.VISIBLE);
-            if (!isClickNoticeClose) {
-                if (!TextUtils.isEmpty(mNoticeContentStr)) {
-                    mLayoutOnlyNotice.setVisibility(View.VISIBLE);
-                    mMarqueeNotice.setVisibility(View.VISIBLE);
-                    mMarqueeNotice.setText(mNoticeContentStr);
-                    mMarqueeNotice.startScroll();
-                }
-            }
         } else {
             ll_detail.setVisibility(View.GONE);
-            mMarqueeNotice.setVisibility(View.GONE);
-            mMarqueeNotice.stopScroll();
-            mLayoutOnlyNotice.setVisibility(View.GONE);
         }
     }
 
     @Override
     public void showNotice(String content) {
-        this.mNoticeContentStr = content;
-        isClickNoticeClose = false;
-        if (!TextUtils.isEmpty(content) && getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mLayoutOnlyNotice.setVisibility(View.VISIBLE);
-            mMarqueeNotice.setVisibility(View.VISIBLE);
-            mMarqueeNotice.setText(content);
-            mMarqueeNotice.startScroll();
-        }
+        tv_notice.setText(content);
+        tv_notice.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void dismissNotice() {
+        tv_notice.setVisibility(View.GONE);
     }
 
     @Override
@@ -309,52 +316,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
-    public void showSingIn(String signId, final int startTime) {
-        this.mSignId = signId;
-        LayoutInflater inflater = getLayoutInflater();
-        View dialog = inflater.inflate(R.layout.alert_dialog_show_signin, (ViewGroup) findViewById(R.id.dialog));
-        mImageSignClose = (ImageView) dialog.findViewById(R.id.image_signin_close);
-        mImageSignClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-        mTextSignInContent = (TextView) dialog.findViewById(R.id.tv_signin_content);
-        alertDialog = new AlertDialog.Builder(this).setView(dialog).create();
-        alertDialog.setCanceledOnTouchOutside(false); //点击外部不消失
-        alertDialog.show();
-        myCount = new MyCount(startTime * 1000, 100);
-        myCount.start();
-    }
-
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
-        close();
-    }
-
-    public void performOnclickSignIn(View view) {
-        VhallSDK.getInstance().performSignIn(param.watchId, param.userVhallId, param.userName, mSignId, new VhallSDK.RequestCallback() {
-            @Override
-            public void onSuccess() {
-                close();
-                Toast.makeText(WatchActivity.this, "签到成功", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(int errorCode, String errorMsg) {
-                Toast.makeText(WatchActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public void performMarqueeClose(View view) {
-        if (mLayoutOnlyNotice.getVisibility() == View.VISIBLE) {
-            mLayoutOnlyNotice.setVisibility(View.GONE);
-            isClickNoticeClose = true;
-        }
     }
 
     @Override
@@ -362,41 +325,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         mPresenter = presenter;
     }
 
-    /* 定义一个倒计时的内部类 */
-    class MyCount extends CountDownTimer {
-
-        public MyCount(long millisInFuture, long countDownInterval) {
-            super(millisInFuture, countDownInterval);
-        }
-
-        @Override
-        public void onFinish() {
-            Toast.makeText(WatchActivity.this, "签到已结束", Toast.LENGTH_SHORT).show();
-            close();
-        }
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-            mTextSignInContent.setText("您有" + millisUntilFinished / 1000 + "秒的时间进行签到");
-        }
-    }
-
-    public void close() {
-        if (alertDialog != null) {
-            alertDialog.dismiss();
-        }
-        if (myCount != null) {
-            myCount.cancel();
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
-        if (!TextUtils.isEmpty(mNoticeContentStr) && mMarqueeNotice != null) {
-            mMarqueeNotice.setText(mNoticeContentStr);
-            mMarqueeNotice.startScroll();
-        }
     }
 
 

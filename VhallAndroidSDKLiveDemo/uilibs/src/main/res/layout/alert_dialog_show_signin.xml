@@ -10,7 +10,6 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -47,10 +46,10 @@
     　　
 
     <Button
+        android:id="@+id/btn_signin"
         style="@style/BaseAppButtonForRed"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_margin="@dimen/common_margin_size_10"
-        android:onClick="performOnclickSignIn"
         android:text="签到" />
 </LinearLayout>

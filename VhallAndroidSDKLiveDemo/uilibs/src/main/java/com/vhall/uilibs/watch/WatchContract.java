@@ -18,13 +18,18 @@ import java.util.HashMap;
 public class WatchContract {
 
     interface WatchView extends BaseView<WatchPresenter> {
+
         void setShowDetail(boolean isShow);
+
+        void showChatView(boolean emoji, InputUser user, int limit);
 
         void showNotice(String content);
 
-        void showSingIn(String signId, int startTime);
+        void dismissNotice();
 
-        void showChatView(boolean emoji, InputUser user, int limit);
+        void showSignIn(String signId, int startTime);
+
+        void dismissSignIn();
 
         void showSurvey(Survey survey);
 

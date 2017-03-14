@@ -268,7 +268,18 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     //签到
     @Override
     public void signIn(String signId) {
+        VhallSDK.getInstance().performSignIn(params.watchId, params.userVhallId, params.userName, signId, new VhallSDK.RequestCallback() {
+            @Override
+            public void onSuccess() {
+                liveView.showToast("签到成功");
+                watchView.dismissSignIn();
+            }
 
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                liveView.showToast(errorMsg);
+            }
+        });
     }
 
     //提交问卷 需要先登录且watch已初始化完成
@@ -387,7 +398,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
                     break;
                 case MessageServer.EVENT_SIGNIN: //签到消息
                     if (!TextUtils.isEmpty(messageInfo.sign_id) && !TextUtils.isEmpty(messageInfo.sign_show_time)) {
-                        watchView.showSingIn(messageInfo.sign_id, parseTime(messageInfo.sign_show_time, 30));
+                        watchView.showSignIn(messageInfo.sign_id, parseTime(messageInfo.sign_show_time, 30));
                     }
                     break;
                 case MessageServer.EVENT_QUESTION: // 问答开关
