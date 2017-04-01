@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -286,6 +287,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     @Override
     public void showNotice(String content) {
+        if (TextUtils.isEmpty(content))
+            return;
         tv_notice.setText(content);
         tv_notice.setVisibility(View.VISIBLE);
     }

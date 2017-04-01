@@ -27,14 +27,15 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vhall.business.MessageServer;
 import com.vhall.business.WatchLive;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import master.flame.danmaku.controller.IDanmakuView;
@@ -361,9 +362,21 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     }
 
     @Override
-    public void showDialogStatus(int level, final boolean isLottery, String[] nameList) {
+    public void showDialogStatus(int level, final List<MessageServer.Lottery> lotteries) {
         if (alertDialog != null) {
             alertDialog.cancel();
+        }
+
+        MessageServer.Lottery lottery = null;
+        String[] nameList = null;
+        if (lotteries != null && lotteries.size() > 0) {
+            nameList = new String[lotteries.size()];
+            for (int i = 0; i < lotteries.size(); i++) {
+                nameList[i] = lotteries.get(i).nick_name;
+                if (lotteries.get(i).isSelf) {
+                    lottery = lotteries.get(i);
+                }
+            }
         }
         switch (level) {
             case 1:
@@ -374,10 +387,12 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
                 alertDialog.show();
                 break;
             case 2:
-                if (isLottery) {
+                if (lottery != null) {
                     lotteryStr = "恭喜您,中奖了";
                 } else
                     lotteryStr = "有点遗憾,这次没中";
+
+                final MessageServer.Lottery finalLottery = lottery;
                 alertDialog = new AlertDialog.Builder(this.getActivity())
                         .setTitle(lotteryStr)
                         .setItems(nameList, new DialogInterface.OnClickListener() {
@@ -388,8 +403,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
                         .setPositiveButton("下一步", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                if (isLottery) {
-                                    showDialogStatus(3, isLottery, null);
+                                if (finalLottery != null) {
+                                    showDialogStatus(3, lotteries);
                                 }
                             }
                         }).create();
@@ -401,6 +416,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
                 final EditText submitNickname = (EditText) submitView.findViewById(R.id.lottery_submit_nickname);
                 final EditText submitPhone = (EditText) submitView.findViewById(R.id.lottery_submit_phone);
 
+                final MessageServer.Lottery finalLottery1 = lottery;
                 alertDialog = new AlertDialog.Builder(this.getActivity())
                         .setTitle("请提供您的信息")
                         .setView(submitView)
@@ -410,12 +426,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
                                 final String submitNicknameStr = submitNickname.getText().toString();
                                 final String submitPhoneStr = submitPhone.getText().toString();
                                 if (!TextUtils.isEmpty(submitNicknameStr) && !TextUtils.isEmpty(submitPhoneStr)) {
-                                    if (VhallUtil.IsPhone(submitPhoneStr)) {
-                                        mPresenter.submitLotteryInfo(submitNicknameStr, submitPhoneStr);
-                                    } else {
-                                        showToast("手机号填写错误");
-                                        return;
-                                    }
+                                    mPresenter.submitLotteryInfo(finalLottery1.id, finalLottery1.lottery_id, submitNicknameStr, submitPhoneStr);
                                 } else {
                                     showToast("请填写信息");
                                     return;

@@ -9,7 +9,7 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.vhall.business.ChatServer;
-import com.vhall.business.VhallPPT;
+import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.WatchLive;
 import com.vhall.business.WatchPlayback;
@@ -34,16 +34,14 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     WatchContract.DocumentView documentView;
     WatchContract.WatchView watchView;
     ChatContract.ChatView chatView;
-    private int limit = 5;
-    private int pos = 0;
-
-
     private WatchPlayback watchPlayback;
-    private VhallPPT ppt;
 
     int[] scaleTypeList = new int[]{WatchLive.FIT_DEFAULT, WatchLive.FIT_CENTER_INSIDE, WatchLive.FIT_X, WatchLive.FIT_Y, WatchLive.FIT_XY};
     int currentPos = 0;
     private int scaleType = WatchLive.FIT_DEFAULT;
+
+    private int limit = 5;
+    private int pos = 0;
 
     private long playerCurrentPosition = 0L;
     private long playerDuration;
@@ -57,13 +55,9 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             if (getWatchPlayback().isPlaying()) {
                 playerCurrentPosition = getWatchPlayback().getCurrentPosition();
                 playbackView.setSeekbarCurrentPosition((int) playerCurrentPosition);
-                String playerCurrentPositionStr = VhallUtil.converLongTimeToStr(playerCurrentPosition);
-                //playbackView.setProgressLabel(playerCurrentPositionStr + "/" + playerDurationTimeStr);
-                playbackView.setProgressLabel(playerCurrentPositionStr, playerDurationTimeStr);
-                if (ppt != null) {
-                    String url = ppt.getPPT(playerCurrentPosition / 1000);
-                    documentView.showDoc(url);
-                }
+//                String playerCurrentPositionStr = VhallUtil.converLongTimeToStr(playerCurrentPosition);
+//                //playbackView.setProgressLabel(playerCurrentPositionStr + "/" + playerDurationTimeStr);
+//                playbackView.setProgressLabel(playerCurrentPositionStr, playerDurationTimeStr);
             }
         }
     };
@@ -103,7 +97,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             @Override
             public void onSuccess() {
                 handlePosition();
-                setPPT();
                 pos = 0;
                 initCommentData(pos);
                 watchView.showNotice(getWatchPlayback().getNotice()); //显示公告
@@ -127,6 +120,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             timer.cancel();
             timer = null;
         }
+        getWatchPlayback().destory();
     }
 
     @Override
@@ -165,8 +159,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        Log.e(TAG, "VhallUtil.converLongTimeToStr(progress) " + VhallUtil.converLongTimeToStr(progress));
-        Log.e(TAG, "playerDurationTimeStr " + playerDurationTimeStr);
         playbackView.setProgressLabel(VhallUtil.converLongTimeToStr(progress), playerDurationTimeStr);
     }
 
@@ -200,57 +192,76 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     public WatchPlayback getWatchPlayback() {
         if (watchPlayback == null) {
-            WatchPlayback.Builder builder = new WatchPlayback.Builder().context(playbackView.getmActivity()).containerLayout(playbackView.getContainer()).callback(new WatchPlayback.WatchEventCallback() {
-                @Override
-                public void onStartFailed(String reason) {//开始播放失败
-                    Toast.makeText(playbackView.getmActivity(), reason, Toast.LENGTH_SHORT).show();
-                    playbackView.setPlayIcon(true);
-                }
-
-                @Override
-                public void onStateChanged(boolean playWhenReady, int playbackState) {//播放过程中的状态信息
-                    switch (playbackState) {
-                        case VHallPlayer.STATE_IDLE:
-                            Log.e(TAG, "STATE_IDLE");
-                            break;
-                        case VHallPlayer.STATE_PREPARING:
-                            Log.e(TAG, "STATE_PREPARING");
-                            playbackView.showProgressbar(true);
-                            break;
-                        case VHallPlayer.STATE_BUFFERING:
-                            Log.e(TAG, "STATE_BUFFERING");
-                            playbackView.showProgressbar(true);
-                            break;
-                        case VHallPlayer.STATE_READY:
-                            playbackView.showProgressbar(false);
-                            playerDuration = getWatchPlayback().getDuration();
-                            playerDurationTimeStr = VhallUtil.converLongTimeToStr(playerDuration);
-                            playbackView.setSeekbarMax((int) playerDuration);
-                            Log.e(TAG, "STATE_READY");
-                            break;
-                        case VHallPlayer.STATE_ENDED:
-                            playbackView.showProgressbar(false);
-                            Log.e(TAG, "STATE_ENDED");
-                            stopPlay();
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                @Override
-                public void onError(Exception e) {//播放出错
-                    playbackView.showProgressbar(false);
-                    stopPlay();
-                }
-
-                @Override
-                public void onVideoSizeChanged(int width, int height) {//视频宽高改变
-                }
-            });
+            WatchPlayback.Builder builder = new WatchPlayback.Builder().context(playbackView.getmActivity()).containerLayout(playbackView.getContainer()).callback(new WatchCallback()).docCallback(new DocCallback());
             watchPlayback = builder.build();
         }
         return watchPlayback;
+    }
+
+    private class DocCallback implements WatchPlayback.DocumentEventCallback {
+
+        @Override
+        public void onEvent(String key, List<MessageServer.MsgInfo> msgInfos) {
+            if (msgInfos != null && msgInfos.size() > 0) {
+                documentView.paintPPT(key, msgInfos);
+                documentView.paintBoard(key, msgInfos);
+            }
+        }
+
+        @Override
+        public void onEvent(MessageServer.MsgInfo msgInfo) {
+            documentView.paintPPT(msgInfo);
+            documentView.paintBoard(msgInfo);
+        }
+    }
+
+    private class WatchCallback implements WatchPlayback.WatchEventCallback {
+        @Override
+        public void onStartFailed(String reason) {//开始播放失败
+            Toast.makeText(playbackView.getmActivity(), reason, Toast.LENGTH_SHORT).show();
+            playbackView.setPlayIcon(true);
+        }
+
+        @Override
+        public void onStateChanged(boolean playWhenReady, int playbackState) {//播放过程中的状态信息
+            switch (playbackState) {
+                case VHallPlayer.STATE_IDLE:
+                    Log.e(TAG, "STATE_IDLE");
+                    break;
+                case VHallPlayer.STATE_PREPARING:
+                    Log.e(TAG, "STATE_PREPARING");
+                    playbackView.showProgressbar(true);
+                    break;
+                case VHallPlayer.STATE_BUFFERING:
+                    Log.e(TAG, "STATE_BUFFERING");
+                    playbackView.showProgressbar(true);
+                    break;
+                case VHallPlayer.STATE_READY:
+                    playbackView.showProgressbar(false);
+                    playerDuration = getWatchPlayback().getDuration();
+                    playerDurationTimeStr = VhallUtil.converLongTimeToStr(playerDuration);
+                    playbackView.setSeekbarMax((int) playerDuration);
+                    Log.e(TAG, "STATE_READY");
+                    break;
+                case VHallPlayer.STATE_ENDED:
+                    playbackView.showProgressbar(false);
+                    Log.e(TAG, "STATE_ENDED");
+                    stopPlay();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void onError(Exception e) {//播放出错
+            playbackView.showProgressbar(false);
+            stopPlay();
+        }
+
+        @Override
+        public void onVideoSizeChanged(int width, int height) {//视频宽高改变
+        }
     }
 
     //每秒获取一下进度
@@ -264,13 +275,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 handler.sendEmptyMessage(0);
             }
         }, 1000, 1000);
-    }
-
-    //如果没有PPT业务，可忽略
-    private void setPPT() {
-        if (ppt == null)
-            ppt = new VhallPPT();
-        getWatchPlayback().setVhallPPT(ppt);
     }
 
     @Override

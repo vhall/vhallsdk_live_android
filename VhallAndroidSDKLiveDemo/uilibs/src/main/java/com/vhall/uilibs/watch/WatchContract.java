@@ -11,6 +11,7 @@ import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * 观看页的接口类
@@ -37,9 +38,14 @@ public class WatchContract {
     }
 
     interface DocumentView extends BaseView<BasePresenter> {
-        void showDoc(String docUrl);
+        //        void showDoc(String docUrl);
+        void paintBoard(MessageServer.MsgInfo msgInfo);
 
-        void rePainBoard(MessageServer.MsgInfo msgInfo);
+        void paintBoard(String key, List<MessageServer.MsgInfo> msgInfos);
+
+        void paintPPT(MessageServer.MsgInfo msgInfo);
+
+        void paintPPT(String key, List<MessageServer.MsgInfo> msgInfos);
     }
 
     interface DetailView extends BaseView<BasePresenter> {
@@ -64,7 +70,7 @@ public class WatchContract {
 
         void setScaleButtonText(int type);
 
-        void showDialogStatus(int level, boolean isLottery, String[] nameList);
+        void showDialogStatus(int level, List<MessageServer.Lottery> lotteries);
 
         void addDanmu(String danmu);
     }
@@ -132,7 +138,7 @@ public class WatchContract {
 
         void onDestory();
 
-        void submitLotteryInfo(String nickname, String phone);
+        void submitLotteryInfo(String id, String lottery_id, String nickname, String phone);
 
         int getCurrentPixel();
 

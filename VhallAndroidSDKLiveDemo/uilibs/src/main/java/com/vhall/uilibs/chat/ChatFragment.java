@@ -221,7 +221,6 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                     } else {
                         viewHolder = (ViewHolder) convertView.getTag();
                     }
-
                     Glide.with(getActivity()).load(data.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_chat_avatar);
                     switch (data.event) {
                         case ChatServer.eventMsgKey:

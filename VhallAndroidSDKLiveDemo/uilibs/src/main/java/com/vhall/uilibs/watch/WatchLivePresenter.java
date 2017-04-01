@@ -39,7 +39,6 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     int[] scaleTypes = new int[]{WatchLive.FIT_DEFAULT, WatchLive.FIT_CENTER_INSIDE, WatchLive.FIT_X, WatchLive.FIT_Y, WatchLive.FIT_XY};
     int currentPos = 0;
     private int scaleType = WatchLive.FIT_DEFAULT;
-    private MessageServer.MsgInfo messageServer;
 
     public WatchLivePresenter(WatchContract.LiveView liveView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, ChatContract.ChatView questionView, WatchContract.WatchView watchView, Param param) {
         this.params = param;
@@ -52,7 +51,6 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
         this.liveView.setPresenter(this);
         this.chatView.setPresenter(this);
         this.questionView.setPresenter(this);
-        this.messageServer = new MessageServer.MsgInfo();
     }
 
     @Override
@@ -189,9 +187,9 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     }
 
     @Override
-    public void submitLotteryInfo(String nickname, String phone) {
-        if (!TextUtils.isEmpty(messageServer.id) && !TextUtils.isEmpty(messageServer.lottery_id)) {
-            VhallSDK.getInstance().submitLotteryInfo(messageServer.id, messageServer.lottery_id, nickname, phone, new VhallSDK.RequestCallback() {
+    public void submitLotteryInfo(String id, String lottery_id, String nickname, String phone) {
+        if (!TextUtils.isEmpty(id) && !TextUtils.isEmpty(lottery_id)) {
+            VhallSDK.getInstance().submitLotteryInfo(id, lottery_id, nickname, phone, new VhallSDK.RequestCallback() {
                 @Override
                 public void onSuccess() {
                     liveView.showToast("信息提交成功");
@@ -360,11 +358,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     private class MessageEventCallback implements MessageServer.Callback {
         @Override
         public void onEvent(MessageServer.MsgInfo messageInfo) {
-            Log.e(TAG, "messageInfo.event : " + messageInfo.event);
             switch (messageInfo.event) {
-                case MessageServer.EVENT_PPT_CHANGED://PPT翻页消息
-                    documentView.showDoc(messageInfo.pptUrl);
-                    break;
                 case MessageServer.EVENT_DISABLE_CHAT://禁言
                     break;
                 case MessageServer.EVENT_KICKOUT://踢出
@@ -376,29 +370,18 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
                 case MessageServer.EVENT_PERMIT_CHAT://解除禁言
                     break;
                 case MessageServer.EVENT_START_LOTTERY://抽奖开始
-                    liveView.showDialogStatus(1, false, null);
+                    liveView.showDialogStatus(1, messageInfo.lotteries);
                     break;
                 case MessageServer.EVENT_END_LOTTERY://抽奖结束
-                    String[] nameList = null;
-                    if (messageInfo != null && !TextUtils.isEmpty(messageInfo.id)) {
-                        messageServer.id = messageInfo.id;
-                        messageServer.lottery_id = messageInfo.lottery_id;
-                    }
-                    if (messageInfo.lists != null && messageInfo.lists.size() > 0) {
-                        nameList = new String[messageInfo.lists.size()];
-                        for (int i = 0; i < messageInfo.lists.size(); i++) {
-                            nameList[i] = messageInfo.lists.get(i).nick_name;
-                        }
-                        liveView.showDialogStatus(2, messageInfo.isLottery, nameList);
-                    }
+                    liveView.showDialogStatus(2, messageInfo.lotteries);
                     break;
                 case MessageServer.EVENT_NOTICE:
                     watchView.showNotice(messageInfo.content);
                     Log.e(TAG, "notice:" + messageInfo.content);
                     break;
                 case MessageServer.EVENT_SIGNIN: //签到消息
-                    if (!TextUtils.isEmpty(messageInfo.sign_id) && !TextUtils.isEmpty(messageInfo.sign_show_time)) {
-                        watchView.showSignIn(messageInfo.sign_id, parseTime(messageInfo.sign_show_time, 30));
+                    if (!TextUtils.isEmpty(messageInfo.id) && !TextUtils.isEmpty(messageInfo.sign_show_time)) {
+                        watchView.showSignIn(messageInfo.id, parseTime(messageInfo.sign_show_time, 30));
                     }
                     break;
                 case MessageServer.EVENT_QUESTION: // 问答开关
@@ -407,8 +390,21 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
                 case MessageServer.EVENT_SURVEY://问卷
                     ChatServer.ChatInfo chatInfo = new ChatServer.ChatInfo();
                     chatInfo.event = "survey";
-                    chatInfo.id = messageInfo.survey_id;
+                    chatInfo.id = messageInfo.id;
                     chatView.notifyDataChanged(chatInfo);
+                    break;
+                case MessageServer.EVENT_CLEARBOARD:
+                case MessageServer.EVENT_DELETEBOARD:
+                case MessageServer.EVENT_INITBOARD:
+                case MessageServer.EVENT_PAINTBOARD:
+                case MessageServer.EVENT_SHOWBOARD:
+                    documentView.paintBoard(messageInfo);
+                    break;
+                case MessageServer.EVENT_CHANGEDOC://PPT翻页消息
+                case MessageServer.EVENT_CLEARDOC:
+                case MessageServer.EVENT_PAINTDOC:
+                case MessageServer.EVENT_DELETEDOC:
+                    documentView.paintPPT(messageInfo);
                     break;
             }
 
