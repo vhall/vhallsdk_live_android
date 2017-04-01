@@ -1,5 +1,3 @@
-vhall_sdk 说明文档
-
 自助式网络直播SDK（Android版）
 
 一、集成方式：
