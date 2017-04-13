@@ -15,6 +15,7 @@ import com.vhall.business.data.source.SurveyDataSource;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
+import com.vhall.uilibs.util.ShowLotteryDialog;
 import com.vhall.uilibs.util.emoji.InputUser;
 
 import java.util.List;
@@ -55,6 +56,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
 
     @Override
     public void start() {
+        getWatchLive().setVRHeadTracker(true);
         initWatch();
     }
 
@@ -93,7 +95,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     @Override
     public void sendQuestion(String content) {
         if (TextUtils.isEmpty(params.userVhallId)) {
-            Toast.makeText(liveView.getmActivity(), R.string.vhall_login_first, Toast.LENGTH_SHORT).show();
+            watchView.showToast(R.string.vhall_login_first);
             return;
         }
         getWatchLive().sendQuestion(content, params.userVhallId, new VhallSDK.RequestCallback() {
@@ -121,7 +123,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     @Override
     public void showSurvey(String surveyid) {
         if (TextUtils.isEmpty(params.userVhallId)) {
-            liveView.showToast("请先登录！");
+            watchView.showToast(R.string.vhall_login_first);
             return;
         }
         VhallSDK.getInstance().getSurveyInfo(surveyid, new SurveyDataSource.SurveyInfoCallback() {
@@ -140,10 +142,9 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     @Override
     public void onSwitchPixel(int level) {
         if (getWatchLive().getDefinition() == level) {
-            liveView.showToast("已经切过了!!!");
             return;
         }
-        if (liveView.getmActivity().isFinishing()) {
+        if (watchView.getActivity().isFinishing()) {
             return;
         }
         if (isWatching) {
@@ -154,7 +155,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (!isWatching && !liveView.getmActivity().isFinishing()) {
+                if (!isWatching && !watchView.getActivity().isFinishing()) {
                     startWatch();
                 }
             }
@@ -172,13 +173,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
 
     @Override
     public int changeOriention() {
-        int ori = liveView.changeOrientation();
-        if (ori == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            watchView.setShowDetail(true);
-        } else {
-            watchView.setShowDetail(false);
-        }
-        return ori;
+        return watchView.changeOrientation();
     }
 
     @Override
@@ -192,7 +187,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
             VhallSDK.getInstance().submitLotteryInfo(id, lottery_id, nickname, phone, new VhallSDK.RequestCallback() {
                 @Override
                 public void onSuccess() {
-                    liveView.showToast("信息提交成功");
+                    watchView.showToast("信息提交成功");
                 }
 
                 @Override
@@ -217,6 +212,21 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     }
 
     @Override
+    public void setHeadTracker() {
+        if (!getWatchLive().isVR()) {
+            watchView.showToast("当前活动为非VR活动，不可使用陀螺仪");
+            return;
+        }
+        getWatchLive().setVRHeadTracker(!getWatchLive().isVRHeadTracker());
+        liveView.reFreshView();
+    }
+
+    @Override
+    public boolean isHeadTracker() {
+        return getWatchLive().isVRHeadTracker();
+    }
+
+    @Override
     public void initWatch() {
         VhallSDK.getInstance().initWatch(params.watchId, params.userName, params.userCustomId, params.userVhallId, params.key, getWatchLive(), new VhallSDK.RequestCallback() {
             @Override
@@ -228,7 +238,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
 
             @Override
             public void onError(int errorCode, String msg) {
-                liveView.showToast(msg);
+                watchView.showToast(msg);
             }
 
         });
@@ -252,7 +262,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     public WatchLive getWatchLive() {
         if (watchLive == null) {
             WatchLive.Builder builder = new WatchLive.Builder()
-                    .context(liveView.getmActivity())
+                    .context(watchView.getActivity())
                     .containerLayout(liveView.getWatchLayout())
                     .bufferDelay(params.bufferSecond)
                     .callback(new WatchCallback())
@@ -269,13 +279,13 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
         VhallSDK.getInstance().performSignIn(params.watchId, params.userVhallId, params.userName, signId, new VhallSDK.RequestCallback() {
             @Override
             public void onSuccess() {
-                liveView.showToast("签到成功");
+                watchView.showToast("签到成功");
                 watchView.dismissSignIn();
             }
 
             @Override
             public void onError(int errorCode, String errorMsg) {
-                liveView.showToast(errorMsg);
+                watchView.showToast(errorMsg);
             }
         });
     }
@@ -286,19 +296,19 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
         if (survey == null)
             return;
         if (TextUtils.isEmpty(params.userVhallId)) {
-            liveView.showToast("请先登录！");
+            watchView.showToast("请先登录！");
             return;
         }
         VhallSDK.getInstance().submitSurveyInfo(params.userVhallId, getWatchLive(), survey.surveyid, result, new VhallSDK.RequestCallback() {
             @Override
             public void onSuccess() {
-                liveView.showToast("提交成功！");
+                watchView.showToast("提交成功！");
                 watchView.dismissSurvey();
             }
 
             @Override
             public void onError(int errorCode, String errorMsg) {
-                liveView.showToast(errorMsg);
+                watchView.showToast(errorMsg);
                 if (errorCode == 10821)
                     watchView.dismissSurvey();
             }
@@ -316,10 +326,10 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
                     isWatching = false;
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
-                    liveView.showToast(errorMsg);
+                    watchView.showToast(errorMsg);
                     break;
                 default:
-                    liveView.showToast(errorMsg);
+                    watchView.showToast(errorMsg);
             }
         }
 
@@ -364,20 +374,25 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
                 case MessageServer.EVENT_KICKOUT://踢出
                     break;
                 case MessageServer.EVENT_OVER://直播结束
-                    liveView.showToast("直播已结束");
+                    watchView.showToast("直播已结束");
                     stopWatch();
                     break;
                 case MessageServer.EVENT_PERMIT_CHAT://解除禁言
                     break;
+                case MessageServer.EVENT_DIFINITION_CHANGED:
+                    liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
+                    if (!getWatchLive().isDifinitionAvailable(getWatchLive().getDefinition())) {
+                        onSwitchPixel(WatchLive.DPI_DEFAULT);
+                    }
+                    break;
                 case MessageServer.EVENT_START_LOTTERY://抽奖开始
-                    liveView.showDialogStatus(1, messageInfo.lotteries);
+                    watchView.showLottery(messageInfo);
                     break;
                 case MessageServer.EVENT_END_LOTTERY://抽奖结束
-                    liveView.showDialogStatus(2, messageInfo.lotteries);
+                    watchView.showLottery(messageInfo);
                     break;
                 case MessageServer.EVENT_NOTICE:
                     watchView.showNotice(messageInfo.content);
-                    Log.e(TAG, "notice:" + messageInfo.content);
                     break;
                 case MessageServer.EVENT_SIGNIN: //签到消息
                     if (!TextUtils.isEmpty(messageInfo.id) && !TextUtils.isEmpty(messageInfo.sign_show_time)) {
@@ -385,7 +400,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
                     }
                     break;
                 case MessageServer.EVENT_QUESTION: // 问答开关
-                    liveView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
+                    watchView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
                     break;
                 case MessageServer.EVENT_SURVEY://问卷
                     ChatServer.ChatInfo chatInfo = new ChatServer.ChatInfo();
@@ -442,18 +457,15 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     private class ChatCallback implements ChatServer.Callback {
         @Override
         public void onChatServerConnected() {
-            Log.e(TAG, " ChatServerConnected");
         }
 
         @Override
         public void onConnectFailed() {
-            Log.e(TAG, " onConnectFailed -----");
 //            getWatchLive().connectChatServer();
         }
 
         @Override
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
-            Log.e(TAG, " onChatMessageReceived -----");
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
                     chatView.notifyDataChanged(chatInfo);
@@ -473,7 +485,6 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
 
         @Override
         public void onChatServerClosed() {
-            Log.e(TAG, " onChatServerClosed -----");
         }
     }
 
@@ -481,7 +492,6 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
         getWatchLive().acquireChatRecord(true, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                Log.e(TAG, "list->" + list.size());
                 chatView.notifyDataChanged(list);
             }
 

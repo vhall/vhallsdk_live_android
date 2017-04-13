@@ -3,7 +3,7 @@ package com.vhall.uilibs.broadcast;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
-import com.vinny.vinnylive.CameraFilterView;
+import com.vhall.vhalllive.CameraFilterView;
 
 /**
  * 发直播的View接口类

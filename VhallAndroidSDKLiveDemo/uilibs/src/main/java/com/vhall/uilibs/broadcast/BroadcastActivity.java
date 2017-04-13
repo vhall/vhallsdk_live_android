@@ -8,14 +8,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.chat.ChatFragment;
-import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.util.VhallUtil;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
+import com.vhall.uilibs.watch.WatchActivity;
 
 
 /**

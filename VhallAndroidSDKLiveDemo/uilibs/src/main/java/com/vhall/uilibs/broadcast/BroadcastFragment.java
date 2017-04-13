@@ -10,12 +10,13 @@ import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vhall.gpuimage.GPUImageRenderer;
 import com.vhall.uilibs.R;
-import com.vinny.vinnylive.CameraFilterView;
+import com.vhall.vhalllive.CameraFilterView;
 
 /**
  * 发直播的Fragment

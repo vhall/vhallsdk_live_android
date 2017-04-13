@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="vhall_app_key"></string>
-    <string name="vhall_app_secret_key"></string>
+    <string name="vhall_app_key">e53f769ab2e128c9d8f3200bd739f80d</string>
+    <string name="vhall_app_secret_key">a469b1f66cdd96a73367b3908f264f56</string>
 </resources>

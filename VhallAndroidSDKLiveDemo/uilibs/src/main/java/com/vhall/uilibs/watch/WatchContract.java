@@ -20,21 +20,41 @@ public class WatchContract {
 
     interface WatchView extends BaseView<WatchPresenter> {
 
-        void setShowDetail(boolean isShow);
-
+        //显示聊天view
         void showChatView(boolean emoji, InputUser user, int limit);
 
+        //显示公告
         void showNotice(String content);
 
+        //隐藏公告
         void dismissNotice();
 
+        //显示签到框
         void showSignIn(String signId, int startTime);
 
+        //隐藏签到框
         void dismissSignIn();
 
+        //显示问卷
         void showSurvey(Survey survey);
 
+        //隐藏问卷
         void dismissSurvey();
+
+        //横竖屏切换
+        int changeOrientation();
+
+        //显示toast
+        void showToast(String toast);
+
+        void showToast(int toast);
+
+        //获取当前activity实例
+        Activity getActivity();
+
+        //显示抽奖
+        void showLottery(final MessageServer.MsgInfo messageInfo);
+
     }
 
     interface DocumentView extends BaseView<BasePresenter> {
@@ -52,7 +72,6 @@ public class WatchContract {
     }
 
     interface LiveView extends BaseView<LivePresenter> {
-        Activity getmActivity();
 
         ContainerLayout getWatchLayout();
 
@@ -62,22 +81,17 @@ public class WatchContract {
 
         void showLoading(boolean isShow);
 
-        int changeOrientation();
-
-        void showToast(String message);
-
         void showRadioButton(HashMap map);
 
         void setScaleButtonText(int type);
 
-        void showDialogStatus(int level, List<MessageServer.Lottery> lotteries);
-
         void addDanmu(String danmu);
+
+        void reFreshView();
     }
 
 
     interface PlaybackView extends BaseView<PlaybackPresenter> {
-        Activity getmActivity();
 
         void setPlayIcon(boolean isStop);
 
@@ -89,13 +103,10 @@ public class WatchContract {
 
         void showProgressbar(boolean show);
 
-        void showToast(String message);
-
         ContainerLayout getContainer();
 
         void setScaleTypeText(int type);
 
-        int changeScreenOri();
     }
 
     interface PlaybackPresenter extends BasePresenter {
@@ -143,6 +154,10 @@ public class WatchContract {
         int getCurrentPixel();
 
         int getScaleType();
+
+        void setHeadTracker(); // 设置陀螺仪
+
+        boolean isHeadTracker();  // 当前的陀螺仪
     }
 
     interface WatchPresenter extends BasePresenter {
@@ -150,5 +165,6 @@ public class WatchContract {
         void signIn(String signId);
 
         void submitSurvey(Survey survey, String result);
+
     }
 }

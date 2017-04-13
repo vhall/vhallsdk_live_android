@@ -1,5 +1,6 @@
 package com.vhall.uilibs.watch;
 
+import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
@@ -10,20 +11,24 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
+import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
+import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.chat.ChatFragment;
-import com.vhall.uilibs.util.ActivityUtils;
-import com.vhall.uilibs.util.ExtendTextView;
+import com.vhall.uilibs.util.ShowLotteryDialog;
 import com.vhall.uilibs.util.SignInDialog;
 import com.vhall.uilibs.util.SurveyPopu;
 import com.vhall.uilibs.util.VhallUtil;
+import com.vhall.uilibs.chat.ChatFragment;
+import com.vhall.uilibs.util.ExtendTextView;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
@@ -52,7 +57,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     public int chatEvent = ChatFragment.CHAT_EVENT_CHAT;
     private SurveyPopu popu;
     private SignInDialog signInDialog;
-
+    private ShowLotteryDialog lotteryDialog;
     WatchContract.WatchPresenter mPresenter;
 
     @Override
@@ -277,12 +282,42 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
-    public void setShowDetail(boolean isShow) {
-        if (isShow) {
-            ll_detail.setVisibility(View.VISIBLE);
-        } else {
+    public int changeOrientation() {
+        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             ll_detail.setVisibility(View.GONE);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            ll_detail.setVisibility(View.VISIBLE);
         }
+        return getRequestedOrientation();
+    }
+
+    @Override
+    public void showToast(String toast) {
+        Toast.makeText(this, toast, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showToast(int toast) {
+        Toast.makeText(this, toast, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public Activity getActivity() {
+        return this;
+    }
+
+    @Override
+    public void showLottery(MessageServer.MsgInfo messageInfo) {
+        if (lotteryDialog == null) {
+            lotteryDialog = new ShowLotteryDialog(this);
+        }
+        lotteryDialog.setMessageInfo(messageInfo);
+        lotteryDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+        lotteryDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE |
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        lotteryDialog.show();
     }
 
     @Override
@@ -306,7 +341,10 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     @Override
     public void onBackPressed() {
-        inputView.dismiss();
+        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+            changeOrientation();
+            return;
+        }
         super.onBackPressed();
     }
 

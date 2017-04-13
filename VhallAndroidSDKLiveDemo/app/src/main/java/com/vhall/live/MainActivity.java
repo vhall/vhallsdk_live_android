@@ -8,13 +8,14 @@ import android.support.v4.app.FragmentActivity;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.vhall.uilibs.Param;
-import com.vhall.uilibs.broadcast.BroadcastActivity;
 import com.vhall.uilibs.util.CircleImageView;
 import com.vhall.uilibs.util.VhallUtil;
+import com.vhall.uilibs.broadcast.BroadcastActivity;
 import com.vhall.uilibs.watch.WatchActivity;
 
 /**

@@ -23,8 +23,11 @@
     <string name="pay_hint_fee">打赏金额</string>
     <string name="pay_hint_note">打赏说明</string>
     <string name="pay_hint_type">支付类型:</string>
+    <string name="vhall_lottery_title_start">趣味抽奖</string>
+    <string name="vhall_lottery_title_show">抽奖结果</string>
+    <string name="vhall_lottery_title_submit">提交信息</string>
+    <string name="vhall_lottery_true">恭喜您中奖了</string>
+    <string name="vhall_lottery_false">很遗憾您没中</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

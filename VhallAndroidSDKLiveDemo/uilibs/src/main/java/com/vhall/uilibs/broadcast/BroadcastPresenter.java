@@ -26,7 +26,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     private boolean isPublishing = false;
     private boolean isFinish = true;
 
-    public BroadcastPresenter(Param params, BroadcastContract.BraodcastView mBraodcastView , BroadcastContract.View mView, ChatContract.ChatView chatView) {
+    public BroadcastPresenter(Param params, BroadcastContract.BraodcastView mBraodcastView, BroadcastContract.View mView, ChatContract.ChatView chatView) {
         this.param = params;
         this.mView = mView;
         this.mBraodcastView = mBraodcastView;
@@ -39,7 +39,6 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     public void start() {
         //初始化，必须
         mView.initCamera(param.pixel_type);
-        getBroadcast().setAudioing(true);
     }
 
 
@@ -117,9 +116,9 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void changeAudio() {
-        boolean isAudioRecord = getBroadcast().isAudioing();
-        getBroadcast().setAudioing(!isAudioRecord);
-        mView.setAudioBtnImage(!isAudioRecord);
+        boolean isMute = getBroadcast().isMute();
+        getBroadcast().setMute(!isMute);
+        mView.setAudioBtnImage(isMute);
     }
 
     @Override
@@ -264,7 +263,6 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         }
     }
 
-    //TODO 是否去掉  发起直播是否需要聊天记录
     private void getChatHistory() {
         getBroadcast().acquireChatRecord(false, new ChatServer.ChatRecordCallback() {
             @Override

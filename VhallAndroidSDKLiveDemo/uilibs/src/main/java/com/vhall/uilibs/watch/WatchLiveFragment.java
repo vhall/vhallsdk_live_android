@@ -17,6 +17,7 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +30,10 @@ import android.widget.Toast;
 
 import com.vhall.business.MessageServer;
 import com.vhall.business.WatchLive;
+import com.vhall.business.utils.LogManager;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
 
 import java.util.HashMap;
@@ -55,11 +58,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
     private WatchContract.LivePresenter mPresenter;
 
-    private ImageView clickStart;
-    private ImageView clickOrientation;
-    private RadioButton radioButtonShowSD;
-    private RadioButton radioButtonShowHD;
-    private RadioButton radioButtonShowUHD;
+    private ImageView clickOrientation, clickStart, mVrButton;
+    private RadioButton radioButtonShowDEFAULT, radioButtonShowHD, radioButtonShowUHD;
+
     private RadioGroup radioChoose;
     private TextView fragmentDownloadSpeed;
     private ProgressDialog mProcessDialog;
@@ -67,17 +68,11 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     private ImageView btn_change_scaletype;
     private ImageView btnChangePlayStatus;
     ImageView btn_danmaku;
-    private Dialog alertDialog;
-    private String lotteryStr;
 
     private IDanmakuView mDanmakuView;
     private DanmakuContext mDanmuContext;
     private BaseDanmakuParser mParser;
     private Context context;
-    /***
-     * 控制显示Toast
-     */
-    public static boolean isShowToast = true;
 
     public static WatchLiveFragment newInstance() {
         return new WatchLiveFragment();
@@ -108,7 +103,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.watch_live_fragment, container, false);
         initView(root);
-        initStatue();
+        reFreshView();
+        //initStatue();
         return root;
     }
 
@@ -126,12 +122,13 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         clickOrientation.setOnClickListener(this);
         radioChoose = (RadioGroup) root.findViewById(R.id.radio_choose);
         radioChoose.setOnCheckedChangeListener(checkListener);
-        radioButtonShowSD = (RadioButton) root.findViewById(R.id.radio_btn_sd);
+        radioButtonShowDEFAULT = (RadioButton) root.findViewById(R.id.radio_btn_default);
         radioButtonShowHD = (RadioButton) root.findViewById(R.id.radio_btn_hd);
         radioButtonShowUHD = (RadioButton) root.findViewById(R.id.radio_btn_uhd);
         mContainerLayout = (ContainerLayout) root.findViewById(R.id.rl_container);
         fragmentDownloadSpeed = (TextView) root.findViewById(R.id.fragment_download_speed);
-
+        mVrButton = (ImageView) root.findViewById(R.id.btn_headtracker);
+        mVrButton.setOnClickListener(this);
         btn_danmaku = (ImageView) root.findViewById(R.id.btn_danmaku);
         btn_danmaku.setImageResource(R.drawable.vhall_icon_danmaku_close);
         btn_danmaku.setOnClickListener(this);
@@ -183,23 +180,6 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
                     mDanmakuView.start();
                 }
             });
-            mDanmakuView.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
-
-                @Override
-                public boolean onDanmakuClick(IDanmakus danmakus) {
-                    BaseDanmaku latest = danmakus.last();
-                    if (null != latest) {
-                        return true;
-                    }
-                    return false;
-                }
-
-                @Override
-                public boolean onViewClick(IDanmakuView view) {
-//                    mMediaController.setVisibility(View.VISIBLE);
-                    return false;
-                }
-            });
             mDanmakuView.prepare(mParser, mDanmuContext);
             mDanmakuView.showFPS(false);
             mDanmakuView.enableDanmakuDrawingCache(true);
@@ -210,22 +190,6 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             mPresenter.start();
         }
 
-    }
-
-    private void initStatue() {
-        if (mPresenter != null) {
-            if (mPresenter.getCurrentPixel() == WatchLive.DPI_DEFAULT) {
-                btnChangePlayStatus.setBackground(getResources().getDrawable(R.drawable.audio_close));
-            } else if (mPresenter.getCurrentPixel() == WatchLive.DPI_AUDIO) {
-                btnChangePlayStatus.setBackground(getResources().getDrawable(R.drawable.audio_open));
-            }
-            setScaleButtonText(mPresenter.getScaleType());
-        }
-    }
-
-    @Override
-    public Activity getmActivity() {
-        return this.getActivity();
     }
 
     @Override
@@ -267,8 +231,11 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             mPresenter.changeOriention();
         } else if (i == R.id.btn_change_scaletype) {
             mPresenter.setScaleType();
+        } else if (i == R.id.btn_headtracker) {
+            mPresenter.setHeadTracker();
+            LogManager.innerLog("HeadTracker", " HeadTracker == " + mPresenter.isHeadTracker());
         } else if (i == R.id.image_action_back) {
-            getActivity().finish();
+            getActivity().onBackPressed();
         } else if (i == R.id.btn_change_audio) {
             if (mPresenter.getCurrentPixel() == WatchLive.DPI_DEFAULT) {
                 mPresenter.onSwitchPixel(WatchLive.DPI_AUDIO);
@@ -291,12 +258,6 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }
     }
 
-    @Override
-    public void showToast(String message) {
-        if (isShowToast && isAdded())
-            Toast.makeText(getmActivity(), message, Toast.LENGTH_SHORT).show();
-    }
-
     /**
      * 切换分辨率
      *
@@ -312,18 +273,18 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             String key = (String) entry.getKey();
             Integer value = (Integer) entry.getValue();
             switch (key) {
-                case "Audio":
-//                    if (value == 1)
-//                        btnChangePlayStatus.setVisibility(View.VISIBLE);
-//                    else
-//                        btnChangePlayStatus.setVisibility(View.GONE);
-                    break;
-                case "SD":
+                case "A":
                     if (value == 1)
-                        radioButtonShowSD.setVisibility(View.VISIBLE);
+                        btnChangePlayStatus.setVisibility(View.VISIBLE);
                     else
-                        radioButtonShowSD.setVisibility(View.GONE);
+                        btnChangePlayStatus.setVisibility(View.GONE);
                     break;
+//                case "SD":
+//                    if (value == 1)
+//                        radioButtonShowSD.setVisibility(View.VISIBLE);
+//                    else
+//                        radioButtonShowSD.setVisibility(View.GONE);
+//                    break;
                 case "HD":
                     if (value == 1)
                         radioButtonShowHD.setVisibility(View.VISIBLE);
@@ -362,86 +323,6 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     }
 
     @Override
-    public void showDialogStatus(int level, final List<MessageServer.Lottery> lotteries) {
-        if (alertDialog != null) {
-            alertDialog.cancel();
-        }
-
-        MessageServer.Lottery lottery = null;
-        String[] nameList = null;
-        if (lotteries != null && lotteries.size() > 0) {
-            nameList = new String[lotteries.size()];
-            for (int i = 0; i < lotteries.size(); i++) {
-                nameList[i] = lotteries.get(i).nick_name;
-                if (lotteries.get(i).isSelf) {
-                    lottery = lotteries.get(i);
-                }
-            }
-        }
-        switch (level) {
-            case 1:
-                alertDialog = new AlertDialog.Builder(this.getActivity())
-                        .setTitle("vhall抽奖")
-                        .setMessage("抽奖中~~~~~")
-                        .create();
-                alertDialog.show();
-                break;
-            case 2:
-                if (lottery != null) {
-                    lotteryStr = "恭喜您,中奖了";
-                } else
-                    lotteryStr = "有点遗憾,这次没中";
-
-                final MessageServer.Lottery finalLottery = lottery;
-                alertDialog = new AlertDialog.Builder(this.getActivity())
-                        .setTitle(lotteryStr)
-                        .setItems(nameList, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        })
-                        .setPositiveButton("下一步", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                if (finalLottery != null) {
-                                    showDialogStatus(3, lotteries);
-                                }
-                            }
-                        }).create();
-                alertDialog.show();
-                break;
-            case 3:
-                LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-                View submitView = layoutInflater.inflate(R.layout.submit_lottery, null);
-                final EditText submitNickname = (EditText) submitView.findViewById(R.id.lottery_submit_nickname);
-                final EditText submitPhone = (EditText) submitView.findViewById(R.id.lottery_submit_phone);
-
-                final MessageServer.Lottery finalLottery1 = lottery;
-                alertDialog = new AlertDialog.Builder(this.getActivity())
-                        .setTitle("请提供您的信息")
-                        .setView(submitView)
-                        .setPositiveButton("提交领奖信息", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                final String submitNicknameStr = submitNickname.getText().toString();
-                                final String submitPhoneStr = submitPhone.getText().toString();
-                                if (!TextUtils.isEmpty(submitNicknameStr) && !TextUtils.isEmpty(submitPhoneStr)) {
-                                    mPresenter.submitLotteryInfo(finalLottery1.id, finalLottery1.lottery_id, submitNicknameStr, submitPhoneStr);
-                                } else {
-                                    showToast("请填写信息");
-                                    return;
-                                }
-                            }
-                        }).create();
-                alertDialog.show();
-                break;
-            default:
-
-        }
-
-    }
-
-    @Override
     public void addDanmu(String danmu) {
         BaseDanmaku danmaku = mDanmuContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
         if (danmaku == null || mDanmakuView == null) {
@@ -459,6 +340,23 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         // danmaku.underlineColor = Color.GREEN;
         danmaku.borderColor = Color.TRANSPARENT;
         mDanmakuView.addDanmaku(danmaku);
+    }
+
+    @Override
+    public void reFreshView() {
+        if (mPresenter != null) {
+            if (mPresenter.getCurrentPixel() == WatchLive.DPI_DEFAULT) {
+                btnChangePlayStatus.setBackground(getResources().getDrawable(R.drawable.audio_close));
+            } else if (mPresenter.getCurrentPixel() == WatchLive.DPI_AUDIO) {
+                btnChangePlayStatus.setBackground(getResources().getDrawable(R.drawable.audio_open));
+            }
+            setScaleButtonText(mPresenter.getScaleType());
+            if (mPresenter.isHeadTracker()) {
+                mVrButton.setImageDrawable(getResources().getDrawable(R.drawable.vhall_icon_headtracker_checked));
+            } else {
+                mVrButton.setImageDrawable(getResources().getDrawable(R.drawable.vhall_icon_headtracker));
+            }
+        }
     }
 
     private void addDanmaKuShowTextAndImage(boolean islive) {
@@ -489,16 +387,6 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     }
 
     @Override
-    public int changeOrientation() {
-        if (this.getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else {
-            this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-        return getActivity().getRequestedOrientation();
-    }
-
-    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
     }
@@ -506,8 +394,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     public RadioGroup.OnCheckedChangeListener checkListener = new RadioGroup.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(RadioGroup radioGroup, int i) {
-            if (i == R.id.radio_btn_sd) {
-                mPresenter.onSwitchPixel(WatchLive.DPI_SD);
+            if (i == R.id.radio_btn_default) {
+                mPresenter.onSwitchPixel(WatchLive.DPI_DEFAULT);
             } else if (i == R.id.radio_btn_hd) {
                 mPresenter.onSwitchPixel(WatchLive.DPI_HD);
             } else if (i == R.id.radio_btn_uhd) {

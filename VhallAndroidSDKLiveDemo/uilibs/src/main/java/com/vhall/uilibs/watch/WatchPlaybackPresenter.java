@@ -13,16 +13,17 @@ import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.WatchLive;
 import com.vhall.business.WatchPlayback;
-import com.vhall.playersdk.player.vhallplayer.VHallPlayer;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.util.VhallUtil;
-import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.uilibs.chat.ChatContract;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.vhall.playersdk.player.vhallplayer.VHallPlayer;
+import com.vhall.uilibs.util.emoji.InputUser;
 
 /**
  * 观看回放的Presenter
@@ -87,7 +88,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
             @Override
             public void onFailed(int errorcode, String messaage) {
-                playbackView.showToast(messaage);
+                watchView.showToast(messaage);
             }
         });
     }
@@ -104,7 +105,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
             @Override
             public void onError(int errorCode, String reason) {
-                playbackView.showToast(reason);
+                watchView.showToast(reason);
             }
         });
     }
@@ -181,18 +182,12 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     @Override
     public int changeScreenOri() {
-        int ori = playbackView.changeScreenOri();
-        if (ori == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            watchView.setShowDetail(true);
-        } else {
-            watchView.setShowDetail(false);
-        }
-        return playbackView.getmActivity().getRequestedOrientation();
+        return watchView.changeOrientation();
     }
 
     public WatchPlayback getWatchPlayback() {
         if (watchPlayback == null) {
-            WatchPlayback.Builder builder = new WatchPlayback.Builder().context(playbackView.getmActivity()).containerLayout(playbackView.getContainer()).callback(new WatchCallback()).docCallback(new DocCallback());
+            WatchPlayback.Builder builder = new WatchPlayback.Builder().context(watchView.getActivity()).containerLayout(playbackView.getContainer()).callback(new WatchCallback()).docCallback(new DocCallback());
             watchPlayback = builder.build();
         }
         return watchPlayback;
@@ -218,7 +213,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     private class WatchCallback implements WatchPlayback.WatchEventCallback {
         @Override
         public void onStartFailed(String reason) {//开始播放失败
-            Toast.makeText(playbackView.getmActivity(), reason, Toast.LENGTH_SHORT).show();
+            Toast.makeText(watchView.getActivity(), reason, Toast.LENGTH_SHORT).show();
             playbackView.setPlayIcon(true);
         }
 
@@ -285,7 +280,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     @Override
     public void sendChat(final String text) {
         if (TextUtils.isEmpty(param.userVhallId)) {
-            Toast.makeText(playbackView.getmActivity(), R.string.vhall_login_first, Toast.LENGTH_SHORT).show();
+            Toast.makeText(watchView.getActivity(), R.string.vhall_login_first, Toast.LENGTH_SHORT).show();
             return;
         }
         getWatchPlayback().sendComment(text, param.userVhallId, new VhallSDK.RequestCallback() {
@@ -297,7 +292,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
             @Override
             public void onError(int errorCode, String reason) {
-                playbackView.showToast(reason);
+                watchView.showToast(reason);
             }
         });
     }

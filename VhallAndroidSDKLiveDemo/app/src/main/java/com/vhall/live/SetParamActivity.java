@@ -1,5 +1,7 @@
 package com.vhall.live;
 
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -9,7 +11,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.vhall.uilibs.Param;
-import com.vinny.vinnylive.CameraFilterView;
+import com.vhall.vhalllive.CameraFilterView;
 
 /**
  * 主界面的Activity

@@ -1,9 +1,6 @@
 package com.vhall.uilibs;
 
-import android.content.pm.ActivityInfo;
-
-import com.vinny.vinnylive.CameraFilterView;
-import com.vinny.vinnylive.Constants;
+import com.vhall.vhalllive.CameraFilterView;
 
 import java.io.Serializable;
 

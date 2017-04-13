@@ -58,7 +58,6 @@ public class ExtendTextView extends TextView {
                         drawableClickListener.onDrawableClick(DRAWABLE_LEFT);
                         return false;
                     }
-                    //TODO top and bottom
                 }
                 break;
         }

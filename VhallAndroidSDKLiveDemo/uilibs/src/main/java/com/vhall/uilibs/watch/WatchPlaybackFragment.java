@@ -87,11 +87,6 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     }
 
     @Override
-    public Activity getmActivity() {
-        return getActivity();
-    }
-
-    @Override
     public void setPlayIcon(boolean isStop) {
         if (isStop) {
             iv_play.setImageResource(R.drawable.vhall_icon_live_play);
@@ -125,12 +120,6 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     }
 
     @Override
-    public void showToast(String message) {
-        if (isShowToast && isAdded())
-            Toast.makeText(this.getActivity(), message, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     public ContainerLayout getContainer() {
         return rl_video_container;
     }
@@ -154,16 +143,6 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_xy));
                 break;
         }
-    }
-
-    @Override
-    public int changeScreenOri() {
-        if (getActivity().getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        } else {
-            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
-        return getActivity().getRequestedOrientation();
     }
 
     @Override

@@ -7,10 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.vhall.business.MessageServer;
-import com.vhall.business.widget.PPTView;
-import com.vhall.business.widget.WhiteBoardView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.R;
+import com.vhall.business.widget.PPTView;
+import com.vhall.business.widget.WhiteBoardView;
 
 import java.util.List;
 
