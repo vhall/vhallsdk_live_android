@@ -7,8 +7,8 @@ android {
         applicationId "com.vhall.live"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 270
-        versionName "2.7.0"
+        versionCode 290
+        versionName "2.9.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -18,11 +18,13 @@ android {
         }
     }
 
+
     repositories {
         flatDir {
             dirs project(':uilibs').file('libs')
         }
     }
+
 }
 
 dependencies {

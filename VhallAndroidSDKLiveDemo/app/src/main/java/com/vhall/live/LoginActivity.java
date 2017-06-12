@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import android.widget.EditText;
@@ -23,7 +24,7 @@ import com.vhall.uilibs.Param;
  */
 public class LoginActivity extends Activity {
 
-    public static final String TAG = "LoginActivity";
+    private static final String TAG = "LoginActivity";
     private EditText mTextInputUsername;
     private EditText mTextInputPassword;
     public AlertDialog alertDialog;
@@ -48,9 +49,7 @@ public class LoginActivity extends Activity {
                     param.userCustomId = userInfo.account;
                     param.userName = userInfo.nick_name;
                     VhallApplication.setParam(param);
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                    skipMain();
                 }
             }
 
@@ -92,6 +91,10 @@ public class LoginActivity extends Activity {
     }
 
     public void customerClick(View view) {
+        skipMain();
+    }
+
+    private void skipMain() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -104,4 +107,10 @@ public class LoginActivity extends Activity {
             login(username, password);
         }
     }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        return super.dispatchTouchEvent(ev);
+    }
+
 }

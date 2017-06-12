@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     android:orientation="vertical">
 
     <com.vhall.business.widget.ContainerLayout
@@ -58,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"
+                android:layout_marginRight="5dp"
                 android:src="@drawable/vhall_icon_headtracker_checked" />
 
             <ImageView
@@ -66,7 +65,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"
+                android:layout_marginRight="5dp"
                 android:src="@drawable/vhall_icon_danmaku_close" />
 
             <ImageView
@@ -74,8 +73,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"
-                android:background="@drawable/audio_close" />
+                android:layout_marginRight="5dp"
+                android:src="@drawable/audio_close" />
 
             <ImageView
                 android:id="@+id/btn_change_scaletype"
@@ -83,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"
+                android:layout_marginRight="5dp"
                 android:background="@drawable/fit_default" />
 
             <ImageView
@@ -92,7 +91,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="10dp"
                 android:background="@drawable/icon_round_fullscreen" />
 
 
@@ -111,7 +109,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
                 android:background="@drawable/vhall_icon_live_play" />
 
 
@@ -128,9 +125,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:background="@drawable/vhall_icon_resolution_sd"
+                    android:background="@drawable/vhall_icon_resolution"
                     android:button="@null"
                     android:visibility="visible" />
+
+                <RadioButton
+                    android:id="@+id/radio_btn_sd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/vhall_icon_resolution_sd"
+                    android:button="@null"
+                    android:visibility="invisible" />
 
                 <RadioButton
                     android:id="@+id/radio_btn_hd"
@@ -154,6 +160,13 @@
 
 
     </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
 
 
 </RelativeLayout>

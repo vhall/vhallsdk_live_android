@@ -1,11 +1,12 @@
 package com.vhall.uilibs.watch;
 
-import android.content.pm.ActivityInfo;
+import android.content.Context;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.opengl.GL_Preview_YUV;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
@@ -15,8 +16,8 @@ import com.vhall.business.data.source.SurveyDataSource;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
-import com.vhall.uilibs.util.ShowLotteryDialog;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.vhalllive.common.GLPlayInterface;
 
 import java.util.List;
 
@@ -40,6 +41,8 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     int[] scaleTypes = new int[]{WatchLive.FIT_DEFAULT, WatchLive.FIT_CENTER_INSIDE, WatchLive.FIT_X, WatchLive.FIT_Y, WatchLive.FIT_XY};
     int currentPos = 0;
     private int scaleType = WatchLive.FIT_DEFAULT;
+
+    private GLPlayInterface mPlayView;
 
     public WatchLivePresenter(WatchContract.LiveView liveView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, ChatContract.ChatView questionView, WatchContract.WatchView watchView, Param param) {
         this.params = param;
@@ -139,11 +142,14 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
         });
     }
 
+    boolean force = false;
+
     @Override
     public void onSwitchPixel(int level) {
-        if (getWatchLive().getDefinition() == level) {
+        if (getWatchLive().getDefinition() == level && !force) {
             return;
         }
+        force = false;
         if (watchView.getActivity().isFinishing()) {
             return;
         }
@@ -231,6 +237,8 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
         VhallSDK.getInstance().initWatch(params.watchId, params.userName, params.userCustomId, params.userVhallId, params.key, getWatchLive(), new VhallSDK.RequestCallback() {
             @Override
             public void onSuccess() {
+                if (watchView.getActivity().isFinishing())
+                    return;
                 liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
                 chatView.clearChatData();
                 getChatHistory();
@@ -262,14 +270,27 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     public WatchLive getWatchLive() {
         if (watchLive == null) {
             WatchLive.Builder builder = new WatchLive.Builder()
-                    .context(watchView.getActivity())
+                    .context(watchView.getActivity().getApplicationContext())
                     .containerLayout(liveView.getWatchLayout())
                     .bufferDelay(params.bufferSecond)
                     .callback(new WatchCallback())
                     .messageCallback(new MessageEventCallback())
+                    .connectTimeoutMils(5000)
                     .chatCallback(new ChatCallback());
             watchLive = builder.build();
         }
+        //狄拍builder
+//        if (watchLive == null) {
+//            WatchLive.Builder builder = new WatchLive.Builder()
+//                    .context(watchView.getActivity().getApplicationContext())
+//                    .bufferDelay(params.bufferSecond)
+//                    .callback(new WatchCallback())
+//                    .messageCallback(new MessageEventCallback())
+//                    .connectTimeoutMils(5000)
+//                    .playView(mPlayView = new VRPlayView(watchView.getActivity().getApplicationContext()))//todo 添加到自定义布局中，非new
+//                    .chatCallback(new ChatCallback());
+//            watchLive = builder.build();
+//        }
         return watchLive;
     }
 
@@ -360,6 +381,15 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
             liveView.setDownSpeed("速率" + kbps + "/kbps");
         }
 
+        @Override
+        public void videoInfo(int width, int height) {
+            if(mPlayView!=null){
+                mPlayView.init(width,height);
+                // INIT STUF
+            }
+        }
+
+
     }
 
     /**
@@ -420,6 +450,10 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
                 case MessageServer.EVENT_PAINTDOC:
                 case MessageServer.EVENT_DELETEDOC:
                     documentView.paintPPT(messageInfo);
+                    break;
+                case MessageServer.EVENT_RESTART:
+                    force = true;
+                    onSwitchPixel(WatchLive.DPI_DEFAULT);
                     break;
             }
 
@@ -502,5 +536,47 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
         });
     }
 
+    //狄拍自定义渲染
+    public class VRPlayView extends GL_Preview_YUV implements GLPlayInterface {
+        public VRPlayView(Context var1) {
+            super(var1);
+        }
+
+        public VRPlayView(Context var1, AttributeSet var2) {
+            super(var1, var2);
+        }
+
+        public void setDrawMode(int model) {
+            super.setDrawMode(model);
+        }
+
+        public void setIsHeadTracker(boolean head) {
+            super.setIsHeadTracker(head);
+        }
+
+        public boolean init(int width, int height) {
+            super.setPreviewW(width);
+            super.setPreviewH(height);
+            super.setIsFlip(true);
+            super.setColorFormat(19);
+            mIsReady.set(true);
+            return false;
+        }
+
+        public void playView(byte[] YUV) {
+            if (this.isReady()) {
+                this.setdata(YUV);
+            }
+
+        }
+
+        public boolean isReady() {
+            return mIsReady.get();
+        }
+
+        public void release() {
+            this.setRelease();
+        }
+    }
 }
 

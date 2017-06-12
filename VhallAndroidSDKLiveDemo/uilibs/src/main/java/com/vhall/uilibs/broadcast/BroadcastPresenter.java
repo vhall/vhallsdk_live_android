@@ -147,8 +147,18 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                     .videoBitrate(param.videoBitrate)
                     .callback(new BroadcastEventCallback())
                     .chatCallback(new ChatCallback());
+            //狄拍
+//            LiveParam.PushParam param = new LiveParam.PushParam();
+//            param.video_width = 1280;
+//            param.video_height = 720;
+//            Broadcast.Builder builder = new Broadcast.Builder()
+//                    .stream(true)
+//                    .param(param)
+//                    .callback(new BroadcastEventCallback())
+//                    .chatCallback(new ChatCallback());
             broadcast = builder.build();
         }
+
         return broadcast;
     }
 
@@ -196,6 +206,9 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     private class BroadcastEventCallback implements Broadcast.BroadcastEventCallback {
         @Override
         public void onError(int errorCode, String reason) {
+            if (errorCode == Broadcast.ERROR_CONNECTE) {
+                Log.e(TAG, "broadcast error, reason:" + reason);
+            }
             mView.showMsg(reason);
         }
 
@@ -206,6 +219,27 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                     mView.showMsg("连接成功!");
                     isPublishing = true;
                     mView.setStartBtnImage(false);
+                    //start push data for 狄拍
+                    /**
+                     * push音频数据
+                     *
+                     * @param data      音频数据（aac编码的数据）注意要先传音频头
+                     * @param size      音频数据大小
+                     * @param type      数据类型 0代表视频头 1代表音频头 2代表音频数据 3代表I帧 4代表p帧 5代表b帧
+                     * @param timestamp 音频时间戳 单位MS
+                     * @return 0是成功，非0是失败
+                     */
+//                    getBroadcast().PushAACDataTs();
+                    /**
+                     * push视频数据
+                     *
+                     * @param data      视屏数据(h264编码的数据) 注意要先传视频头
+                     * @param size      视频数据的大小
+                     * @param type      数据类型 0代表视频头 1代表音频头 2代表音频数据 3代表I帧 4代表p帧 5代表b帧
+                     * @param timestamp 视频时间戳 单位MS
+                     * @return 0是成功，非0是失败
+                     */
+//                    getBroadcast().PushH264DataTs();
                     break;
                 case Broadcast.STATE_NETWORK_OK: /** 网络通畅*/
                     mView.showMsg("网络通畅!");
@@ -216,6 +250,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                 case Broadcast.STATE_STOP:
                     isPublishing = false;
                     mView.setStartBtnImage(true);
+                    //stop push data for 狄拍
                     break;
             }
         }

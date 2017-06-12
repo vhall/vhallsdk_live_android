@@ -1,12 +1,6 @@
 package com.vhall.uilibs.watch;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -14,31 +8,25 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.vhall.business.MessageServer;
 import com.vhall.business.WatchLive;
 import com.vhall.business.utils.LogManager;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import master.flame.danmaku.controller.IDanmakuView;
@@ -59,20 +47,20 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     private WatchContract.LivePresenter mPresenter;
 
     private ImageView clickOrientation, clickStart, mVrButton;
-    private RadioButton radioButtonShowDEFAULT, radioButtonShowHD, radioButtonShowUHD;
+    private RadioButton radioButtonShowDEFAULT, radioButtonShowSD, radioButtonShowHD, radioButtonShowUHD;
 
     private RadioGroup radioChoose;
     private TextView fragmentDownloadSpeed;
-    private ProgressDialog mProcessDialog;
     private ContainerLayout mContainerLayout;
     private ImageView btn_change_scaletype;
     private ImageView btnChangePlayStatus;
     ImageView btn_danmaku;
+    ProgressBar progressbar;
 
     private IDanmakuView mDanmakuView;
     private DanmakuContext mDanmuContext;
     private BaseDanmakuParser mParser;
-    private Context context;
+    private Activity context;
 
     public static WatchLiveFragment newInstance() {
         return new WatchLiveFragment();
@@ -92,10 +80,6 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         this.context = activity;
-        /** 初始化Dialog*/
-        mProcessDialog = new ProgressDialog(activity);
-        mProcessDialog.setCancelable(true);
-        mProcessDialog.setCanceledOnTouchOutside(false);
     }
 
     @Override
@@ -123,6 +107,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         radioChoose = (RadioGroup) root.findViewById(R.id.radio_choose);
         radioChoose.setOnCheckedChangeListener(checkListener);
         radioButtonShowDEFAULT = (RadioButton) root.findViewById(R.id.radio_btn_default);
+        radioButtonShowSD = (RadioButton) root.findViewById(R.id.radio_btn_sd);
         radioButtonShowHD = (RadioButton) root.findViewById(R.id.radio_btn_hd);
         radioButtonShowUHD = (RadioButton) root.findViewById(R.id.radio_btn_uhd);
         mContainerLayout = (ContainerLayout) root.findViewById(R.id.rl_container);
@@ -136,6 +121,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         btnChangePlayStatus.setOnClickListener(this);
         btn_change_scaletype = (ImageView) root.findViewById(R.id.btn_change_scaletype);
         btn_change_scaletype.setOnClickListener(this);
+        progressbar = (ProgressBar) root.findViewById(R.id.progressbar);
         root.findViewById(R.id.image_action_back).setOnClickListener(this);
         // 设置最大显示行数
         HashMap<Integer, Integer> maxLinesPair = new HashMap<Integer, Integer>();
@@ -213,12 +199,10 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
     @Override
     public void showLoading(boolean isShow) {
-        if (mProcessDialog != null) {
-            mProcessDialog.dismiss();
-            if (isShow) {
-                mProcessDialog.show();
-            }
-        }
+        if (isShow)
+            progressbar.setVisibility(View.VISIBLE);
+        else
+            progressbar.setVisibility(View.GONE);
     }
 
 
@@ -239,10 +223,10 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         } else if (i == R.id.btn_change_audio) {
             if (mPresenter.getCurrentPixel() == WatchLive.DPI_DEFAULT) {
                 mPresenter.onSwitchPixel(WatchLive.DPI_AUDIO);
-                btnChangePlayStatus.setBackground(getResources().getDrawable(R.drawable.audio_open));
+                btnChangePlayStatus.setImageResource(R.drawable.audio_open);
             } else if (mPresenter.getCurrentPixel() == WatchLive.DPI_AUDIO) {
                 mPresenter.onSwitchPixel(WatchLive.DPI_DEFAULT);
-                btnChangePlayStatus.setBackground(getResources().getDrawable(R.drawable.audio_close));
+                btnChangePlayStatus.setImageResource(R.drawable.audio_close);
             }
         } else if (i == R.id.btn_danmaku) {
             if (mDanmakuView == null || !mDanmakuView.isPrepared())
@@ -279,12 +263,12 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
                     else
                         btnChangePlayStatus.setVisibility(View.GONE);
                     break;
-//                case "SD":
-//                    if (value == 1)
-//                        radioButtonShowSD.setVisibility(View.VISIBLE);
-//                    else
-//                        radioButtonShowSD.setVisibility(View.GONE);
-//                    break;
+                case "SD":
+                    if (value == 1)
+                        radioButtonShowSD.setVisibility(View.VISIBLE);
+                    else
+                        radioButtonShowSD.setVisibility(View.GONE);
+                    break;
                 case "HD":
                     if (value == 1)
                         radioButtonShowHD.setVisibility(View.VISIBLE);
@@ -396,6 +380,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         public void onCheckedChanged(RadioGroup radioGroup, int i) {
             if (i == R.id.radio_btn_default) {
                 mPresenter.onSwitchPixel(WatchLive.DPI_DEFAULT);
+            } else if (i == R.id.radio_btn_sd) {
+                mPresenter.onSwitchPixel(WatchLive.DPI_SD);
             } else if (i == R.id.radio_btn_hd) {
                 mPresenter.onSwitchPixel(WatchLive.DPI_HD);
             } else if (i == R.id.radio_btn_uhd) {

@@ -22,6 +22,7 @@
             android:drawablePadding="@dimen/common_drawable_padding_8dp"
             android:gravity="center_vertical"
             android:hint="请输入用户名"
+            android:text=""
             android:textColorHint="@color/gray_text_hint"
             android:textSize="@dimen/string_size_16" />
 
@@ -34,6 +35,7 @@
             android:gravity="center_vertical"
             android:hint="请输入密码"
             android:inputType="textPassword"
+            android:text=""
             android:textColorHint="@color/gray_text_hint"
             android:textSize="@dimen/string_size_16" />
 

@@ -1,6 +1,5 @@
 package com.vhall.uilibs.watch;
 
-import android.content.pm.ActivityInfo;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
@@ -13,17 +12,16 @@ import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.WatchLive;
 import com.vhall.business.WatchPlayback;
+import com.vhall.playersdk.player.vhallplayer.VHallPlayer;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.chat.ChatContract;
+import com.vhall.uilibs.util.VhallUtil;
+import com.vhall.uilibs.util.emoji.InputUser;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.vhall.playersdk.player.vhallplayer.VHallPlayer;
-import com.vhall.uilibs.util.emoji.InputUser;
 
 /**
  * 观看回放的Presenter
@@ -47,6 +45,9 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     private long playerCurrentPosition = 0L;
     private long playerDuration;
     private String playerDurationTimeStr = "00:00:00";
+
+    private boolean loadingVideo = false;
+    private boolean loadingComment = false;
 
     private Timer timer;
     private Handler handler = new Handler() {
@@ -80,23 +81,32 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     private void initCommentData(int pos) {
+        if (loadingComment)
+            return;
+        loadingComment = true;
         watchPlayback.requestCommentHistory(param.watchId, limit, pos, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
+                loadingComment = false;
                 chatView.notifyDataChanged(list);
             }
 
             @Override
             public void onFailed(int errorcode, String messaage) {
+                loadingComment = false;
                 watchView.showToast(messaage);
             }
         });
     }
 
     private void initWatch() {
+        if (loadingVideo)
+            return;
+        loadingVideo = true;
         VhallSDK.getInstance().initWatch(param.watchId, param.userName, param.userCustomId, param.userVhallId, param.key, getWatchPlayback(), new VhallSDK.RequestCallback() {
             @Override
             public void onSuccess() {
+                loadingVideo = false;
                 handlePosition();
                 pos = 0;
                 initCommentData(pos);
@@ -105,6 +115,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
             @Override
             public void onError(int errorCode, String reason) {
+                loadingVideo = false;
                 watchView.showToast(reason);
             }
         });

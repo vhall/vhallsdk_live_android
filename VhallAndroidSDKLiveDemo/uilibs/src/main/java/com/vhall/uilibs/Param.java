@@ -18,7 +18,7 @@ public class Param implements Serializable {
     //看直播相关
     public String watchId = "";
     public String key = "";
-    public int bufferSecond = 2;
+    public int bufferSecond = 4;
 
     //用户相关
     public String userVhallId = "";
