@@ -31,7 +31,7 @@ dependencies {
     compile('io.socket:socket.io-client:0.8.3') {
         exclude group: 'org.json', module: 'json'
     }
-    compile(name: 'vhallsdk2.9.0.2', ext: 'aar')
+    compile(name: 'vhallsdk3.0', ext: 'aar')
     dependencies {
         compile 'com.github.ctiao:DanmakuFlameMaster:0.6.4'
         compile 'com.github.ctiao:ndkbitmap-armv7a:0.6.4'

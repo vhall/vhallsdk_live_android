@@ -89,9 +89,7 @@ public class SetParamActivity extends FragmentActivity {
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
-        if (bufferSeconds > 0 && bufferSeconds < 5) {
-            param.bufferSecond = bufferSeconds;
-        }
+        param.bufferSecond = bufferSeconds;
 
         if (rb_hdpi.isChecked()) {
             param.pixel_type = CameraFilterView.TYPE_HDPI;

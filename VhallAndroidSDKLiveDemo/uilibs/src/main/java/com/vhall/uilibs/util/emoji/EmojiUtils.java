@@ -219,10 +219,10 @@ public class EmojiUtils {
         addPattern(emoticons, f072, R.mipmap.f072);
         addPattern(emoticons, f073, R.mipmap.f073);
         addPattern(emoticons, f074, R.mipmap.f074);
-        addPattern(emoticons, f075, R.mipmap.f075);
-        addPattern(emoticons, f076, R.mipmap.f076);
-        addPattern(emoticons, f077, R.mipmap.f077);
-        addPattern(emoticons, f078, R.mipmap.f078);
+        addPattern(emoticons, f078, R.mipmap.f075);
+        addPattern(emoticons, f075, R.mipmap.f076);
+        addPattern(emoticons, f076, R.mipmap.f077);
+        addPattern(emoticons, f077, R.mipmap.f078);
         addPattern(emoticons, f079, R.mipmap.f079);
         addPattern(emoticons, f080, R.mipmap.f080);
         addPattern(emoticons, f081, R.mipmap.f081);

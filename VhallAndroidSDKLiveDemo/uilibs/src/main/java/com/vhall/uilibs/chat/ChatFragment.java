@@ -299,7 +299,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
             }
             ChatServer.ChatInfo data = chatData.get(position);
             ChatServer.ChatInfo.QuestionData questionData = data.questionData;
-            //Glide.with(getActivity()).load(data.avatar).placeholder(R.drawable.icon_vhall_108).into(viewHolder.iv_question_avatar);
+            Glide.with(getActivity()).load(questionData.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_question_avatar);
             //TODO 头像设置
             viewHolder.tv_question_name.setText(questionData.nick_name);
             viewHolder.tv_question_time.setText(questionData.created_at);
@@ -309,7 +309,10 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                 viewHolder.tv_answer_content.setText(EmojiUtils.getEmojiText(mActivity, questionData.answer.content), TextView.BufferType.SPANNABLE);
                 viewHolder.tv_answer_name.setText(questionData.answer.nick_name);
                 viewHolder.tv_answer_time.setText(questionData.answer.created_at);
+                Glide.with(getActivity()).load(questionData.answer.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_answer_avatar);
+                Glide.with(getActivity()).load(questionData.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_question_avatar);
             } else {
+                Glide.with(getActivity()).load(data.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_question_avatar);
                 viewHolder.ll_answer.setVisibility(View.GONE);
             }
             return convertView;

@@ -1,8 +1,12 @@
 package com.vhall.uilibs.broadcast;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +19,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vhall.gpuimage.GPUImageRenderer;
+import com.vhall.gpuimage.gpuimagefilter.GPUImageAlphaBlendFilter;
+import com.vhall.gpuimage.gpuimagefilter.GPUImageFilter;
+import com.vhall.gpuimage.gpuimagefilter.VhallBeautyFilter;
 import com.vhall.uilibs.R;
 import com.vhall.vhalllive.CameraFilterView;
+import com.vhall.vhalllive.Constants;
 
 /**
  * 发直播的Fragment
@@ -27,9 +35,11 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     private CameraFilterView cameraview;
     private TextView mSpeed;
     private Button mPublish, mChangeCamera, mChangeFlash, mChangeAudio, mChangeFilter, mBackBtn;
+    private SeekBar seekBar;
 
     private Activity mActivity;
     private PopupWindow mPopupWindow;
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -70,25 +80,48 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         mBackBtn = (Button) getView().findViewById(R.id.btn_back);
         mBackBtn.setOnClickListener(this);
 
-        cameraview.setAutoCloseFilterCallback(new GPUImageRenderer.AutoCloseBaeutyFilter() {
+        cameraview.setAutoCloseFilterCallback(new GPUImageRenderer.AutoCloseFilterListener() {
             @Override
-            public void onAutoCloseBaeutyFilter() {
+            public void onAutoCloseFilter() {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        cameraview.setFilterToBeauty(false);
+                        if (nonfilter == null)
+                            nonfilter = new GPUImageFilter();
+                        cameraview.setFilter(nonfilter);
                     }
                 });
             }
         });
         mPresenter.start();
+
+        seekBar = (SeekBar) getView().findViewById(R.id.seekbar);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mPresenter.setVolumeAmplificateSize(progress / 100f);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
     @Override
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.btn_publish) {
-            mPresenter.onstartBtnClick();
+            if (cameraAvailable)
+                mPresenter.onstartBtnClick();
+            else
+                Toast.makeText(mActivity, "camera is not available...", Toast.LENGTH_SHORT).show();
         } else if (i == R.id.btn_changeAudio) {
             mPresenter.changeAudio();
         } else if (i == R.id.btn_changeCamera) {
@@ -110,7 +143,9 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
 
     @Override
     public void initCamera(int piexl_type) {
-        cameraview.init(piexl_type, mActivity, new RelativeLayout.LayoutParams(0, 0));
+        cameraview.init(piexl_type, mActivity);
+        cameraview.setDrawMode(CameraFilterView.DrawMode.kVHallDrawModeAspectFill.getValue());
+
         if (cameraview.getNumberOfCameras() > 1)
             setCameraBtnEnable(true);
         else
@@ -166,21 +201,28 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     public void onPause() {
         super.onPause();
         cameraview.pause();
-        mPresenter.onPause();
+        mPresenter.stopBroadcast();
     }
+
+    boolean cameraAvailable = true;
 
     @Override
     public void onResume() {
         super.onResume();
-        cameraview.resume();
-        mPresenter.onResume();
+        cameraAvailable = cameraview.resume();
+        Log.e("broadcast", "cameraAvai:" + cameraAvailable);
+        //auto startBro or not
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mPresenter.onDestory();
+        mPresenter.destoryBroadcast();
     }
+
+
+    VhallBeautyFilter beautyFilter = null;
+    GPUImageFilter nonfilter = null;
 
     private void showPopupWindow() {
         if (mPopupWindow == null) {
@@ -191,29 +233,28 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     if (checkedId == R.id.radio_0) {
-                        cameraview.setFilterToBeauty(false);
-                    } else if (checkedId == R.id.radio_1) {
-                        if (!cameraview.isShowFilter())
-                            cameraview.setFilterToBeauty(true);
-                        cameraview.setFilterAdjuster(20);
-                    } else if (checkedId == R.id.radio_2) {
-                        if (!cameraview.isShowFilter())
-                            cameraview.setFilterToBeauty(true);
-                        cameraview.setFilterAdjuster(40);
-                    } else if (checkedId == R.id.radio_3) {
-                        if (!cameraview.isShowFilter())
-                            cameraview.setFilterToBeauty(true);
-                        cameraview.setFilterAdjuster(60);
-                    } else if (checkedId == R.id.radio_4) {
-                        if (!cameraview.isShowFilter())
-                            cameraview.setFilterToBeauty(true);
-                        cameraview.setFilterAdjuster(80);
-                    } else if (checkedId == R.id.radio_5) {
-                        if (!cameraview.isShowFilter())
-                            cameraview.setFilterToBeauty(true);
-                        cameraview.setFilterAdjuster(100);
+                        if (nonfilter == null)
+                            nonfilter = new GPUImageFilter();
+                        cameraview.setFilter(nonfilter);
+                    } else {
+                        if (beautyFilter == null)
+                            beautyFilter = new VhallBeautyFilter();
+                        cameraview.setFilter(beautyFilter);
+                        int level = 1;
+                        if (checkedId == R.id.radio_1) {
+                            level = 1;
+                        } else if (checkedId == R.id.radio_2) {
+                            level = 2;
+                        } else if (checkedId == R.id.radio_3) {
+                            level = 3;
+                        } else if (checkedId == R.id.radio_4) {
+                            level = 4;
+                        } else if (checkedId == R.id.radio_5) {
+//                            cameraview.setFilterAdjuster(100);
+                            level = 5;
+                        }
+                        beautyFilter.setBeautyLevel(level);
                     }
-                    Toast.makeText(mActivity, "checked:" + checkedId, Toast.LENGTH_SHORT).show();
                 }
             });
             mPopupWindow = new PopupWindow(contentView,
@@ -226,4 +267,6 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
 
         mPopupWindow.showAsDropDown(mChangeFilter, -18, 0);
     }
+
+
 }

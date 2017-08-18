@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.widget.RelativeLayout;
 
 import com.opengl.GL_Preview_YUV;
 import com.vhall.business.ChatServer;
@@ -17,6 +18,7 @@ import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.vhalllive.Constants;
 import com.vhall.vhalllive.common.GLPlayInterface;
 
 import java.util.List;
@@ -38,9 +40,9 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     public boolean isWatching = false;
     private WatchLive watchLive;
 
-    int[] scaleTypes = new int[]{WatchLive.FIT_DEFAULT, WatchLive.FIT_CENTER_INSIDE, WatchLive.FIT_X, WatchLive.FIT_Y, WatchLive.FIT_XY};
+    int[] scaleTypes = new int[]{Constants.DrawMode.kVHallDrawModeAspectFit.getValue(), Constants.DrawMode.kVHallDrawModeAspectFill.getValue(), Constants.DrawMode.kVHallDrawModeNone.getValue()};
     int currentPos = 0;
-    private int scaleType = WatchLive.FIT_DEFAULT;
+    private int scaleType = Constants.DrawMode.kVHallDrawModeAspectFit.getValue();
 
     private GLPlayInterface mPlayView;
 
@@ -60,6 +62,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     @Override
     public void start() {
         getWatchLive().setVRHeadTracker(true);
+        getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeAspectFit.getValue());
         initWatch();
     }
 
@@ -150,22 +153,16 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
             return;
         }
         force = false;
-        if (watchView.getActivity().isFinishing()) {
-            return;
-        }
+
         if (isWatching) {
             stopWatch();
         }
         getWatchLive().setDefinition(level);
-        /** 停止观看 不能立即重连 要延迟一秒重连*/
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!isWatching && !watchView.getActivity().isFinishing()) {
-                    startWatch();
-                }
-            }
-        }, 500);
+
+        if (watchView.getActivity().isFinishing()) {
+            return;
+        }
+        startWatch();
     }
 
 
@@ -290,6 +287,8 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
 //                    .playView(mPlayView = new VRPlayView(watchView.getActivity().getApplicationContext()))//todo 添加到自定义布局中，非new
 //                    .chatCallback(new ChatCallback());
 //            watchLive = builder.build();
+//            liveView.getWatchLayout().addView((VRPlayView) mPlayView, 640, 480);
+//            ((VRPlayView) mPlayView).getHolder().setFixedSize(640, 480);
 //        }
         return watchLive;
     }
@@ -297,6 +296,10 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
     //签到
     @Override
     public void signIn(String signId) {
+        if (TextUtils.isEmpty(params.userVhallId)) {
+            watchView.showToast(R.string.vhall_login_first);
+            return;
+        }
         VhallSDK.getInstance().performSignIn(params.watchId, params.userVhallId, params.userName, signId, new VhallSDK.RequestCallback() {
             @Override
             public void onSuccess() {
@@ -344,6 +347,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
         public void onError(int errorCode, String errorMsg) {
             switch (errorCode) {
                 case WatchLive.ERROR_CONNECT:
+                    Log.e(TAG, "ERROR_CONNECT  ");
                     isWatching = false;
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
@@ -358,6 +362,7 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
         public void onStateChanged(int stateCode) {
             switch (stateCode) {
                 case WatchLive.STATE_CONNECTED:
+                    Log.e(TAG, "STATE_CONNECTED  ");
                     isWatching = true;
                     liveView.setPlayPicture(isWatching);
                     break;
@@ -367,9 +372,11 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
                         liveView.showLoading(true);
                     break;
                 case WatchLive.STATE_BUFFER_STOP:
+                    Log.e(TAG, "STATE_BUFFER_STOP  ");
                     liveView.showLoading(false);
                     break;
                 case WatchLive.STATE_STOP:
+                    Log.e(TAG, "STATE_STOP  ");
                     isWatching = false;
                     liveView.setPlayPicture(isWatching);
                     break;
@@ -383,8 +390,8 @@ public class WatchLivePresenter implements WatchContract.WatchPresenter, WatchCo
 
         @Override
         public void videoInfo(int width, int height) {
-            if(mPlayView!=null){
-                mPlayView.init(width,height);
+            if (mPlayView != null) {
+                mPlayView.init(width, height);
                 // INIT STUF
             }
         }

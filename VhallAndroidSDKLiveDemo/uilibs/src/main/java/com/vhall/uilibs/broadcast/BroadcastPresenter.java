@@ -79,7 +79,8 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void stopBroadcast() {//停止直播
-        getBroadcast().stop();
+        if (isPublishing)
+            getBroadcast().stop();
     }
 
     @Override
@@ -122,21 +123,13 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     }
 
     @Override
-    public void onPause() {
-        if (isPublishing)
-            stopBroadcast();
-    }
-
-    @Override
-    public void onDestory() {
+    public void destoryBroadcast() {
         getBroadcast().destory();
     }
 
     @Override
-    public void onResume() {
-        //异常中断（HOME/PHONE）返回，是否自动继续直播
-//        if (!ispublishing && getBroadcast().isAvaliable())
-//            getBroadcast().start();
+    public void setVolumeAmplificateSize(float size) {
+        getBroadcast().setVolumeAmplificateSize(size);
     }
 
     private Broadcast getBroadcast() {

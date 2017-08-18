@@ -252,7 +252,11 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 case VHallPlayer.STATE_ENDED:
                     playbackView.showProgressbar(false);
                     Log.e(TAG, "STATE_ENDED");
-                    stopPlay();
+                    playerCurrentPosition = 0;
+                    getWatchPlayback().seekTo(0);
+                    playbackView.setSeekbarCurrentPosition(0);
+                    getWatchPlayback().pause();
+                    playbackView.setPlayIcon(true);
                     break;
                 default:
                     break;

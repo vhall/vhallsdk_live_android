@@ -52,10 +52,8 @@ public class BroadcastContract {
 
         void changeAudio();
 
-        void onPause();
+        void destoryBroadcast();
 
-        void onDestory();
-
-        void onResume();
+        void setVolumeAmplificateSize(float size);
     }
 }

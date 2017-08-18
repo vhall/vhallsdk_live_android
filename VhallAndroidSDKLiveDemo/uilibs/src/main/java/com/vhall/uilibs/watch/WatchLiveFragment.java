@@ -221,12 +221,12 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         } else if (i == R.id.image_action_back) {
             getActivity().onBackPressed();
         } else if (i == R.id.btn_change_audio) {
-            if (mPresenter.getCurrentPixel() == WatchLive.DPI_DEFAULT) {
-                mPresenter.onSwitchPixel(WatchLive.DPI_AUDIO);
-                btnChangePlayStatus.setImageResource(R.drawable.audio_open);
-            } else if (mPresenter.getCurrentPixel() == WatchLive.DPI_AUDIO) {
+            if (mPresenter.getCurrentPixel() == WatchLive.DPI_AUDIO) {
                 mPresenter.onSwitchPixel(WatchLive.DPI_DEFAULT);
                 btnChangePlayStatus.setImageResource(R.drawable.audio_close);
+            } else {
+                mPresenter.onSwitchPixel(WatchLive.DPI_AUDIO);
+                btnChangePlayStatus.setImageResource(R.drawable.audio_open);
             }
         } else if (i == R.id.btn_danmaku) {
             if (mDanmakuView == null || !mDanmakuView.isPrepared())
