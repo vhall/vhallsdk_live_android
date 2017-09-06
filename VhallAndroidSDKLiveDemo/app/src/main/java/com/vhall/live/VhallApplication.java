@@ -41,7 +41,7 @@ public class VhallApplication extends Application {
 
             param.watchId = sp.getString("watchid", "747100285");
             param.key = sp.getString("key", "");
-            param.bufferSecond = sp.getInt("buffersecond", 2);
+            param.bufferSecond = sp.getInt("buffersecond", 6);
 
             param.userVhallId = sp.getString("uservhallid", "");
             param.userCustomId = sp.getString("usercustomid", telephonyMgr.getDeviceId());
