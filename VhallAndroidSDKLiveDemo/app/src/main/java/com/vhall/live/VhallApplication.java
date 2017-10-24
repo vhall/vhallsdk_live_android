@@ -3,12 +3,9 @@ package com.vhall.live;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
-import android.telephony.TelephonyManager;
-
 import com.vhall.business.VhallSDK;
 import com.vhall.uilibs.Param;
-import com.vhall.vhalllive.CameraFilterView;
+import com.vhall.vhalllive.pushlive.CameraFilterView;
 
 /**
  * 主Application类
@@ -25,29 +22,23 @@ public class VhallApplication extends Application {
         context = this;
         getParam();
         VhallSDK.init(this, getResources().getString(R.string.vhall_app_key), getResources().getString(R.string.vhall_app_secret_key));
-        VhallSDK.setLogEnable(false);
+        VhallSDK.setLogEnable(true);
     }
 
     public Param getParam() {
         if (param == null) {
             param = new Param();
             SharedPreferences sp = this.getSharedPreferences("set", MODE_PRIVATE);
-            TelephonyManager telephonyMgr = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
-            param.broId = sp.getString("broid", "747100285");
-            param.broToken = sp.getString("brotoken", "e90bf38ce5104a07105182d19dcf7059");
+
+            param.broId = sp.getString("broid", "678757121");
+            param.broToken = sp.getString("brotoken", "3f726aed13c31d0b80bf5a1d1ed8048e");
             param.pixel_type = sp.getInt("pixeltype", CameraFilterView.TYPE_HDPI);
             param.videoBitrate = sp.getInt("videobitrate", 500);
-            param.videoFrameRate = sp.getInt("videoframerate", 20);
+            param.videoFrameRate = sp.getInt("videoframerate", 15);
 
-            param.watchId = sp.getString("watchid", "747100285");
+            param.watchId = sp.getString("watchid", "353741994");
             param.key = sp.getString("key", "");
             param.bufferSecond = sp.getInt("buffersecond", 6);
-
-            param.userVhallId = sp.getString("uservhallid", "");
-            param.userCustomId = sp.getString("usercustomid", telephonyMgr.getDeviceId());
-            param.userName = sp.getString("username", Build.BRAND + getString(R.string.phone_user));
-            param.userAvatar = sp.getString("useravatar", "");
-
         }
         return param;
     }
@@ -67,11 +58,6 @@ public class VhallApplication extends Application {
         editor.putString("watchid", param.watchId);
         editor.putString("key", param.key);
         editor.putInt("buffersecond", param.bufferSecond);
-
-        editor.putString("uservhallid", param.userVhallId);
-        editor.putString("usercustomid", param.userCustomId);
-        editor.putString("username", param.userName);
-        editor.putString("useravatar", param.userAvatar);
 
         editor.commit();
 

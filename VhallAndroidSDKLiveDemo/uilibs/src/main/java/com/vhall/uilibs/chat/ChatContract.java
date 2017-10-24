@@ -30,6 +30,8 @@ public class ChatContract {
 
         void sendChat(String text);
 
+        void sendCustom(String text);
+
         void sendQuestion(String content);
 
         void onLoginReturn();

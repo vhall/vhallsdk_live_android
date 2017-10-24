@@ -4,13 +4,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -19,6 +16,7 @@ import android.widget.Toast;
 
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
+import com.vhall.business.data.RequestCallback;
 import com.vhall.uilibs.R;
 
 /**
@@ -41,6 +39,7 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
         this.mContext = context;
         initView();
     }
+
     public ShowLotteryDialog(Context context, int theme) {
         super(context, theme);
         this.mContext = context;
@@ -157,7 +156,7 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
 
     public void submit(String nickname, String phone) {
         if (!TextUtils.isEmpty(lottery.id) && !TextUtils.isEmpty(lottery.lottery_id)) {
-            VhallSDK.getInstance().submitLotteryInfo(lottery.id, lottery.lottery_id, nickname, phone, new VhallSDK.RequestCallback() {
+            VhallSDK.submitLotteryInfo(lottery.id, lottery.lottery_id, nickname, phone, new RequestCallback() {
                 @Override
                 public void onSuccess() {
                     dismiss();

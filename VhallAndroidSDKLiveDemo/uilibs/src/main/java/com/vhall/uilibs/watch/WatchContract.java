@@ -6,9 +6,12 @@ import android.widget.SeekBar;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
 import com.vhall.business.widget.ContainerLayout;
+import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
+
+import org.fourthline.cling.android.AndroidUpnpService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +57,10 @@ public class WatchContract {
 
         //显示抽奖
         void showLottery(final MessageServer.MsgInfo messageInfo);
+
+        void showDevices();
+
+        void dismissDevices();
 
     }
 
@@ -109,7 +116,7 @@ public class WatchContract {
 
     }
 
-    interface PlaybackPresenter extends BasePresenter {
+    interface PlaybackPresenter extends WatchPresenter {
         void onFragmentStop();
 
         void onFragmentDestory();
@@ -129,9 +136,11 @@ public class WatchContract {
         int changeScaleType();
 
         int changeScreenOri();
+
+        void saveCurrentPosition(boolean isStart);
     }
 
-    interface LivePresenter extends BasePresenter {
+    interface LivePresenter extends WatchPresenter {
 
         void initWatch();
 
@@ -166,5 +175,10 @@ public class WatchContract {
 
         void submitSurvey(Survey survey, String result);
 
+        void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
+
+        void showDevices();
+
+        void dismissDevices();
     }
 }

@@ -1,17 +1,19 @@
 package com.vhall.live;
 
-import android.content.Intent;
-import android.content.pm.ActivityInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.vhall.business.VhallSDK;
 import com.vhall.uilibs.Param;
-import com.vhall.vhalllive.CameraFilterView;
+import com.vhall.vhalllive.pushlive.CameraFilterView;
 
 /**
  * 主界面的Activity
@@ -53,8 +55,9 @@ public class SetParamActivity extends FragmentActivity {
         et_watch_id.setText(param.watchId);
         et_key.setText(param.key);
         et_buffersecond.setText(String.valueOf(param.bufferSecond));
-        et_userid.setText(param.userCustomId);
-        et_usernickname.setText(param.userName);
+        TelephonyManager telephonyMgr = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
+        et_userid.setText(TextUtils.isEmpty(VhallSDK.getUserName())?telephonyMgr.getDeviceId():VhallSDK.getUserName());
+        et_usernickname.setText(TextUtils.isEmpty(VhallSDK.getUserNickname())? Build.BRAND + getString(R.string.phone_user):VhallSDK.getUserNickname());
         if (param.pixel_type == CameraFilterView.TYPE_HDPI) {
             rb_hdpi.setChecked(true);
         } else if (param.pixel_type == CameraFilterView.TYPE_XHDPI) {

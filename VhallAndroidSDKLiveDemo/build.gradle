@@ -16,6 +16,12 @@ allprojects {
     repositories {
         jcenter()
     }
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://4thline.org/m2'
+        }
+    }
 }
 
 task clean(type: Delete) {

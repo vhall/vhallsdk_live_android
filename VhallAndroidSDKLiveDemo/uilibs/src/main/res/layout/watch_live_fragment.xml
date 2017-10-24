@@ -28,6 +28,14 @@
             android:layout_margin="7dp"
             android:src="@drawable/icon_round_back" />
 
+        <ImageView
+            android:id="@+id/iv_dlna"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/push_tv" />
+
         <TextView
             android:id="@+id/fragment_download_speed"
             android:layout_width="wrap_content"
@@ -37,6 +45,8 @@
             android:layout_marginTop="10dp"
             android:textColor="#E60000"
             android:textSize="16sp" />
+
+
     </RelativeLayout>
 
     <RelativeLayout

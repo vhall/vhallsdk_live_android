@@ -5,13 +5,12 @@ import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.vhall.business.VhallSDK;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.util.CircleImageView;
 import com.vhall.uilibs.util.VhallUtil;
@@ -41,16 +40,11 @@ public class MainActivity extends FragmentActivity {
         tv_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (TextUtils.isEmpty(param.userVhallId)) {
+                if (!VhallSDK.isLogin()) {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
                 } else {
-                    TelephonyManager telephonyMgr = (TelephonyManager) MainActivity.this.getSystemService(TELEPHONY_SERVICE);
-                    param.userVhallId = "";
-                    param.userAvatar = "";
-                    param.userName = Build.BRAND + getResources().getString(R.string.phone_user);
-                    param.userCustomId = telephonyMgr.getDeviceId();
-                    VhallApplication.setParam(param);
+                    VhallSDK.logout();
                     initPage();
                 }
             }
@@ -66,10 +60,13 @@ public class MainActivity extends FragmentActivity {
     private void initPage() {
         param = VhallApplication.param;
         tv_phone.setText(Build.MODEL);
-        tv_name.setText(param.userName);
-        //Glide.with(this).load(param.userAvatar).placeholder(R.drawable.icon_default_avatar).into(mCircleViewAvatar);
-        Glide.with(this).load(param.userAvatar).into(mCircleViewAvatar);
-        if (TextUtils.isEmpty(param.userVhallId)) {
+        tv_name.setText(TextUtils.isEmpty(VhallSDK.getUserNickname()) ? Build.BRAND + getString(R.string.phone_user) : VhallSDK.getUserNickname());
+        if (!TextUtils.isEmpty(VhallSDK.getUserAvatar())){
+            Glide.with(this).load(VhallSDK.getUserAvatar()).into(mCircleViewAvatar);
+        } else {
+            mCircleViewAvatar.setImageDrawable(getResources().getDrawable(R.drawable.icon_default_avatar));
+        }
+        if (!VhallSDK.isLogin()) {
             tv_login.setText(R.string.login);
         } else {
             tv_login.setText(R.string.logoff);

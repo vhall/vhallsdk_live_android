@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -17,7 +16,6 @@ import android.widget.Toast;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.UserInfo;
 import com.vhall.business.data.source.UserInfoDataSource;
-import com.vhall.uilibs.Param;
 
 /**
  * 登录界面
@@ -38,25 +36,16 @@ public class LoginActivity extends Activity {
     }
 
     public void login(String username, String userpass) {
-        VhallSDK.getInstance().login(username, userpass, new UserInfoDataSource.UserInfoCallback() {
+        VhallSDK.login(username, userpass, new UserInfoDataSource.UserInfoCallback() {
             @Override
             public void onSuccess(UserInfo userInfo) {
                 Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
-                if (userInfo != null) {
-                    Param param = VhallApplication.param;
-                    param.userAvatar = userInfo.avatar;
-                    param.userVhallId = userInfo.user_id;
-                    param.userCustomId = userInfo.account;
-                    param.userName = userInfo.nick_name;
-                    VhallApplication.setParam(param);
-                    skipMain();
-                }
+                skipMain();
             }
 
             @Override
             public void onError(int errorCode, String reason) {
-                Toast.makeText(LoginActivity.this, "" + reason, Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "errorCode:" + errorCode + " errorReason:" + reason);
+                Toast.makeText(LoginActivity.this, reason, Toast.LENGTH_SHORT).show();
             }
         });
     }

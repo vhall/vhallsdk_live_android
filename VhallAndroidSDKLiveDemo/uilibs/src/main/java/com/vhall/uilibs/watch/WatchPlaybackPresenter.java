@@ -1,8 +1,10 @@
 package com.vhall.uilibs.watch;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -10,14 +12,21 @@ import android.widget.Toast;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
-import com.vhall.business.WatchLive;
-import com.vhall.business.WatchPlayback;
+import com.vhall.business.data.RequestCallback;
+import com.vhall.business.data.WebinarInfo;
+import com.vhall.business_support.WatchLive;
+import com.vhall.business_support.WatchPlayback;
+import com.vhall.business.data.Survey;
+import com.vhall.business_support.Watch_Support;
+import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.playersdk.player.vhallplayer.VHallPlayer;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
+
+import org.fourthline.cling.android.AndroidUpnpService;
 
 import java.util.List;
 import java.util.Timer;
@@ -42,7 +51,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     private int limit = 5;
     private int pos = 0;
 
-    private long playerCurrentPosition = 0L;
+    private long playerCurrentPosition = 0L; // 当前的进度
     private long playerDuration;
     private String playerDurationTimeStr = "00:00:00";
 
@@ -54,12 +63,26 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (getWatchPlayback().isPlaying()) {
-                playerCurrentPosition = getWatchPlayback().getCurrentPosition();
-                playbackView.setSeekbarCurrentPosition((int) playerCurrentPosition);
-//                String playerCurrentPositionStr = VhallUtil.converLongTimeToStr(playerCurrentPosition);
-//                //playbackView.setProgressLabel(playerCurrentPositionStr + "/" + playerDurationTimeStr);
-//                playbackView.setProgressLabel(playerCurrentPositionStr, playerDurationTimeStr);
+
+            switch (msg.what) {
+                case 0: // 每秒更新SeekBar
+                    if (getWatchPlayback().isPlaying()) {
+                        playerCurrentPosition = getWatchPlayback().getCurrentPosition();
+                        playbackView.setSeekbarCurrentPosition((int) playerCurrentPosition);
+                        //                String playerCurrentPositionStr = VhallUtil.converLongTimeToStr(playerCurrentPosition);
+                        //                //playbackView.setProgressLabel(playerCurrentPositionStr + "/" + playerDurationTimeStr);
+                        //                playbackView.setProgressLabel(playerCurrentPositionStr, playerDurationTimeStr);
+                    }
+                    break;
+                case 1: // 获取当前的播放进度
+                    boolean isStart = (boolean) msg.obj;
+                    if (isStart) {
+                        startPlay();
+                    } else
+                        paushPlay();
+                    getWatchPlayback().seekTo(playerCurrentPosition);
+                    //playbackView.setPlayIcon(!isStart);
+                    break;
             }
         }
     };
@@ -72,6 +95,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         this.param = param;
         this.playbackView.setPresenter(this);
         this.chatView.setPresenter(this);
+        this.watchView.setPresenter(this);
     }
 
     @Override
@@ -103,7 +127,11 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         if (loadingVideo)
             return;
         loadingVideo = true;
-        VhallSDK.getInstance().initWatch(param.watchId, param.userName, param.userCustomId, param.userVhallId, param.key, getWatchPlayback(), new VhallSDK.RequestCallback() {
+        //游客ID及昵称 已登录用户可传空
+        TelephonyManager telephonyMgr = (TelephonyManager) watchView.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+        String customeId = telephonyMgr.getDeviceId();
+        String customNickname = Build.BRAND + "手机用户";
+        VhallSDK.initWatch(param.watchId, customeId, customNickname, param.key, getWatchPlayback(), WebinarInfo.VIDEO, new RequestCallback() {
             @Override
             public void onSuccess() {
                 loadingVideo = false;
@@ -141,7 +169,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             return;
         playbackView.setPlayIcon(false);
         getWatchPlayback().start();
-
     }
 
     @Override
@@ -162,7 +189,14 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             paushPlay();
         } else {
             if (getWatchPlayback().isAvaliable()) {
-                startPlay();
+                if (playerCurrentPosition > 0) {
+                    Message msg = handler.obtainMessage();
+                    msg.what = 1;
+                    msg.obj = true;
+                    handler.sendMessage(msg);
+                } else {
+                    startPlay();
+                }
             } else {
                 initWatch();
             }
@@ -196,12 +230,59 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         return watchView.changeOrientation();
     }
 
+    @Override
+    public void saveCurrentPosition(boolean isStart) {
+        if (playerCurrentPosition > 0 && handler != null) {
+            //handler.sendEmptyMessage(1);
+            Message msg = handler.obtainMessage();
+            msg.what = 1;
+            msg.obj = isStart;
+            handler.sendMessage(msg);
+        }
+    }
+
     public WatchPlayback getWatchPlayback() {
         if (watchPlayback == null) {
             WatchPlayback.Builder builder = new WatchPlayback.Builder().context(watchView.getActivity()).containerLayout(playbackView.getContainer()).callback(new WatchCallback()).docCallback(new DocCallback());
             watchPlayback = builder.build();
         }
         return watchPlayback;
+    }
+
+    @Override
+    public void signIn(String signId) {
+
+    }
+
+
+    @Override
+    public void submitSurvey(Survey survey, String result) {
+
+    }
+
+    @Override
+    public void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
+        getWatchPlayback().dlnaPost(deviceDisplay, service, new Watch_Support.DLNACallback() {
+            @Override
+            public void onError(int errorCode) {
+                watchView.showToast("投屏失败，errorCode:" + errorCode);
+            }
+
+            @Override
+            public void onSuccess() {
+                watchView.showToast("投屏成功!");
+            }
+        });
+    }
+
+    @Override
+    public void showDevices() {
+        watchView.showDevices();
+    }
+
+    @Override
+    public void dismissDevices() {
+        watchView.dismissDevices();
     }
 
     private class DocCallback implements WatchPlayback.DocumentEventCallback {
@@ -272,6 +353,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         @Override
         public void onVideoSizeChanged(int width, int height) {//视频宽高改变
         }
+
     }
 
     //每秒获取一下进度
@@ -294,11 +376,11 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     @Override
     public void sendChat(final String text) {
-        if (TextUtils.isEmpty(param.userVhallId)) {
+        if (!VhallSDK.isLogin()) {
             Toast.makeText(watchView.getActivity(), R.string.vhall_login_first, Toast.LENGTH_SHORT).show();
             return;
         }
-        getWatchPlayback().sendComment(text, param.userVhallId, new VhallSDK.RequestCallback() {
+        getWatchPlayback().sendComment(text, new RequestCallback() {
             @Override
             public void onSuccess() {
                 chatView.clearChatData();
@@ -310,6 +392,11 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 watchView.showToast(reason);
             }
         });
+    }
+
+    @Override
+    public void sendCustom(String text) {
+
     }
 
     @Override

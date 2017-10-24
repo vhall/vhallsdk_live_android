@@ -1,17 +1,26 @@
 package com.vhall.uilibs.watch;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -20,9 +29,11 @@ import android.widget.Toast;
 
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
+import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.DevicePopu;
 import com.vhall.uilibs.util.ShowLotteryDialog;
 import com.vhall.uilibs.util.SignInDialog;
 import com.vhall.uilibs.util.SurveyPopu;
@@ -32,6 +43,21 @@ import com.vhall.uilibs.util.ExtendTextView;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
+
+import org.fourthline.cling.android.AndroidUpnpService;
+import org.fourthline.cling.android.AndroidUpnpServiceImpl;
+import org.fourthline.cling.android.FixedAndroidLogHandler;
+import org.fourthline.cling.model.meta.Device;
+import org.fourthline.cling.model.meta.LocalDevice;
+import org.fourthline.cling.model.meta.RemoteDevice;
+import org.fourthline.cling.model.types.DeviceType;
+import org.fourthline.cling.model.types.UDADeviceType;
+import org.fourthline.cling.registry.DefaultRegistryListener;
+import org.fourthline.cling.registry.Registry;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -112,6 +138,15 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     playbackFragment, R.id.contentVideo);
             new WatchPlaybackPresenter(playbackFragment, docFragment, chatFragment, this, param);
         }
+
+        org.seamless.util.logging.LoggingUtil.resetRootHandler(
+                new FixedAndroidLogHandler()
+        );
+        this.bindService(
+                new Intent(this, AndroidUpnpServiceImpl.class),
+                serviceConnection,
+                Context.BIND_AUTO_CREATE
+        );
 
     }
 
@@ -321,6 +356,21 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
+    public void showDevices() {
+        if (devicePopu == null) {
+            devicePopu = new DevicePopu(this);
+            devicePopu.setOnItemClickListener(new OnItemClick());
+        }
+        devicePopu.showAtLocation(getWindow().getDecorView().findViewById(android.R.id.content), Gravity.CENTER, 0, 0);
+    }
+
+    @Override
+    public void dismissDevices() {
+        if (devicePopu != null)
+            devicePopu.dismiss();
+    }
+
+    @Override
     public void showNotice(String content) {
         if (TextUtils.isEmpty(content))
             return;
@@ -359,6 +409,10 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (upnpService != null) {
+            upnpService.getRegistry().removeListener(registryListener);
+        }
+        this.unbindService(serviceConnection);
     }
 
     @Override
@@ -369,6 +423,130 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+
+    //------------------------------------------------------投屏相关--------------------------------------------------
+    private BrowseRegistryListener registryListener = new BrowseRegistryListener();
+    private AndroidUpnpService upnpService;
+    private DevicePopu devicePopu;
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.e("Service ", "mUpnpServiceConnection onServiceConnected");
+            upnpService = (AndroidUpnpService) service;
+            // Clear the list
+            if (devicePopu != null)
+                devicePopu.clear();
+            // Get ready for future device advertisements
+            upnpService.getRegistry().addListener(registryListener);
+            // Now add all devices to the list we already know about
+            for (Device device : upnpService.getRegistry().getDevices()) {
+                registryListener.deviceAdded(device);
+            }
+            // Search asynchronously for all devices, they will respond soon
+            upnpService.getControlPoint().search(); // 搜索设备
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            upnpService = null;
+        }
+    };
+
+    protected class BrowseRegistryListener extends DefaultRegistryListener {
+
+        @Override
+        public void remoteDeviceDiscoveryStarted(Registry registry, RemoteDevice device) {
+//            deviceAdded(device);
+        }
+
+        @Override
+        public void remoteDeviceDiscoveryFailed(Registry registry, final RemoteDevice device, final Exception ex) {
+//            runOnUiThread(new Runnable() {
+//                public void run() {
+//                    Toast.makeText(
+//                        BrowserActivity2.this,
+//                        "Discovery failed of '" + device.getDisplayString() + "': "
+//                            + (ex != null ? ex.toString() : "Couldn't retrieve device/service descriptors"),
+//                        Toast.LENGTH_LONG
+//                    ).show();
+//                }
+//            });
+//            deviceRemoved(device);
+        }
+        /* End of optimization, you can remove the whole block if your Android handset is fast (>= 600 Mhz) */
+
+        @Override
+        public void remoteDeviceAdded(Registry registry, RemoteDevice device) {
+            if (device.getType().getNamespace().equals("schemas-upnp-org") && device.getType().getType().equals("MediaRenderer")) {
+                deviceAdded(device);
+            }
+
+        }
+
+        @Override
+        public void remoteDeviceRemoved(Registry registry, RemoteDevice device) {
+            deviceRemoved(device);
+        }
+
+        @Override
+        public void localDeviceAdded(Registry registry, LocalDevice device) {
+//            deviceAdded(device);
+        }
+
+        @Override
+        public void localDeviceRemoved(Registry registry, LocalDevice device) {
+//            deviceRemoved(device);
+        }
+
+        public void deviceAdded(final Device device) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    if (devicePopu == null) {
+                        devicePopu = new DevicePopu(WatchActivity.this);
+                        devicePopu.setOnItemClickListener(new OnItemClick());
+                    }
+                    devicePopu.deviceAdded(device);
+                }
+            });
+        }
+
+        public void deviceRemoved(final Device device) {
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    if (devicePopu == null) {
+                        devicePopu = new DevicePopu(WatchActivity.this);
+                        devicePopu.setOnItemClickListener(new OnItemClick());
+                    }
+                    devicePopu.deviceRemoved(device);
+                }
+            });
+        }
+    }
+
+    class OnItemClick implements AdapterView.OnItemClickListener {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            final DeviceDisplay deviceDisplay = (DeviceDisplay) parent.getItemAtPosition(position);
+            mPresenter.dlnaPost(deviceDisplay, upnpService);
+            dismissDevices();
+        }
+    }
+
+    public static final DeviceType DMR_DEVICE_TYPE = new UDADeviceType("MediaRenderer");
+
+    /**
+     * 获取支持投屏的设备
+     *
+     * @return  设备列表
+     */
+    @Nullable
+    public Collection<Device> getDmrDevices() {
+        if (upnpService == null)
+            return null;
+        Collection<Device> devices = upnpService.getRegistry().getDevices(DMR_DEVICE_TYPE);
+        return devices;
     }
 
 

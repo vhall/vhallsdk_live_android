@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "com.vhall.live"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 290
-        versionName "2.9.0"
+        versionCode 301
+        versionName "3.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -18,17 +18,20 @@ android {
         }
     }
 
+    packagingOptions {
+        exclude 'META-INF/beans.xml'
+    }
 
     repositories {
         flatDir {
             dirs project(':uilibs').file('libs')
         }
     }
-
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':uilibs')
     compile 'com.android.support:appcompat-v7:22.0.+'
+
 }

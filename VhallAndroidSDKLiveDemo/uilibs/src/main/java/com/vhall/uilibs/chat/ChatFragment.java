@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.vhall.business.ChatServer;
+import com.vhall.business.VhallSDK;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
@@ -46,7 +47,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     int status = -1;
 
     TextView text_chat_content;
-
+    TextView test_send_custom;
     private Activity mActivity;
 
 
@@ -80,6 +81,13 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         lv_chat = (ListView) getView().findViewById(R.id.lv_chat);
+        test_send_custom = (TextView) getView().findViewById(R.id.test_send_custom);
+        test_send_custom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.sendCustom("ccccccc");
+            }
+        });
         getView().findViewById(R.id.text_chat_content).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -224,6 +232,11 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                     Glide.with(getActivity()).load(data.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_chat_avatar);
                     switch (data.event) {
                         case ChatServer.eventMsgKey:
+                            viewHolder.tv_chat_content.setVisibility(View.VISIBLE);
+                            viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.msgData.text), TextView.BufferType.SPANNABLE);
+                            viewHolder.tv_chat_name.setText(data.user_name);
+                            break;
+                        case ChatServer.eventCustomKey:
                             viewHolder.tv_chat_content.setVisibility(View.VISIBLE);
                             viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.msgData.text), TextView.BufferType.SPANNABLE);
                             viewHolder.tv_chat_name.setText(data.user_name);

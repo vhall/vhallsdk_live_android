@@ -5,7 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.text.TextUtils;
+
+import com.vhall.business.VhallSDK;
 
 /**
  * 程序启动页的Activity
@@ -19,8 +20,8 @@ public class SplashActivity extends Activity {
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
-                Intent intent = null;
-                if (!TextUtils.isEmpty(VhallApplication.param.userVhallId)) {
+                Intent intent;
+                if (VhallSDK.isLogin()) {
                     intent = new Intent(SplashActivity.this, MainActivity.class);
                 } else {
                     intent = new Intent(SplashActivity.this, LoginActivity.class);

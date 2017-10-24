@@ -1,10 +1,13 @@
 package com.vhall.uilibs.watch;
 
-import android.app.Activity;
-import android.content.pm.ActivityInfo;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.media.Image;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +15,15 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.vhall.business.WatchLive;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.uilibs.R;
+
+import org.fourthline.cling.android.AndroidUpnpService;
+import org.fourthline.cling.model.meta.Device;
+
+import static master.flame.danmaku.ui.widget.DanmakuTextureView.TAG;
 
 /**
  * 观看回放的Fragment
@@ -29,9 +36,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     SeekBar seekbar;
     TextView tv_current_time, tv_end_time;
     ProgressBar pb;
-
-    public static boolean isShowToast = true;
-
+    ImageView iv_dlna_playback;
     public static WatchPlaybackFragment newInstance() {
         WatchPlaybackFragment articleFragment = new WatchPlaybackFragment();
         return articleFragment;
@@ -53,7 +58,9 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
         super.onActivityCreated(savedInstanceState);
         rl_video_container = (ContainerLayout) getView().findViewById(R.id.rl_video_container);
         btn_changescaletype = (ImageView) getView().findViewById(R.id.btn_change_scale_type);
+        iv_dlna_playback = (ImageView) getView().findViewById(R.id.iv_dlna_playback);
         btn_changescaletype.setOnClickListener(this);
+        iv_dlna_playback.setOnClickListener(this);
         pb = (ProgressBar) getView().findViewById(R.id.pb);
         iv_play = (ImageView) getView().findViewById(R.id.iv_play);
         iv_play.setOnClickListener(this);
@@ -66,6 +73,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mPresenter.onProgressChanged(seekBar, progress, fromUser);
+                Log.e(TAG , "progress == " + progress + " fromUser == " + fromUser);
             }
 
             @Override
@@ -76,6 +84,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mPresenter.onStopTrackingTouch(seekBar);
+                Log.e(TAG , "onStopTrackingTouch == " + seekBar.getProgress());
             }
         });
         mPresenter.start();
@@ -148,13 +157,21 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     @Override
     public void onStop() {
         super.onStop();
-        mPresenter.onFragmentStop();
+//        mPresenter.onFragmentStop();
+        //mPresenter.startPlay();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mPresenter.onFragmentDestory();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //mPresenter.startPlay();
+        mPresenter.saveCurrentPosition(false);
     }
 
     @Override
@@ -173,6 +190,10 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             mPresenter.changeScreenOri();
         } else if (i == R.id.btn_change_scale_type) {
             mPresenter.changeScaleType();
+        } else if (i == R.id.iv_dlna_playback) {
+            mPresenter.showDevices();
         }
     }
+
+
 }

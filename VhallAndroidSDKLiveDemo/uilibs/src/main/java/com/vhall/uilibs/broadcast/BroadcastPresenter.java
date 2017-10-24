@@ -7,6 +7,7 @@ import android.util.Log;
 import com.vhall.business.Broadcast;
 import com.vhall.business.ChatServer;
 import com.vhall.business.VhallSDK;
+import com.vhall.business.data.RequestCallback;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.util.emoji.InputUser;
@@ -57,7 +58,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void initBroadcast() {
-        VhallSDK.getInstance().initBroadcast(param.broId, param.broToken, param.userVhallId, getBroadcast(), new VhallSDK.RequestCallback() {
+        VhallSDK.initBroadcast(param.broId, param.broToken, getBroadcast(), new RequestCallback() {
             @Override
             public void onSuccess() {
                 isFinish = false;
@@ -85,7 +86,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void finishBroadcast() {
-        VhallSDK.getInstance().finishBroadcast(param.broId, param.broToken, getBroadcast(), new VhallSDK.RequestCallback() {
+        VhallSDK.finishBroadcast(param.broId, param.broToken, getBroadcast(), new RequestCallback() {
             @Override
             public void onSuccess() {
                 isFinish = true;
@@ -164,7 +165,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     public void sendChat(String text) {
         if (TextUtils.isEmpty(text))
             return;
-        getBroadcast().sendChat(String.valueOf(text), new VhallSDK.RequestCallback() {
+        getBroadcast().sendChat(String.valueOf(text), new RequestCallback() {
             @Override
             public void onSuccess() {
             }
@@ -174,6 +175,11 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                 chatView.showToast(reason);
             }
         });
+    }
+
+    @Override
+    public void sendCustom(String text) {
+
     }
 
     @Override

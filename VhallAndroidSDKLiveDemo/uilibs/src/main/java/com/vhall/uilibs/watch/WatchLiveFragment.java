@@ -62,6 +62,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     private BaseDanmakuParser mParser;
     private Activity context;
 
+    private ImageView iv_dlna;
+
     public static WatchLiveFragment newInstance() {
         return new WatchLiveFragment();
     }
@@ -88,18 +90,12 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         View root = inflater.inflate(R.layout.watch_live_fragment, container, false);
         initView(root);
         reFreshView();
-        //initStatue();
         return root;
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        getActivity().setResult(Activity.RESULT_OK);
-        mPresenter.stopWatch();
-    }
-
     private void initView(View root) {
+        iv_dlna = (ImageView) root.findViewById(R.id.iv_dlna);
+        iv_dlna.setOnClickListener(this);
         clickStart = (ImageView) root.findViewById(R.id.click_rtmp_watch);
         clickStart.setOnClickListener(this);
         clickOrientation = (ImageView) root.findViewById(R.id.click_rtmp_orientation);
@@ -239,6 +235,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
                 btn_danmaku.setImageResource(R.drawable.vhall_icon_danmaku_open);
             }
 
+        } else if (i == R.id.iv_dlna) {
+            mPresenter.showDevices();
         }
     }
 
@@ -397,6 +395,12 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         if (mDanmakuView != null && mDanmakuView.isPrepared()) {
             mDanmakuView.pause();
         }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mPresenter.stopWatch();
     }
 
     @Override

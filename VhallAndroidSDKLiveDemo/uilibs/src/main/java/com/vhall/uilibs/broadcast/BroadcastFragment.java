@@ -22,9 +22,8 @@ import com.vhall.gpuimage.GPUImageRenderer;
 import com.vhall.gpuimage.gpuimagefilter.GPUImageAlphaBlendFilter;
 import com.vhall.gpuimage.gpuimagefilter.GPUImageFilter;
 import com.vhall.gpuimage.gpuimagefilter.VhallBeautyFilter;
+import com.vhall.vhalllive.pushlive.CameraFilterView;
 import com.vhall.uilibs.R;
-import com.vhall.vhalllive.CameraFilterView;
-import com.vhall.vhalllive.Constants;
 
 /**
  * 发直播的Fragment
@@ -268,5 +267,5 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         mPopupWindow.showAsDropDown(mChangeFilter, -18, 0);
     }
 
-
+    
 }

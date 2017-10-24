@@ -8,28 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:gravity="center">
-
-        <ImageView
-            android:id="@+id/image_action_back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="7dp"
-            android:src="@drawable/icon_round_back" />
-
-        <ImageView
-            android:id="@+id/btn_change_scale_type"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/fit_default" />
-    </RelativeLayout>
-
     <ProgressBar
         android:id="@+id/pb"
         android:layout_width="wrap_content"
@@ -100,6 +78,36 @@
             android:layout_height="wrap_content"
             android:src="@drawable/icon_round_fullscreen" />
     </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:id="@+id/image_action_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="7dp"
+            android:src="@drawable/icon_round_back" />
+
+        <ImageView
+            android:id="@+id/iv_dlna_playback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/push_tv" />
+
+        <ImageView
+            android:id="@+id/btn_change_scale_type"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/fit_default" />
+    </RelativeLayout>
 
 
 </RelativeLayout>

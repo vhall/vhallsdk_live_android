@@ -1,6 +1,7 @@
 package com.vhall.uilibs;
 
-import com.vhall.vhalllive.CameraFilterView;
+
+import com.vhall.vhalllive.pushlive.CameraFilterView;
 
 import java.io.Serializable;
 
@@ -19,10 +20,4 @@ public class Param implements Serializable {
     public String watchId = "";
     public String key = "";
     public int bufferSecond = 6;
-
-    //用户相关
-    public String userVhallId = "";
-    public String userCustomId = "";
-    public String userName = "";
-    public String userAvatar = "";
 }
