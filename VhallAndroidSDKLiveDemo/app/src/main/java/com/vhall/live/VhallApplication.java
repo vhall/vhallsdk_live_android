@@ -30,13 +30,13 @@ public class VhallApplication extends Application {
             param = new Param();
             SharedPreferences sp = this.getSharedPreferences("set", MODE_PRIVATE);
 
-            param.broId = sp.getString("broid", "678757121");
-            param.broToken = sp.getString("brotoken", "3f726aed13c31d0b80bf5a1d1ed8048e");
+            param.broId = sp.getString("broid", "");
+            param.broToken = sp.getString("brotoken", "");
             param.pixel_type = sp.getInt("pixeltype", CameraFilterView.TYPE_HDPI);
             param.videoBitrate = sp.getInt("videobitrate", 500);
             param.videoFrameRate = sp.getInt("videoframerate", 15);
 
-            param.watchId = sp.getString("watchid", "353741994");
+            param.watchId = sp.getString("watchid", "");
             param.key = sp.getString("key", "");
             param.bufferSecond = sp.getInt("buffersecond", 6);
         }
