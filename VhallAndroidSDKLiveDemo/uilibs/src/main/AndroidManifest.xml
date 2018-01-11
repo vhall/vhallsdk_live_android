@@ -24,14 +24,14 @@
         <activity
             android:name=".broadcast.BroadcastActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape"></activity>
+            android:label="@string/app_name"></activity>
         <activity
             android:name=".watch.WatchActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/app_name"></activity>
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"></activity>
 
-        <service android:name="org.fourthline.cling.android.AndroidUpnpServiceImpl"/>
+        <service android:name="org.fourthline.cling.android.AndroidUpnpServiceImpl" />
     </application>
 
 </manifest>

@@ -12,13 +12,14 @@ import android.widget.Toast;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
+import com.vhall.business.WatchLive;
+import com.vhall.business.WatchPlayback;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.WebinarInfo;
-import com.vhall.business_support.WatchLive;
-import com.vhall.business_support.WatchPlayback;
+
 import com.vhall.business.data.Survey;
-import com.vhall.business_support.Watch_Support;
-import com.vhall.business_support.dlna.DeviceDisplay;
+
+import com.vhall.playersdk.player.VHExoPlayer;
 import com.vhall.playersdk.player.vhallplayer.VHallPlayer;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
@@ -26,11 +27,18 @@ import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 
-import org.fourthline.cling.android.AndroidUpnpService;
+//TODO  投屏相关
+//import com.vhall.business_support.Watch_Support;
+//import com.vhall.business_support.dlna.DeviceDisplay;
+//import com.vhall.business_support.WatchLive;
+//import com.vhall.business_support.WatchPlayback;
+//import org.fourthline.cling.android.AndroidUpnpService;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 观看回放的Presenter
@@ -57,6 +65,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     private boolean loadingVideo = false;
     private boolean loadingComment = false;
+    private boolean mRuning = false;
 
     private Timer timer;
     private Handler handler = new Handler() {
@@ -73,15 +82,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                         //                //playbackView.setProgressLabel(playerCurrentPositionStr + "/" + playerDurationTimeStr);
                         //                playbackView.setProgressLabel(playerCurrentPositionStr, playerDurationTimeStr);
                     }
-                    break;
-                case 1: // 获取当前的播放进度
-                    boolean isStart = (boolean) msg.obj;
-                    if (isStart) {
-                        startPlay();
-                    } else
-                        paushPlay();
-                    getWatchPlayback().seekTo(playerCurrentPosition);
-                    //playbackView.setPlayIcon(!isStart);
                     break;
             }
         }
@@ -111,6 +111,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         watchPlayback.requestCommentHistory(param.watchId, limit, pos, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
+                chatView.clearChatData();
                 loadingComment = false;
                 chatView.notifyDataChanged(list);
             }
@@ -149,10 +150,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         });
     }
 
-    @Override
-    public void onFragmentStop() {
-        stopPlay();
-    }
 
     @Override
     public void onFragmentDestory() {
@@ -172,33 +169,19 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     @Override
-    public void paushPlay() {
-        getWatchPlayback().pause();
-        playbackView.setPlayIcon(true);
-    }
-
-    @Override
-    public void stopPlay() {
-        getWatchPlayback().stop();
-        playbackView.setPlayIcon(true);
-    }
-
-    @Override
     public void onPlayClick() {
         if (getWatchPlayback().isPlaying()) {
-            paushPlay();
+            mRuning = false;
+            onStop();
         } else {
-            if (getWatchPlayback().isAvaliable()) {
-                if (playerCurrentPosition > 0) {
-                    Message msg = handler.obtainMessage();
-                    msg.what = 1;
-                    msg.obj = true;
-                    handler.sendMessage(msg);
-                } else {
-                    startPlay();
-                }
-            } else {
+            mRuning = true;
+            if (!getWatchPlayback().isAvaliable()) {
                 initWatch();
+            } else {
+                if (getWatchPlayback().getPlayerState() == VHExoPlayer.STATE_ENDED){
+                    getWatchPlayback().seekTo(0);
+                }
+                startPlay();
             }
         }
     }
@@ -231,14 +214,27 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     @Override
-    public void saveCurrentPosition(boolean isStart) {
-        if (playerCurrentPosition > 0 && handler != null) {
-            //handler.sendEmptyMessage(1);
-            Message msg = handler.obtainMessage();
-            msg.what = 1;
-            msg.obj = isStart;
-            handler.sendMessage(msg);
+    public void onResume() {
+        //TODO 如果点击Home键时返回继续播放  mRunning = true
+        getWatchPlayback().onResume(mRuning);
+        if (mRuning && getWatchPlayback().isAvaliable()) {
+            playbackView.setPlayIcon(false);
+        } else {
+            playbackView.setPlayIcon(true);
         }
+    }
+
+
+    @Override
+    public void onPause() {
+        getWatchPlayback().onPause();
+        playbackView.setPlayIcon(true);
+    }
+
+    @Override
+    public void onStop() {
+        getWatchPlayback().stop();
+        playbackView.setPlayIcon(true);
     }
 
     public WatchPlayback getWatchPlayback() {
@@ -260,30 +256,31 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     }
 
-    @Override
-    public void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
-        getWatchPlayback().dlnaPost(deviceDisplay, service, new Watch_Support.DLNACallback() {
-            @Override
-            public void onError(int errorCode) {
-                watchView.showToast("投屏失败，errorCode:" + errorCode);
-            }
-
-            @Override
-            public void onSuccess() {
-                watchView.showToast("投屏成功!");
-            }
-        });
-    }
-
-    @Override
-    public void showDevices() {
-        watchView.showDevices();
-    }
-
-    @Override
-    public void dismissDevices() {
-        watchView.dismissDevices();
-    }
+    //TODO 投屏相关
+//    @Override
+//    public void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
+//        getWatchPlayback().dlnaPost(deviceDisplay, service, new Watch_Support.DLNACallback() {
+//            @Override
+//            public void onError(int errorCode) {
+//                watchView.showToast("投屏失败，errorCode:" + errorCode);
+//            }
+//
+//            @Override
+//            public void onSuccess() {
+//                watchView.showToast("投屏成功!");
+//            }
+//        });
+//    }
+//
+//    @Override
+//    public void showDevices() {
+//        watchView.showDevices();
+//    }
+//
+//    @Override
+//    public void dismissDevices() {
+//        watchView.dismissDevices();
+//    }
 
     private class DocCallback implements WatchPlayback.DocumentEventCallback {
 
@@ -304,19 +301,14 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     private class WatchCallback implements WatchPlayback.WatchEventCallback {
         @Override
-        public void onStartFailed(String reason) {//开始播放失败
-            Toast.makeText(watchView.getActivity(), reason, Toast.LENGTH_SHORT).show();
-            playbackView.setPlayIcon(true);
-        }
-
-        @Override
-        public void onStateChanged(boolean playWhenReady, int playbackState) {//播放过程中的状态信息
+        public void onVhallPlayerStatue(boolean playWhenReady, int playbackState) {//播放过程中的状态信息
             switch (playbackState) {
                 case VHallPlayer.STATE_IDLE:
                     Log.e(TAG, "STATE_IDLE");
                     break;
                 case VHallPlayer.STATE_PREPARING:
                     Log.e(TAG, "STATE_PREPARING");
+                    playbackView.setPlayIcon(false);
                     playbackView.showProgressbar(true);
                     break;
                 case VHallPlayer.STATE_BUFFERING:
@@ -328,15 +320,20 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                     playerDuration = getWatchPlayback().getDuration();
                     playerDurationTimeStr = VhallUtil.converLongTimeToStr(playerDuration);
                     playbackView.setSeekbarMax((int) playerDuration);
+                    if (playWhenReady) {
+                        playbackView.setPlayIcon(false);
+                    } else {
+                        playbackView.setPlayIcon(true);
+                    }
                     Log.e(TAG, "STATE_READY");
                     break;
                 case VHallPlayer.STATE_ENDED:
                     playbackView.showProgressbar(false);
                     Log.e(TAG, "STATE_ENDED");
                     playerCurrentPosition = 0;
-                    getWatchPlayback().seekTo(0);
-                    playbackView.setSeekbarCurrentPosition(0);
-                    getWatchPlayback().pause();
+//                    getWatchPlayback().seekTo(0);
+//                    playbackView.setSeekbarCurrentPosition(0);
+                    getWatchPlayback().stop();
                     playbackView.setPlayIcon(true);
                     break;
                 default:
@@ -345,13 +342,24 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         }
 
         @Override
-        public void onError(Exception e) {//播放出错
-            playbackView.showProgressbar(false);
-            stopPlay();
+        public void uploadSpeed(String kbps) {
+
         }
 
         @Override
-        public void onVideoSizeChanged(int width, int height) {//视频宽高改变
+        public void onError(int errorCode, String errorMeg) {//播放出错
+            playbackView.showProgressbar(false);
+            playbackView.setPlayIcon(true);
+            watchView.showToast("播放出错");
+        }
+
+        @Override
+        public void onStateChanged(int stateCode) {
+
+        }
+
+        @Override
+        public void videoInfo(int width, int height) {//视频宽高改变
         }
 
     }
@@ -366,7 +374,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             public void run() {
                 handler.sendEmptyMessage(0);
             }
-        }, 1000, 1000);
+        }, 0, 1000);
     }
 
     @Override
@@ -383,7 +391,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         getWatchPlayback().sendComment(text, new RequestCallback() {
             @Override
             public void onSuccess() {
-                chatView.clearChatData();
                 initCommentData(pos = 0);
             }
 
@@ -395,7 +402,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     @Override
-    public void sendCustom(String text) {
+    public void sendCustom(JSONObject text) {
 
     }
 

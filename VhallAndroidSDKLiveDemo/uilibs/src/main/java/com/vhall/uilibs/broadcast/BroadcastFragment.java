@@ -78,7 +78,6 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         mChangeFilter.setOnClickListener(this);
         mBackBtn = (Button) getView().findViewById(R.id.btn_back);
         mBackBtn.setOnClickListener(this);
-
         cameraview.setAutoCloseFilterCallback(new GPUImageRenderer.AutoCloseFilterListener() {
             @Override
             public void onAutoCloseFilter() {

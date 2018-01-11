@@ -5,6 +5,8 @@ import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
 
+import org.json.JSONObject;
+
 import java.util.List;
 
 /**
@@ -30,7 +32,7 @@ public class ChatContract {
 
         void sendChat(String text);
 
-        void sendCustom(String text);
+        void sendCustom(JSONObject text);
 
         void sendQuestion(String content);
 

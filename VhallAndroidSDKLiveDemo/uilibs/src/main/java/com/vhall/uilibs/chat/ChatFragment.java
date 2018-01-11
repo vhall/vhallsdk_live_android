@@ -21,6 +21,9 @@ import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +88,15 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
         test_send_custom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.sendCustom("ccccccc");
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("key0", "value");
+                    json.put("key1", "0000");
+                    json.put("key2", "微吼");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                mPresenter.sendCustom(json);
             }
         });
         getView().findViewById(R.id.text_chat_content).setOnClickListener(new View.OnClickListener() {

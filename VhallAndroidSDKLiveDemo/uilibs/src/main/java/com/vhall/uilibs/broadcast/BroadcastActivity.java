@@ -17,6 +17,7 @@ import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
 import com.vhall.uilibs.watch.WatchActivity;
+import com.vhall.vhalllive.common.LiveParam;
 
 
 /**

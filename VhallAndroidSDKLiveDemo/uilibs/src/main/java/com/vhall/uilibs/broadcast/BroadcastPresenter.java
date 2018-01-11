@@ -12,6 +12,8 @@ import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.util.emoji.InputUser;
 
+import org.json.JSONObject;
+
 import java.util.List;
 
 /**
@@ -178,7 +180,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     }
 
     @Override
-    public void sendCustom(String text) {
+    public void sendCustom(JSONObject text) {
 
     }
 

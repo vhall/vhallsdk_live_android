@@ -11,13 +11,14 @@ import com.opengl.GL_Preview_YUV;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
+import com.vhall.business.Watch;
+import com.vhall.business.WatchLive;
 import com.vhall.business.data.WebinarInfo;
-import com.vhall.business_support.WatchLive;
+
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.source.SurveyDataSource;
-import com.vhall.business_support.Watch_Support;
-import com.vhall.business_support.dlna.DeviceDisplay;
+
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.util.emoji.InputUser;
@@ -25,7 +26,12 @@ import com.vhall.vhalllive.common.Constants;
 import com.vhall.vhalllive.playlive.GLPlayInterface;
 import com.vhall.uilibs.R;
 
-import org.fourthline.cling.android.AndroidUpnpService;
+//TODO 投屏相关
+//import com.vhall.business_support.Watch_Support;
+//import com.vhall.business_support.dlna.DeviceDisplay;
+//import com.vhall.business_support.WatchLive;
+//import org.fourthline.cling.android.AndroidUpnpService;
+import org.json.JSONObject;
 
 import java.util.List;
 
@@ -109,7 +115,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     @Override
-    public void sendCustom(String text) {
+    public void sendCustom(JSONObject text) {
         if (!VhallSDK.isLogin()) {
             watchView.showToast(R.string.vhall_login_first);
             return;
@@ -183,15 +189,27 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         }
         force = false;
 
-        if (isWatching) {
-            stopWatch();
-        }
-        getWatchLive().setDefinition(level);
-
+//        if (isWatching) {
+//            stopWatch();
+//        }
+//        getWatchLive().setDefinition(level);
+        getWatchLive().setPCSwitchDefinition();
         if (watchView.getActivity().isFinishing()) {
             return;
         }
-        startWatch();
+        //startWatch();  // 暂不请求
+    }
+
+    @Override
+    public void onMobileSwitchRes(int res) {
+        if (getWatchLive().getDefinition() == res && !force) {
+            return;
+        }
+        if (isWatching) {
+            stopWatch();
+        }
+        force = false;
+        getWatchLive().setDefinition(res);
     }
 
 
@@ -372,38 +390,41 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         });
     }
 
-    @Override
-    public void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
-        getWatchLive().dlnaPost(deviceDisplay, service, new Watch_Support.DLNACallback() {
 
-            @Override
-            public void onError(int errorCode) {
-                watchView.showToast("投屏失败，errorCode:" + errorCode);
-            }
-
-            @Override
-            public void onSuccess() {
-                watchView.showToast("投屏成功!");
-                stopWatch();
-            }
-
-        });
-    }
-
-    @Override
-    public void showDevices() {
-        watchView.showDevices();
-    }
-
-    @Override
-    public void dismissDevices() {
-        watchView.dismissDevices();
-    }
+    //TODO 投屏相关
+//
+//    @Override
+//    public void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
+//        getWatchLive().dlnaPost(deviceDisplay, service, new Watch_Support.DLNACallback() {
+//
+//            @Override
+//            public void onError(int errorCode) {
+//                watchView.showToast("投屏失败，errorCode:" + errorCode);
+//            }
+//
+//            @Override
+//            public void onSuccess() {
+//                watchView.showToast("投屏成功!");
+//                stopWatch();
+//            }
+//
+//        });
+//    }
+//
+//    @Override
+//    public void showDevices() {
+//        watchView.showDevices();
+//    }
+//
+//    @Override
+//    public void dismissDevices() {
+//        watchView.dismissDevices();
+//    }
 
     /**
      * 观看过程中事件监听
      */
-    private class WatchCallback implements WatchLive.WatchEventCallback {
+    private class WatchCallback implements Watch.WatchEventCallback {
         @Override
         public void onError(int errorCode, String errorMsg) {
             switch (errorCode) {
@@ -439,9 +460,15 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case WatchLive.STATE_STOP:
                     Log.e(TAG, "STATE_STOP  ");
                     isWatching = false;
+                    liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
                     break;
             }
+        }
+
+        @Override
+        public void onVhallPlayerStatue(boolean playWhenReady, int playbackState) {
+            // 播放器状态回调  只在看回放时使用
         }
 
         @Override
@@ -456,7 +483,6 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 // INIT STUF
             }
         }
-
 
     }
 
@@ -478,10 +504,12 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case MessageServer.EVENT_PERMIT_CHAT://解除禁言
                     break;
                 case MessageServer.EVENT_DIFINITION_CHANGED:
+                    Log.e(TAG, "EVENT_DIFINITION_CHANGED PC 端切换分辨率");
                     liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
-                    if (!getWatchLive().isDifinitionAvailable(getWatchLive().getDefinition())) {
-                        onSwitchPixel(WatchLive.DPI_DEFAULT);
-                    }
+                    onSwitchPixel(WatchLive.DPI_DEFAULT);
+//                    if (!getWatchLive().isDifinitionAvailable(getWatchLive().getDefinition())) {
+//                        onSwitchPixel(WatchLive.DPI_DEFAULT);
+//                    }
                     break;
                 case MessageServer.EVENT_START_LOTTERY://抽奖开始
                     watchView.showLottery(messageInfo);
@@ -521,7 +549,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_RESTART:
                     force = true;
-                    onSwitchPixel(WatchLive.DPI_DEFAULT);
+                    //onSwitchPixel(WatchLive.DPI_DEFAULT);
                     break;
             }
 

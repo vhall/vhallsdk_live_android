@@ -1,11 +1,7 @@
 package com.vhall.uilibs.watch;
 
-import android.content.ComponentName;
-import android.content.ServiceConnection;
 import android.content.res.Configuration;
-import android.media.Image;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,16 +16,11 @@ import com.vhall.business.WatchLive;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.uilibs.R;
 
-import org.fourthline.cling.android.AndroidUpnpService;
-import org.fourthline.cling.model.meta.Device;
-
-import static master.flame.danmaku.ui.widget.DanmakuTextureView.TAG;
-
 /**
  * 观看回放的Fragment
  */
 public class WatchPlaybackFragment extends Fragment implements WatchContract.PlaybackView, View.OnClickListener {
-
+    private final String TAG = WatchPlaybackFragment.class.getName();
     WatchContract.PlaybackPresenter mPresenter;
     ContainerLayout rl_video_container;//视频区容器
     ImageView iv_play, btn_changescaletype;
@@ -37,6 +28,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     TextView tv_current_time, tv_end_time;
     ProgressBar pb;
     ImageView iv_dlna_playback;
+
     public static WatchPlaybackFragment newInstance() {
         WatchPlaybackFragment articleFragment = new WatchPlaybackFragment();
         return articleFragment;
@@ -73,7 +65,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mPresenter.onProgressChanged(seekBar, progress, fromUser);
-                Log.e(TAG , "progress == " + progress + " fromUser == " + fromUser);
+                Log.e(TAG, "progress == " + progress + " fromUser == " + fromUser);
             }
 
             @Override
@@ -84,7 +76,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mPresenter.onStopTrackingTouch(seekBar);
-                Log.e(TAG , "onStopTrackingTouch == " + seekBar.getProgress());
+                Log.e(TAG, "onStopTrackingTouch == " + seekBar.getProgress());
             }
         });
         mPresenter.start();
@@ -170,8 +162,13 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     @Override
     public void onResume() {
         super.onResume();
-        //mPresenter.startPlay();
-        mPresenter.saveCurrentPosition(false);
+        mPresenter.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.onPause();
     }
 
     @Override
@@ -183,6 +180,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.image_action_back) {
+            mPresenter.onFragmentDestory();
             getActivity().finish();
         } else if (i == R.id.iv_play) {
             mPresenter.onPlayClick();
@@ -191,7 +189,8 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
         } else if (i == R.id.btn_change_scale_type) {
             mPresenter.changeScaleType();
         } else if (i == R.id.iv_dlna_playback) {
-            mPresenter.showDevices();
+            // Todo 投屏相关
+            // mPresenter.showDevices();
         }
     }
 

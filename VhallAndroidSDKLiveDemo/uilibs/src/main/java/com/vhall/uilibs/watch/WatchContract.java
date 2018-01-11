@@ -6,13 +6,13 @@ import android.widget.SeekBar;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
 import com.vhall.business.widget.ContainerLayout;
-import com.vhall.business_support.dlna.DeviceDisplay;
+
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
 
-import org.fourthline.cling.android.AndroidUpnpService;
-
+//import org.fourthline.cling.android.AndroidUpnpService;
+//import com.vhall.business_support.dlna.DeviceDisplay;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,9 +58,11 @@ public class WatchContract {
         //显示抽奖
         void showLottery(final MessageServer.MsgInfo messageInfo);
 
-        void showDevices();
 
-        void dismissDevices();
+        // 投屏使用
+        // void showDevices();
+        // 投屏使用
+        // void dismissDevices();
 
     }
 
@@ -117,17 +119,15 @@ public class WatchContract {
     }
 
     interface PlaybackPresenter extends WatchPresenter {
-        void onFragmentStop();
-
         void onFragmentDestory();
 
         void onPlayClick();
 
         void startPlay();
 
-        void paushPlay();
+        //void paushPlay();
 
-        void stopPlay();
+        //void stopPlay();
 
         void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser);
 
@@ -137,7 +137,9 @@ public class WatchContract {
 
         int changeScreenOri();
 
-        void saveCurrentPosition(boolean isStart);
+        void onPause();
+        void onResume();
+        void onStop();
     }
 
     interface LivePresenter extends WatchPresenter {
@@ -151,6 +153,8 @@ public class WatchContract {
         void onWatchBtnClick();
 
         void onSwitchPixel(int pixel);// 切换分辨率
+
+        void onMobileSwitchRes(int res);// 切换分辨率
 
         int setScaleType();
 
@@ -175,10 +179,10 @@ public class WatchContract {
 
         void submitSurvey(Survey survey, String result);
 
-        void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
+        // void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
 
-        void showDevices();
+        // void showDevices();
 
-        void dismissDevices();
+        // void dismissDevices();
     }
 }

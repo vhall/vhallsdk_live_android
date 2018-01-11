@@ -166,12 +166,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             mDanmakuView.showFPS(false);
             mDanmakuView.enableDanmakuDrawingCache(true);
         }
-
-
         if (mPresenter != null) {
             mPresenter.start();
         }
-
     }
 
     @Override
@@ -201,7 +198,6 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             progressbar.setVisibility(View.GONE);
     }
 
-
     @Override
     public void onClick(View view) {
         int i = view.getId();
@@ -218,10 +214,10 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             getActivity().onBackPressed();
         } else if (i == R.id.btn_change_audio) {
             if (mPresenter.getCurrentPixel() == WatchLive.DPI_AUDIO) {
-                mPresenter.onSwitchPixel(WatchLive.DPI_DEFAULT);
+                mPresenter.onMobileSwitchRes(WatchLive.DPI_DEFAULT);
                 btnChangePlayStatus.setImageResource(R.drawable.audio_close);
             } else {
-                mPresenter.onSwitchPixel(WatchLive.DPI_AUDIO);
+                mPresenter.onMobileSwitchRes(WatchLive.DPI_AUDIO);
                 btnChangePlayStatus.setImageResource(R.drawable.audio_open);
             }
         } else if (i == R.id.btn_danmaku) {
@@ -236,7 +232,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             }
 
         } else if (i == R.id.iv_dlna) {
-            mPresenter.showDevices();
+            // TODO 投屏相关
+            //mPresenter.showDevices();
         }
     }
 
@@ -377,13 +374,17 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         @Override
         public void onCheckedChanged(RadioGroup radioGroup, int i) {
             if (i == R.id.radio_btn_default) {
-                mPresenter.onSwitchPixel(WatchLive.DPI_DEFAULT);
+                mPresenter.onMobileSwitchRes(WatchLive.DPI_DEFAULT);
+                //mPresenter.onSwitchPixel(WatchLive.DPI_DEFAULT);
             } else if (i == R.id.radio_btn_sd) {
-                mPresenter.onSwitchPixel(WatchLive.DPI_SD);
+                mPresenter.onMobileSwitchRes(WatchLive.DPI_SD);
+//                mPresenter.onSwitchPixel(WatchLive.DPI_SD);
             } else if (i == R.id.radio_btn_hd) {
-                mPresenter.onSwitchPixel(WatchLive.DPI_HD);
+                mPresenter.onMobileSwitchRes(WatchLive.DPI_HD);
+//                mPresenter.onSwitchPixel(WatchLive.DPI_HD);
             } else if (i == R.id.radio_btn_uhd) {
-                mPresenter.onSwitchPixel(WatchLive.DPI_UHD);
+                mPresenter.onMobileSwitchRes(WatchLive.DPI_UHD);
+//                mPresenter.onSwitchPixel(WatchLive.DPI_UHD);
             } else {
             }
         }
