@@ -37,8 +37,6 @@ dependencies {
     compile 'com.github.ctiao:ndkbitmap-armv5:0.6.4'
     compile 'com.github.ctiao:ndkbitmap-x86:0.6.4'
 
-    /*vhall-support包依赖*/
-    compile files('libs/vhallsdk_support1.1.jar')
     compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '8.1.8.v20121106'
     compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '8.1.8.v20121106'
     compile group: 'org.eclipse.jetty', name: 'jetty-client', version: '8.1.8.v20121106'
