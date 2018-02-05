@@ -38,7 +38,6 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 观看回放的Presenter
@@ -65,7 +64,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     private boolean loadingVideo = false;
     private boolean loadingComment = false;
-    private boolean mRuning = false;
 
     private Timer timer;
     private Handler handler = new Handler() {
@@ -150,7 +148,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         });
     }
 
-
     @Override
     public void onFragmentDestory() {
         if (timer != null) {
@@ -171,10 +168,8 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     @Override
     public void onPlayClick() {
         if (getWatchPlayback().isPlaying()) {
-            mRuning = false;
             onStop();
         } else {
-            mRuning = true;
             if (!getWatchPlayback().isAvaliable()) {
                 initWatch();
             } else {
@@ -215,9 +210,8 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     @Override
     public void onResume() {
-        //TODO 如果点击Home键时返回继续播放  mRunning = true
-        getWatchPlayback().onResume(mRuning);
-        if (mRuning && getWatchPlayback().isAvaliable()) {
+        getWatchPlayback().onResume();
+        if (getWatchPlayback().isAvaliable()) {
             playbackView.setPlayIcon(false);
         } else {
             playbackView.setPlayIcon(true);
@@ -331,8 +325,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                     playbackView.showProgressbar(false);
                     Log.e(TAG, "STATE_ENDED");
                     playerCurrentPosition = 0;
-//                    getWatchPlayback().seekTo(0);
-//                    playbackView.setSeekbarCurrentPosition(0);
                     getWatchPlayback().stop();
                     playbackView.setPlayIcon(true);
                     break;
