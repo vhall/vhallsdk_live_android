@@ -1,6 +1,7 @@
 package com.vhall.uilibs.broadcast;
 
 import android.hardware.Camera;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -42,6 +43,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     public void start() {
         //初始化，必须
         mView.initCamera(param.pixel_type);
+
     }
 
 
@@ -69,7 +71,6 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
             @Override
             public void onError(int errorCode, String reason) {
-
                 mView.showMsg("initBroadcastFailed：" + reason);
             }
         });
@@ -163,11 +164,33 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         mBraodcastView.showChatView(emoji, user, limit);
     }
 
+    int request = 0;
+    int response = 0;
+
     @Override
     public void sendChat(String text) {
         if (TextUtils.isEmpty(text))
             return;
+        request++;
+        Log.e(TAG, "请求：" + request);
         getBroadcast().sendChat(String.valueOf(text), new RequestCallback() {
+            @Override
+            public void onSuccess() {
+                response++;
+                Log.e(TAG, "响应成功：" + response);
+            }
+
+            @Override
+            public void onError(int errorCode, String reason) {
+                response++;
+                Log.e(TAG, "响应失败：" + reason + "count:" + response);
+            }
+        });
+    }
+
+    @Override
+    public void sendCustom(JSONObject text) {
+        getBroadcast().sendCustom(text, new RequestCallback() {
             @Override
             public void onSuccess() {
             }
@@ -177,11 +200,6 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                 chatView.showToast(reason);
             }
         });
-    }
-
-    @Override
-    public void sendCustom(JSONObject text) {
-
     }
 
     @Override
@@ -289,6 +307,9 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                     chatView.notifyDataChanged(chatInfo);
                     break;
                 case ChatServer.eventQuestion:
+                    break;
+                case ChatServer.eventCustomKey:
+                    chatView.notifyDataChanged(chatInfo);
                     break;
             }
         }

@@ -1,4 +1,4 @@
-package com.vhall.uilibs.util;//package com.vhall.uilibs.util;
+//package com.vhall.uilibs.util;
 //
 //import android.content.Context;
 //import android.graphics.Color;

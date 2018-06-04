@@ -16,8 +16,7 @@ import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
-import com.vhall.uilibs.watch.WatchActivity;
-import com.vhall.vhalllive.common.LiveParam;
+
 
 
 /**
@@ -82,7 +81,12 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
         }
 
         new BroadcastPresenter(param, this, mainFragment, chatFragment);
+
     }
+
+
+
+
 
     @Override
     public void showChatView(boolean isShowEmoji, InputUser user, int contentLengthLimit) {

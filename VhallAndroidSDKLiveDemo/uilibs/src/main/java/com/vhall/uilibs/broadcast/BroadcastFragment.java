@@ -28,7 +28,7 @@ import com.vhall.uilibs.R;
 /**
  * 发直播的Fragment
  */
-public class BroadcastFragment extends Fragment implements BroadcastContract.View, View.OnClickListener {
+public class    BroadcastFragment extends Fragment implements BroadcastContract.View, View.OnClickListener {
 
     private BroadcastContract.Presenter mPresenter;
     private CameraFilterView cameraview;

@@ -8,19 +8,26 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.text.InputFilter;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.vhall.business.utils.LogManager;
 import com.vhall.uilibs.R;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +45,9 @@ public class InputView {
     private ViewPager vp_emoji;
     Context context;
     Activity activity;
+    private boolean hasVirtual = false; // 是否有虚拟按键
+    private int virtualHeight = 0;  // 虚拟按键的高度
+    private int keyboardHeight = 0;
 
     private int limitNo = 280;
     private ClickCallback mCallback;
@@ -101,11 +111,16 @@ public class InputView {
         keyboardHeight_landspace = landspaceHeight;
         initView();
         initEmoji();
+        hasVirtual = KeyBoardManager.hasVirtualButton(context);
+        if (hasVirtual) {
+            virtualHeight = KeyBoardManager.getVirtualButtonHeight(context);
+        }
     }
+
 
     public void initView() {
         contentView = View.inflate(context, R.layout.emoji_inputview_layout, null);
-        iv_emoji = (ImageView) contentView.findViewById(R.id.iv_emoji);
+        iv_emoji = contentView.findViewById(R.id.iv_emoji);
         et_content = (EditText) contentView.findViewById(R.id.et_content);
         tv_send = (TextView) contentView.findViewById(R.id.tv_send);
         vp_emoji = (ViewPager) contentView.findViewById(R.id.vp_emoji);
@@ -131,11 +146,11 @@ public class InputView {
                 if (onSendClickListener != null) {
                     String msg = et_content.getText().toString();
                     if (msg.contains("@") && msg.contains(":")) {
-                        msg = msg.substring(msg.indexOf(":")+1);
+                        msg = msg.substring(msg.indexOf(":") + 1);
                     }
-                    if (user!=null) {
+                    if (user != null) {
                         String text = "@" + user.userName + ":";
-                        msg = text+msg;
+                        msg = text + msg;
                     }
                     onSendClickListener.onSendClick(msg, user);
                     et_content.setText("");
@@ -178,7 +193,7 @@ public class InputView {
 
     public void show(boolean isShowEmoji, InputUser user) {
         this.user = user;
-        if (user!=null) {
+        if (user != null) {
             String text = "@" + user.userName + ":";
             et_content.setText(text);
             et_content.setSelection(et_content.getText().length());
@@ -198,6 +213,9 @@ public class InputView {
         }
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) contentView.getLayoutParams();
         KeyBoardManager.closeKeyboard(et_content, activity);
+        if(keyboardHeight > 0) {
+            vp_emoji.getLayoutParams().height = this.keyboardHeight ;
+        }
         contentView.setVisibility(View.VISIBLE);
         new Handler() {//延时0.2秒显示表情
             @Override
@@ -228,7 +246,7 @@ public class InputView {
                         vp_emoji.setVisibility(View.GONE);
                         contentView.setVisibility(View.VISIBLE);
                     }
-                },300);
+                }, 300);
                 return;
             }
             params.setMargins(0, 0, 0, keyboardHeight_portrait);
@@ -256,7 +274,7 @@ public class InputView {
                     contentView.setVisibility(View.VISIBLE);
                     KeyBoardManager.openKeyboard(et_content, activity);
                 }
-            },300);
+            }, 300);
         }
 
 
@@ -294,7 +312,12 @@ public class InputView {
                 decorView.getWindowVisibleDisplayFrame(rect);
                 int displayHeight = rect.bottom - rect.top;
                 int height = decorView.getHeight();
-                int keyboardHeight = height - displayHeight - rect.top;
+                /** 是否存在虚拟键盘*/
+                if (hasVirtual && virtualHeight > 0) {
+                    keyboardHeight = height - displayHeight - rect.top - virtualHeight;
+                } else {
+                    keyboardHeight = height - displayHeight - rect.top;
+                }
                 if (previousKeyboardHeight != keyboardHeight) {
                     boolean hide = (double) displayHeight / height > 0.8;
                     if (hide && !showEmoji) {
@@ -302,16 +325,16 @@ public class InputView {
                     }
                     if (!hide) {
                         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) contentView.getLayoutParams();
-                        if ( activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                        if (activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                             keyboardHeight_portrait = keyboardHeight;
                             if (onHeightReceivedListener != null)
                                 onHeightReceivedListener.onHeightReceived(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT, keyboardHeight_portrait);
-                            params.setMargins(0,0,0,keyboardHeight);
-                        } else if ( activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                            params.setMargins(0, 0, 0, keyboardHeight);
+                        } else if (activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
                             keyboardHeight_landspace = keyboardHeight;
                             if (onHeightReceivedListener != null)
                                 onHeightReceivedListener.onHeightReceived(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, keyboardHeight_landspace);
-                            params.setMargins(0,0,0,keyboardHeight);
+                            params.setMargins(0, 0, 0, keyboardHeight);
                         }
                         contentView.setLayoutParams(params);
                     }
@@ -321,7 +344,7 @@ public class InputView {
         });
     }
 
-    public  interface ClickCallback{
+    public interface ClickCallback {
         void onEmojiClick();
     }
 }

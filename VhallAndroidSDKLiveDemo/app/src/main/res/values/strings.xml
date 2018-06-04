@@ -2,7 +2,7 @@
 <resources>
 
     <string name="action_settings">Settings</string>
-    <string name="vhall_copyright">Copyright (c) 2017Vhall.All rights reserved.</string>
+    <string name="vhall_copyright">Copyright (c) 2018Vhall.All rights reserved.</string>
     <string name="app_name">微吼小直播</string>
     <string name="vhall_hint">用 直 播 创 造 价 值</string>
     <string name="login">登 录</string>

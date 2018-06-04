@@ -5,49 +5,50 @@
     android:background="#ffffff"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ffffff"
+        android:background="@color/red_gray"
+        android:gravity="center_vertical"
         android:padding="2dp">
 
         <ImageView
             android:id="@+id/iv_emoji"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
             android:padding="8dp"
             android:src="@mipmap/inputview_icon_emoji" />
+
+        <EditText
+            android:id="@+id/et_content"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_common_rounded_white_border_gray"
+            android:imeOptions="flagNoExtractUi|actionSend"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:textColor="@color/gray_deep"
+            android:textColorHint="@color/gray_normal"
+            android:textSize="15dp" />
 
         <TextView
             android:id="@+id/tv_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:padding="8dp"
+            android:background="@drawable/bg_common_rounded_red"
+            android:layout_marginLeft="@dimen/common_margin_size_5"
+            android:layout_marginRight="@dimen/common_margin_size_5"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:paddingTop="@dimen/common_margin_size_10"
+            android:paddingBottom="@dimen/common_margin_size_10"
             android:text="发送"
-            android:textColor="@color/send_text_color_selector"
+            android:textColor="@color/white"
             android:textSize="15dp" />
 
-        <EditText
-            android:id="@+id/et_content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/tv_send"
-            android:layout_toRightOf="@id/iv_emoji"
-            android:background="@drawable/bg_edittext_selector"
-            android:gravity="center_vertical"
-            android:imeOptions="flagNoExtractUi|actionSend"
-            android:minHeight="35dp"
-            android:padding="5dp"
-            android:singleLine="true"
-            android:textColor="@color/gray_deep"
-            android:textColorHint="@color/gray_normal"
-            android:textSize="15dp" />
-    </RelativeLayout>
+
+    </LinearLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vp_emoji"

@@ -9,6 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@color/red_gray"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <TextView
@@ -17,25 +19,22 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_centerVertical="true"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp"
+            android:layout_margin="@dimen/common_margin_size_5"
             android:background="@drawable/bg_common_rounded_white_border_gray"
-            android:gravity="center_vertical"
             android:padding="10dp"
             android:text="我来说两句"
-            android:textColor="@color/gray_deep"
+            android:textColor="@color/gray_heavy"
             android:textSize="15dp" />
 
         <TextView
             android:id="@+id/test_send_custom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/common_margin_size_5"
+            android:padding="@dimen/common_margin_size_10"
+            android:layout_marginRight="@dimen/common_margin_size_5"
             android:textColor="@color/white"
             android:background="@drawable/bg_common_rounded_red"
-            android:layout_gravity="center_vertical"
+            android:textSize="15dp"
             android:text="自定义消息"/>
 
     </LinearLayout>

@@ -3,7 +3,10 @@ package com.vhall.uilibs.chat;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +19,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.vhall.business.ChatServer;
-import com.vhall.business.VhallSDK;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
@@ -40,9 +42,6 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     private ChatContract.ChatPresenter mPresenter;
     public final int RequestLogin = 0;
     ListView lv_chat;
-    //    Button btnSendMsg;
-//    Button btnFresh;
-//    EditText editContent;
     List<ChatServer.ChatInfo> chatData = new ArrayList<ChatServer.ChatInfo>();
     ChatAdapter chatAdapter = new ChatAdapter();
     QuestionAdapter questionAdapter = new QuestionAdapter();
@@ -52,6 +51,10 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     TextView text_chat_content;
     TextView test_send_custom;
     private Activity mActivity;
+
+    private Handler handler = new Handler(Looper.getMainLooper());
+
+    private boolean flag = false;
 
 
     @Override
@@ -88,7 +91,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
         test_send_custom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                JSONObject json = new JSONObject();
+                final JSONObject json = new JSONObject();
                 try {
                     json.put("key0", "value");
                     json.put("key1", "0000");
@@ -105,9 +108,6 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                 mPresenter.showChatView(false, null, 0);
             }
         });
-
-//        btnFresh = (Button) getView().findViewById(R.id.btn_fresh);
-//        btnFresh.setOnClickListener(this);
         isquestion = getArguments().getBoolean("question");
         status = getArguments().getInt("state");
         if (isquestion) {
@@ -119,13 +119,12 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     }
 
     private void init() {
-//        if (status == VhallUtil.WATCH_PLAYBACK) {
-//            btnFresh.setVisibility(View.VISIBLE);
-//        }
     }
 
     @Override
     public void notifyDataChanged(ChatServer.ChatInfo data) {
+        if (chatData.size() > 10)
+            chatData.remove(0);
         chatData.add(data);
         if (isquestion) {
             questionAdapter.notifyDataSetChanged();
@@ -367,4 +366,24 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
         TextView tv_answer_name;
     }
 
+    class TestRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            while (flag) {
+                try {
+                    Thread.sleep(500);
+                    mPresenter.sendChat("lalala");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        flag = false;
+    }
 }

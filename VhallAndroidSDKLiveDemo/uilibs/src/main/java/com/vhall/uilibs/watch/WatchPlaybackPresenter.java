@@ -1,5 +1,6 @@
 package com.vhall.uilibs.watch;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
@@ -38,6 +39,7 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 观看回放的Presenter
@@ -123,12 +125,11 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     private void initWatch() {
-        if (loadingVideo)
-            return;
+        if (loadingVideo) return;
         loadingVideo = true;
         //游客ID及昵称 已登录用户可传空
         TelephonyManager telephonyMgr = (TelephonyManager) watchView.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-        String customeId = telephonyMgr.getDeviceId();
+        @SuppressLint("MissingPermission") String customeId = telephonyMgr.getDeviceId();
         String customNickname = Build.BRAND + "手机用户";
         VhallSDK.initWatch(param.watchId, customeId, customNickname, param.key, getWatchPlayback(), WebinarInfo.VIDEO, new RequestCallback() {
             @Override
@@ -147,6 +148,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             }
         });
     }
+
 
     @Override
     public void onFragmentDestory() {
@@ -173,7 +175,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             if (!getWatchPlayback().isAvaliable()) {
                 initWatch();
             } else {
-                if (getWatchPlayback().getPlayerState() == VHExoPlayer.STATE_ENDED){
+                if (getWatchPlayback().getPlayerState() == VHExoPlayer.STATE_ENDED) {
                     getWatchPlayback().seekTo(0);
                 }
                 startPlay();
@@ -211,6 +213,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     @Override
     public void onResume() {
         getWatchPlayback().onResume();
+
         if (getWatchPlayback().isAvaliable()) {
             playbackView.setPlayIcon(false);
         } else {
@@ -221,6 +224,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     @Override
     public void onPause() {
+        /** onPause只需要根据Activity的生命周期调用即可,暂停可以使用stop方法*/
         getWatchPlayback().onPause();
         playbackView.setPlayIcon(true);
     }

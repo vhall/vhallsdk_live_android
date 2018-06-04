@@ -8,9 +8,11 @@
     <color name="alpha">#5D000000</color>
     <color name="gray_deep">#2b2c32</color>
     <color name="common_content_color">@color/gray_normal</color>
+    <color name="gray_heavy">#707075</color>
     <color name="radiogroup_bg">#18181C</color>
     <color name="gray_normal">#9c9ca0</color>
     <color name="red_main">#ff3333</color>
     <color name="red_gray">#f5f5f5</color>
     <color name="app_background_color">#e2e8eb</color>
+
 </resources>

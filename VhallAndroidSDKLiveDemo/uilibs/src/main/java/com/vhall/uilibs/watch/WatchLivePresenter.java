@@ -2,6 +2,7 @@ package com.vhall.uilibs.watch;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -31,6 +32,7 @@ import com.vhall.uilibs.R;
 //import com.vhall.business_support.dlna.DeviceDisplay;
 //import com.vhall.business_support.WatchLive;
 //import org.fourthline.cling.android.AndroidUpnpService;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -109,7 +111,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
             @Override
             public void onError(int errorCode, String reason) {
-                chatView.showToast(reason);
+                Log.e(TAG, " reason == " + reason);
+                //chatView.showToast(reason);
             }
         });
     }
@@ -188,16 +191,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             return;
         }
         force = false;
-
-//        if (isWatching) {
-//            stopWatch();
-//        }
-//        getWatchLive().setDefinition(level);
         getWatchLive().setPCSwitchDefinition();
         if (watchView.getActivity().isFinishing()) {
             return;
         }
-        //startWatch();  // 暂不请求
     }
 
     @Override
@@ -545,6 +542,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case MessageServer.EVENT_CLEARDOC:
                 case MessageServer.EVENT_PAINTDOC:
                 case MessageServer.EVENT_DELETEDOC:
+                    Log.e(TAG, " event " + messageInfo.event);
                     documentView.paintPPT(messageInfo);
                     break;
                 case MessageServer.EVENT_RESTART:

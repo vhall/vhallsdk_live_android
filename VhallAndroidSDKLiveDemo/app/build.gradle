@@ -1,14 +1,12 @@
 apply plugin: 'com.android.application'
-
 android {
-    compileSdkVersion 22
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 26
     defaultConfig {
         applicationId "com.vhall.live"
         minSdkVersion 16
-        targetSdkVersion 22
-        versionCode 301
-        versionName "3.0.1"
+        targetSdkVersion 26
+        versionCode 293
+        versionName "3.3.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -17,21 +15,31 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     packagingOptions {
         exclude 'META-INF/beans.xml'
     }
 
-    repositories {
-        flatDir {
-            dirs project(':uilibs').file('libs')
-        }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile project(':uilibs')
-    compile 'com.android.support:appcompat-v7:22.0.+'
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
 
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation project(':uilibs')
+    implementation "com.android.support:appcompat-v7:${SUPPORT_VERSION}"
+}
+
+repositories {
+    flatDir {
+        dirs '../uilibs/libs'
+    }
+}
+repositories {
+    mavenCentral()
 }

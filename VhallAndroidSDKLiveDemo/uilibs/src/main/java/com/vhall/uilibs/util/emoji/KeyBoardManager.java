@@ -2,8 +2,17 @@ package com.vhall.uilibs.util.emoji;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.os.Build;
+import android.util.DisplayMetrics;
+import android.view.Display;
+import android.view.ViewConfiguration;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import java.lang.reflect.Method;
+
 
 /**
  * 打开或关闭软键盘
@@ -58,5 +67,69 @@ public class KeyBoardManager {
         SharedPreferences.Editor editor = sp.edit();
         editor.putInt("keyboard_height_landspace", height);
         editor.commit();
+    }
+
+    /**
+     * 获取虚拟按键的高度
+     * @param context 上下文
+     * @return
+     */
+    public static int getVirtualButtonHeight(Context context) {
+        int vh = 0;
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        DisplayMetrics dm = new DisplayMetrics();
+        try {
+            @SuppressWarnings("rawtypes")
+            Class c = Class.forName("android.view.Display");
+            @SuppressWarnings("unchecked")
+            Method method = c.getMethod("getRealMetrics", DisplayMetrics.class);
+            method.invoke(display, dm);
+            vh = dm.heightPixels - display.getHeight();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return vh;
+    }
+
+    /**
+     * 判断是否存在虚拟按键 例如小米MIX2(全面屏)
+     * @param context 上下文
+     * @return
+     */
+    public static boolean hasVirtualButton(Context context) {
+        Resources res = context.getResources();
+        boolean hasVirtral;
+        int resourceId = res.getIdentifier("config_showNavigationBar", "bool", "android");
+        if (resourceId != 0) {
+            hasVirtral = res.getBoolean(resourceId);
+            String navBarOverride = getNavBarOverride();
+            if (navBarOverride.equals(1)) {
+                hasVirtral = false;
+            } else if (navBarOverride.equals(0)) {
+                hasVirtral = true;
+            }
+            return hasVirtral;
+        } else {
+            return !ViewConfiguration.get(context).hasPermanentMenuKey();
+        }
+    }
+
+    /**
+     * 判断虚拟按键栏是否重写
+     * @return
+     */
+    private static String getNavBarOverride() {
+        String sNavBarOverride = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            try {
+                Class c = Class.forName("android.os.SystemProperties");
+                Method m = c.getDeclaredMethod("get", String.class);
+                m.setAccessible(true);
+                sNavBarOverride = (String) m.invoke(null, "qemu.hw.mainkeys");
+            } catch (Throwable e) {
+            }
+        }
+        return sNavBarOverride;
     }
 }

@@ -20,11 +20,13 @@ import android.text.Spannable.Factory;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.VhallUtil;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -300,6 +302,12 @@ public class EmojiUtils {
 
     public static View getGridChildView(final Context context, int i, List<String> reslist, final EditText et_chat) {
         View view = View.inflate(context, R.layout.emoji_grid, null);
+
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        int width = wm.getDefaultDisplay().getWidth();
+        int height = wm.getDefaultDisplay().getHeight();
+        int screenWidth = width;
+
         EmojiGridView gv = (EmojiGridView) view.findViewById(R.id.gv_emoji);
         List<String> list = new ArrayList<String>();
         if (i == 5) {
@@ -307,8 +315,14 @@ public class EmojiUtils {
         } else {
             list.addAll(reslist.subList((i - 1) * 20, i * 20));
         }
+        gv.setSelector(android.R.color.transparent);
+        gv.setNumColumns(7);//设置7列
+        int spacing = VhallUtil.dp2px(context, 10);
+        gv.setPadding(spacing, spacing, spacing, spacing);
+        // 动态计算item的宽度和高度
+        int itemWidth = (screenWidth - spacing * 8) / 7;
         list.add(delete_name);
-        final EmojiAdapter expressionAdapter = new EmojiAdapter(context, 1, list);
+        final EmojiAdapter expressionAdapter = new EmojiAdapter(context, 1, list, itemWidth);
         gv.setAdapter(expressionAdapter);
         gv.setOnItemClickListener(new OnItemClickListener() {
 
