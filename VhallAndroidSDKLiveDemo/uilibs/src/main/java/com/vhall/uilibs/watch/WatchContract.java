@@ -6,15 +6,15 @@ import android.widget.SeekBar;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
 import com.vhall.business.widget.ContainerLayout;
-
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
 
-//import org.fourthline.cling.android.AndroidUpnpService;
-//import com.vhall.business_support.dlna.DeviceDisplay;
 import java.util.HashMap;
 import java.util.List;
+
+//import org.fourthline.cling.android.AndroidUpnpService;
+//import com.vhall.business_support.dlna.DeviceDisplay;
 
 /**
  * 观看页的接口类
@@ -116,6 +116,10 @@ public class WatchContract {
 
         void setScaleTypeText(int type);
 
+        void setQuality(List<String> qualities);
+
+        void setQualityChecked(String dpi);
+
     }
 
     interface PlaybackPresenter extends WatchPresenter {
@@ -138,8 +142,12 @@ public class WatchContract {
         int changeScreenOri();
 
         void onPause();
+
         void onResume();
+
         void onStop();
+
+        void onSwitchPixel(String pix);// 切换分辨率
     }
 
     interface LivePresenter extends WatchPresenter {

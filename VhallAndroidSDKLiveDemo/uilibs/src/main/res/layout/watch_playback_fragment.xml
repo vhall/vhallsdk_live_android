@@ -109,5 +109,17 @@
             android:background="@drawable/fit_default" />
     </RelativeLayout>
 
+    <RadioGroup
+        android:id="@+id/rg_quality"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:background="#30ffffff"
+        android:orientation="vertical"
+        android:padding="5dp">
+
+    </RadioGroup>
+
 
 </RelativeLayout>

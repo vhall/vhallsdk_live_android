@@ -1,20 +1,26 @@
 package com.vhall.uilibs.watch;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.vhall.business.WatchLive;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.uilibs.R;
+
+import java.util.List;
 
 /**
  * 观看回放的Fragment
@@ -28,10 +34,18 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     TextView tv_current_time, tv_end_time;
     ProgressBar pb;
     ImageView iv_dlna_playback;
+    RadioGroup rg_quality;
+    Context mContext;
 
     public static WatchPlaybackFragment newInstance() {
         WatchPlaybackFragment articleFragment = new WatchPlaybackFragment();
         return articleFragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
     }
 
     @Override
@@ -51,6 +65,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
         rl_video_container = (ContainerLayout) getView().findViewById(R.id.rl_video_container);
         btn_changescaletype = (ImageView) getView().findViewById(R.id.btn_change_scale_type);
         iv_dlna_playback = (ImageView) getView().findViewById(R.id.iv_dlna_playback);
+        rg_quality = getView().findViewById(R.id.rg_quality);
         btn_changescaletype.setOnClickListener(this);
         iv_dlna_playback.setOnClickListener(this);
         pb = (ProgressBar) getView().findViewById(R.id.pb);
@@ -65,7 +80,6 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mPresenter.onProgressChanged(seekBar, progress, fromUser);
-                Log.e(TAG, "progress == " + progress + " fromUser == " + fromUser);
             }
 
             @Override
@@ -143,6 +157,37 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             case WatchLive.FIT_XY:
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_xy));
                 break;
+        }
+    }
+
+    @Override
+    public void setQuality(List<String> qualities) {
+        if (qualities != null && qualities.size() > 0) {
+            for (int i = 0; i < qualities.size(); i++) {
+                RadioButton button = new RadioButton(mContext);
+                button.setText(qualities.get(i));
+                rg_quality.addView(button);
+            }
+            rg_quality.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    RadioButton rb = group.findViewById(checkedId);
+                    String text = rb.getText().toString();
+                    mPresenter.onSwitchPixel(text);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void setQualityChecked(String dpi) {
+        int count = rg_quality.getChildCount();
+        if (TextUtils.isEmpty(dpi) || count <= 0)
+            return;
+        for (int i = 0; i < count; i++) {
+            RadioButton rb = (RadioButton) rg_quality.getChildAt(i);
+            if (rb.getText().equals(dpi))
+                rb.setChecked(true);
         }
     }
 

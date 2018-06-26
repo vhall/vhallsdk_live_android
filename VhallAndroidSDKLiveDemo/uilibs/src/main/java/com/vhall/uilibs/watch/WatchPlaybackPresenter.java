@@ -13,13 +13,12 @@ import android.widget.Toast;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
+import com.vhall.business.Watch;
 import com.vhall.business.WatchLive;
 import com.vhall.business.WatchPlayback;
 import com.vhall.business.data.RequestCallback;
-import com.vhall.business.data.WebinarInfo;
-
 import com.vhall.business.data.Survey;
-
+import com.vhall.business.data.WebinarInfo;
 import com.vhall.playersdk.player.VHExoPlayer;
 import com.vhall.playersdk.player.vhallplayer.VHallPlayer;
 import com.vhall.uilibs.Param;
@@ -28,18 +27,18 @@ import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 
+import org.json.JSONObject;
+
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
 //TODO  投屏相关
 //import com.vhall.business_support.Watch_Support;
 //import com.vhall.business_support.dlna.DeviceDisplay;
 //import com.vhall.business_support.WatchLive;
 //import com.vhall.business_support.WatchPlayback;
 //import org.fourthline.cling.android.AndroidUpnpService;
-import org.json.JSONObject;
-
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 观看回放的Presenter
@@ -139,6 +138,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 pos = 0;
                 initCommentData(pos);
                 watchView.showNotice(getWatchPlayback().getNotice()); //显示公告
+                playbackView.setQuality(getWatchPlayback().getQualities());
             }
 
             @Override
@@ -233,6 +233,11 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     public void onStop() {
         getWatchPlayback().stop();
         playbackView.setPlayIcon(true);
+    }
+
+    @Override
+    public void onSwitchPixel(String pix) {
+        getWatchPlayback().setDefinition(pix);
     }
 
     public WatchPlayback getWatchPlayback() {
@@ -351,7 +356,12 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
         @Override
         public void onStateChanged(int stateCode) {
-
+            switch (stateCode) {
+                case Watch.STATE_CHANGE_DEFINITION:
+                    String dpi = watchPlayback.getCurrentDPI();
+                    playbackView.setQualityChecked(dpi);
+                    break;
+            }
         }
 
         @Override
