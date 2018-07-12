@@ -7,7 +7,6 @@ android {
         targetSdkVersion 26
         versionCode 293
         versionName "3.3.1"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -19,10 +18,6 @@ android {
         exclude 'META-INF/beans.xml'
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
 }
 
 tasks.withType(JavaCompile) {
