@@ -1,6 +1,7 @@
 package com.vhall.uilibs.watch;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -23,6 +24,7 @@ import com.vhall.business.WatchLive;
 import com.vhall.business.utils.LogManager;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.interactive.InteractiveActivity;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
 
 import java.util.HashMap;
@@ -337,6 +339,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             }
         }
     }
+
+
 
     private void addDanmaKuShowTextAndImage(boolean islive) {
         BaseDanmaku danmaku = mDanmuContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);

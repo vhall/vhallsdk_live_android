@@ -1,13 +1,10 @@
 package com.vhall.live;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -31,21 +28,18 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  * 主界面的Activity
  */
 public class MainActivity extends FragmentActivity {
-
     TextView tv_phone, tv_name, tv_login;
     CircleImageView mCircleViewAvatar;
-
     Param param = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-
-        tv_phone = (TextView) this.findViewById(R.id.tv_phone);
-        tv_name = (TextView) this.findViewById(R.id.text_name);
-        mCircleViewAvatar = (CircleImageView) this.findViewById(R.id.iv_avatar);
-        tv_login = (TextView) this.findViewById(R.id.tv_login);
+        tv_phone = this.findViewById(R.id.tv_phone);
+        tv_name = this.findViewById(R.id.text_name);
+        mCircleViewAvatar = this.findViewById(R.id.iv_avatar);
+        tv_login = this.findViewById(R.id.tv_login);
 
         tv_login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,16 +60,17 @@ public class MainActivity extends FragmentActivity {
         if (Build.VERSION.SDK_INT < 23) return;
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) { // 如果之前请求拒绝返回true
-                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-                alertDialog.setTitle("设置权限");
-                alertDialog.setMessage("没有获取摄像头的权限,请去设置中开启").setPositiveButton("去设置", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(Settings.ACTION_SETTINGS);
-                        startActivity(intent);
-                    }
-                });
-                alertDialog.show();
+//                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+//                alertDialog.setTitle("设置权限");
+//                alertDialog.setMessage("没有获取摄像头的权限,请去设置中开启").setPositiveButton("去设置", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Intent intent = new Intent(Settings.ACTION_SETTINGS);
+//                        startActivity(intent);
+//                    }
+//                });
+//                alertDialog.show();
+
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
@@ -124,7 +119,6 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
     }
 
     public void onBroadcastLandspace(View view) {
@@ -142,7 +136,6 @@ public class MainActivity extends FragmentActivity {
     }
 
     public void onWatchLive(View view) {
-
         Intent intent = new Intent(this, WatchActivity.class);
         intent.putExtra("param", param);
         intent.putExtra("type", VhallUtil.WATCH_LIVE);

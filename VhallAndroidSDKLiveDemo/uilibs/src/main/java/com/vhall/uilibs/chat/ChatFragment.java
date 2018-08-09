@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +49,6 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     boolean isquestion = false;
     int status = -1;
 
-    TextView text_chat_content;
     TextView test_send_custom;
     private Activity mActivity;
 
@@ -86,8 +86,8 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        lv_chat = (ListView) getView().findViewById(R.id.lv_chat);
-        test_send_custom = (TextView) getView().findViewById(R.id.test_send_custom);
+        lv_chat = getView().findViewById(R.id.lv_chat);
+        test_send_custom =  getView().findViewById(R.id.test_send_custom);
         test_send_custom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -134,12 +134,12 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     }
 
     @Override
-    public void notifyDataChanged(List<ChatServer.ChatInfo> list) {
+    public void notifyDataChanged(int type, List<ChatServer.ChatInfo> list) {
         chatData.addAll(list);
-        if (isquestion)
-            questionAdapter.notifyDataSetChanged();
-        else
+        if (type == CHAT_EVENT_CHAT) {
             chatAdapter.notifyDataSetChanged();
+        } else
+            questionAdapter.notifyDataSetChanged();
     }
 
 
@@ -306,8 +306,8 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
             if (convertView == null) {
                 convertView = View.inflate(getActivity(), R.layout.chat_question_item, null);
                 viewHolder = new Holder();
-                viewHolder.iv_question_avatar = (ImageView) convertView.findViewById(R.id.iv_question_avatar);
-                viewHolder.tv_question_content = (TextView) convertView.findViewById(R.id.tv_question_content);
+                viewHolder.iv_question_avatar = convertView.findViewById(R.id.iv_question_avatar);
+                viewHolder.tv_question_content = convertView.findViewById(R.id.tv_question_content);
                 viewHolder.tv_question_name = (TextView) convertView.findViewById(R.id.tv_question_name);
                 viewHolder.tv_question_time = (TextView) convertView.findViewById(R.id.tv_question_time);
 
@@ -322,7 +322,9 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
             }
             ChatServer.ChatInfo data = chatData.get(position);
             ChatServer.ChatInfo.QuestionData questionData = data.questionData;
-            Glide.with(getActivity()).load(questionData.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_question_avatar);
+            if (questionData != null && !TextUtils.isEmpty(questionData.avatar)) {
+                Glide.with(getActivity()).load(questionData.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_question_avatar);
+            }
             //TODO 头像设置
             viewHolder.tv_question_name.setText(questionData.nick_name);
             viewHolder.tv_question_time.setText(questionData.created_at);

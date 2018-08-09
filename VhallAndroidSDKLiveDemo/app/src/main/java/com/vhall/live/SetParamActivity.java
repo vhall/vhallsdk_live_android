@@ -11,6 +11,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.vhall.business.VHILSS;
 import com.vhall.business.VhallSDK;
 import com.vhall.uilibs.Param;
 import com.vhall.vhalllive.pushlive.CameraFilterView;
@@ -23,7 +24,7 @@ public class SetParamActivity extends FragmentActivity {
     EditText et_bro_token, et_bro_id, et_video_bitrate, et_video_framerate, et_watch_id, et_key, et_buffersecond;
     TextView et_userid, et_usernickname;
     RadioGroup rg_type;
-    RadioButton rb_hdpi, rb_xhdpi;
+    RadioButton rb_hdpi, rb_xhdpi, radioButtonHD, radioButtonSD, radioButtonUHD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +45,10 @@ public class SetParamActivity extends FragmentActivity {
         rb_hdpi = (RadioButton) this.findViewById(R.id.rb_hdpi);
         rb_xhdpi = (RadioButton) this.findViewById(R.id.rb_xhdpi);
 
+        radioButtonHD = this.findViewById(R.id.interactive_param_hd);
+        radioButtonSD = this.findViewById(R.id.interactive_param_sd);
+        radioButtonUHD = this.findViewById(R.id.interactive_param_uhd);
+        radioButtonSD.isChecked();
         initData();
     }
 
@@ -56,8 +61,8 @@ public class SetParamActivity extends FragmentActivity {
         et_key.setText(param.key);
         et_buffersecond.setText(String.valueOf(param.bufferSecond));
         TelephonyManager telephonyMgr = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
-        et_userid.setText(TextUtils.isEmpty(VhallSDK.getUserName())?telephonyMgr.getDeviceId():VhallSDK.getUserName());
-        et_usernickname.setText(TextUtils.isEmpty(VhallSDK.getUserNickname())? Build.BRAND + getString(R.string.phone_user):VhallSDK.getUserNickname());
+        et_userid.setText(TextUtils.isEmpty(VhallSDK.getUserName()) ? telephonyMgr.getDeviceId() : VhallSDK.getUserName());
+        et_usernickname.setText(TextUtils.isEmpty(VhallSDK.getUserNickname()) ? Build.BRAND + getString(R.string.phone_user) : VhallSDK.getUserNickname());
         if (param.pixel_type == CameraFilterView.TYPE_HDPI) {
             rb_hdpi.setChecked(true);
         } else if (param.pixel_type == CameraFilterView.TYPE_XHDPI) {
@@ -98,6 +103,14 @@ public class SetParamActivity extends FragmentActivity {
             param.pixel_type = CameraFilterView.TYPE_HDPI;
         } else if (rb_xhdpi.isChecked()) {
             param.pixel_type = CameraFilterView.TYPE_XHDPI;
+        }
+
+        if (radioButtonSD.isChecked()) {
+            param.interactive_definition = VHILSS.SD;
+        } else if (radioButtonHD.isChecked()) {
+            param.interactive_definition = VHILSS.HD;
+        } else if (radioButtonUHD.isChecked()) {
+            param.interactive_definition = VHILSS.UHD;
         }
 
         VhallApplication.setParam(param);

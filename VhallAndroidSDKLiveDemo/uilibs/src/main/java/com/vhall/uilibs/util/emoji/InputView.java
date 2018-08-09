@@ -321,7 +321,7 @@ public class InputView {
                 if (previousKeyboardHeight != keyboardHeight) {
                     boolean hide = (double) displayHeight / height > 0.8;
                     if (hide && !showEmoji) {
-                        dismiss();
+                        //dismiss();
                     }
                     if (!hide) {
                         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) contentView.getLayoutParams();

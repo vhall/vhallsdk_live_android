@@ -276,6 +276,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/white"
         android:orientation="horizontal"
+        android:visibility="gone"
         android:weightSum="1.0">
 
         <TextView
@@ -290,6 +291,58 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.7" />
+    </LinearLayout>
+
+    <TextView
+        style="@style/AppBackTheme"
+        android:text="互动直播" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:orientation="horizontal">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_settings_string_dp" />
+
+        <RadioGroup
+            android:id="@+id/interactive_param_rg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/interactive_param_uhd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/common_line_padding"
+                android:text="标清"
+                android:textSize="10dp" />
+
+            <RadioButton
+                android:id="@+id/interactive_param_hd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/common_line_padding"
+                android:text="清晰"
+                android:textSize="10dp"
+                android:visibility="visible" />
+
+            <RadioButton
+                android:id="@+id/interactive_param_sd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/common_line_padding"
+                android:text="流畅"
+                android:textSize="10dp"
+                android:visibility="visible" />
+        </RadioGroup>
+
     </LinearLayout>
 
 </LinearLayout>

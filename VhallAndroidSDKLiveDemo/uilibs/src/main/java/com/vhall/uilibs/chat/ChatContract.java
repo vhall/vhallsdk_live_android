@@ -17,7 +17,7 @@ public class ChatContract {
     public interface ChatView extends BaseView<ChatPresenter> {
         void notifyDataChanged(ChatServer.ChatInfo data);
 
-        void notifyDataChanged(List<ChatServer.ChatInfo> list);
+        void notifyDataChanged(int type , List<ChatServer.ChatInfo> list);
 
         void showToast(String content);
 

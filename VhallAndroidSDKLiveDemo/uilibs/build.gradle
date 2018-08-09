@@ -35,5 +35,4 @@ dependencies {
     implementation 'com.github.ctiao:ndkbitmap-armv5:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-x86:0.6.4'
 
-
 }

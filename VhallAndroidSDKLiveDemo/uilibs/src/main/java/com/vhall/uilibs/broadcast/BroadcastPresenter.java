@@ -11,6 +11,7 @@ import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.emoji.InputUser;
 
 import org.json.JSONObject;
@@ -325,7 +326,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
                 Log.e(TAG, "list->" + list.size());
-                chatView.notifyDataChanged(list);
+                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT , list);
             }
 
             @Override

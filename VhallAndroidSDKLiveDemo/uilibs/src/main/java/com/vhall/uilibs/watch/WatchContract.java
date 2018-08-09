@@ -6,15 +6,15 @@ import android.widget.SeekBar;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
 import com.vhall.business.widget.ContainerLayout;
+
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
 
-import java.util.HashMap;
-import java.util.List;
-
 //import org.fourthline.cling.android.AndroidUpnpService;
 //import com.vhall.business_support.dlna.DeviceDisplay;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * 观看页的接口类
@@ -58,11 +58,13 @@ public class WatchContract {
         //显示抽奖
         void showLottery(final MessageServer.MsgInfo messageInfo);
 
-
+        void enterInteractive(); // 进入互动
         // 投屏使用
         // void showDevices();
         // 投屏使用
         // void dismissDevices();
+
+        void refreshHand(int second);
 
     }
 
@@ -97,6 +99,7 @@ public class WatchContract {
         void addDanmu(String danmu);
 
         void reFreshView();
+
     }
 
 
@@ -186,6 +189,8 @@ public class WatchContract {
         void signIn(String signId);
 
         void submitSurvey(Survey survey, String result);
+
+        void onRaiseHand(); // 举手
 
         // void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
 

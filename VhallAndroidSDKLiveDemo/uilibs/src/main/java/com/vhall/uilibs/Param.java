@@ -1,6 +1,7 @@
 package com.vhall.uilibs;
 
 
+import com.vhall.business.VHILSS;
 import com.vhall.vhalllive.pushlive.CameraFilterView;
 
 import java.io.Serializable;
@@ -20,4 +21,7 @@ public class Param implements Serializable {
     public String watchId = "";
     public String key = "";
     public int bufferSecond = 6;
+
+    //互动相关
+    public int interactive_definition = VHILSS.SD;
 }

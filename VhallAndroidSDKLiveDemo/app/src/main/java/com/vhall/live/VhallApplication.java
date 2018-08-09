@@ -36,7 +36,7 @@ public class VhallApplication extends Application {
             param.videoBitrate = sp.getInt("videobitrate", 500);
             param.videoFrameRate = sp.getInt("videoframerate", 15);
 
-            param.watchId = sp.getString("watchid", ""); // 412768506  465735486(正式)
+            param.watchId = sp.getString("watchid", ""); //
             param.key = sp.getString("key", "");
             param.bufferSecond = sp.getInt("buffersecond", 6);
         }

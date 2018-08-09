@@ -1,13 +1,12 @@
 package com.vhall.uilibs.watch;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -15,6 +14,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -23,10 +23,12 @@ import android.widget.Toast;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
 
+import com.vhall.uilibs.interactive.InteractiveActivity;
 import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 
+import com.vhall.uilibs.util.CircleView;
 import com.vhall.uilibs.util.ShowLotteryDialog;
 import com.vhall.uilibs.util.SignInDialog;
 import com.vhall.uilibs.util.SurveyPopu;
@@ -52,7 +54,6 @@ import com.vhall.uilibs.util.emoji.KeyBoardManager;
 //import org.fourthline.cling.registry.Registry;
 
 
-
 /**
  * 观看页的Activity
  */
@@ -62,6 +63,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     private RadioGroup radio_tabs;
     private RadioButton questionBtn, chatBtn;
     private LinearLayout ll_detail;
+    private CircleView mHand;
     ExtendTextView tv_notice;
     private Param param;
     private int type;
@@ -78,6 +80,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     private SignInDialog signInDialog;
     private ShowLotteryDialog lotteryDialog;
     WatchContract.WatchPresenter mPresenter;
+
+    CountDownTimer onHandDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,7 +215,16 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         questionBtn = (RadioButton) this.findViewById(R.id.rb_question);
         chatBtn = (RadioButton) this.findViewById(R.id.rb_chat);
 
-        tv_notice = (ExtendTextView) this.findViewById(R.id.tv_notice);
+        mHand = this.findViewById(R.id.image_hand);
+        mHand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //点击上麦, 再次点击下麦
+                mPresenter.onRaiseHand();
+            }
+        });
+
+        tv_notice = this.findViewById(R.id.tv_notice);
         tv_notice.setDrawableClickListener(new ExtendTextView.DrawableClickListener() {
             @Override
             public void onDrawableClick(int position) {
@@ -350,6 +363,18 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         lotteryDialog.show();
     }
 
+    @Override
+    public void enterInteractive() { // 进入互动房间
+        Intent intent = new Intent(this, InteractiveActivity.class);
+        intent.putExtra("param", param);
+        startActivity(intent);
+//        this.finish();
+    }
+
+    @Override
+    public void refreshHand(int second) {
+        mHand.setTextAndInvalidate(second);
+    }
 
 
     @Override

@@ -1,12 +1,15 @@
 package com.vhall.uilibs.watch;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.opengl.GL_Preview_YUV;
 import com.vhall.business.ChatServer;
@@ -18,10 +21,12 @@ import com.vhall.business.data.WebinarInfo;
 
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
+import com.vhall.business.data.source.InteractiveDataSource;
 import com.vhall.business.data.source.SurveyDataSource;
 
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.vhalllive.common.Constants;
 import com.vhall.vhalllive.playlive.GLPlayInterface;
@@ -59,6 +64,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     private int scaleType = Constants.DrawMode.kVHallDrawModeAspectFit.getValue();
 
     private GLPlayInterface mPlayView;
+    private boolean isHand = false;
+    private int isHandStatus = 1;
+
+    CountDownTimer onHandDownTimer;
+    private int durationSec = 30; // 举手上麦倒计时
 
     public WatchLivePresenter(WatchContract.LiveView liveView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, ChatContract.ChatView questionView, WatchContract.WatchView watchView, Param param) {
         this.params = param;
@@ -287,6 +297,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
                 chatView.clearChatData();
                 getChatHistory();
+                getAnswerList();
             }
 
             @Override
@@ -297,11 +308,24 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         });
     }
 
+    private void getAnswerList() {
+        VhallSDK.getAnswerList(params.watchId, new ChatServer.ChatRecordCallback() {
+            @Override
+            public void onDataLoaded(List<ChatServer.ChatInfo> list) {
+                questionView.notifyDataChanged(ChatFragment.CHAT_EVENT_QUESTION, list);
+            }
+
+            @Override
+            public void onFailed(int errorcode, String messaage) {
+//                Toast.makeText(watchView.getActivity(), messaage, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     @Override
     public void startWatch() {
         getWatchLive().start();
     }
-
 
     @Override
     public void stopWatch() {
@@ -387,6 +411,31 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         });
     }
 
+    @Override
+    public void onRaiseHand() {
+        getWatchLive().onRaiseHand(params.watchId, isHand ? 0 : 1, new RequestCallback() {
+            @Override
+            public void onSuccess() {
+                if (isHand) {
+                    isHand = false;
+                    watchView.refreshHand(0);
+                    if (onHandDownTimer != null) {
+                        onHandDownTimer.cancel();
+                    }
+                } else {
+                    Log.e(TAG, "举手成功");
+                    startDownTimer(durationSec);
+                    isHand = true;
+                }
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                watchView.showToast("举手失败，errorMsg:" + errorMsg);
+            }
+        });
+    }
+
 
     //TODO 投屏相关
 //
@@ -397,7 +446,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 //            @Override
 //            public void onError(int errorCode) {
 //                watchView.showToast("投屏失败，errorCode:" + errorCode);
-//            }
+////            }
 //
 //            @Override
 //            public void onSuccess() {
@@ -480,7 +529,6 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 // INIT STUF
             }
         }
-
     }
 
     /**
@@ -489,6 +537,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     private class MessageEventCallback implements MessageServer.Callback {
         @Override
         public void onEvent(MessageServer.MsgInfo messageInfo) {
+            Log.e(TAG, "messageInfo " + messageInfo.event);
             switch (messageInfo.event) {
                 case MessageServer.EVENT_DISABLE_CHAT://禁言
                     break;
@@ -549,8 +598,23 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     force = true;
                     //onSwitchPixel(WatchLive.DPI_DEFAULT);
                     break;
+                case MessageServer.EVENT_INTERACTIVE_HAND:
+                    Log.e(TAG, " status " + messageInfo.status);
+                    /** 互动举手消息 status = 1  允许上麦  */
+                    break;
+                case MessageServer.EVENT_INTERACTIVE_ALLOW_MIC:
+//                    getWatchLive().disconnectMsgServer(); // 关闭watchLive中的消息
+                    watchView.enterInteractive();
+                    if (onHandDownTimer != null) {
+                        isHand = false; //重置是否举手标识
+                        onHandDownTimer.cancel();
+                        watchView.refreshHand(0);
+                    }
+                    break;
+                case MessageServer.EVENT_INTERACTIVE_ALLOW_HAND:
+                    watchView.showToast(messageInfo.status == 0 ? "举手按钮关闭" : "举手按钮开启");
+                    break;
             }
-
         }
 
         public int parseTime(String str, int defaultTime) {
@@ -580,6 +644,21 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         public void onMsgServerClosed() {
 
         }
+    }
+
+    public void startDownTimer(int secondTimer) {
+        onHandDownTimer = new CountDownTimer(secondTimer * 1000 + 1080, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                watchView.refreshHand((int) millisUntilFinished / 1000 - 1);
+            }
+
+            @Override
+            public void onFinish() {
+                onHandDownTimer.cancel();
+                onRaiseHand();
+            }
+        }.start();
     }
 
     private class ChatCallback implements ChatServer.Callback {
@@ -623,7 +702,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         getWatchLive().acquireChatRecord(true, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                chatView.notifyDataChanged(list);
+                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, list);
             }
 
             @Override
@@ -664,7 +743,6 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             if (this.isReady()) {
                 this.setdata(YUV);
             }
-
         }
 
         public boolean isReady() {

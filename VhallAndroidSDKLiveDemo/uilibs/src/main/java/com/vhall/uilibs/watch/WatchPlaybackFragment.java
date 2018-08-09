@@ -10,12 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.vhall.business.Watch;
 import com.vhall.business.WatchLive;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.uilibs.R;
@@ -168,6 +170,12 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
                 button.setText(qualities.get(i));
                 rg_quality.addView(button);
             }
+//            rg_quality.setOnCheckedChangeListener((group, checkedId) -> {
+//                RadioButton rb = group.findViewById(checkedId);
+//                String text = rb.getText().toString();
+//                mPresenter.onSwitchPixel(text);
+//            });
+
             rg_quality.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -176,6 +184,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
                     mPresenter.onSwitchPixel(text);
                 }
             });
+
         }
     }
 
