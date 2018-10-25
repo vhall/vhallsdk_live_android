@@ -42,9 +42,9 @@ public class CircleView extends ImageView {
         super(context, attrs, defStyleAttr);
         this.mContext = context;
         init();
-        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.CircleView, defStyleAttr, 0);
-        mBackColor = array.getColor(R.styleable.CircleView_circleBackColor, mBackColor);
-        mRadius = array.getFloat(R.styleable.CircleView_circleRadius, mRadius);
+        TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.circleView, defStyleAttr, 0);
+        mBackColor = array.getColor(R.styleable.circleView_circleBackColor, mBackColor);
+        mRadius = array.getFloat(R.styleable.circleView_circleRadius, mRadius);
         array.recycle();
     }
 

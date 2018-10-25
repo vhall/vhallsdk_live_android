@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="CircleView">
+    <declare-styleable name="circleView">
         <attr name="circleBackColor" format="color"/>
         <attr name="circleRadius" format="dimension"/>
     </declare-styleable>

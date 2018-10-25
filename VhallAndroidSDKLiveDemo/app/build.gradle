@@ -5,8 +5,8 @@ android {
         applicationId "com.vhall.live"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 293
-        versionName "3.2.0"
+        versionCode 321
+        versionName "3.2.1"
     }
     buildTypes {
         release {
@@ -16,6 +16,11 @@ android {
     }
     packagingOptions {
         exclude 'META-INF/beans.xml'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
 }

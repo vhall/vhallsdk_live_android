@@ -11,7 +11,6 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.vhall.business.VHILSS;
 import com.vhall.business.VhallSDK;
 import com.vhall.uilibs.Param;
 import com.vhall.vhalllive.pushlive.CameraFilterView;
@@ -105,13 +104,13 @@ public class SetParamActivity extends FragmentActivity {
             param.pixel_type = CameraFilterView.TYPE_XHDPI;
         }
 
-        if (radioButtonSD.isChecked()) {
-            param.interactive_definition = VHILSS.SD;
-        } else if (radioButtonHD.isChecked()) {
-            param.interactive_definition = VHILSS.HD;
-        } else if (radioButtonUHD.isChecked()) {
-            param.interactive_definition = VHILSS.UHD;
-        }
+//        if (radioButtonSD.isChecked()) {
+//            param.interactive_definition = VHILSS.SD;
+//        } else if (radioButtonHD.isChecked()) {
+//            param.interactive_definition = VHILSS.HD;
+//        } else if (radioButtonUHD.isChecked()) {
+//            param.interactive_definition = VHILSS.UHD;
+//        }
 
         VhallApplication.setParam(param);
 
