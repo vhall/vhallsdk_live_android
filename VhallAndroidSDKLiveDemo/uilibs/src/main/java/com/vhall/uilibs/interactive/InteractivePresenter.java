@@ -1,22 +1,20 @@
 package com.vhall.uilibs.interactive;
 
-import android.content.Context;
 import android.graphics.PixelFormat;
-import android.media.AudioManager;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.vhall.business.InterActive;
 import com.vhall.business.MessageServer;
-import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
+import com.vhall.business_interactive.InterActive;
 import com.vhall.uilibs.Param;
 import com.vhall.vhallrtc.client.Room;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 
 import org.json.JSONException;
+import org.webrtc.RendererCommon;
 
 public class InteractivePresenter implements InteractiveContract.InteractiveFraPresenter {
     private InteractiveContract.InteractiveActView interActView;
@@ -47,24 +45,23 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
 
     @Override
     public void initInteractive() {
-        VhallSDK.initInteractive(mParam.watchId, "", "", "", getInteractive(), new RequestCallback() {
+        interactive = new InterActive(interActView.getContext(), new RoomCallback(), new MessageEventCallback());
+        interactive.init(mParam.watchId, "", "", "", new RequestCallback() {
             @Override
             public void onSuccess() {
-                getInteractive().setDefinition(mParam.interactive_definition);
                 setLocalView();
             }
 
             @Override
-            public void onError(int errorCode, String msg) {
-                Toast.makeText(interActView.getContext(), "" + msg, Toast.LENGTH_SHORT).show();
+            public void onError(int errorCode, String errorMsg) {
+                Toast.makeText(interActView.getContext(), "" + errorMsg, Toast.LENGTH_SHORT).show();
             }
-
         });
     }
 
     @Override
     public void onDownMic() {
-        getInteractive().unpublish(new RequestCallback() {
+        interactive.unpublish(new RequestCallback() {
             @Override
             public void onSuccess() {
                 interActView.finish();
@@ -79,12 +76,12 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
 
     @Override
     public void onSwitchCamera() {
-        getInteractive().switchCamera();
+        interactive.switchCamera();
     }
 
     @Override
     public void onSwitchVideo(boolean isOpen) {
-        getInteractive().switchDevice(CAMERA_VIDEO, isOpen ? CAMERA_DEVICE_OPEN : CAMERA_DEVICE_CLOSE, new RequestCallback() {
+        interactive.switchDevice(CAMERA_VIDEO, isOpen ? CAMERA_DEVICE_OPEN : CAMERA_DEVICE_CLOSE, new RequestCallback() {
             @Override
             public void onSuccess() {
             }
@@ -98,7 +95,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
 
     @Override
     public void onSwitchAudio(boolean isOpen) {
-        getInteractive().switchDevice(CAMERA_AUDIO, isOpen ? CAMERA_DEVICE_OPEN : CAMERA_DEVICE_CLOSE, new RequestCallback() {
+        interactive.switchDevice(CAMERA_AUDIO, isOpen ? CAMERA_DEVICE_OPEN : CAMERA_DEVICE_CLOSE, new RequestCallback() {
             @Override
             public void onSuccess() {
             }
@@ -110,25 +107,28 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
         });
     }
 
+    /**
+     * 设置本地流
+     */
     private void setLocalView() {
         vhRenderView = new VHRenderView(interActView.getContext());
-        vhRenderView.setScalingMode(VHRenderView.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFill);
-        vhRenderView.init(getInteractive().getEglBase().getEglBaseContext(), null);
-        getInteractive().setLocalView(vhRenderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo);
+        vhRenderView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+        vhRenderView.init(interactive.getEglBase().getEglBaseContext(), null);
+        interactive.setLocalView(vhRenderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo);
         interFraView.addLocalView(vhRenderView);
-        getInteractive().enterRoom();
+        interactive.enterRoom();
     }
 
-    public InterActive getInteractive() {
-        if (interactive == null) {
-            InterActive.Builder builder = new InterActive.Builder()
-                    .context(interActView.getContext())
-                    .messageCallback(new MessageEventCallback())
-                    .roomCallback(new RoomCallback());
-            interactive = builder.build();
-        }
-        return interactive;
-    }
+//    public InterActive getInteractive() {
+//        if (interactive == null) {
+//            InterActive.Builder builder = new InterActive.Builder()
+//                    .context(interActView.getContext())
+//                    .messageCallback(new MessageEventCallback())
+//                    .roomCallback(new RoomCallback());
+//            interactive = builder.build();
+//        }
+//        return interactive;
+//    }
 
     /**
      * 观看过程消息监听
@@ -184,27 +184,19 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
     }
 
     public void switchVideoFrame(int status) {
-        try {
             if (status == CAMERA_DEVICE_OPEN) { //1打开
                 interactive.getLocalStream().unmuteVideo();
             } else { // 0禁止
                 interactive.getLocalStream().muteVideo();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     public void switchAudioFrame(int status) {
-        try {
             if (status == CAMERA_DEVICE_OPEN) {
                 interactive.getLocalStream().unmuteAudio();
             } else {
                 interactive.getLocalStream().muteAudio();
             }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     class RoomCallback implements InterActive.RoomCallback {
@@ -241,7 +233,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
                     interActView.setSpeakerphoneOn(true);
                     newRenderView.getHolder().setFormat(PixelFormat.TRANSPARENT);
                     newRenderView.setZOrderMediaOverlay(true);
-                    newRenderView.setScalingMode(VHRenderView.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFill);
+                    newRenderView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
                     interFraView.addStream(newRenderView);
                 }
             });
@@ -274,12 +266,11 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
         }
     }
 
-
     @Override
     public void onDestory() {
         onDownMic();
-        getInteractive().leaveRoom();
-        getInteractive().onDestory();
+        interactive.leaveRoom();
+        interactive.onDestory();
         interactive = null;
     }
 

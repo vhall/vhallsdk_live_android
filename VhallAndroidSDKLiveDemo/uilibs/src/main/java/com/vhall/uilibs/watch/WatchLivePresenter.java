@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.opengl.GL_Preview_YUV;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
@@ -287,7 +288,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     public void initWatch() {
         //游客ID及昵称 已登录用户可传空
         TelephonyManager telephonyMgr = (TelephonyManager) watchView.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-        String customeId = telephonyMgr.getDeviceId();
+//        String customeId = telephonyMgr.getDeviceId();
+        String customeId = Build.BOARD + Build.DEVICE + Build.SERIAL;//SERIAL  串口序列号 保证唯一值
         String customNickname = Build.BRAND + "手机用户";
         VhallSDK.initWatch(params.watchId, customeId, customNickname, params.key, getWatchLive(), WebinarInfo.LIVE, new RequestCallback() {
             @Override
@@ -737,6 +739,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             super.setColorFormat(19);
             mIsReady.set(true);
             return false;
+        }
+
+        @Override
+        public void playView(byte[] bytes, int i, int i1) {
+
         }
 
         public void playView(byte[] YUV) {
