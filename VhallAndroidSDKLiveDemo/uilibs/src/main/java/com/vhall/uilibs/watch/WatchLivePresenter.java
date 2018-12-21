@@ -122,8 +122,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
             @Override
             public void onError(int errorCode, String reason) {
-                Log.e(TAG, " reason == " + reason);
-                //chatView.showToast(reason);
+                chatView.showToast(reason);
             }
         });
     }
@@ -542,14 +541,27 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             Log.e(TAG, "messageInfo " + messageInfo.event);
             switch (messageInfo.event) {
                 case MessageServer.EVENT_DISABLE_CHAT://禁言
+                    watchView.showToast("您已被禁言");
                     break;
                 case MessageServer.EVENT_KICKOUT://踢出
+                    watchView.showToast("您已被踢出");
+                    watchView.getActivity().finish();
+                    break;
+                case MessageServer.EVENT_PERMIT_CHAT://解除禁言
+                    watchView.showToast("您已被解除禁言");
+                    break;
+                case MessageServer.EVENT_CHAT_FORBID_ALL://全员禁言
+                    if (messageInfo.status == 0) {
+                        //取消全员禁言
+                        watchView.showToast("解除全员禁言");
+                    } else {
+                        //全员禁言
+                        watchView.showToast("全员禁言");
+                    }
                     break;
                 case MessageServer.EVENT_OVER://直播结束
                     watchView.showToast("直播已结束");
                     stopWatch();
-                    break;
-                case MessageServer.EVENT_PERMIT_CHAT://解除禁言
                     break;
                 case MessageServer.EVENT_DIFINITION_CHANGED:
                     Log.e(TAG, "EVENT_DIFINITION_CHANGED PC 端切换分辨率");

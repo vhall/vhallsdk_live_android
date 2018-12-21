@@ -3,6 +3,7 @@ package com.vhall.live;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,8 +23,6 @@ import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.broadcast.BroadcastActivity;
 import com.vhall.uilibs.watch.WatchActivity;
 
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
-
 /**
  * 主界面的Activity
  */
@@ -31,6 +30,14 @@ public class MainActivity extends FragmentActivity {
     TextView tv_phone, tv_name, tv_login;
     CircleImageView mCircleViewAvatar;
     Param param = null;
+
+    private static final int REQUEST_PERMISSIONS = 1;
+    public String[] permissions = new String[]{
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,39 +65,7 @@ public class MainActivity extends FragmentActivity {
 
     public void requestPermission() {
         if (Build.VERSION.SDK_INT < 23) return;
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) { // 如果之前请求拒绝返回true
-//                AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
-//                alertDialog.setTitle("设置权限");
-//                alertDialog.setMessage("没有获取摄像头的权限,请去设置中开启").setPositiveButton("去设置", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        Intent intent = new Intent(Settings.ACTION_SETTINGS);
-//                        startActivity(intent);
-//                    }
-//                });
-//                alertDialog.show();
-
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,
-                        Manifest.permission.READ_PHONE_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1) {
-            for (int i = 0; i < permissions.length; i++) {
-                if (grantResults[i] == PERMISSION_GRANTED) { //PERMISSION_GRANTED 已授权
-                    //videoCapture.changeCamera(0);
-                    Toast.makeText(this, "" + "权限" + permissions[i] + "申请成功", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(this, "权限" + permissions[i] + "申请失败", Toast.LENGTH_LONG).show();
-                }
-            }
-        }
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_PERMISSIONS);
     }
 
     @Override

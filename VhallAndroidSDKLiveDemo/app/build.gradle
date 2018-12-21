@@ -5,8 +5,8 @@ android {
         applicationId "com.vhall.live"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 321
-        versionName "3.2.1"
+        versionCode 323
+        versionName "3.2.3"
     }
     buildTypes {
         release {
@@ -23,7 +23,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-}
+    }
 
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"

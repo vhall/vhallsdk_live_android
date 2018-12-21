@@ -5,6 +5,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
@@ -15,6 +16,7 @@ public class InteractiveActivity extends FragmentActivity implements Interactive
     private InteractiveContract.InteractiveActPresenter mPresenter;
     private Param param;
     AudioManager audioManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +31,7 @@ public class InteractiveActivity extends FragmentActivity implements Interactive
         if (interactiveFragment == null) {
             interactiveFragment = InteractiveFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), interactiveFragment, R.id.contentVideo);
-            new InteractivePresenter(this, interactiveFragment , param);
+            new InteractivePresenter(this, interactiveFragment, param);
         }
     }
 
@@ -45,6 +47,11 @@ public class InteractiveActivity extends FragmentActivity implements Interactive
         }
         audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
         audioManager.setSpeakerphoneOn(on);           //默认为扬声器播放
+    }
+
+    @Override
+    public void showToast(String toast) {
+        Toast.makeText(this, toast, Toast.LENGTH_SHORT).show();
     }
 
     @Override

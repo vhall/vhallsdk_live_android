@@ -139,16 +139,29 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
             Log.e(TAG, "messageInfo " + messageInfo.event);
             switch (messageInfo.event) {
                 case MessageServer.EVENT_DISABLE_CHAT://禁言
+                    interActView.showToast("您已被禁言");
                     break;
                 case MessageServer.EVENT_KICKOUT://踢出
+                    interActView.showToast("您已被踢出");
+                    interActView.finish();
+                    break;
+                case MessageServer.EVENT_PERMIT_CHAT://解除禁言
+                    interActView.showToast("您已被解除禁言");
+                    break;
+                case MessageServer.EVENT_CHAT_FORBID_ALL://全员禁言
+                    if (messageInfo.status == 0) {
+                        //取消全员禁言
+                        interActView.showToast("解除全员禁言");
+                    } else {
+                        //全员禁言
+                        interActView.showToast("全员禁言");
+                    }
                     break;
                 case MessageServer.EVENT_OVER://直播结束
                     if (interactive != null) {
                         interactive.unpublish();
                         interActView.finish();
                     }
-                    break;
-                case MessageServer.EVENT_PERMIT_CHAT://解除禁言
                     break;
                 case MessageServer.EVENT_SWITCH_DEVICE:
                     if (messageInfo.device == CAMERA_AUDIO) { // 麦克风
@@ -184,19 +197,19 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
     }
 
     public void switchVideoFrame(int status) {
-            if (status == CAMERA_DEVICE_OPEN) { //1打开
-                interactive.getLocalStream().unmuteVideo();
-            } else { // 0禁止
-                interactive.getLocalStream().muteVideo();
-            }
+        if (status == CAMERA_DEVICE_OPEN) { //1打开
+            interactive.getLocalStream().unmuteVideo();
+        } else { // 0禁止
+            interactive.getLocalStream().muteVideo();
+        }
     }
 
     public void switchAudioFrame(int status) {
-            if (status == CAMERA_DEVICE_OPEN) {
-                interactive.getLocalStream().unmuteAudio();
-            } else {
-                interactive.getLocalStream().muteAudio();
-            }
+        if (status == CAMERA_DEVICE_OPEN) {
+            interactive.getLocalStream().unmuteAudio();
+        } else {
+            interactive.getLocalStream().muteAudio();
+        }
     }
 
     class RoomCallback implements InterActive.RoomCallback {

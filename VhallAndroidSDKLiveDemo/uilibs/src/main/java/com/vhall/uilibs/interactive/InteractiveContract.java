@@ -21,6 +21,8 @@ public class InteractiveContract {
         void setSpeakerphoneOn(boolean on);
 
         void finish();
+
+        void showToast(String toast);
     }
 
     interface InteractiveActPresenter extends BasePresenter {
