@@ -1,9 +1,9 @@
 package com.vhall.uilibs.broadcast;
 
+import com.vhall.push.VHVideoCaptureView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
-import com.vhall.vhalllive.pushlive.CameraFilterView;
 
 /**
  * 发直播的View接口类
@@ -16,9 +16,10 @@ public class BroadcastContract {
 
     interface View extends BaseView<Presenter> {
 
-        CameraFilterView getCameraView();
+        VHVideoCaptureView getCameraView();
 
-        void initCamera(int piexl_type);
+        //模块化中，在播放器类初始化 可以删除
+//        void initCamera(int piexl_type);
 
         void setStartBtnImage(boolean start);
 
@@ -55,5 +56,7 @@ public class BroadcastContract {
         void destoryBroadcast();
 
         void setVolumeAmplificateSize(float size);
+
+        void initCameraView();
     }
 }

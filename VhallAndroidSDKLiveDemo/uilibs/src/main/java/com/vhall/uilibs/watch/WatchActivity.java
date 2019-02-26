@@ -29,6 +29,7 @@ import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 
 import com.vhall.uilibs.util.CircleView;
+import com.vhall.uilibs.util.InvitedDialog;
 import com.vhall.uilibs.util.ShowLotteryDialog;
 import com.vhall.uilibs.util.SignInDialog;
 import com.vhall.uilibs.util.SurveyPopu;
@@ -79,6 +80,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     private SurveyPopu popu;
     private SignInDialog signInDialog;
     private ShowLotteryDialog lotteryDialog;
+    private InvitedDialog invitedDialog;
     WatchContract.WatchPresenter mPresenter;
 
     CountDownTimer onHandDownTimer;
@@ -374,6 +376,22 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     @Override
     public void refreshHand(int second) {
         mHand.setTextAndInvalidate(second);
+    }
+
+    @Override
+    public void showInvited() {
+        if (invitedDialog == null) {
+            invitedDialog = new InvitedDialog(this);
+            invitedDialog.setPositiveOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //同意上麦
+                    enterInteractive();
+                    invitedDialog.dismiss();
+                }
+            });
+        }
+        invitedDialog.show();
     }
 
 

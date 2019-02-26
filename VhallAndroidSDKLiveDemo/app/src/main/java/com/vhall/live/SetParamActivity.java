@@ -1,5 +1,6 @@
 package com.vhall.live;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -12,8 +13,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.vhall.business.VhallSDK;
+import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
-import com.vhall.vhalllive.pushlive.CameraFilterView;
 
 /**
  * 主界面的Activity
@@ -51,6 +52,7 @@ public class SetParamActivity extends FragmentActivity {
         initData();
     }
 
+    @SuppressLint("MissingPermission")
     private void initData() {
         et_bro_token.setText(param.broToken);
         et_bro_id.setText(param.broId);
@@ -62,9 +64,9 @@ public class SetParamActivity extends FragmentActivity {
         TelephonyManager telephonyMgr = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
         et_userid.setText(TextUtils.isEmpty(VhallSDK.getUserName()) ? telephonyMgr.getDeviceId() : VhallSDK.getUserName());
         et_usernickname.setText(TextUtils.isEmpty(VhallSDK.getUserNickname()) ? Build.BRAND + getString(R.string.phone_user) : VhallSDK.getUserNickname());
-        if (param.pixel_type == CameraFilterView.TYPE_HDPI) {
+        if (param.pixel_type == VHLivePushFormat.PUSH_MODE_HD) {
             rb_hdpi.setChecked(true);
-        } else if (param.pixel_type == CameraFilterView.TYPE_XHDPI) {
+        } else if (param.pixel_type == VHLivePushFormat.PUSH_MODE_XXHD) {
             rb_xhdpi.setChecked(true);
         }
     }
@@ -99,9 +101,9 @@ public class SetParamActivity extends FragmentActivity {
         param.bufferSecond = bufferSeconds;
 
         if (rb_hdpi.isChecked()) {
-            param.pixel_type = CameraFilterView.TYPE_HDPI;
+            param.pixel_type = VHLivePushFormat.PUSH_MODE_HD;
         } else if (rb_xhdpi.isChecked()) {
-            param.pixel_type = CameraFilterView.TYPE_XHDPI;
+            param.pixel_type = VHLivePushFormat.PUSH_MODE_XXHD;
         }
 
 //        if (radioButtonSD.isChecked()) {

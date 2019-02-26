@@ -14,8 +14,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    packagingOptions {
-        exclude 'META-INF/beans.xml'
+//    packagingOptions {
+//        exclude 'META-INF/beans.xml'
+//    }
+
+    signingConfigs {
+        debug {
+            storeFile file("vhall_android_app.keystore")
+            storePassword '123456'
+            keyAlias 'yanting lin'
+            keyPassword '123456'
+        }
     }
 
     compileOptions {
@@ -25,21 +34,17 @@ android {
 
     }
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':uilibs')
     implementation "com.android.support:appcompat-v7:${SUPPORT_VERSION}"
 }
 
-repositories {
-    flatDir {
-        dirs '../uilibs/libs'
-    }
-}
+//repositories {
+//    flatDir {
+//        dirs '../uilibs/libs'
+//    }
+//}
 repositories {
     mavenCentral()
 }

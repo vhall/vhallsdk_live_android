@@ -15,12 +15,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    repositories {
-        flatDir {
-            dirs 'libs'
-        }
-    }
+//
+//    repositories {
+//        flatDir {
+//            dirs 'libs'
+//        }
+//    }
 }
 
 dependencies {
@@ -30,6 +30,9 @@ dependencies {
     api("io.socket:socket.io-client:${SOCKET_IO_VERSION}") {
         exclude group: 'org.json', module: 'json'
     }
+    api 'com.google.android.exoplayer:exoplayer-core:2.9.1'
+    api 'com.google.android.exoplayer:exoplayer-hls:2.9.1'
+
     implementation 'com.github.ctiao:DanmakuFlameMaster:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-armv7a:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-armv5:0.6.4'

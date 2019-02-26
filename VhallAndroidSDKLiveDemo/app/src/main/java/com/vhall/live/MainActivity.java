@@ -98,15 +98,15 @@ public class MainActivity extends FragmentActivity {
 
     public void onBroadcastLandspace(View view) {
         Intent intent = new Intent(this, BroadcastActivity.class);
+        param.screenOri = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
         intent.putExtra("param", param);
-        intent.putExtra("ori", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         startActivity(intent);
     }
 
     public void onBroadcastPortrait(View view) {
         Intent intent = new Intent(this, BroadcastActivity.class);
+        param.screenOri = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         intent.putExtra("param", param);
-        intent.putExtra("ori", ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         startActivity(intent);
     }
 

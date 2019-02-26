@@ -1,36 +1,32 @@
 package com.vhall.uilibs.watch;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.opengl.GL_Preview_YUV;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
-import com.vhall.business.Watch;
 import com.vhall.business.WatchLive;
+import com.vhall.business.common.Constants;
 import com.vhall.business.data.WebinarInfo;
 
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
-import com.vhall.business.data.source.InteractiveDataSource;
 import com.vhall.business.data.source.SurveyDataSource;
 
+import com.vhall.player.VHPlayerListener;
+import com.vhall.player.stream.play.IVHVideoPlayer;
+import com.vhall.player.stream.play.impl.VHVideoPlayerView;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.emoji.InputUser;
-import com.vhall.vhalllive.common.Constants;
-import com.vhall.vhalllive.playlive.GLPlayInterface;
 import com.vhall.uilibs.R;
 
 //TODO 投屏相关
@@ -38,10 +34,10 @@ import com.vhall.uilibs.R;
 //import com.vhall.business_support.dlna.DeviceDisplay;
 //import com.vhall.business_support.WatchLive;
 //import org.fourthline.cling.android.AndroidUpnpService;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -64,7 +60,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     int currentPos = 0;
     private int scaleType = Constants.DrawMode.kVHallDrawModeAspectFit.getValue();
 
-    private GLPlayInterface mPlayView;
+    private VHVideoPlayerView mPlayView;
     private boolean isHand = false;
     private int isHandStatus = 1;
 
@@ -196,8 +192,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     boolean force = false;
 
     @Override
-    public void onSwitchPixel(int level) {
-        if (getWatchLive().getDefinition() == level && !force) {
+    public void onSwitchPixel(String dpi) {
+        if (getWatchLive().getDefinition().equals(dpi) && !force) {
             return;
         }
         force = false;
@@ -208,15 +204,12 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     @Override
-    public void onMobileSwitchRes(int res) {
-        if (getWatchLive().getDefinition() == res && !force) {
+    public void onMobileSwitchRes(String dpi) {
+        if (getWatchLive().getDefinition() == dpi && !force) {
             return;
         }
-        if (isWatching) {
-            stopWatch();
-        }
         force = false;
-        getWatchLive().setDefinition(res);
+        getWatchLive().setDefinition(dpi);
     }
 
 
@@ -256,7 +249,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     @Override
-    public int getCurrentPixel() {
+    public String getCurrentPixel() {
         return getWatchLive().getDefinition();
     }
 
@@ -471,63 +464,52 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     /**
      * 观看过程中事件监听
      */
-    private class WatchCallback implements Watch.WatchEventCallback {
+    private class WatchCallback implements VHPlayerListener {
         @Override
-        public void onError(int errorCode, String errorMsg) {
+        public void onStateChanged(com.vhall.player.Constants.State state) {
+            switch (state) {
+                case START:
+                    isWatching = true;
+                    liveView.showLoading(false);
+                    liveView.setPlayPicture(isWatching);
+                    break;
+                case BUFFER:
+                    if (isWatching) {
+                        liveView.showLoading(true);
+                    }
+                    break;
+                case STOP:
+                    isWatching = false;
+                    liveView.showLoading(false);
+                    liveView.setPlayPicture(isWatching);
+                    break;
+            }
+        }
+
+        @Override
+        public void onEvent(int event, String msg) {
+            switch (event) {
+                case com.vhall.player.Constants.Event.EVENT_DOWNLOAD_SPEED:
+                    liveView.setDownSpeed("速率" + msg + "/kbps");
+                    break;
+                case com.vhall.player.Constants.Event.EVENT_VIDEO_SIZE_CHANGED:
+                    Log.i(TAG, msg);
+                    break;
+            }
+        }
+
+        @Override
+        public void onError(int errorCode, int innerCode, String msg) {
             switch (errorCode) {
-                case WatchLive.ERROR_CONNECT:
+                case com.vhall.player.Constants.ErrorCode.ERROR_CONNECT:
                     Log.e(TAG, "ERROR_CONNECT  ");
                     isWatching = false;
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
-                    watchView.showToast(errorMsg);
+                    watchView.showToast(msg);
                     break;
                 default:
-                    watchView.showToast(errorMsg);
-            }
-        }
-
-        @Override
-        public void onStateChanged(int stateCode) {
-            switch (stateCode) {
-                case WatchLive.STATE_CONNECTED:
-                    Log.e(TAG, "STATE_CONNECTED  ");
-                    isWatching = true;
-                    liveView.setPlayPicture(isWatching);
-                    break;
-                case WatchLive.STATE_BUFFER_START:
-                    Log.e(TAG, "STATE_BUFFER_START  ");
-                    if (isWatching)
-                        liveView.showLoading(true);
-                    break;
-                case WatchLive.STATE_BUFFER_STOP:
-                    Log.e(TAG, "STATE_BUFFER_STOP  ");
-                    liveView.showLoading(false);
-                    break;
-                case WatchLive.STATE_STOP:
-                    Log.e(TAG, "STATE_STOP  ");
-                    isWatching = false;
-                    liveView.showLoading(false);
-                    liveView.setPlayPicture(isWatching);
-                    break;
-            }
-        }
-
-        @Override
-        public void onVhallPlayerStatue(boolean playWhenReady, int playbackState) {
-            // 播放器状态回调  只在看回放时使用
-        }
-
-        @Override
-        public void uploadSpeed(String kbps) {
-            liveView.setDownSpeed("速率" + kbps + "/kbps");
-        }
-
-        @Override
-        public void videoInfo(int width, int height) {
-            if (mPlayView != null) {
-                mPlayView.init(width, height);
-                // INIT STUF
+                    watchView.showToast(msg);
             }
         }
     }
@@ -566,7 +548,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case MessageServer.EVENT_DIFINITION_CHANGED:
                     Log.e(TAG, "EVENT_DIFINITION_CHANGED PC 端切换分辨率");
                     liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
-                    onSwitchPixel(WatchLive.DPI_DEFAULT);
+                    onSwitchPixel(com.vhall.player.Constants.Rate.DPI_SAME);
 //                    if (!getWatchLive().isDifinitionAvailable(getWatchLive().getDefinition())) {
 //                        onSwitchPixel(WatchLive.DPI_DEFAULT);
 //                    }
@@ -627,6 +609,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_INTERACTIVE_ALLOW_HAND:
                     watchView.showToast(messageInfo.status == 0 ? "举手按钮关闭" : "举手按钮开启");
+
+                    break;
+                case MessageServer.EVENT_INVITED_MIC://被邀请上麦
+                    watchView.showInvited();
                     break;
             }
         }
@@ -651,6 +637,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
         @Override
         public void onConnectFailed() {
+            Log.e(TAG, "MessageServer CONNECT FAILED");
 //            getWatchLive().connectMsgServer();
         }
 
@@ -678,11 +665,12 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     private class ChatCallback implements ChatServer.Callback {
         @Override
         public void onChatServerConnected() {
+            Log.e(TAG, "CHAT CONNECTED ");
         }
 
         @Override
         public void onConnectFailed() {
-//            getWatchLive().connectChatServer();
+            Log.e(TAG, "CHAT CONNECT FAILED");
         }
 
         @Override
@@ -726,8 +714,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         });
     }
 
+    /*
+    //核心模块中已经实现VR渲染器，可直接使用
     //狄拍自定义渲染
-    public class VRPlayView extends GL_Preview_YUV implements GLPlayInterface {
+    public class VRPlayView extends GL_Preview_YUV implements IVHVideoPlayer {
+        AtomicBoolean mIsReady = new AtomicBoolean(false);
         public VRPlayView(Context var1) {
             super(var1);
         }
@@ -754,7 +745,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         }
 
         @Override
-        public void playView(byte[] bytes, int i, int i1) {
+        public void play(byte[] bytes, int i, int i1) {
 
         }
 
@@ -771,6 +762,6 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         public void release() {
             this.setRelease();
         }
-    }
+    }*/
 }
 

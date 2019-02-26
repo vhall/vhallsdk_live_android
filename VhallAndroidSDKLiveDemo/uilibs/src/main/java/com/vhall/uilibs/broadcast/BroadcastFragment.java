@@ -1,9 +1,6 @@
 package com.vhall.uilibs.broadcast;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,25 +10,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.PopupWindow;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vhall.gpuimage.GPUImageRenderer;
-import com.vhall.gpuimage.gpuimagefilter.GPUImageAlphaBlendFilter;
-import com.vhall.gpuimage.gpuimagefilter.GPUImageFilter;
-import com.vhall.gpuimage.gpuimagefilter.VhallBeautyFilter;
-import com.vhall.vhalllive.pushlive.CameraFilterView;
+import com.vhall.push.VHLivePushConfig;
+import com.vhall.push.VHVideoCaptureView;
+import com.vhall.push.renderer.filter.VHBeautyFilter;
 import com.vhall.uilibs.R;
 
 /**
  * 发直播的Fragment
  */
-public class    BroadcastFragment extends Fragment implements BroadcastContract.View, View.OnClickListener {
+public class BroadcastFragment extends Fragment implements BroadcastContract.View, View.OnClickListener {
 
     private BroadcastContract.Presenter mPresenter;
-    private CameraFilterView cameraview;
+    private VHVideoCaptureView cameraview;
     private TextView mSpeed;
     private Button mPublish, mChangeCamera, mChangeFlash, mChangeAudio, mChangeFilter, mBackBtn;
     private SeekBar seekBar;
@@ -64,7 +58,8 @@ public class    BroadcastFragment extends Fragment implements BroadcastContract.
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        cameraview = (CameraFilterView) getView().findViewById(R.id.cameraview);
+
+        cameraview = (VHVideoCaptureView) getView().findViewById(R.id.cameraview);
         mSpeed = (TextView) getView().findViewById(R.id.tv_upload_speed);
         mPublish = (Button) getView().findViewById(R.id.btn_publish);
         mPublish.setOnClickListener(this);
@@ -78,19 +73,7 @@ public class    BroadcastFragment extends Fragment implements BroadcastContract.
         mChangeFilter.setOnClickListener(this);
         mBackBtn = (Button) getView().findViewById(R.id.btn_back);
         mBackBtn.setOnClickListener(this);
-        cameraview.setAutoCloseFilterCallback(new GPUImageRenderer.AutoCloseFilterListener() {
-            @Override
-            public void onAutoCloseFilter() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (nonfilter == null)
-                            nonfilter = new GPUImageFilter();
-                        cameraview.setFilter(nonfilter);
-                    }
-                });
-            }
-        });
+        mPresenter.initCameraView();
         mPresenter.start();
 
         seekBar = (SeekBar) getView().findViewById(R.id.seekbar);
@@ -135,19 +118,8 @@ public class    BroadcastFragment extends Fragment implements BroadcastContract.
     }
 
     @Override
-    public CameraFilterView getCameraView() {
+    public VHVideoCaptureView getCameraView() {
         return cameraview;
-    }
-
-    @Override
-    public void initCamera(int piexl_type) {
-        cameraview.init(piexl_type, mActivity);
-        cameraview.setDrawMode(CameraFilterView.DrawMode.kVHallDrawModeAspectFill.getValue());
-
-        if (cameraview.getNumberOfCameras() > 1)
-            setCameraBtnEnable(true);
-        else
-            setCameraBtnEnable(false);
     }
 
     @Override
@@ -198,7 +170,6 @@ public class    BroadcastFragment extends Fragment implements BroadcastContract.
     @Override
     public void onPause() {
         super.onPause();
-        cameraview.pause();
         mPresenter.stopBroadcast();
     }
 
@@ -207,7 +178,9 @@ public class    BroadcastFragment extends Fragment implements BroadcastContract.
     @Override
     public void onResume() {
         super.onResume();
-        cameraAvailable = cameraview.resume();
+        //自动恢复推流？
+//        cameraAvailable = cameraview.resume();
+        cameraAvailable = cameraview.isEnabled();
         Log.e("broadcast", "cameraAvai:" + cameraAvailable);
         //auto startBro or not
     }
@@ -219,8 +192,7 @@ public class    BroadcastFragment extends Fragment implements BroadcastContract.
     }
 
 
-    VhallBeautyFilter beautyFilter = null;
-    GPUImageFilter nonfilter = null;
+    VHBeautyFilter beautyFilter = null;
 
     private void showPopupWindow() {
         if (mPopupWindow == null) {
@@ -231,12 +203,10 @@ public class    BroadcastFragment extends Fragment implements BroadcastContract.
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     if (checkedId == R.id.radio_0) {
-                        if (nonfilter == null)
-                            nonfilter = new GPUImageFilter();
-                        cameraview.setFilter(nonfilter);
+                        cameraview.setFilter(null);
                     } else {
                         if (beautyFilter == null)
-                            beautyFilter = new VhallBeautyFilter();
+                            beautyFilter = new VHBeautyFilter();
                         cameraview.setFilter(beautyFilter);
                         int level = 1;
                         if (checkedId == R.id.radio_1) {
@@ -266,5 +236,5 @@ public class    BroadcastFragment extends Fragment implements BroadcastContract.
         mPopupWindow.showAsDropDown(mChangeFilter, -18, 0);
     }
 
-    
+
 }

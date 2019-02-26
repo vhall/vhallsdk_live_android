@@ -10,15 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.vhall.business.Watch;
-import com.vhall.business.WatchLive;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.uilibs.R;
 
@@ -144,19 +141,19 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     @Override
     public void setScaleTypeText(int text) {
         switch (text) {
-            case WatchLive.FIT_DEFAULT:
+            case 0://FIT_DEFAULT
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_default));
                 break;
-            case WatchLive.FIT_CENTER_INSIDE:
+            case 1://FIT_CENTER_INSIDE
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_center));
                 break;
-            case WatchLive.FIT_X:
+            case 2://FIT_X
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_x));
                 break;
-            case WatchLive.FIT_Y:
+            case 3://FIT_Y
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_y));
                 break;
-            case WatchLive.FIT_XY:
+            case 4://FIT_XY
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_xy));
                 break;
         }

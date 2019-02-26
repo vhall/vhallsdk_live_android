@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="vhall_app_key"></string>
-    <string name="vhall_app_secret_key"></string>
+    <string name="vhall_app_key">183765c409e5fd09c1c9e83a513f111c</string><!-- c6a40332c0eda5ca93dab4b52587f38f 测试环境：37da26355d1a55c8c7a06cb1239f220b   183765c409e5fd09c1c9e83a513f111c-->
+    <string name="vhall_app_secret_key">61d9393c7cd0d1f0f6f86df9692e3645</string><!-- 1e0be891bc6fd1918882c81497727d32 测试环境：50a299de962ab4be47625df960e7710c  61d9393c7cd0d1f0f6f86df9692e3645-->
 </resources>

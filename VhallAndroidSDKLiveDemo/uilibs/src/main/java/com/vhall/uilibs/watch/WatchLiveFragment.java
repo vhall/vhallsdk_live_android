@@ -1,7 +1,6 @@
 package com.vhall.uilibs.watch;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -20,11 +19,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.vhall.business.WatchLive;
 import com.vhall.business.utils.LogManager;
 import com.vhall.business.widget.ContainerLayout;
+import com.vhall.player.Constants;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.interactive.InteractiveActivity;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
 
 import java.util.HashMap;
@@ -49,13 +47,13 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     private WatchContract.LivePresenter mPresenter;
 
     private ImageView clickOrientation, clickStart, mVrButton;
-    private RadioButton radioButtonShowDEFAULT, radioButtonShowSD, radioButtonShowHD, radioButtonShowUHD;
+    private RadioButton radioButtonShowDEFAULT, radioButtonShowSD, radioButtonShowHD, radioButtonShowUHD,radioButtonShowA;
 
     private RadioGroup radioChoose;
     private TextView fragmentDownloadSpeed;
     private ContainerLayout mContainerLayout;
     private ImageView btn_change_scaletype;
-    private ImageView btnChangePlayStatus;
+//    private ImageView btnChangePlayStatus;
     ImageView btn_danmaku;
     ProgressBar progressbar;
 
@@ -105,6 +103,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         radioChoose = (RadioGroup) root.findViewById(R.id.radio_choose);
         radioChoose.setOnCheckedChangeListener(checkListener);
         radioButtonShowDEFAULT = (RadioButton) root.findViewById(R.id.radio_btn_default);
+        radioButtonShowA = (RadioButton) root.findViewById(R.id.radio_btn_a);
         radioButtonShowSD = (RadioButton) root.findViewById(R.id.radio_btn_sd);
         radioButtonShowHD = (RadioButton) root.findViewById(R.id.radio_btn_hd);
         radioButtonShowUHD = (RadioButton) root.findViewById(R.id.radio_btn_uhd);
@@ -115,8 +114,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         btn_danmaku = (ImageView) root.findViewById(R.id.btn_danmaku);
         btn_danmaku.setImageResource(R.drawable.vhall_icon_danmaku_close);
         btn_danmaku.setOnClickListener(this);
-        btnChangePlayStatus = (ImageView) root.findViewById(R.id.btn_change_audio);
-        btnChangePlayStatus.setOnClickListener(this);
+//        btnChangePlayStatus = (ImageView) root.findViewById(R.id.btn_change_audio);
+//        btnChangePlayStatus.setOnClickListener(this);
         btn_change_scaletype = (ImageView) root.findViewById(R.id.btn_change_scaletype);
         btn_change_scaletype.setOnClickListener(this);
         progressbar = (ProgressBar) root.findViewById(R.id.progressbar);
@@ -214,15 +213,15 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             LogManager.innerLog("HeadTracker", " HeadTracker == " + mPresenter.isHeadTracker());
         } else if (i == R.id.image_action_back) {
             getActivity().onBackPressed();
-        } else if (i == R.id.btn_change_audio) {
-            if (mPresenter.getCurrentPixel() == WatchLive.DPI_AUDIO) {
-                mPresenter.onMobileSwitchRes(WatchLive.DPI_DEFAULT);
+        } /*else if (i == R.id.btn_change_audio) {
+            if (mPresenter.getCurrentPixel().equals(Constants.Rate.DPI_AUDIO)) {
                 btnChangePlayStatus.setImageResource(R.drawable.audio_close);
+                mPresenter.onMobileSwitchRes(Constants.Rate.DPI_SAME);
             } else {
-                mPresenter.onMobileSwitchRes(WatchLive.DPI_AUDIO);
                 btnChangePlayStatus.setImageResource(R.drawable.audio_open);
+                mPresenter.onMobileSwitchRes(Constants.Rate.DPI_AUDIO);
             }
-        } else if (i == R.id.btn_danmaku) {
+        }*/ else if (i == R.id.btn_danmaku) {
             if (mDanmakuView == null || !mDanmakuView.isPrepared())
                 return;
             if (mDanmakuView.isShown()) {
@@ -256,9 +255,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             switch (key) {
                 case "A":
                     if (value == 1)
-                        btnChangePlayStatus.setVisibility(View.VISIBLE);
+                        radioButtonShowA.setVisibility(View.VISIBLE);
                     else
-                        btnChangePlayStatus.setVisibility(View.GONE);
+                        radioButtonShowA.setVisibility(View.GONE);
                     break;
                 case "SD":
                     if (value == 1)
@@ -285,19 +284,19 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     @Override
     public void setScaleButtonText(int type) {
         switch (type) {
-            case WatchLive.FIT_DEFAULT:
+            case 0://FIT_DEFAULT
                 btn_change_scaletype.setBackground(getResources().getDrawable(R.drawable.fit_default));
                 break;
-            case WatchLive.FIT_CENTER_INSIDE:
+            case 1://FIT_CENTER_INSIDE
                 btn_change_scaletype.setBackground(getResources().getDrawable(R.drawable.fit_center));
                 break;
-            case WatchLive.FIT_X:
+            case 2://FIT_X
                 btn_change_scaletype.setBackground(getResources().getDrawable(R.drawable.fit_x));
                 break;
-            case WatchLive.FIT_Y:
+            case 3://FIT_Y
                 btn_change_scaletype.setBackground(getResources().getDrawable(R.drawable.fit_y));
                 break;
-            case WatchLive.FIT_XY:
+            case 4://FIT_XY
                 btn_change_scaletype.setBackground(getResources().getDrawable(R.drawable.fit_xy));
                 break;
         }
@@ -326,11 +325,11 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     @Override
     public void reFreshView() {
         if (mPresenter != null) {
-            if (mPresenter.getCurrentPixel() == WatchLive.DPI_DEFAULT) {
-                btnChangePlayStatus.setBackground(getResources().getDrawable(R.drawable.audio_close));
-            } else if (mPresenter.getCurrentPixel() == WatchLive.DPI_AUDIO) {
-                btnChangePlayStatus.setBackground(getResources().getDrawable(R.drawable.audio_open));
-            }
+//            if (mPresenter.getCurrentPixel() == Constants.Rate.DPI_SAME) {
+//                btnChangePlayStatus.setBackground(getResources().getDrawable(R.drawable.audio_close));
+//            } else if (mPresenter.getCurrentPixel() == Constants.Rate.DPI_AUDIO) {
+//                btnChangePlayStatus.setBackground(getResources().getDrawable(R.drawable.audio_open));
+//            }
             setScaleButtonText(mPresenter.getScaleType());
             if (mPresenter.isHeadTracker()) {
                 mVrButton.setImageDrawable(getResources().getDrawable(R.drawable.vhall_icon_headtracker_checked));
@@ -339,7 +338,6 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             }
         }
     }
-
 
 
     private void addDanmaKuShowTextAndImage(boolean islive) {
@@ -378,18 +376,19 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         @Override
         public void onCheckedChanged(RadioGroup radioGroup, int i) {
             if (i == R.id.radio_btn_default) {
-                mPresenter.onMobileSwitchRes(WatchLive.DPI_DEFAULT);
+                mPresenter.onMobileSwitchRes(Constants.Rate.DPI_SAME);
                 //mPresenter.onSwitchPixel(WatchLive.DPI_DEFAULT);
             } else if (i == R.id.radio_btn_sd) {
-                mPresenter.onMobileSwitchRes(WatchLive.DPI_SD);
+                mPresenter.onMobileSwitchRes(Constants.Rate.DPI_SD);
 //                mPresenter.onSwitchPixel(WatchLive.DPI_SD);
             } else if (i == R.id.radio_btn_hd) {
-                mPresenter.onMobileSwitchRes(WatchLive.DPI_HD);
+                mPresenter.onMobileSwitchRes(Constants.Rate.DPI_HD);
 //                mPresenter.onSwitchPixel(WatchLive.DPI_HD);
             } else if (i == R.id.radio_btn_uhd) {
-                mPresenter.onMobileSwitchRes(WatchLive.DPI_UHD);
+                mPresenter.onMobileSwitchRes(Constants.Rate.DPI_XHD);
 //                mPresenter.onSwitchPixel(WatchLive.DPI_UHD);
-            } else {
+            } else if(i == R.id.radio_btn_a){
+                mPresenter.onMobileSwitchRes(Constants.Rate.DPI_AUDIO);
             }
         }
     };

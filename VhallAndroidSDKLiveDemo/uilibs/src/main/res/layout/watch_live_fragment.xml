@@ -78,13 +78,13 @@
                 android:layout_marginRight="5dp"
                 android:src="@drawable/vhall_icon_danmaku_close" />
 
-            <ImageView
+           <!-- <ImageView
                 android:id="@+id/btn_change_audio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="5dp"
-                android:src="@drawable/audio_close" />
+                android:src="@drawable/audio_close" />-->
 
             <ImageView
                 android:id="@+id/btn_change_scaletype"
@@ -135,7 +135,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
-                    android:background="@drawable/vhall_icon_resolution"
+                    android:background="@drawable/bg_oval_black"
+                    android:text="原画"
+                    android:checked="true"
+                    android:textColor="@color/text_color_selector_white_red"
+                    android:textSize="13sp"
+                    android:gravity="center"
                     android:button="@null"
                     android:visibility="visible" />
 
@@ -144,7 +149,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@drawable/vhall_icon_resolution_sd"
+                    android:background="@drawable/bg_oval_black"
+                    android:text="标清"
+                    android:textColor="@color/text_color_selector_white_red"
+                    android:textSize="13sp"
+                    android:gravity="center"
                     android:button="@null"
                     android:visibility="invisible" />
 
@@ -153,7 +162,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
-                    android:background="@drawable/vhall_icon_resolution_hd"
+                    android:background="@drawable/bg_oval_black"
+                    android:text="高清"
+                    android:textColor="@color/text_color_selector_white_red"
+                    android:textSize="13sp"
+                    android:gravity="center"
                     android:button="@null"
                     android:visibility="invisible" />
 
@@ -161,10 +174,24 @@
                     android:id="@+id/radio_btn_uhd"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/vhall_icon_resolution_uhd"
+                    android:background="@drawable/bg_oval_black"
+                    android:text="超清"
+                    android:textColor="@color/text_color_selector_white_red"
+                    android:textSize="13sp"
+                    android:gravity="center"
                     android:button="@null"
                     android:visibility="invisible" />
-
+                <RadioButton
+                    android:id="@+id/radio_btn_a"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:background="@drawable/bg_oval_black"
+                    android:button="@null"
+                    android:visibility="invisible"
+                    android:text="音频"
+                    android:textColor="@color/text_color_selector_white_red"
+                    android:textSize="13sp"/>
             </RadioGroup>
         </LinearLayout>
 

@@ -66,6 +66,9 @@ public class WatchContract {
 
         void refreshHand(int second);
 
+        //显示被邀请上麦
+        void showInvited();
+
     }
 
     interface DocumentView extends BaseView<BasePresenter> {
@@ -163,9 +166,9 @@ public class WatchContract {
 
         void onWatchBtnClick();
 
-        void onSwitchPixel(int pixel);// 切换分辨率
+        void onSwitchPixel(String dpi);// 切换分辨率
 
-        void onMobileSwitchRes(int res);// 切换分辨率
+        void onMobileSwitchRes(String dpi);// 切换分辨率
 
         int setScaleType();
 
@@ -175,7 +178,7 @@ public class WatchContract {
 
         void submitLotteryInfo(String id, String lottery_id, String nickname, String phone);
 
-        int getCurrentPixel();
+        String getCurrentPixel();
 
         int getScaleType();
 

@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.vhall.push.VHLivePushConfig;
 import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
@@ -33,7 +34,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
 //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         Param param = (Param) getIntent().getSerializableExtra("param");
-        int screenOri = getIntent().getIntExtra("ori", ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        int screenOri = param.screenOri;
         if (screenOri == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else {

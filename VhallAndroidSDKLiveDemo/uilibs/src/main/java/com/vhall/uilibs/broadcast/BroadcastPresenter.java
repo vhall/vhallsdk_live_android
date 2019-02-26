@@ -1,7 +1,6 @@
 package com.vhall.uilibs.broadcast;
 
 import android.hardware.Camera;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -9,6 +8,10 @@ import com.vhall.business.Broadcast;
 import com.vhall.business.ChatServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
+import com.vhall.player.Constants;
+import com.vhall.player.VHPlayerListener;
+import com.vhall.push.VHLivePushConfig;
+import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.ChatFragment;
@@ -30,6 +33,8 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     private Broadcast broadcast;
     private boolean isPublishing = false;
     private boolean isFinish = true;
+    private boolean isFlashOpen = false;
+
 
     public BroadcastPresenter(Param params, BroadcastContract.BraodcastView mBraodcastView, BroadcastContract.View mView, ChatContract.ChatView chatView) {
         this.param = params;
@@ -38,13 +43,20 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         this.chatView = chatView;
         this.chatView.setPresenter(this);
         mView.setPresenter(this);
+
     }
 
     @Override
     public void start() {
-        //初始化，必须
-        mView.initCamera(param.pixel_type);
 
+
+    }
+
+    @Override
+    public void initCameraView() {
+        VHLivePushConfig config = new VHLivePushConfig(param.pixel_type);
+        config.screenOri = param.screenOri;
+        mView.getCameraView().init(config);
     }
 
 
@@ -105,7 +117,8 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void changeFlash() {
-        mView.setFlashBtnImage(getBroadcast().changeFlash());
+        isFlashOpen = getBroadcast().changeFlash(!isFlashOpen);
+        mView.setFlashBtnImage(isFlashOpen);
     }
 
     @Override
@@ -129,7 +142,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void destoryBroadcast() {
-        getBroadcast().destory();
+        getBroadcast().destroy();
     }
 
     @Override
@@ -139,10 +152,12 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     private Broadcast getBroadcast() {
         if (broadcast == null) {
+            VHLivePushConfig config = new VHLivePushConfig(param.pixel_type);
+            config.screenOri = param.screenOri;//横竖屏设置重要
+
             Broadcast.Builder builder = new Broadcast.Builder()
                     .cameraView(mView.getCameraView())
-                    .frameRate(param.videoFrameRate)
-                    .videoBitrate(param.videoBitrate)
+                    .config(config)
                     .callback(new BroadcastEventCallback())
                     .chatCallback(new ChatCallback());
             //狄拍
@@ -223,22 +238,16 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     }
 
 
-    private class BroadcastEventCallback implements Broadcast.BroadcastEventCallback {
-        @Override
-        public void onError(int errorCode, String reason) {
-            if (errorCode == Broadcast.ERROR_CONNECTE) {
-                Log.e(TAG, "broadcast error, reason:" + reason);
-            }
-            mView.showMsg(reason);
-        }
+    private class BroadcastEventCallback implements VHPlayerListener {
 
         @Override
-        public void onStateChanged(int stateCode) {
-            switch (stateCode) {
-                case Broadcast.STATE_CONNECTED: /** 连接成功*/
+        public void onStateChanged(Constants.State state) {
+            switch (state) {
+                case START:
                     mView.showMsg("连接成功!");
                     isPublishing = true;
                     mView.setStartBtnImage(false);
+
                     //start push data for 狄拍
                     /**
                      * push音频数据
@@ -261,26 +270,35 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                      */
 //                    getBroadcast().PushH264DataTs();
                     break;
-                case Broadcast.STATE_NETWORK_OK: /** 网络通畅*/
-                    mView.showMsg("网络通畅!");
-                    break;
-                case Broadcast.STATE_NETWORK_EXCEPTION: /** 网络异常*/
-                    mView.showMsg("网络环境差!");
-                    break;
-                case Broadcast.STATE_STOP:
+                case STOP:
                     isPublishing = false;
                     mView.setStartBtnImage(true);
-                    //stop push data for 狄拍
                     break;
             }
         }
 
         @Override
-        public void uploadSpeed(String kbps) {
-            mView.setSpeedText(kbps + "/kbps");
+        public void onEvent(int eventCode, String eventMsg) {
+            switch (eventCode) {
+                case Constants.Event.EVENT_UPLOAD_SPEED:
+                    mView.setSpeedText(eventMsg + "/kbps");
+                    break;
+                case Constants.Event.EVENT_NETWORK_UNOBS:
+                    mView.showMsg("网络通畅!");
+                    break;
+                case Constants.Event.EVENT_NETWORK_OBS:
+                    mView.showMsg("网络环境差!");
+                    break;
+            }
         }
 
-
+        @Override
+        public void onError(int errorCode, int i1, String reason) {
+            if (errorCode == Broadcast.ERROR_CONNECTE) {
+                Log.e(TAG, "broadcast error, reason:" + reason);
+            }
+            mView.showMsg(reason);
+        }
     }
 
 
@@ -326,7 +344,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
                 Log.e(TAG, "list->" + list.size());
-                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT , list);
+                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, list);
             }
 
             @Override
