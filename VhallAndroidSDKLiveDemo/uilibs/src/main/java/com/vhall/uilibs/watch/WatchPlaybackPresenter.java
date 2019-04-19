@@ -53,7 +53,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     private WatchPlayback watchPlayback;
 
     //FIT_DEFAULT = 0;FIT_CENTER_INSIDE = 1;FIT_X = 2;FIT_Y = 3;FIT_XY = 4
-    int[] scaleTypeList = new int[]{0, 1, 2, 3, 4};
+    int[] scaleTypeList = new int[]{0, 1, 2};
     int currentPos = 0;
     private int scaleType = 0;//FIT_DEFAULT
 
@@ -244,7 +244,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         if (watchPlayback == null) {
             WatchPlayback.Builder builder = new WatchPlayback.Builder()
                     .context(watchView.getActivity())
-                    .containerLayout(playbackView.getContainer())
+                    .vodPlayView(playbackView.getVideoView())
                     .callback(new WatchCallback())
                     .docCallback(new DocCallback());
             watchPlayback = builder.build();
@@ -265,6 +265,11 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     @Override
     public void onRaiseHand() {
+
+    }
+
+    @Override
+    public void replyInvite(int type) {
 
     }
 

@@ -430,6 +430,21 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         });
     }
 
+    @Override
+    public void replyInvite(int type) {
+        getWatchLive().replyInvitation(params.watchId, type, new RequestCallback() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                watchView.showToast("上麦状态反馈异常，errorMsg:" + errorMsg);
+            }
+        });
+    }
+
 
     //TODO 投屏相关
 //
@@ -600,6 +615,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_INTERACTIVE_ALLOW_MIC:
 //                    getWatchLive().disconnectMsgServer(); // 关闭watchLive中的消息
+//                    replyInvite(1);
                     watchView.enterInteractive();
                     if (onHandDownTimer != null) {
                         isHand = false; //重置是否举手标识

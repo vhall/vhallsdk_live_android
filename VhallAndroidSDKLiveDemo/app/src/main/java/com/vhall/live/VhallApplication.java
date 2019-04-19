@@ -22,8 +22,6 @@ public class VhallApplication extends Application {
         super.onCreate();
         context = this;
         getParam();
-        //azure.e.vhall.com    t.e.vhall.com tencent.vhall.com
-//        VhallSDK.init(this, getResources().getString(R.string.vhall_app_key), getResources().getString(R.string.vhall_app_secret_key),"tencent.vhall.com");
         VhallSDK.init(this, getResources().getString(R.string.vhall_app_key), getResources().getString(R.string.vhall_app_secret_key));
         VhallSDK.setLogEnable(true);
     }

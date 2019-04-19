@@ -114,7 +114,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
         vhRenderView = new VHRenderView(interActView.getContext());
         vhRenderView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
         vhRenderView.init(interactive.getEglBase().getEglBaseContext(), null);
-        interactive.setLocalView(vhRenderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo);
+        interactive.setLocalView(vhRenderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo, null);
         interFraView.addLocalView(vhRenderView);
         interactive.enterRoom();
     }
@@ -159,7 +159,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
                     break;
                 case MessageServer.EVENT_OVER://直播结束
                     if (interactive != null) {
-                        interactive.unpublish();
+//                        interactive.unpublish();
                         interActView.finish();
                     }
                     break;
@@ -173,9 +173,10 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
                     }
                     break;
                 case MessageServer.EVENT_INTERACTIVE_DOWN_MIC:
-                    if (interactive != null) {
-                        interactive.unpublish();
-                        interActView.finish();
+                    if (messageInfo.user_id.equals(interactive.getWebinarInfo().join_id)) {
+                        if (interactive != null) {
+                            interActView.finish();
+                        }
                     }
                     break;
             }
@@ -198,17 +199,17 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
 
     public void switchVideoFrame(int status) {
         if (status == CAMERA_DEVICE_OPEN) { //1打开
-            interactive.getLocalStream().unmuteVideo();
+            interactive.getLocalStream().unmuteVideo(null);
         } else { // 0禁止
-            interactive.getLocalStream().muteVideo();
+            interactive.getLocalStream().muteVideo(null);
         }
     }
 
     public void switchAudioFrame(int status) {
         if (status == CAMERA_DEVICE_OPEN) {
-            interactive.getLocalStream().unmuteAudio();
+            interactive.getLocalStream().unmuteAudio(null);
         } else {
-            interactive.getLocalStream().muteAudio();
+            interactive.getLocalStream().muteAudio(null);
         }
     }
 
@@ -273,7 +274,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
         }
 
         @Override
-        public void onDidRemoveStream(Room room, Stream stream) {
+        public void onDidRemoveStream(Room room, final Stream stream) {
             Log.e(TAG, "onDidRemoveStream");
             interFraView.removeStream(stream);
         }
@@ -282,7 +283,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
     @Override
     public void onDestory() {
         onDownMic();
-        interactive.leaveRoom();
+//        interactive.leaveRoom();
         interactive.onDestory();
         interactive = null;
     }

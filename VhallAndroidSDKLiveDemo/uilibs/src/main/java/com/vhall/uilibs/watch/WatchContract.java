@@ -1,12 +1,14 @@
 package com.vhall.uilibs.watch;
 
 import android.app.Activity;
+import android.view.SurfaceView;
 import android.widget.SeekBar;
 
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
 import com.vhall.business.widget.ContainerLayout;
 
+import com.vhall.player.vod.VodPlayerView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
@@ -118,7 +120,7 @@ public class WatchContract {
 
         void showProgressbar(boolean show);
 
-        ContainerLayout getContainer();
+        VodPlayerView getVideoView();
 
         void setScaleTypeText(int type);
 
@@ -194,6 +196,8 @@ public class WatchContract {
         void submitSurvey(Survey survey, String result);
 
         void onRaiseHand(); // 举手
+
+        void replyInvite(int type);
 
         // void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
 

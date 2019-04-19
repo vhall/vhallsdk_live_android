@@ -15,7 +15,6 @@ public class InteractiveActivity extends FragmentActivity implements Interactive
     private InteractiveFragment interactiveFragment;
     private InteractiveContract.InteractiveActPresenter mPresenter;
     private Param param;
-    AudioManager audioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +41,7 @@ public class InteractiveActivity extends FragmentActivity implements Interactive
 
     @Override
     public void setSpeakerphoneOn(boolean on) {
-        if (audioManager == null) {
-            audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        }
-        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-        audioManager.setSpeakerphoneOn(on);           //默认为扬声器播放
+
     }
 
     @Override

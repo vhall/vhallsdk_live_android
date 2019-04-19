@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -83,7 +84,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     private InvitedDialog invitedDialog;
     WatchContract.WatchPresenter mPresenter;
 
-    CountDownTimer onHandDownTimer;
+    private static final String TAG = "WatchActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,8 +95,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         setContentView(R.layout.watch_activity);
         param = (Param) getIntent().getSerializableExtra("param");
         type = getIntent().getIntExtra("type", VhallUtil.WATCH_LIVE);
-        liveFragment = (WatchLiveFragment) getSupportFragmentManager().findFragmentById(R.id.contentVideo);
-        playbackFragment = (WatchPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.contentVideo);
+//        liveFragment = (WatchLiveFragment) getSupportFragmentManager().findFragmentById(R.id.contentVideo);
+//        playbackFragment = (WatchPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.contentVideo);
         chatFragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.contentChat);
         DocumentFragment docFragment = (DocumentFragment) getSupportFragmentManager().findFragmentById(R.id.contentDoc);
         DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentById(R.id.contentDetail);
@@ -386,8 +387,18 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                 @Override
                 public void onClick(View v) {
                     //同意上麦
+                    mPresenter.replyInvite(1);
                     enterInteractive();
                     invitedDialog.dismiss();
+                    //发送同意上麦信息
+                }
+            });
+            invitedDialog.setNegativeOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mPresenter.replyInvite(2);
+                    invitedDialog.dismiss();
+                    //发送拒绝上麦信息
                 }
             });
         }

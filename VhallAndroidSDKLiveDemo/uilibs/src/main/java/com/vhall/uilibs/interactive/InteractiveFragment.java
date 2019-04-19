@@ -142,8 +142,9 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         Log.e("onDestroy", "onDestroy");
         mPresenter.onDestory();
+        super.onDestroy();
+
     }
 }

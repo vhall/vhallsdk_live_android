@@ -22,7 +22,7 @@ public class InvitedDialog extends AlertDialog implements View.OnClickListener {
     private TextView tvAgree;
     private TextView tvDisagree;
     private MyCount count;
-    private int countTime = 10;
+    private int countTime = 30;
 
     public InvitedDialog(Context context) {
         super(context);
@@ -42,7 +42,6 @@ public class InvitedDialog extends AlertDialog implements View.OnClickListener {
         tvAgree = rootView.findViewById(R.id.tv_invited_agree);
         tvDisagree = rootView.findViewById(R.id.tv_invited_disagree);
         imgClose.setOnClickListener(this);
-        tvDisagree.setOnClickListener(this);
         setView(rootView);
         setCanceledOnTouchOutside(false);
 
@@ -69,6 +68,10 @@ public class InvitedDialog extends AlertDialog implements View.OnClickListener {
 
     public void setPositiveOnClickListener(View.OnClickListener onClickListener) {
         tvAgree.setOnClickListener(onClickListener);
+    }
+
+    public void setNegativeOnClickListener(View.OnClickListener onClickListener){
+        tvDisagree.setOnClickListener(onClickListener);
     }
 
     public void setCountTime(int countTime) {

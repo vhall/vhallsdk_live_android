@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,6 +18,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.vhall.business.widget.ContainerLayout;
+import com.vhall.player.vod.VodPlayerView;
 import com.vhall.uilibs.R;
 
 import java.util.List;
@@ -27,7 +29,7 @@ import java.util.List;
 public class WatchPlaybackFragment extends Fragment implements WatchContract.PlaybackView, View.OnClickListener {
     private final String TAG = WatchPlaybackFragment.class.getName();
     WatchContract.PlaybackPresenter mPresenter;
-    ContainerLayout rl_video_container;//视频区容器
+    VodPlayerView rl_video_view;//视频区容器
     ImageView iv_play, btn_changescaletype;
     SeekBar seekbar;
     TextView tv_current_time, tv_end_time;
@@ -61,9 +63,9 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        rl_video_container = (ContainerLayout) getView().findViewById(R.id.rl_video_container);
-        btn_changescaletype = (ImageView) getView().findViewById(R.id.btn_change_scale_type);
-        iv_dlna_playback = (ImageView) getView().findViewById(R.id.iv_dlna_playback);
+        rl_video_view = getView().findViewById(R.id.rl_video_view);
+        btn_changescaletype = getView().findViewById(R.id.btn_change_scale_type);
+        iv_dlna_playback = getView().findViewById(R.id.iv_dlna_playback);
         rg_quality = getView().findViewById(R.id.rg_quality);
         btn_changescaletype.setOnClickListener(this);
         iv_dlna_playback.setOnClickListener(this);
@@ -134,27 +136,21 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     }
 
     @Override
-    public ContainerLayout getContainer() {
-        return rl_video_container;
+    public VodPlayerView getVideoView() {
+        return rl_video_view;
     }
 
     @Override
     public void setScaleTypeText(int text) {
         switch (text) {
-            case 0://FIT_DEFAULT
-                btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_default));
+            case 0://fitXy
+                btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_xy));
                 break;
-            case 1://FIT_CENTER_INSIDE
+            case 1://fit
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_center));
                 break;
-            case 2://FIT_X
-                btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_x));
-                break;
-            case 3://FIT_Y
+            case 2://fill
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_y));
-                break;
-            case 4://FIT_XY
-                btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_xy));
                 break;
         }
     }
