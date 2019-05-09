@@ -152,33 +152,6 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (ev.getAction() == MotionEvent.ACTION_DOWN && inputView.getContentView().getVisibility() == View.VISIBLE) {
-            boolean isDismiss = isShouldHideInput(inputView.getContentView(), ev);
-            if (isDismiss) {
-                inputView.dismiss();
-                return false;
-            } else {
-                return super.dispatchTouchEvent(ev);
-            }
-        }
-        return super.dispatchTouchEvent(ev);
-    }
-
-    public boolean isShouldHideInput(View view, MotionEvent event) {
-        if (view.getVisibility() == View.GONE)
-            return false;
-        int[] leftTop = {0, 0};
-        //获取输入框当前的location位置
-        inputView.getContentView().getLocationInWindow(leftTop);
-        int left = leftTop[0];
-        int top = leftTop[1];
-        int bottom = top + inputView.getContentView().getHeight();
-        int right = left + inputView.getContentView().getWidth();
-        return !(event.getX() > left && event.getX() < right
-                && event.getY() > top && event.getY() < bottom);
-    }
 
     private void initView() {
         inputView = new InputView(this, KeyBoardManager.getKeyboardHeight(this), KeyBoardManager.getKeyboardHeightLandspace(this));

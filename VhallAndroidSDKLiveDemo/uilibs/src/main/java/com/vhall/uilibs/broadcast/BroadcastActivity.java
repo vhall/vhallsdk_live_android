@@ -102,33 +102,6 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (ev.getAction() == MotionEvent.ACTION_DOWN && inputView.getContentView().getVisibility() == View.VISIBLE) {
-            boolean isDismiss = isShouldHideInput(inputView.getContentView(), ev);
-            if (isDismiss) {
-                inputView.dismiss();
-                return false;
-            } else {
-                return super.dispatchTouchEvent(ev);
-            }
-        }
-        return super.dispatchTouchEvent(ev);
-    }
-
-    public boolean isShouldHideInput(View view, MotionEvent event) {
-        if (view.getVisibility() == View.GONE)
-            return false;
-        int[] leftTop = {0, 0};
-        inputView.getContentView().getLocationInWindow(leftTop);
-        int left = leftTop[0];
-        int top = leftTop[1];
-        int bottom = top + inputView.getContentView().getHeight();
-        int right = left + inputView.getContentView().getWidth();
-        return !(event.getX() > left && event.getX() < right
-                && event.getY() > top && event.getY() < bottom);
-    }
-
-    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         inputView.dismiss();

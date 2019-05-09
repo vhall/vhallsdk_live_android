@@ -43,6 +43,7 @@ public class InputView {
     private EditText et_content;
     private TextView tv_send;
     private ViewPager vp_emoji;
+    private View bg;
     Context context;
     Activity activity;
     private boolean hasVirtual = false; // 是否有虚拟按键
@@ -125,6 +126,15 @@ public class InputView {
         tv_send = (TextView) contentView.findViewById(R.id.tv_send);
         vp_emoji = (ViewPager) contentView.findViewById(R.id.vp_emoji);
         contentView.setVisibility(View.GONE);
+        bg = (View) contentView.findViewById(R.id.view_bg);
+
+        bg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+
         iv_emoji.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -213,8 +223,8 @@ public class InputView {
         }
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) contentView.getLayoutParams();
         KeyBoardManager.closeKeyboard(et_content, activity);
-        if(keyboardHeight > 0) {
-            vp_emoji.getLayoutParams().height = this.keyboardHeight ;
+        if (keyboardHeight > 0) {
+            vp_emoji.getLayoutParams().height = this.keyboardHeight;
         }
         contentView.setVisibility(View.VISIBLE);
         new Handler() {//延时0.2秒显示表情

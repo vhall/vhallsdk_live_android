@@ -52,10 +52,10 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     ChatContract.ChatView chatView;
     private WatchPlayback watchPlayback;
 
-    //FIT_DEFAULT = 0;FIT_CENTER_INSIDE = 1;FIT_X = 2;FIT_Y = 3;FIT_XY = 4
+    //FIT_XY = 0;FIT = 1;FILL= 2;
     int[] scaleTypeList = new int[]{0, 1, 2};
     int currentPos = 0;
-    private int scaleType = 0;//FIT_DEFAULT
+    private int scaleType = 0;//FIT_XY
 
     private int limit = 5;
     private int pos = 0;
@@ -245,6 +245,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             WatchPlayback.Builder builder = new WatchPlayback.Builder()
                     .context(watchView.getActivity())
                     .vodPlayView(playbackView.getVideoView())
+//                    .surfaceView(playbackView.getVideoView())
                     .callback(new WatchCallback())
                     .docCallback(new DocCallback());
             watchPlayback = builder.build();
@@ -335,11 +336,17 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                     Log.e(TAG, "STATE_BUFFERING");
                     playbackView.showProgressbar(true);
                     break;
+                case STOP:
+                    playbackView.showProgressbar(false);
+                    Log.e(TAG, "STATE_STOP");
+//                    getWatchPlayback().stop();
+                    playbackView.setPlayIcon(true);
+                    break;
                 case END:
                     playbackView.showProgressbar(false);
                     Log.e(TAG, "STATE_ENDED");
                     playerCurrentPosition = 0;
-                    getWatchPlayback().stop();
+//                    getWatchPlayback().stop();
                     playbackView.setPlayIcon(true);
                     break;
             }

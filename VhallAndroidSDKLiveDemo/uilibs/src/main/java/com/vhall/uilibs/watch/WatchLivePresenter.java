@@ -7,6 +7,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.opengl.GL_Preview_YUV;
 import com.vhall.business.ChatServer;
@@ -34,6 +35,8 @@ import com.vhall.uilibs.R;
 //import com.vhall.business_support.dlna.DeviceDisplay;
 //import com.vhall.business_support.WatchLive;
 //import org.fourthline.cling.android.AndroidUpnpService;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -507,9 +510,28 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case com.vhall.player.Constants.Event.EVENT_DOWNLOAD_SPEED:
                     liveView.setDownSpeed("速率" + msg + "/kbps");
                     break;
+                case com.vhall.player.Constants.Event.EVENT_DPI_CHANGED:
+                    //分辨率切换
+                    Log.i(TAG, msg);
+                    break;
+                case com.vhall.player.Constants.Event.EVENT_DPI_LIST:
+                    //支持的分辨率 msg
+                    try {
+                        JSONArray array = new JSONArray(msg);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
                 case com.vhall.player.Constants.Event.EVENT_VIDEO_SIZE_CHANGED:
                     Log.i(TAG, msg);
                     break;
+                case com.vhall.player.Constants.Event.EVENT_STREAM_START://发起端开始推流
+
+                    break;
+                case com.vhall.player.Constants.Event.EVENT_STREAM_STOP://发起端停止推流
+
+                    break;
+
             }
         }
 

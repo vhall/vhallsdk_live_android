@@ -58,7 +58,6 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         cameraview = (VHVideoCaptureView) getView().findViewById(R.id.cameraview);
         mSpeed = (TextView) getView().findViewById(R.id.tv_upload_speed);
         mPublish = (Button) getView().findViewById(R.id.btn_publish);
@@ -73,7 +72,6 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         mChangeFilter.setOnClickListener(this);
         mBackBtn = (Button) getView().findViewById(R.id.btn_back);
         mBackBtn.setOnClickListener(this);
-        mPresenter.initCameraView();
         mPresenter.start();
 
         seekBar = (SeekBar) getView().findViewById(R.id.seekbar);

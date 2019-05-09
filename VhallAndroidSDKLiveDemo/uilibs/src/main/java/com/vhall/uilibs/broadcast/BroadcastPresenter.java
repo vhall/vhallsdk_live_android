@@ -1,6 +1,8 @@
 package com.vhall.uilibs.broadcast;
 
 import android.hardware.Camera;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -43,21 +45,26 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         this.chatView = chatView;
         this.chatView.setPresenter(this);
         mView.setPresenter(this);
-
     }
 
     @Override
     public void start() {
-
+        /**
+         * （默认预览分辨率640*480）
+         *  播放器配置更改了 分辨率设置必需保证进入画面前播放器已经初始化
+         *  否则可能出现因采集画面大小和推流大小不一致造成观看端花屏问题
+         *
+         */
+        getBroadcast();
 
     }
 
-    @Override
-    public void initCameraView() {
-        VHLivePushConfig config = new VHLivePushConfig(param.pixel_type);
-        config.screenOri = param.screenOri;
-        mView.getCameraView().init(config);
-    }
+//    @Override
+//    public void initCameraView() {
+//        VHLivePushConfig config = new VHLivePushConfig(param.pixel_type);
+//        config.screenOri = param.screenOri;
+//        mView.getCameraView().init(config);
+//    }
 
 
     @Override
@@ -153,8 +160,10 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     private Broadcast getBroadcast() {
         if (broadcast == null) {
             VHLivePushConfig config = new VHLivePushConfig(param.pixel_type);
-            config.screenOri = param.screenOri;//横竖屏设置重要
-
+            config.screenOri = param.screenOri;//横竖屏设置 重要
+            //可不设置
+            config.videoFrameRate = param.videoFrameRate;//帧率
+            config.videoBitrate = param.videoBitrate;//码率
             Broadcast.Builder builder = new Broadcast.Builder()
                     .cameraView(mView.getCameraView())
                     .config(config)

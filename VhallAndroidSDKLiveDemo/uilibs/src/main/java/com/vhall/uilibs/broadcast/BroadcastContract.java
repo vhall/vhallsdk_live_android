@@ -57,6 +57,5 @@ public class BroadcastContract {
 
         void setVolumeAmplificateSize(float size);
 
-        void initCameraView();
     }
 }
