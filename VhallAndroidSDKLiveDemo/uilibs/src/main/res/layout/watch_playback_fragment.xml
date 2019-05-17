@@ -100,6 +100,7 @@
             android:layout_marginRight="5dp"
             android:src="@drawable/push_tv" />
 
+
         <ImageView
             android:id="@+id/btn_change_scale_type"
             android:layout_width="25dp"
@@ -108,6 +109,16 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
             android:background="@drawable/fit_default" />
+        <TextView
+            android:id="@+id/tv_play_speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="1.00"
+            android:textColor="#ffffff"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="5dp"
+            android:layout_toLeftOf="@id/btn_change_scale_type"/>
     </RelativeLayout>
 
     <RadioGroup

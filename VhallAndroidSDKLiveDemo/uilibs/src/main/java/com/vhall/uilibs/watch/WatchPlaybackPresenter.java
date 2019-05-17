@@ -57,6 +57,10 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     int currentPos = 0;
     private int scaleType = 0;//FIT_XY
 
+
+    String[] speedStrs = new String[]{"0.25", "0.50", "1.00", "1.25", "1.50", "2.00"};
+    int currentSpeed = 2;
+
     private int limit = 5;
     private int pos = 0;
 
@@ -238,6 +242,15 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     @Override
     public void onSwitchPixel(String pix) {
         getWatchPlayback().setDefinition(pix);
+    }
+
+    @Override
+    public void setSpeed() {
+        String speed = speedStrs[(++currentSpeed) % speedStrs.length];
+        if (getWatchPlayback().setSpeed(Float.parseFloat(speed)) == 0) {
+            speed = speedStrs[(--currentSpeed) % speedStrs.length];
+        }
+        playbackView.setPlaySpeedText(speed);
     }
 
     public WatchPlayback getWatchPlayback() {

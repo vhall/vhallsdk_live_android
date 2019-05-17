@@ -32,7 +32,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     VodPlayerView rl_video_view;//视频区容器
     ImageView iv_play, btn_changescaletype;
     SeekBar seekbar;
-    TextView tv_current_time, tv_end_time;
+    TextView tv_current_time, tv_end_time, tv_play_speed;
     ProgressBar pb;
     ImageView iv_dlna_playback;
     RadioGroup rg_quality;
@@ -77,6 +77,8 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
         tv_current_time = (TextView) getView().findViewById(R.id.tv_current_time);
         tv_end_time = (TextView) getView().findViewById(R.id.tv_end_time);
         getView().findViewById(R.id.image_action_back).setOnClickListener(this);
+        tv_play_speed = (TextView) getView().findViewById(R.id.tv_play_speed);
+        tv_play_speed.setOnClickListener(this);
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -194,6 +196,11 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     }
 
     @Override
+    public void setPlaySpeedText(String text) {
+        tv_play_speed.setText(text);
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
 //        mPresenter.onFragmentStop();
@@ -238,6 +245,8 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
         } else if (i == R.id.iv_dlna_playback) {
             // Todo 投屏相关
             // mPresenter.showDevices();
+        } else if (i == R.id.tv_play_speed) {
+            mPresenter.setSpeed();
         }
     }
 

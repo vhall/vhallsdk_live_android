@@ -128,6 +128,7 @@ public class WatchContract {
 
         void setQualityChecked(String dpi);
 
+        void setPlaySpeedText(String text);
     }
 
     interface PlaybackPresenter extends WatchPresenter {
@@ -156,6 +157,8 @@ public class WatchContract {
         void onStop();
 
         void onSwitchPixel(String pix);// 切换分辨率
+
+        void setSpeed();
     }
 
     interface LivePresenter extends WatchPresenter {
