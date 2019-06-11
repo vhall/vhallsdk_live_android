@@ -82,6 +82,8 @@ public class WatchContract {
         void paintPPT(MessageServer.MsgInfo msgInfo);
 
         void paintPPT(String key, List<MessageServer.MsgInfo> msgInfos);
+
+        void showType(int type);
     }
 
     interface DetailView extends BaseView<BasePresenter> {

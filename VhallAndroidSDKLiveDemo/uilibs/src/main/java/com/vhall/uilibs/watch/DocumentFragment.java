@@ -72,6 +72,25 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
         iv_doc.setSteps(key, msgInfos);
     }
 
+
+    @Override
+    public void showType(int type) {
+        switch (type) {
+            case 0://文档
+                iv_doc.setVisibility(View.VISIBLE);
+                board.setVisibility(View.GONE);
+                break;
+            case 1://白板
+                iv_doc.setVisibility(View.VISIBLE);
+                board.setVisibility(View.VISIBLE);
+                break;
+            case 2://关闭文档
+                iv_doc.setVisibility(View.GONE);
+                board.setVisibility(View.GONE);
+                break;
+        }
+    }
+
     @Override
     public void setPresenter(BasePresenter presenter) {
 

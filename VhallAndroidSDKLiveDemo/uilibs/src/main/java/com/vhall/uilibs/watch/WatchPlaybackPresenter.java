@@ -36,10 +36,15 @@ import com.vhall.uilibs.util.emoji.InputUser;
 //import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONObject;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.vhall.business.MessageServer.EVENT_SHOWBOARD;
+import static com.vhall.business.MessageServer.EVENT_SHOWDOC;
+import static com.vhall.business.WatchPlayback.BOARD_KEY;
+import static com.vhall.business.WatchPlayback.SHOW_DOC_KEY;
 /**
  * 观看回放的Presenter
  */
@@ -144,6 +149,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 initCommentData(pos);
                 watchView.showNotice(getWatchPlayback().getNotice()); //显示公告
                 playbackView.setQuality(getWatchPlayback().getQualities());
+                operationDocument();
             }
 
             @Override
@@ -313,20 +319,65 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 //        watchView.dismissDevices();
 //    }
 
+    /**
+     * 根据文档状态选择展示
+     */
+    private void operationDocument() {
+        if (!getWatchPlayback().isUseDoc()) {
+            documentView.showType(2);//关闭文档
+        } else {
+            //展示文档
+            if (getWatchPlayback().isUseBoard()) {
+                //当前为白板
+                documentView.showType(1);
+            } else {
+                documentView.showType(0);
+            }
+        }
+    }
+
     private class DocCallback implements WatchPlayback.DocumentEventCallback {
 
         @Override
         public void onEvent(String key, List<MessageServer.MsgInfo> msgInfos) {
-            if (msgInfos != null && msgInfos.size() > 0) {
-                documentView.paintPPT(key, msgInfos);
-                documentView.paintBoard(key, msgInfos);
+            if (SHOW_DOC_KEY.equals(key)) {
+                if (msgInfos.size() > 0) {
+                    getWatchPlayback().setIsUseDoc(msgInfos.get(msgInfos.size() - 1).watchType);
+                    operationDocument();
+                }
+            } else {
+                if (msgInfos != null && msgInfos.size() > 0) {
+                    //循环删除文档关闭时，白板开关操作
+                    Iterator<MessageServer.MsgInfo> iter = msgInfos.iterator();
+                    while (iter.hasNext()){
+                        MessageServer.MsgInfo info = iter.next();
+                        if(info.event == EVENT_SHOWBOARD){
+                            getWatchPlayback().setIsUseBoard(info.showType);
+                            if (!getWatchPlayback().isUseDoc()) {
+                                iter.remove();
+                            }
+                        }
+                    }
+                    documentView.paintBoard(key, msgInfos);
+                    documentView.paintPPT(key, msgInfos);
+                }
             }
         }
 
         @Override
         public void onEvent(MessageServer.MsgInfo msgInfo) {
-            documentView.paintPPT(msgInfo);
-            documentView.paintBoard(msgInfo);
+            if (msgInfo.event == EVENT_SHOWDOC) {
+                getWatchPlayback().setIsUseDoc(msgInfo.watchType);
+                operationDocument();
+            } else {
+                if (msgInfo.event == EVENT_SHOWBOARD) {
+                    getWatchPlayback().setIsUseBoard(msgInfo.showType);
+                }
+                if (getWatchPlayback().isUseDoc()) {
+                    documentView.paintBoard(msgInfo);
+                }
+                documentView.paintPPT(msgInfo);
+            }
         }
     }
 

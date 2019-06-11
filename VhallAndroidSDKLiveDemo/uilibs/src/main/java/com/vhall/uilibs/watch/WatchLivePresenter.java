@@ -295,6 +295,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 chatView.clearChatData();
                 getChatHistory();
                 getAnswerList();
+                //根据房间信息设置，是否展示文档
+                operationDocument();
             }
 
             @Override
@@ -613,12 +615,24 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     chatInfo.id = messageInfo.id;
                     chatView.notifyDataChanged(chatInfo);
                     break;
+                case MessageServer.EVENT_SHOWDOC://文档开关指令 1 使用文档 0 关闭文档
+                    Log.e(TAG, "onEvent:show_docType:watchType= " + messageInfo.watchType);
+                    getWatchLive().setIsUseDoc(messageInfo.watchType);
+                    operationDocument();
+                    break;
                 case MessageServer.EVENT_CLEARBOARD:
                 case MessageServer.EVENT_DELETEBOARD:
                 case MessageServer.EVENT_INITBOARD:
                 case MessageServer.EVENT_PAINTBOARD:
+                    if (getWatchLive().isUseDoc()) {
+                        documentView.paintBoard(messageInfo);
+                    }
+                    break;
                 case MessageServer.EVENT_SHOWBOARD:
-                    documentView.paintBoard(messageInfo);
+                    getWatchLive().setIsUseBoard(messageInfo.showType);
+                    if (getWatchLive().isUseDoc()) {
+                        documentView.paintBoard(messageInfo);
+                    }
                     break;
                 case MessageServer.EVENT_CHANGEDOC://PPT翻页消息
                 case MessageServer.EVENT_CLEARDOC:
@@ -668,6 +682,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             return currentTime;
         }
 
+
         @Override
         public void onMsgServerConnected() {
 
@@ -682,6 +697,23 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         @Override
         public void onMsgServerClosed() {
 
+        }
+    }
+
+    /**
+     * 根据文档状态选择展示
+     */
+    private void operationDocument() {
+        if (!getWatchLive().isUseDoc()) {
+            documentView.showType(2);//关闭文档
+        } else {
+            //展示文档
+            if (getWatchLive().isUseBoard()) {
+                //当前为白板
+                documentView.showType(1);
+            } else {
+                documentView.showType(0);
+            }
         }
     }
 
