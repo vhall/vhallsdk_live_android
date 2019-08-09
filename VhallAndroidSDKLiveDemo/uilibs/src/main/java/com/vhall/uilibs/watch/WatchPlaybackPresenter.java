@@ -347,17 +347,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 }
             } else {
                 if (msgInfos != null && msgInfos.size() > 0) {
-                    //循环删除文档关闭时，白板开关操作
-                    Iterator<MessageServer.MsgInfo> iter = msgInfos.iterator();
-                    while (iter.hasNext()){
-                        MessageServer.MsgInfo info = iter.next();
-                        if(info.event == EVENT_SHOWBOARD){
-                            getWatchPlayback().setIsUseBoard(info.showType);
-                            if (!getWatchPlayback().isUseDoc()) {
-                                iter.remove();
-                            }
-                        }
-                    }
                     documentView.paintBoard(key, msgInfos);
                     documentView.paintPPT(key, msgInfos);
                 }
