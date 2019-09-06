@@ -1,8 +1,6 @@
 package com.vhall.uilibs.broadcast;
 
 import android.hardware.Camera;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -13,15 +11,12 @@ import com.vhall.business.data.RequestCallback;
 import com.vhall.player.Constants;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.push.VHLivePushConfig;
-import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
-import com.vhall.uilibs.chat.ChatFragment;
+import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.emoji.InputUser;
 
 import org.json.JSONObject;
-
-import java.util.List;
 
 /**
  * 发直播的Presenter
@@ -30,7 +25,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     private static final String TAG = "BroadcastPresenter";
     private Param param;
     private BroadcastContract.View mView;
-    private BroadcastContract.BraodcastView mBraodcastView;
+    private BroadcastContract.BroadcastView mBraodcastView;
     ChatContract.ChatView chatView;
     private Broadcast broadcast;
     private boolean isPublishing = false;
@@ -38,7 +33,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     private boolean isFlashOpen = false;
 
 
-    public BroadcastPresenter(Param params, BroadcastContract.BraodcastView mBraodcastView, BroadcastContract.View mView, ChatContract.ChatView chatView) {
+    public BroadcastPresenter(Param params, BroadcastContract.BroadcastView mBraodcastView, BroadcastContract.View mView, ChatContract.ChatView chatView) {
         this.param = params;
         this.mView = mView;
         this.mBraodcastView = mBraodcastView;
@@ -148,7 +143,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     }
 
     @Override
-    public void destoryBroadcast() {
+    public void destroyBroadcast() {
         getBroadcast().destroy();
     }
 
@@ -160,6 +155,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     private Broadcast getBroadcast() {
         if (broadcast == null) {
             VHLivePushConfig config = new VHLivePushConfig(param.pixel_type);
+            Log.e("onCreate","param.screenOri    "+param.screenOri);
             config.screenOri = param.screenOri;//横竖屏设置 重要
             //可不设置
             config.videoFrameRate = param.videoFrameRate;//帧率
@@ -207,6 +203,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
             @Override
             public void onError(int errorCode, String reason) {
+                chatView.showToast(reason);
                 response++;
                 Log.e(TAG, "响应失败：" + reason + "count:" + response);
             }
@@ -236,8 +233,9 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     }
 
+
     @Override
-    public void onFreshData() {
+    public void showSurvey(String url, String title) {
 
     }
 
@@ -283,6 +281,8 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                     isPublishing = false;
                     mView.setStartBtnImage(true);
                     break;
+                default:
+                    break;
             }
         }
 
@@ -297,6 +297,8 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                     break;
                 case Constants.Event.EVENT_NETWORK_OBS:
                     mView.showMsg("网络环境差!");
+                    break;
+                default:
                     break;
             }
         }
@@ -319,25 +321,25 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
         @Override
         public void onConnectFailed() {
-//            getBroadcast().connectChatServer();
+            getBroadcast().connectChatServer();
         }
 
         @Override
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
-                    chatView.notifyDataChanged(chatInfo);
-                    break;
-                case ChatServer.eventOnlineKey:
-                    chatView.notifyDataChanged(chatInfo);
-                    break;
-                case ChatServer.eventOfflineKey:
-                    chatView.notifyDataChanged(chatInfo);
-                    break;
-                case ChatServer.eventQuestion:
+                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     break;
                 case ChatServer.eventCustomKey:
-                    chatView.notifyDataChanged(chatInfo);
+                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    break;
+                case ChatServer.eventOnlineKey:
+                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    break;
+                case ChatServer.eventOfflineKey:
+                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    break;
+                default:
                     break;
             }
         }
@@ -346,21 +348,6 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         public void onChatServerClosed() {
 
         }
-    }
-
-    private void getChatHistory() {
-        getBroadcast().acquireChatRecord(false, new ChatServer.ChatRecordCallback() {
-            @Override
-            public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                Log.e(TAG, "list->" + list.size());
-                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, list);
-            }
-
-            @Override
-            public void onFailed(int errorcode, String messaage) {
-                Log.e(TAG, "onFailed->" + errorcode + ":" + messaage);
-            }
-        });
     }
 
 }

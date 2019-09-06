@@ -18,8 +18,6 @@ public class InteractiveContract {
 
         Context getContext();
 
-        void setSpeakerphoneOn(boolean on);
-
         void finish();
 
         void showToast(String toast);
@@ -40,6 +38,8 @@ public class InteractiveContract {
         void addStream(VHRenderView view);
 
         void removeStream(Stream stream);
+
+        void updateStream(Stream stream);
     }
 
     interface InteractiveFraPresenter extends InteractiveActPresenter {

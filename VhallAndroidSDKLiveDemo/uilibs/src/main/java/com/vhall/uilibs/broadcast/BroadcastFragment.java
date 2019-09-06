@@ -14,7 +14,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vhall.push.VHLivePushConfig;
 import com.vhall.push.VHVideoCaptureView;
 import com.vhall.push.renderer.filter.VHBeautyFilter;
 import com.vhall.uilibs.R;
@@ -185,8 +184,8 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
 
     @Override
     public void onDestroy() {
+        mPresenter.destroyBroadcast();
         super.onDestroy();
-        mPresenter.destoryBroadcast();
     }
 
 

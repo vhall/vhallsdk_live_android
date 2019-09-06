@@ -8,6 +8,10 @@ import com.vhall.business.VhallSDK;
 import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 
+import vhall.com.vss.VssSdk;
+
+import static com.vhall.business.VhallSDK.getUserId;
+
 /**
  * 主Application类
  */
@@ -22,8 +26,11 @@ public class VhallApplication extends Application {
         super.onCreate();
         context = this;
         getParam();
-        VhallSDK.init(this, getResources().getString(R.string.vhall_app_key), getResources().getString(R.string.vhall_app_secret_key));
         VhallSDK.setLogEnable(true);
+
+        VhallSDK.init(this, getResources().getString(R.string.vhall_app_key), getResources().getString(R.string.vhall_app_secret_key));
+        VssSdk.getInstance().init(getApplicationContext(), getUserId());
+
     }
 
     public Param getParam() {

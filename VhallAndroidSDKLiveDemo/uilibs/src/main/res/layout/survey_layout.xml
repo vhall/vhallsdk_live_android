@@ -3,6 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:layout_height="3dp" />
 
     <ImageView
         android:id="@+id/iv_close"
@@ -10,6 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:padding="10dp"
+        android:visibility="gone"
         android:src="@drawable/vhall_icon_marquee_close" />
 
     <TextView
@@ -21,19 +28,26 @@
         android:textColor="@color/gray_deep"
         android:textSize="20dp" />
 
+    <com.vhall.uilibs.util.SurveyView
+        android:id="@+id/wv_survey"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="visible">
 
         <LinearLayout
             android:id="@+id/ll_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="gone"
             android:orientation="vertical">
 
         </LinearLayout>
 
     </ScrollView>
-
 
 </LinearLayout>

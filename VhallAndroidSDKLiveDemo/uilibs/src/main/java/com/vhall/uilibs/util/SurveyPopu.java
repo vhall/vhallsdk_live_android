@@ -36,17 +36,15 @@ import java.util.Collections;
 
 /**
  * Created by huanan on 2017/3/6.
+ * 旧版问卷
  */
 public class SurveyPopu extends PopupWindow {
 
     ImageView iv_close;
     TextView tv_title;
     LinearLayout ll_content;
-
     Context context;
-
     Survey survey;
-
     OnSubmitClickListener onSubmitClickListener;
 
     public void setOnSubmitClickListener(OnSubmitClickListener onSubmitClickListener) {
@@ -72,6 +70,7 @@ public class SurveyPopu extends PopupWindow {
         });
         tv_title = (TextView) root.findViewById(R.id.tv_title);
         ll_content = (LinearLayout) root.findViewById(R.id.ll_content);
+        ll_content.setVisibility(View.VISIBLE);
     }
 
     public void setSurvey(final Survey survey) {
@@ -177,6 +176,8 @@ public class SurveyPopu extends PopupWindow {
                                 }
                             }
                             break;
+                        default:
+                            break;
                     }
 
                 }
@@ -207,7 +208,7 @@ public class SurveyPopu extends PopupWindow {
                                 Survey.Question question = survey.questions.get(i);
                                 int size = question.answer.size();
                                 if (question.must == 1 && size == 0) {
-                                    errorView.setText("第" + (i+1) + "题为必填题，请填写（输入框）后再提交！");
+                                    errorView.setText("第" + (i + 1) + "题为必填题，请填写（输入框）后再提交！");
                                     errorView.setVisibility(View.VISIBLE);
                                     isAvailable = false;
                                     break;
@@ -255,6 +256,4 @@ public class SurveyPopu extends PopupWindow {
     public interface OnSubmitClickListener {
         void onSubmitClick(Survey survey, String result);
     }
-
-
 }

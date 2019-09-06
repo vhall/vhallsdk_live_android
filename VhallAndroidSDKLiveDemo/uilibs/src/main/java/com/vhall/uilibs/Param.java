@@ -4,6 +4,8 @@ package com.vhall.uilibs;
 import com.vhall.push.VHLivePushFormat;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 直播参数类
@@ -21,6 +23,12 @@ public class Param implements Serializable {
     public String watchId = "";
     public String key = "";
     public int bufferSecond = 6;
+    public String vssToken ;
+    public String vssRoomId;
+    public String webinar_id;
+    public String join_id;
+    public String noticeContent;
+    public List<String> filters=new ArrayList<>();
 
     //互动相关
 //    public int interactive_definition = VHILSS.SD;

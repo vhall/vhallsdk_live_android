@@ -5,42 +5,42 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
-import com.opengl.GL_Preview_YUV;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
+import com.vhall.business.Watch;
 import com.vhall.business.WatchLive;
 import com.vhall.business.common.Constants;
-import com.vhall.business.data.WebinarInfo;
-
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
+import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
-
+import com.vhall.business.widget.ContainerLayout;
 import com.vhall.player.VHPlayerListener;
-import com.vhall.player.stream.play.IVHVideoPlayer;
 import com.vhall.player.stream.play.impl.VHVideoPlayerView;
 import com.vhall.uilibs.Param;
+import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.ChatFragment;
+import com.vhall.uilibs.chat.MessageChatData;
+import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.emoji.InputUser;
-import com.vhall.uilibs.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //TODO 投屏相关
 //import com.vhall.business_support.Watch_Support;
 //import com.vhall.business_support.dlna.DeviceDisplay;
 //import com.vhall.business_support.WatchLive;
 //import org.fourthline.cling.android.AndroidUpnpService;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 /**
@@ -73,7 +73,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     public WatchLivePresenter(WatchContract.LiveView liveView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, ChatContract.ChatView questionView, WatchContract.WatchView watchView, Param param) {
         this.params = param;
         this.liveView = liveView;
-        this.documentView = documentView;
+        this.documentView = (WatchContract.DocumentView) documentView;
         this.watchView = watchView;
         this.questionView = questionView;
         this.chatView = chatView;
@@ -168,9 +168,14 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         initWatch();
     }
 
-    @Override
-    public void onFreshData() {
 
+    @Override
+    public void showSurvey(String url, String title) {
+        if (!VhallSDK.isLogin()) {
+            watchView.showToast(R.string.vhall_login_first);
+            return;
+        }
+        watchView.showSurvey(url, title);
     }
 
     @Override
@@ -289,8 +294,9 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         VhallSDK.initWatch(params.watchId, customeId, customNickname, params.key, getWatchLive(), WebinarInfo.LIVE, new RequestCallback() {
             @Override
             public void onSuccess() {
-                if (watchView.getActivity().isFinishing())
+                if (watchView.getActivity().isFinishing()) {
                     return;
+                }
                 liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
                 chatView.clearChatData();
                 getChatHistory();
@@ -311,7 +317,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         VhallSDK.getAnswerList(params.watchId, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                questionView.notifyDataChanged(ChatFragment.CHAT_EVENT_QUESTION, list);
+                questionView.notifyDataChangedQe(ChatFragment.CHAT_EVENT_QUESTION, list);
             }
 
             @Override
@@ -337,9 +343,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     public WatchLive getWatchLive() {
         if (watchLive == null) {
+            RelativeLayout watchLayout = liveView.getWatchLayout();
             WatchLive.Builder builder = new WatchLive.Builder()
                     .context(watchView.getActivity().getApplicationContext())
-                    .containerLayout(liveView.getWatchLayout())
+                    .containerLayout(watchLayout)
                     .bufferDelay(params.bufferSecond)
                     .callback(new WatchCallback())
                     .messageCallback(new MessageEventCallback())
@@ -386,6 +393,36 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     //提交问卷 需要先登录且watch已初始化完成
+    @Override
+    public void submitSurvey(String result) {
+        /*if (!VhallSDK.isLogin()) {
+            watchView.showToast("请先登录！");
+            return;
+        }
+        JSONObject obj = null;
+        try {
+            obj = new JSONObject(result);
+            String qId = obj.optString("question_id");
+            VhallSDK.submitSurveyInfo(getWatchLive(), qId, result, new RequestCallback() {
+                @Override
+                public void onSuccess() {
+                    watchView.showToast("提交成功！");
+                    watchView.dismissSurvey();
+                }
+
+                @Override
+                public void onError(int errorCode, String errorMsg) {
+                    watchView.showToast(errorMsg);
+                    if (errorCode == 10821) {
+                        watchView.dismissSurvey();
+                    }
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }*/
+    }
+
     @Override
     public void submitSurvey(Survey survey, String result) {
         if (survey == null)
@@ -503,6 +540,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
                     break;
+                default:
+                    break;
             }
         }
 
@@ -532,6 +571,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case com.vhall.player.Constants.Event.EVENT_STREAM_STOP://发起端停止推流
 
+                    break;
+                default:
                     break;
 
             }
@@ -593,10 +634,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 //                    }
                     break;
                 case MessageServer.EVENT_START_LOTTERY://抽奖开始
-                    watchView.showLottery(messageInfo);
+                    watchView.showLottery(MessageLotteryData.getData(messageInfo));
                     break;
                 case MessageServer.EVENT_END_LOTTERY://抽奖结束
-                    watchView.showLottery(messageInfo);
+                    watchView.showLottery(MessageLotteryData.getData(messageInfo));
                     break;
                 case MessageServer.EVENT_NOTICE:
                     watchView.showNotice(messageInfo.content);
@@ -610,10 +651,16 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     watchView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
                     break;
                 case MessageServer.EVENT_SURVEY://问卷
-                    ChatServer.ChatInfo chatInfo = new ChatServer.ChatInfo();
-                    chatInfo.event = "survey";
-                    chatInfo.id = messageInfo.id;
-                    chatView.notifyDataChanged(chatInfo);
+
+                    /**
+                     * 获取msg内容
+                     */
+
+                    MessageChatData surveyData = new MessageChatData();
+                    surveyData.event = MessageChatData.eventSurveyKey;
+                    surveyData.setUrl(VhallSDK.getSurveyUrl(messageInfo.id, messageInfo.webinar_id, messageInfo.user_id));
+                    surveyData.setId(messageInfo.id);
+                    chatView.notifyDataChangedChat(surveyData);
                     break;
                 case MessageServer.EVENT_SHOWDOC://文档开关指令 1 使用文档 0 关闭文档
                     Log.e(TAG, "onEvent:show_docType:watchType= " + messageInfo.watchType);
@@ -665,6 +712,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_INVITED_MIC://被邀请上麦
                     watchView.showInvited();
+                    break;
+                default:
                     break;
             }
         }
@@ -733,6 +782,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     private class ChatCallback implements ChatServer.Callback {
+
         @Override
         public void onChatServerConnected() {
             Log.e(TAG, "CHAT CONNECTED ");
@@ -747,20 +797,22 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
-                    chatView.notifyDataChanged(chatInfo);
+                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     liveView.addDanmu(chatInfo.msgData.text);
                     break;
                 case ChatServer.eventCustomKey:
-                    chatView.notifyDataChanged(chatInfo);
+                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     break;
                 case ChatServer.eventOnlineKey:
-                    chatView.notifyDataChanged(chatInfo);
+                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     break;
                 case ChatServer.eventOfflineKey:
-                    chatView.notifyDataChanged(chatInfo);
+                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     break;
                 case ChatServer.eventQuestion:
-                    questionView.notifyDataChanged(chatInfo);
+                    questionView.notifyDataChangedQe(chatInfo);
+                    break;
+                default:
                     break;
             }
         }
@@ -774,7 +826,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         getWatchLive().acquireChatRecord(true, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, list);
+                List<MessageChatData> list1 = new ArrayList<>();
+                for (ChatServer.ChatInfo chatInfo : list) {
+                    list1.add(MessageChatData.getChatData(chatInfo));
+                }
+                chatView.notifyDataChangedChat(ChatFragment.CHAT_EVENT_CHAT, list1);
             }
 
             @Override

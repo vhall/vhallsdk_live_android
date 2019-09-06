@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vhall.business.utils.LogManager;
@@ -47,13 +48,13 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     private WatchContract.LivePresenter mPresenter;
 
     private ImageView clickOrientation, clickStart, mVrButton;
-    private RadioButton radioButtonShowDEFAULT, radioButtonShowSD, radioButtonShowHD, radioButtonShowUHD,radioButtonShowA;
+    private RadioButton radioButtonShowDEFAULT, radioButtonShowSD, radioButtonShowHD, radioButtonShowUHD, radioButtonShowA;
 
     private RadioGroup radioChoose;
     private TextView fragmentDownloadSpeed;
-    private ContainerLayout mContainerLayout;
+    private RelativeLayout mContainerLayout;
     private ImageView btn_change_scaletype;
-//    private ImageView btnChangePlayStatus;
+    //    private ImageView btnChangePlayStatus;
     ImageView btn_danmaku;
     ProgressBar progressbar;
 
@@ -107,7 +108,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         radioButtonShowSD = (RadioButton) root.findViewById(R.id.radio_btn_sd);
         radioButtonShowHD = (RadioButton) root.findViewById(R.id.radio_btn_hd);
         radioButtonShowUHD = (RadioButton) root.findViewById(R.id.radio_btn_uhd);
-        mContainerLayout = (ContainerLayout) root.findViewById(R.id.rl_container);
+        mContainerLayout = (RelativeLayout) root.findViewById(R.id.rl_container);
         fragmentDownloadSpeed = (TextView) root.findViewById(R.id.fragment_download_speed);
         mVrButton = (ImageView) root.findViewById(R.id.btn_headtracker);
         mVrButton.setOnClickListener(this);
@@ -169,11 +170,12 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }
         if (mPresenter != null) {
             mPresenter.start();
+
         }
     }
 
     @Override
-    public ContainerLayout getWatchLayout() {
+    public RelativeLayout getWatchLayout() {
         return mContainerLayout;
     }
 
@@ -254,28 +256,40 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             Integer value = (Integer) entry.getValue();
             switch (key) {
                 case "A":
+                case "a":
                     if (value == 1)
                         radioButtonShowA.setVisibility(View.VISIBLE);
                     else
                         radioButtonShowA.setVisibility(View.GONE);
                     break;
                 case "SD":
+                case "360p":
                     if (value == 1)
                         radioButtonShowSD.setVisibility(View.VISIBLE);
                     else
                         radioButtonShowSD.setVisibility(View.GONE);
                     break;
                 case "HD":
+                case "480p":
                     if (value == 1)
                         radioButtonShowHD.setVisibility(View.VISIBLE);
                     else
                         radioButtonShowHD.setVisibility(View.GONE);
                     break;
                 case "UHD":
+                case "720p":
                     if (value == 1)
                         radioButtonShowUHD.setVisibility(View.VISIBLE);
                     else
                         radioButtonShowUHD.setVisibility(View.GONE);
+                    break;
+                case "same":
+                    if (value == 1)
+                        radioButtonShowDEFAULT.setVisibility(View.VISIBLE);
+                    else
+                        radioButtonShowDEFAULT.setVisibility(View.GONE);
+                    break;
+                default:
                     break;
             }
         }
@@ -387,7 +401,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             } else if (i == R.id.radio_btn_uhd) {
                 mPresenter.onMobileSwitchRes(Constants.Rate.DPI_XHD);
 //                mPresenter.onSwitchPixel(WatchLive.DPI_UHD);
-            } else if(i == R.id.radio_btn_a){
+            } else if (i == R.id.radio_btn_a) {
                 mPresenter.onMobileSwitchRes(Constants.Rate.DPI_AUDIO);
             }
         }
@@ -404,7 +418,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     @Override
     public void onStop() {
         super.onStop();
-        mPresenter.stopWatch();
+        if (mPresenter != null) {
+            mPresenter.stopWatch();
+        }
     }
 
     @Override
@@ -417,7 +433,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
     @Override
     public void onDestroy() {
-        mPresenter.onDestory();
+        if (mPresenter != null) {
+            mPresenter.onDestory();
+        }
         if (mDanmakuView != null) {
             // dont forget release!
             mDanmakuView.release();

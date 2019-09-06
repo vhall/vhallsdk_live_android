@@ -10,7 +10,7 @@ import com.vhall.uilibs.util.emoji.InputUser;
  */
 public class BroadcastContract {
 
-    interface BraodcastView extends BaseView<Presenter> {
+    interface BroadcastView extends BaseView<Presenter> {
         void showChatView(boolean emoji, InputUser user, int limit);
     }
 
@@ -53,7 +53,7 @@ public class BroadcastContract {
 
         void changeAudio();
 
-        void destoryBroadcast();
+        void destroyBroadcast();
 
         void setVolumeAmplificateSize(float size);
 

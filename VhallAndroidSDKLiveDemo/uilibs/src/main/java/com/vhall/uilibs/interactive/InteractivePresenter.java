@@ -119,16 +119,6 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
         interactive.enterRoom();
     }
 
-//    public InterActive getInteractive() {
-//        if (interactive == null) {
-//            InterActive.Builder builder = new InterActive.Builder()
-//                    .context(interActView.getContext())
-//                    .messageCallback(new MessageEventCallback())
-//                    .roomCallback(new RoomCallback());
-//            interactive = builder.build();
-//        }
-//        return interactive;
-//    }
 
     /**
      * 观看过程消息监听
@@ -173,11 +163,15 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
                     }
                     break;
                 case MessageServer.EVENT_INTERACTIVE_DOWN_MIC:
-                    if (messageInfo.user_id.equals(interactive.getWebinarInfo().join_id)) {
-                        if (interactive != null) {
-                            interActView.finish();
+                    if (interactive != null && interactive.getWebinarInfo() != null) {
+                        if (messageInfo.user_id.equals(interactive.getWebinarInfo().join_id)) {
+                            if (interactive != null) {
+                                interActView.finish();
+                            }
                         }
                     }
+                    break;
+                default:
                     break;
             }
         }
@@ -230,7 +224,6 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
         @Override
         public void onDidPublishStream() {// 上麦
             Log.e(TAG, "onDidPublishStream");
-            interActView.setSpeakerphoneOn(true);
         }
 
         @Override
@@ -244,7 +237,6 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
             new Handler().post(new Runnable() {
                 @Override
                 public void run() {
-                    interActView.setSpeakerphoneOn(true);
                     newRenderView.getHolder().setFormat(PixelFormat.TRANSPARENT);
                     newRenderView.setZOrderMediaOverlay(true);
                     newRenderView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);

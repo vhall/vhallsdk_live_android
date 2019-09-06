@@ -1,0 +1,281 @@
+package com.vhall.uilibs.interactive;
+
+import android.graphics.PixelFormat;
+import android.os.Looper;
+import android.text.TextUtils;
+import android.util.Log;
+import android.widget.Toast;
+
+import com.vhall.business.VhallSDK;
+import com.vhall.business.data.WebinarInfo;
+import com.vhall.business.data.source.InteractiveDataSource;
+import com.vhall.business.data.source.WebinarInfoRepository;
+import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
+import com.vhall.uilibs.Param;
+import com.vhall.uilibs.util.handler.WeakHandler;
+import com.vhall.vhallrtc.client.Stream;
+import com.vhall.vhallrtc.client.VHRenderView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.webrtc.RendererCommon;
+
+import vhall.com.vss.data.MessageData;
+import vhall.com.vss.CallBack;
+import vhall.com.vss.module.room.VssRoomManger;
+import vhall.com.vss.module.room.callback.IVssMessageLister;
+import vhall.com.vss.module.rtc.IVssRtcLister;
+import vhall.com.vss.module.rtc.VssRtcManger;
+
+/**
+ * @author hkl
+ */
+public class InteractivePresenterVss implements InteractiveContract.InteractiveFraPresenter {
+    private InteractiveContract.InteractiveActView interActView;
+    private InteractiveContract.InteractiveFraView interFraView;
+
+    private static final int CAMERA_VIDEO = 2;
+    private static final int CAMERA_AUDIO = 1;
+    private static final int CAMERA_DEVICE_OPEN = 1;
+    private static final int CAMERA_DEVICE_CLOSE = 0;
+
+    private static final String TAG = "InteractivePresenter";
+    private VHRenderView vhRenderView;
+    private Stream localStream;
+
+    public InteractivePresenterVss(final InteractiveContract.InteractiveActView interActView, InteractiveContract.InteractiveFraView interFraView, Param param) {
+        this.interActView = interActView;
+        this.interActView.setPresenter(this);
+        this.interFraView = interFraView;
+        this.interFraView.setPresenter(this);
+        VssRtcManger.getInstance(interActView.getContext()).setRtvLister(new MyVssLister());
+        VssRoomManger.getInstance().setVssMessageLister(new MyCallBack(), IVssMessageLister.MESSAGE_SERVICE_TYPE_ROOM);
+    }
+
+    @Override
+    public void start() {
+        initInteractive();
+    }
+
+    @Override
+    public void initInteractive() {
+        try {
+            JSONObject option = new JSONObject();
+            option.put(Stream.kMinBitrateKbpsKey, 200);
+            option.put(Stream.kCurrentBitrateKey, 400);
+            option.put(Stream.kMaxBitrateKey, 600);
+            option.put(Stream.kFrameResolutionTypeKey, Stream.VhallFrameResolutionValue.VhallFrameResolution480x360.getValue());
+            option.put(Stream.kStreamOptionStreamType, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo.getValue());
+            option.put(Stream.kNumSpatialLayersKey, 2);
+            VssRtcManger.getInstance(interActView.getContext())
+                    .speak(option, "passsdk", new CallBack() {
+                        @Override
+                        public void onSuccess(Object result) {
+                            setLocalView();
+                        }
+
+                        @Override
+                        public void onError(int eventCode, String msg) {
+                            Log.e(TAG, "speak onError" + msg);
+                        }
+                    });
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e(TAG, "speak JSONException" + e.getMessage());
+        }
+    }
+
+    @Override
+    public void onDownMic() {
+        interActView.finish();
+    }
+
+    @Override
+    public void onSwitchCamera() {
+        if (localStream != null) {
+            localStream.switchCamera();
+        }
+    }
+
+    @Override
+    public void onSwitchVideo(boolean isOpen) {
+        Log.e(TAG, "Video isOpen  " + isOpen);
+
+        VssRtcManger.getInstance(interActView.getContext()).setDeviceStatus(String.valueOf(CAMERA_VIDEO), isOpen ? String.valueOf(CAMERA_DEVICE_OPEN) : String.valueOf(CAMERA_DEVICE_CLOSE), new CallBack() {
+            @Override
+            public void onSuccess(Object result) {
+
+            }
+
+            @Override
+            public void onError(int eventCode, String msg) {
+                interActView.showToast(msg);
+            }
+        });
+    }
+
+    @Override
+    public void onSwitchAudio(boolean isOpen) {
+        Log.e(TAG, "Audio isOpen  " + isOpen);
+        VssRtcManger.getInstance(interActView.getContext()).setDeviceStatus(String.valueOf(CAMERA_AUDIO), isOpen ? String.valueOf(CAMERA_DEVICE_OPEN) : String.valueOf(CAMERA_DEVICE_CLOSE), new CallBack() {
+            @Override
+            public void onSuccess(Object result) {
+
+            }
+
+            @Override
+            public void onError(int eventCode, String msg) {
+                interActView.showToast(msg);
+            }
+        });
+    }
+
+    /**
+     * 设置本地流
+     */
+    private void setLocalView() {
+        vhRenderView = new VHRenderView(interActView.getContext());
+        vhRenderView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+        vhRenderView.init(null, null);
+        localStream = VssRtcManger.getLocalStream();
+        vhRenderView.setStream(localStream);
+        interFraView.addLocalView(vhRenderView);
+    }
+
+    class MyCallBack implements IVssMessageLister {
+        @Override
+        public void onMessage(MessageData msg) {
+            if (msg == null || TextUtils.isEmpty(msg.getType())) {
+                return;
+            }
+            switch (msg.getType()) {
+                case "vrtc_frames_forbid":
+                    interFraView.updateVideoFrame(CAMERA_DEVICE_CLOSE);
+                    switchVideoFrame(CAMERA_DEVICE_CLOSE);
+                    break;
+                case "vrtc_frames_display":
+                    interFraView.updateVideoFrame(CAMERA_DEVICE_OPEN);
+                    switchVideoFrame(CAMERA_DEVICE_OPEN);
+                    break;
+                case "vrtc_mute":
+                case "vrtc_mute_all":
+                    interFraView.updateAudioFrame(CAMERA_DEVICE_CLOSE);
+                    switchAudioFrame(CAMERA_DEVICE_CLOSE);
+                    break;
+                case "vrtc_mute_cancel":
+                case "vrtc_mute_all_cancel":
+                    interFraView.updateAudioFrame(CAMERA_DEVICE_OPEN);
+                    switchAudioFrame(CAMERA_DEVICE_OPEN);
+                    break;
+                case "vrtc_disconnect_success":
+                    onDownMic();
+                    break;
+                case "room_kickout":
+                    onDownMic();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void onError(int code, String msg) {
+
+        }
+
+    }
+
+    private void switchVideoFrame(int status) {
+        if (localStream == null) {
+            return;
+        }
+        if (status == CAMERA_DEVICE_OPEN) {
+            //1打开
+            localStream.unmuteVideo(null);
+        } else { // 0禁止
+            localStream.muteVideo(null);
+        }
+    }
+
+    private void switchAudioFrame(int status) {
+        if (localStream == null) {
+            return;
+        }
+        if (status == CAMERA_DEVICE_OPEN) {
+            localStream.unmuteAudio(null);
+        } else {
+            localStream.muteAudio(null);
+        }
+    }
+
+    class MyVssLister implements IVssRtcLister {
+
+        @Override
+        public void addStream(final Stream stream) {
+            if (stream == null) {
+                return;
+            }
+            new WeakHandler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    boolean b = stream.hasVideo();
+                    VHRenderView newRenderView = new VHRenderView(interActView.getContext());
+                    newRenderView.init(null, null);
+                    newRenderView.getHolder().setFormat(PixelFormat.TRANSPARENT);
+                    newRenderView.setZOrderMediaOverlay(true);
+                    newRenderView.setStream(stream);
+                    interFraView.addStream(newRenderView);
+                }
+            });
+        }
+
+        @Override
+        public void removeStream(final Stream stream) {
+            if (stream == null) {
+                return;
+            }
+            new WeakHandler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    interFraView.removeStream(stream);
+                }
+            });
+        }
+
+        @Override
+        public void updateStream(final Stream stream) {
+            if (stream == null) {
+                return;
+            }
+            Log.e("updateStream   id   ", stream.userId + "");
+            new WeakHandler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    interFraView.updateStream(stream);
+                }
+            });
+        }
+
+        @Override
+        public void messageChange(int status) {
+            Log.e(TAG, "S");
+        }
+
+        @Override
+        public void onMessage(JSONObject jsonObject) {
+
+        }
+
+        @Override
+        public void onRefreshMembers(JSONObject jsonObject) {
+
+        }
+
+    }
+
+    @Override
+    public void onDestory() {
+        VssRtcManger.leaveRoom();
+    }
+}

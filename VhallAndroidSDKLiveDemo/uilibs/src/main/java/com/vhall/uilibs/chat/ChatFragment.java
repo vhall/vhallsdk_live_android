@@ -1,13 +1,13 @@
 package com.vhall.uilibs.chat;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +43,8 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     private ChatContract.ChatPresenter mPresenter;
     public final int RequestLogin = 0;
     ListView lv_chat;
-    List<ChatServer.ChatInfo> chatData = new ArrayList<ChatServer.ChatInfo>();
+    List<ChatServer.ChatInfo> questionData = new ArrayList<ChatServer.ChatInfo>();
+    List<MessageChatData> chatInfoList = new ArrayList<>();
     ChatAdapter chatAdapter = new ChatAdapter();
     QuestionAdapter questionAdapter = new QuestionAdapter();
     boolean isquestion = false;
@@ -83,11 +84,17 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
         return inflater.inflate(R.layout.chat_fragment, null);
     }
 
+
+    @Override
+    public Context getContext() {
+        return getActivity();
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         lv_chat = getView().findViewById(R.id.lv_chat);
-        test_send_custom =  getView().findViewById(R.id.test_send_custom);
+        test_send_custom = getView().findViewById(R.id.test_send_custom);
         test_send_custom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,13 +106,17 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                mPresenter.sendCustom(json);
+                if (mPresenter != null) {
+                    mPresenter.sendCustom(json);
+                }
             }
         });
         getView().findViewById(R.id.text_chat_content).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.showChatView(false, null, 0);
+                if (mPresenter != null) {
+                    mPresenter.showChatView(false, null, 0);
+                }
             }
         });
         isquestion = getArguments().getBoolean("question");
@@ -121,38 +132,54 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     private void init() {
     }
 
+
     @Override
-    public void notifyDataChanged(ChatServer.ChatInfo data) {
-        if (chatData.size() > 10)
-            chatData.remove(0);
-        chatData.add(data);
-        if (isquestion) {
-            questionAdapter.notifyDataSetChanged();
-        } else {
-            chatAdapter.notifyDataSetChanged();
+    public void notifyDataChangedChat(MessageChatData data) {
+        if (chatInfoList.size() > 10) {
+            chatInfoList.remove(0);
+        }
+        chatInfoList.add(data);
+        chatAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataChangedQe(ChatServer.ChatInfo data) {
+        if (questionData.size() > 10) {
+            questionData.remove(0);
+        }
+        questionData.add(data);
+        questionAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataChangedChat(int type, List<MessageChatData> list) {
+        chatInfoList.addAll(list);
+        chatAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void notifyDataChangedQe(int type, List<ChatServer.ChatInfo> list) {
+        if (questionData.size() > 10) {
+            questionData.remove(0);
+        }
+        questionData.addAll(list);
+        questionAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showToast(String content) {
+        if (this.isAdded()) {
+            Toast.makeText(getActivity(), content, Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void notifyDataChanged(int type, List<ChatServer.ChatInfo> list) {
-        chatData.addAll(list);
-        if (type == CHAT_EVENT_CHAT) {
-            chatAdapter.notifyDataSetChanged();
-        } else
-            questionAdapter.notifyDataSetChanged();
-    }
-
-
-    @Override
-    public void showToast(String content) {
-        if (this.isAdded())
-            Toast.makeText(getActivity(), content, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     public void clearChatData() {
-        if (chatData != null) {
-            chatData.clear();
+        if (questionData != null) {
+            questionData.clear();
+        }
+        if (chatInfoList != null) {
+            chatInfoList.clear();
         }
     }
 
@@ -172,6 +199,8 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
             case VhallUtil.WATCH_PLAYBACK://回放界面只能发评论(发评论必须保证登陆)
                 mPresenter.sendChat(content);
                 break;
+            default:
+                break;
         }
     }
 
@@ -180,7 +209,9 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
         super.onActivityResult(requestCode, resultCode, data);
         if (RequestLogin == requestCode) {
             if (resultCode == getActivity().RESULT_OK) {
-                mPresenter.onLoginReturn();
+                if (mPresenter != null) {
+                    mPresenter.onLoginReturn();
+                }
             }
         }
     }
@@ -194,7 +225,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
 
         @Override
         public int getItemViewType(int position) {
-            if ("survey".equals(chatData.get(position).event)) {
+            if ("survey".equals(chatInfoList.get(position).event)) {
                 return CHAT_SURVEY;
             } else {
                 return CHAT_NORMAL;
@@ -208,12 +239,12 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
 
         @Override
         public int getCount() {
-            return chatData.size();
+            return chatInfoList.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return chatData.get(position);
+            return chatInfoList.get(position);
         }
 
         @Override
@@ -225,7 +256,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
         public View getView(final int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
             ChatSurveyHolder surveyHolder;
-            final ChatServer.ChatInfo data = chatData.get(position);
+            final MessageChatData data = chatInfoList.get(position);
             switch (getItemViewType(position)) {
                 case CHAT_NORMAL:
                     if (convertView == null) {
@@ -239,28 +270,43 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                     } else {
                         viewHolder = (ViewHolder) convertView.getTag();
                     }
-                    Glide.with(getActivity()).load(data.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_chat_avatar);
+
+                    String avatar = data.getAvatar();
+                    if (!TextUtils.isEmpty(avatar) && !avatar.startsWith("http")) {
+                        avatar = String.format("http:%s", avatar);
+                    }
+                    Glide.with(getActivity()).load(avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_chat_avatar);
                     switch (data.event) {
-                        case ChatServer.eventMsgKey:
+                        case MessageChatData.eventMsgKey:
+                            if (data.getType().equals("image")) {
+                                if (!TextUtils.isEmpty(data.getImage_url())) {
+                                    viewHolder.tv_chat_content.setText(String.format("收到图片---%s", data.getImage_url()));
+                                } else if (data.getImage_urls() != null) {
+                                    viewHolder.tv_chat_content.setText(String.format("收到%d张图片", data.getImage_urls().size()));
+                                }
+                            } else {
+                                viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.getText_content()), TextView.BufferType.SPANNABLE);
+                            }
                             viewHolder.tv_chat_content.setVisibility(View.VISIBLE);
-                            viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.msgData.text), TextView.BufferType.SPANNABLE);
-                            viewHolder.tv_chat_name.setText(data.user_name);
+                            viewHolder.tv_chat_name.setText(data.getNickname());
                             break;
-                        case ChatServer.eventCustomKey:
+                        case MessageChatData.eventCustomKey:
                             viewHolder.tv_chat_content.setVisibility(View.VISIBLE);
-                            viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.msgData.text), TextView.BufferType.SPANNABLE);
-                            viewHolder.tv_chat_name.setText(data.user_name);
+                            viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.getText_content()), TextView.BufferType.SPANNABLE);
+                            viewHolder.tv_chat_name.setText(data.getNickname());
                             break;
-                        case ChatServer.eventOnlineKey:
-                            viewHolder.tv_chat_name.setText(data.user_name + "上线了！");
+                        case MessageChatData.eventOnlineKey:
+                            viewHolder.tv_chat_name.setText(String.format("%s上线了！", data.getNickname()));
                             viewHolder.tv_chat_content.setVisibility(View.INVISIBLE);
                             break;
-                        case ChatServer.eventOfflineKey:
-                            viewHolder.tv_chat_name.setText(data.user_name + "下线了！");
+                        case MessageChatData.eventOfflineKey:
+                            viewHolder.tv_chat_name.setText(String.format("%s下线了！", data.getNickname()));
                             viewHolder.tv_chat_content.setVisibility(View.INVISIBLE);
+                            break;
+                        default:
                             break;
                     }
-                    viewHolder.tv_chat_time.setText(data.time);
+                    viewHolder.tv_chat_time.setText(data.getTime());
                     break;
                 case CHAT_SURVEY:
                     if (convertView == null) {
@@ -274,9 +320,15 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                     surveyHolder.tv_join.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            mPresenter.showSurvey(data.id);
+                            if (TextUtils.isEmpty(data.getUrl())) {
+                                mPresenter.showSurvey(data.getId());
+                            } else {
+                                mPresenter.showSurvey(data.getUrl(), "");
+                            }
                         }
                     });
+                    break;
+                default:
                     break;
             }
             return convertView;
@@ -287,12 +339,12 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
 
         @Override
         public int getCount() {
-            return chatData.size();
+            return questionData.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return chatData.get(position);
+            return questionData.get(position);
         }
 
         @Override
@@ -320,7 +372,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
             } else {
                 viewHolder = (Holder) convertView.getTag();
             }
-            ChatServer.ChatInfo data = chatData.get(position);
+            ChatServer.ChatInfo data = questionData.get(position);
             ChatServer.ChatInfo.QuestionData questionData = data.questionData;
             if (questionData != null && !TextUtils.isEmpty(questionData.avatar)) {
                 Glide.with(getActivity()).load(questionData.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_question_avatar);
@@ -366,21 +418,6 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
         TextView tv_answer_content;
         TextView tv_answer_time;
         TextView tv_answer_name;
-    }
-
-    class TestRunnable implements Runnable {
-
-        @Override
-        public void run() {
-            while (flag) {
-                try {
-                    Thread.sleep(500);
-                    mPresenter.sendChat("lalala");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     @Override

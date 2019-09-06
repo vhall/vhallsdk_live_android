@@ -57,7 +57,9 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initView();
-        mPresenter.start();
+        if (mPresenter != null) {
+            mPresenter.start();
+        }
     }
 
     private void initView() {
@@ -89,9 +91,11 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
         if (status == 1) {
             mSwitchVideo.setImageDrawable(getResources().getDrawable(R.drawable.icon_video_open));
             mLocalViewLayer.setVisibility(View.GONE);
+            hasVideoOpen = false;
         } else {
             mSwitchVideo.setImageDrawable(getResources().getDrawable(R.drawable.icon_video_close));
             mLocalViewLayer.setVisibility(View.VISIBLE);
+            hasVideoOpen = true;
         }
     }
 
@@ -99,8 +103,10 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
     public void updateAudioFrame(int status) {
         if (status == 1) {
             mSwitchAudio.setImageDrawable(getResources().getDrawable(R.drawable.icon_audio_open));
+            hasAudioOpen=false;
         } else {
             mSwitchAudio.setImageDrawable(getResources().getDrawable(R.drawable.icon_audio_close));
+            hasAudioOpen=true;
         }
     }
 
@@ -125,6 +131,21 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
     }
 
     @Override
+    public void updateStream(Stream stream) {
+        if (stream == null) return;
+        int childCount = mContainar.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            VHRenderView view = (VHRenderView) mContainar.getChildAt(i);
+            Log.e("updateStream  id1   ", view.getStream().userId + "");
+            Log.e("updateStream   id2   ", stream.userId + "");
+            if (view.getStream().userId.equals(stream.userId)) {
+                view.setStream(stream);
+                break;
+            }
+        }
+    }
+
+    @Override
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.image_down_mic) {
@@ -133,18 +154,19 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
             mPresenter.onSwitchCamera();
         } else if (i == R.id.image_switch_video) {
             mPresenter.onSwitchVideo(hasVideoOpen);
-            hasVideoOpen = !hasVideoOpen;
+           // hasVideoOpen = !hasVideoOpen;
         } else if (i == R.id.image_switch_audio) {
             mPresenter.onSwitchAudio(hasAudioOpen);
-            hasAudioOpen = !hasAudioOpen;
+           // hasAudioOpen = !hasAudioOpen;
         }
     }
 
     @Override
     public void onDestroy() {
         Log.e("onDestroy", "onDestroy");
-        mPresenter.onDestory();
+        if (mPresenter != null) {
+            mPresenter.onDestory();
+        }
         super.onDestroy();
-
     }
 }

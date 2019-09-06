@@ -17,8 +17,6 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.vhall.business.widget.ContainerLayout;
-import com.vhall.player.vod.VodPlayerView;
 import com.vhall.uilibs.R;
 
 import java.util.List;
@@ -29,7 +27,7 @@ import java.util.List;
 public class WatchPlaybackFragment extends Fragment implements WatchContract.PlaybackView, View.OnClickListener {
     private final String TAG = WatchPlaybackFragment.class.getName();
     WatchContract.PlaybackPresenter mPresenter;
-    VodPlayerView rl_video_view;//视频区容器
+    SurfaceView surface_view;//视频区容器
     ImageView iv_play, btn_changescaletype;
     SeekBar seekbar;
     TextView tv_current_time, tv_end_time, tv_play_speed;
@@ -63,7 +61,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        rl_video_view = getView().findViewById(R.id.rl_video_view);
+        surface_view = getView().findViewById(R.id.surface_view);
         btn_changescaletype = getView().findViewById(R.id.btn_change_scale_type);
         iv_dlna_playback = getView().findViewById(R.id.iv_dlna_playback);
         rg_quality = getView().findViewById(R.id.rg_quality);
@@ -138,8 +136,8 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     }
 
     @Override
-    public VodPlayerView getVideoView() {
-        return rl_video_view;
+    public SurfaceView getVideoView() {
+        return surface_view;
     }
 
     @Override
@@ -154,6 +152,8 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             case 2://fill
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_y));
                 break;
+                default:
+                    break;
         }
     }
 
@@ -165,11 +165,6 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
                 button.setText(qualities.get(i));
                 rg_quality.addView(button);
             }
-//            rg_quality.setOnCheckedChangeListener((group, checkedId) -> {
-//                RadioButton rb = group.findViewById(checkedId);
-//                String text = rb.getText().toString();
-//                mPresenter.onSwitchPixel(text);
-//            });
 
             rg_quality.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                 @Override

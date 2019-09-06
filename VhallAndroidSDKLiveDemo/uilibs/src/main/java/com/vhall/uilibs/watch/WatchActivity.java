@@ -1,29 +1,33 @@
 package com.vhall.uilibs.watch;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
+import android.os.Looper;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
-
+import com.vhall.business.data.WebinarInfo;
+import com.vhall.business.data.source.WebinarInfoDataSource;
+import com.vhall.business.data.source.WebinarInfoRepository;
+import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
 import com.vhall.uilibs.interactive.InteractiveActivity;
 import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.Param;
@@ -31,15 +35,31 @@ import com.vhall.uilibs.R;
 
 import com.vhall.uilibs.util.CircleView;
 import com.vhall.uilibs.util.InvitedDialog;
+import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.ShowLotteryDialog;
 import com.vhall.uilibs.util.SignInDialog;
 import com.vhall.uilibs.util.SurveyPopu;
+import com.vhall.uilibs.util.SurveyPopuVss;
+import com.vhall.uilibs.util.SurveyView;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.ExtendTextView;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
+import com.vhall.uilibs.util.handler.WeakHandler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import vhall.com.vss.VssSdk;
+import vhall.com.vss.api.ApiConstant;
+import vhall.com.vss.module.room.VssRoomManger;
+import vhall.com.vss.module.rtc.VssRtcManger;
+
+import static com.vhall.business.VhallSDK.getUserId;
+import static com.vhall.uilibs.util.SurveyView.EVENT_JS_BACK;
+import static com.vhall.uilibs.util.SurveyView.EVENT_PAGE_LOADED;
 
 //TODO 投屏相关
 //import com.vhall.uilibs.util.DevicePopu;
@@ -69,6 +89,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     ExtendTextView tv_notice;
     private Param param;
     private int type;
+    private WatchContract.WatchView watchView;
 
     public WatchPlaybackFragment playbackFragment;
     public WatchLiveFragment liveFragment;
@@ -78,11 +99,14 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     InputView inputView;
     public int chatEvent = ChatFragment.CHAT_EVENT_CHAT;
+    private SurveyPopuVss popuVss;
     private SurveyPopu popu;
     private SignInDialog signInDialog;
     private ShowLotteryDialog lotteryDialog;
     private InvitedDialog invitedDialog;
     WatchContract.WatchPresenter mPresenter;
+    private Fragment docFragment;
+    private FragmentManager fragmentManager;
 
     private static final String TAG = "WatchActivity";
 
@@ -93,12 +117,13 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.watch_activity);
+        fragmentManager = getSupportFragmentManager();
         param = (Param) getIntent().getSerializableExtra("param");
         type = getIntent().getIntExtra("type", VhallUtil.WATCH_LIVE);
 //        liveFragment = (WatchLiveFragment) getSupportFragmentManager().findFragmentById(R.id.contentVideo);
 //        playbackFragment = (WatchPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.contentVideo);
+        docFragment = fragmentManager.findFragmentById(R.id.contentDoc);
         chatFragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.contentChat);
-        DocumentFragment docFragment = (DocumentFragment) getSupportFragmentManager().findFragmentById(R.id.contentDoc);
         DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentById(R.id.contentDetail);
         questionFragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.contentQuestion);
         initView();
@@ -106,11 +131,6 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             chatFragment = ChatFragment.newInstance(type, false);
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     chatFragment, R.id.contentChat);
-        }
-        if (docFragment == null) {
-            docFragment = DocumentFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    docFragment, R.id.contentDoc);
         }
 
         if (questionFragment == null && type == VhallUtil.WATCH_LIVE) {
@@ -125,19 +145,88 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     detailFragment, R.id.contentDetail);
         }
 
-        if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
-            liveFragment = WatchLiveFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    liveFragment, R.id.contentVideo);
-            new WatchLivePresenter(liveFragment, docFragment, chatFragment, questionFragment, this, param);
-        }
+        watchView = this;
+        initWatch(param, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+            @Override
+            public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
+                    liveFragment = WatchLiveFragment.newInstance();
+                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                            liveFragment, R.id.contentVideo);
+                    param.webinar_id = webinarInfo.webinar_id;
+                    if (!TextUtils.isEmpty(webinarInfo.vss_room_id) && !TextUtils.isEmpty(webinarInfo.vss_token)) {
+                        param.vssRoomId = webinarInfo.vss_room_id;
+                        param.vssToken = webinarInfo.vss_token;
+                        param.join_id = webinarInfo.join_id;
+                        if (docFragment == null) {
+                            docFragment = new DocumentFragmentVss();
+                            fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
+                        }
+                        if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
+                            param.noticeContent = webinarInfo.notice.content;
+                        }
+                        //VssSdk.getInstance().init(getApplicationContext(), ApiConstant.APP_ID, getUserId());
+                        new WatchLivePresenterVss(liveFragment, (WatchContract.DocumentViewVss) docFragment, chatFragment, questionFragment, watchView, param);
+                    } else {
+                        if (docFragment == null) {
+                            docFragment = new DocumentFragment();
+                            fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
+                        }
+                        new WatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param);
+                    }
+                }
+                if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
+                    playbackFragment = WatchPlaybackFragment.newInstance();
+                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                            playbackFragment, R.id.contentVideo);
+                    if (webinarInfo != null && !TextUtils.isEmpty(webinarInfo.vss_room_id) && !TextUtils.isEmpty(webinarInfo.vss_token)) {
+                        param.vssRoomId = webinarInfo.vss_room_id;
+                        param.vssToken = webinarInfo.vss_token;
+                        param.join_id = webinarInfo.join_id;
+                        param.webinar_id = webinarInfo.webinar_id;
+                        if (docFragment == null) {
+                            docFragment = new DocumentFragmentVss();
+                            fragmentManager.beginTransaction().replace(R.id.contentDoc, docFragment).commit();
+                        }
+                        if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
+                            param.noticeContent = webinarInfo.notice.content;
+                        }
+                        if (webinarInfo.filters != null && webinarInfo.filters.size() > 0) {
+                            param.filters.clear();
+                            param.filters.addAll(webinarInfo.filters);
+                        }
+                        //VssSdk.getInstance().init(getApplicationContext(), ApiConstant.APP_ID, getUserId());
+                        new WatchPlaybackPresenterVss(playbackFragment, (WatchContract.DocumentViewVss) docFragment, chatFragment, watchView, param);
+                    } else {
+                        if (docFragment == null) {
+                            docFragment = new DocumentFragment();
+                            fragmentManager.beginTransaction().replace(R.id.contentDoc, docFragment).commit();
+                        }
+                        new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param);
+                    }
+                }
+            }
 
-        if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
-            playbackFragment = WatchPlaybackFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    playbackFragment, R.id.contentVideo);
-            new WatchPlaybackPresenter(playbackFragment, docFragment, chatFragment, this, param);
-        }
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
+                    liveFragment = WatchLiveFragment.newInstance();
+                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                            liveFragment, R.id.contentVideo);
+                    docFragment = new DocumentFragment();
+                    fragmentManager.beginTransaction().replace(R.id.contentDoc, (Fragment) docFragment).commit();
+                    new WatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param);
+                }
+                if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
+                    playbackFragment = WatchPlaybackFragment.newInstance();
+                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                            playbackFragment, R.id.contentVideo);
+                    docFragment = new DocumentFragment();
+                    fragmentManager.beginTransaction().replace(R.id.contentDoc, (Fragment) docFragment).commit();
+                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param);
+                }
+            }
+        });
 
 
         //TODO 投屏相关
@@ -152,6 +241,17 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     }
 
+    public void initWatch(Param params, WebinarInfoDataSource.LoadWebinarInfoCallback callback) {
+        String customeId = Build.BOARD + Build.DEVICE + Build.SERIAL;
+        String customNickname = Build.BRAND + "手机用户";
+        String vhallId = getUserId();
+        if (TextUtils.isEmpty(vhallId) && (TextUtils.isEmpty(customNickname) || TextUtils.isEmpty(customeId))) {
+            callback.onError(-1, "error data");
+            return;
+        }
+        WebinarInfoRepository repository = WebinarInfoRepository.getInstance(WebinarInfoRemoteDataSource.getInstance());
+        repository.getWatchWebinarInfo(params.watchId, customNickname, customeId, params.key, vhallId, "", callback);
+    }
 
     private void initView() {
         inputView = new InputView(this, KeyBoardManager.getKeyboardHeight(this), KeyBoardManager.getKeyboardHeightLandspace(this));
@@ -196,7 +296,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             @Override
             public void onClick(View v) {
                 //点击上麦, 再次点击下麦
-                mPresenter.onRaiseHand();
+                if (mPresenter != null) {
+                    mPresenter.onRaiseHand();
+                }
             }
         });
 
@@ -251,6 +353,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         });
     }
 
+    @Override
     public void showChatView(boolean isShowEmoji, InputUser user, int contentLengthLimit) {
         if (contentLengthLimit > 0)
             inputView.setLimitNo(contentLengthLimit);
@@ -280,6 +383,37 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
+    public void showSurvey(String url, String title) {
+        if (popuVss == null) {
+            popuVss = new SurveyPopuVss(this);
+            popuVss.setListener(new SurveyView.EventListener() {
+                @Override
+                public void onEvent(int eventCode, final String eventMsg) {
+                    switch (eventCode) {
+                        case EVENT_PAGE_LOADED:
+                            //页面加载完成
+                            break;
+                        case EVENT_JS_BACK:
+                            //数据回调
+                            new WeakHandler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    popuVss.dismiss();
+                                   // mPresenter.submitSurvey(eventMsg);
+                                }
+                            });
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+        }
+        popuVss.loadView(url, title);
+        popuVss.showAtLocation(getWindow().getDecorView().findViewById(android.R.id.content), Gravity.NO_GRAVITY, 0, 0);
+    }
+
+    @Override
     public void showSurvey(Survey survey) {
         if (popu == null) {
             popu = new SurveyPopu(this);
@@ -296,8 +430,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     @Override
     public void dismissSurvey() {
-        if (popu != null)
+        if (popuVss != null) {
+            popuVss.dismiss();
+        }
+        if (popu != null) {
             popu.dismiss();
+        }
     }
 
     @Override
@@ -328,11 +466,11 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
-    public void showLottery(MessageServer.MsgInfo messageInfo) {
+    public void showLottery(MessageLotteryData lotteryData) {
         if (lotteryDialog == null) {
             lotteryDialog = new ShowLotteryDialog(this);
         }
-        lotteryDialog.setMessageInfo(messageInfo);
+        lotteryDialog.setMessageInfo(lotteryData);
         lotteryDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
         lotteryDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE |
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -344,7 +482,6 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         Intent intent = new Intent(this, InteractiveActivity.class);
         intent.putExtra("param", param);
         startActivity(intent);
-//        this.finish();
     }
 
     @Override
@@ -417,7 +554,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     @Override
     protected void onDestroy() {
+        VssRoomManger.leaveRoom();
         super.onDestroy();
+        VssRtcManger.leaveRoom();
 //        if (upnpService != null) {
 //            upnpService.getRegistry().removeListener(registryListener);
 //        }
@@ -574,4 +713,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 //            devicePopu.dismiss();
 //    }
 
+    public String[] permissions = new String[]{
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO
+    };
 }

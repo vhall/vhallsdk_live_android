@@ -3,13 +3,10 @@ package com.vhall.live;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
@@ -17,11 +14,17 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.vhall.business.VhallSDK;
+import com.vhall.business.data.WebinarInfo;
+import com.vhall.business.data.source.WebinarInfoDataSource;
+import com.vhall.business.data.source.WebinarInfoRepository;
+import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
 import com.vhall.uilibs.Param;
+import com.vhall.uilibs.broadcast.BroadcastActivity;
 import com.vhall.uilibs.util.CircleImageView;
 import com.vhall.uilibs.util.VhallUtil;
-import com.vhall.uilibs.broadcast.BroadcastActivity;
 import com.vhall.uilibs.watch.WatchActivity;
+
+import static com.vhall.business.VhallSDK.getUserId;
 
 /**
  * 主界面的Activity
@@ -96,18 +99,51 @@ public class MainActivity extends FragmentActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    public void initPush(Param params, WebinarInfoDataSource.LoadWebinarInfoCallback callback) {
+        String vhallId = getUserId();
+        WebinarInfoRepository repository = WebinarInfoRepository.getInstance(WebinarInfoRemoteDataSource.getInstance());
+        repository.getBroadcastWebinarInfo(params.broId, params.broToken, vhallId, callback);
+    }
+
     public void onBroadcastLandspace(View view) {
         Intent intent = new Intent(this, BroadcastActivity.class);
-        param.screenOri = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
-        intent.putExtra("param", param);
-        startActivity(intent);
+        initPush(param, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+            @Override
+            public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                param.vssToken = webinarInfo.vss_token;
+                param.vssRoomId = webinarInfo.vss_room_id;
+                param.join_id = webinarInfo.join_id;
+                param.webinar_id = webinarInfo.webinar_id;
+                param.screenOri = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+                intent.putExtra("param", param);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void onBroadcastPortrait(View view) {
         Intent intent = new Intent(this, BroadcastActivity.class);
-        param.screenOri = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-        intent.putExtra("param", param);
-        startActivity(intent);
+        initPush(param, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+            @Override
+            public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                param.vssToken = webinarInfo.vss_token;
+                param.vssRoomId = webinarInfo.vss_room_id;
+                param.webinar_id = webinarInfo.webinar_id;
+                param.screenOri = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+                intent.putExtra("param", param);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void onWatchLive(View view) {

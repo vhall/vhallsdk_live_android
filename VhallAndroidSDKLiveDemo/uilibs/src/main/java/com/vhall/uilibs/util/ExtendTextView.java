@@ -60,6 +60,8 @@ public class ExtendTextView extends TextView {
                     }
                 }
                 break;
+            default:
+                break;
         }
 
         return super.onTouchEvent(event);

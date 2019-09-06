@@ -2,10 +2,10 @@ apply plugin: 'com.android.library'
 //apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 26
+        minSdkVersion 21
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
@@ -15,18 +15,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-//
-//    repositories {
-//        flatDir {
-//            dirs 'libs'
-//        }
-//    }
+
+    lintOptions {
+        abortOnError false
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
 }
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar','*.aar'])
     implementation "com.android.support:appcompat-v7:${SUPPORT_VERSION}"
     api "com.github.bumptech.glide:glide:${GLIDE_VERSION}"
+    //SaaSSDK
     api("io.socket:socket.io-client:${SOCKET_IO_VERSION}") {
         exclude group: 'org.json', module: 'json'
     }
@@ -37,5 +40,16 @@ dependencies {
     implementation 'com.github.ctiao:ndkbitmap-armv7a:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-armv5:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-x86:0.6.4'
-
+    //VssSDK
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.alibaba:fastjson:1.2.47'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    implementation "io.reactivex.rxjava2:rxjava:2.2.6"
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'org.ligboy.retrofit2:converter-fastjson-android:2.1.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+}
+repositories {
+    mavenCentral()
 }

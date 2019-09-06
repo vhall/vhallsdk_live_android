@@ -4,26 +4,34 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.view.MotionEvent;
-import android.view.View;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.WindowManager;
+import android.widget.Toast;
 
-import com.vhall.push.VHLivePushConfig;
-import com.vhall.uilibs.util.ActivityUtils;
+import com.vhall.business.data.WebinarInfo;
+import com.vhall.business.data.source.WebinarInfoDataSource;
+import com.vhall.business.data.source.WebinarInfoRepository;
+import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.chat.ChatFragment;
+import com.vhall.uilibs.util.ActivityUtils;
+import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
 
+import vhall.com.vss.VssSdk;
+import vhall.com.vss.api.ApiConstant;
+
+import static com.vhall.business.VhallSDK.getUserId;
 
 
 /**
  * 发直播界面的Activity
  */
-public class BroadcastActivity extends FragmentActivity implements BroadcastContract.BraodcastView {
+public class BroadcastActivity extends FragmentActivity implements BroadcastContract.BroadcastView {
     InputView inputView;
     ChatFragment chatFragment;
 
@@ -32,8 +40,9 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        Param param = (Param) getIntent().getSerializableExtra("param");
+        final Param param = (Param) getIntent().getSerializableExtra("param");
         int screenOri = param.screenOri;
         if (screenOri == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -42,37 +51,32 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
         }
         setContentView(R.layout.broadcast_activity);
 
-        inputView = new InputView(this, KeyBoardManager.getKeyboardHeight(this), KeyBoardManager.getKeyboardHeightLandspace(this));
-        inputView.add2Window(this);
-        inputView.setClickCallback(new InputView.ClickCallback() {
-            @Override
-            public void onEmojiClick() {
+        if (inputView == null) {
+            inputView = new InputView(this, KeyBoardManager.getKeyboardHeight(this), KeyBoardManager.getKeyboardHeightLandspace(this));
+            inputView.add2Window(this);
+            inputView.setClickCallback(new InputView.ClickCallback() {
+                @Override
+                public void onEmojiClick() {
 
-            }
-        });
-        inputView.setOnSendClickListener(new InputView.SendMsgClickListener() {
-            @Override
-            public void onSendClick(String msg, InputUser user) {
-                if (chatFragment != null)
-                    chatFragment.performSend(msg, ChatFragment.CHAT_EVENT_CHAT);
-            }
-        });
-        inputView.setOnHeightReceivedListener(new InputView.KeyboardHeightListener() {
-            @Override
-            public void onHeightReceived(int screenOri, int height) {
-                if (screenOri == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-                    KeyBoardManager.setKeyboardHeight(BroadcastActivity.this, height);
-                } else {
-                    KeyBoardManager.setKeyboardHeightLandspace(BroadcastActivity.this, height);
                 }
-            }
-        });
-
-        BroadcastFragment mainFragment = (BroadcastFragment) getSupportFragmentManager().findFragmentById(R.id.broadcastFrame);
-        if (mainFragment == null) {
-            mainFragment = BroadcastFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    mainFragment, R.id.broadcastFrame);
+            });
+            inputView.setOnSendClickListener(new InputView.SendMsgClickListener() {
+                @Override
+                public void onSendClick(String msg, InputUser user) {
+                    if (chatFragment != null)
+                        chatFragment.performSend(msg, ChatFragment.CHAT_EVENT_CHAT);
+                }
+            });
+            inputView.setOnHeightReceivedListener(new InputView.KeyboardHeightListener() {
+                @Override
+                public void onHeightReceived(int screenOri, int height) {
+                    if (screenOri == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                        KeyBoardManager.setKeyboardHeight(BroadcastActivity.this, height);
+                    } else {
+                        KeyBoardManager.setKeyboardHeightLandspace(BroadcastActivity.this, height);
+                    }
+                }
+            });
         }
         chatFragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.chatFrame);
         if (chatFragment == null) {
@@ -80,13 +84,19 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     chatFragment, R.id.chatFrame);
         }
-
-        new BroadcastPresenter(param, this, mainFragment, chatFragment);
-
+        BroadcastFragment mainFragment = (BroadcastFragment) getSupportFragmentManager().findFragmentById(R.id.broadcastFrame);
+        if (mainFragment == null) {
+            mainFragment = BroadcastFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    mainFragment, R.id.broadcastFrame);
+        }
+        if (TextUtils.isEmpty(param.vssToken)) {
+            new BroadcastPresenter(param, this, mainFragment, chatFragment);
+        } else {
+            new BroadcastPresenterVss(param, this, mainFragment, chatFragment);
+        }
+        Log.e("onCreate", "onCreate");
     }
-
-
-
 
 
     @Override
@@ -105,6 +115,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         inputView.dismiss();
+        Log.e("onConfigurationChanged", "onCreate");
     }
 
     @Override
@@ -120,4 +131,5 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
         }
         super.onUserLeaveHint();
     }
+
 }

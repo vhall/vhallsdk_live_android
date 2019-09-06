@@ -273,6 +273,9 @@ public class EmojiUtils {
     }
 
     public static Spannable getEmojiText(Context context, CharSequence text) {
+        if (TextUtils.isEmpty(text)) {
+            return null;
+        }
         Spannable spannable = spannableFactory.newSpannable(text);
         addEmoji(context, spannable);
         return spannable;

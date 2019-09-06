@@ -2,19 +2,17 @@ package com.vhall.uilibs.watch;
 
 import android.app.Activity;
 import android.view.SurfaceView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
-import com.vhall.business.widget.ContainerLayout;
-
-import com.vhall.player.vod.VodPlayerView;
+import com.vhall.document.DocumentView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
+import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.emoji.InputUser;
 
-//import org.fourthline.cling.android.AndroidUpnpService;
-//import com.vhall.business_support.dlna.DeviceDisplay;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,6 +39,8 @@ public class WatchContract {
         void dismissSignIn();
 
         //显示问卷
+        void showSurvey(String url, String title);
+
         void showSurvey(Survey survey);
 
         //隐藏问卷
@@ -58,7 +58,7 @@ public class WatchContract {
         Activity getActivity();
 
         //显示抽奖
-        void showLottery(final MessageServer.MsgInfo messageInfo);
+        void showLottery(MessageLotteryData data);
 
         void enterInteractive(); // 进入互动
         // 投屏使用
@@ -84,6 +84,13 @@ public class WatchContract {
         void paintPPT(String key, List<MessageServer.MsgInfo> msgInfos);
 
         void showType(int type);
+
+    }
+
+    interface DocumentViewVss extends BaseView<BasePresenter> {
+        void refreshView(com.vhall.document.DocumentView view);
+
+        void switchType(String type);
     }
 
     interface DetailView extends BaseView<BasePresenter> {
@@ -91,7 +98,7 @@ public class WatchContract {
 
     interface LiveView extends BaseView<LivePresenter> {
 
-        ContainerLayout getWatchLayout();
+        RelativeLayout getWatchLayout();
 
         void setPlayPicture(boolean state);
 
@@ -122,7 +129,7 @@ public class WatchContract {
 
         void showProgressbar(boolean show);
 
-        VodPlayerView getVideoView();
+        SurfaceView getVideoView();
 
         void setScaleTypeText(int type);
 
@@ -198,7 +205,9 @@ public class WatchContract {
 
         void signIn(String signId);
 
-        void submitSurvey(Survey survey, String result);
+        void submitSurvey(String result);
+
+        void submitSurvey(Survey survey,String result);
 
         void onRaiseHand(); // 举手
 

@@ -14,10 +14,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.handler.WeakHandler;
+
+import java.util.List;
+import java.util.Objects;
+
+import vhall.com.vss.CallBack;
+import vhall.com.vss.module.lottery.VssLotteryManger;
+import vhall.com.vss.module.room.VssRoomManger;
 
 /**
  * Created by qing on 2017/4/6.
@@ -31,8 +38,8 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
     private Context mContext;
     private Button mBtnSkip, mBtnSubmit;
     private EditText submitNickname, submitPhone;
-    MessageServer.MsgInfo messageInfo;
-    MessageServer.Lottery lottery = null;
+    MessageLotteryData lotteryData;
+    MessageLotteryData.LotteryWinnersBean lottery;
 
     public ShowLotteryDialog(Context context) {
         super(context);
@@ -46,37 +53,38 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
         initView();
     }
 
-    public void setMessageInfo(MessageServer.MsgInfo messageInfo) {
-        this.messageInfo = messageInfo;
+    public void setMessageInfo(MessageLotteryData lotteryData) {
+        this.lotteryData = lotteryData;
         initData();
     }
 
-    private Handler handler = new Handler() {
+    private WeakHandler handler = new WeakHandler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(Message msg) {
             switch (msg.what) {
-                case MessageServer.EVENT_START_LOTTERY:
+                case MessageLotteryData.EVENT_START_LOTTERY:
                     mTextStatusStart.setVisibility(View.VISIBLE);
                     mLayoutStatusShow.setVisibility(View.GONE);
                     mLayoutStatusSubmit.setVisibility(View.GONE);
                     mTextTitleStr.setText(R.string.vhall_lottery_title_start);
                     break;
-                case MessageServer.EVENT_END_LOTTERY:
+                case MessageLotteryData.EVENT_END_LOTTERY:
                     mNameView.removeAllViews();  //清除原有的数据
                     lottery = null;
                     mTextStatusStart.setVisibility(View.GONE);
                     mLayoutStatusSubmit.setVisibility(View.GONE);
                     mLayoutStatusShow.setVisibility(View.VISIBLE);
                     mTextTitleStr.setText(R.string.vhall_lottery_title_show);
-                    if (messageInfo != null && messageInfo.lotteries != null && messageInfo.lotteries.size() > 0) {
-                        for (int i = 0; i < messageInfo.lotteries.size(); i++) {
-                            if (messageInfo.lotteries.get(i).isSelf) {
-                                lottery = messageInfo.lotteries.get(i);
+                    if (lotteryData != null && lotteryData.getLottery_winners() != null && lotteryData.getLottery_winners().size() > 0) {
+                        List<MessageLotteryData.LotteryWinnersBean> lottery_winners = lotteryData.getLottery_winners();
+                        for (int i = 0; i < lottery_winners.size(); i++) {
+                            if (lottery_winners.get(i).isSelf) {
+                                lottery = lottery_winners.get(i);
                             }
                             View view = View.inflate(mContext, R.layout.item_common_list, null);
                             TextView mName = (TextView) view.findViewById(R.id.tv_common_name);
                             CircleImageView mCirlceAvatar = (CircleImageView) view.findViewById(R.id.circle_common_avatar);
-                            mName.setText(messageInfo.lotteries.get(i).nick_name);
+                            mName.setText(lottery_winners.get(i).getLottery_user_nickname());
                             mNameView.addView(view);
                         }
                         if (lottery != null) {
@@ -88,11 +96,12 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
                         }
                     }
                     break;
+                default:
+                    break;
             }
-            super.handleMessage(msg);
+            return false;
         }
-    };
-
+    }) ;
     private void initView() {
         if (mContext != null) {
             //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -116,7 +125,7 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
     }
 
     private void initData() {
-        handler.sendEmptyMessage(this.messageInfo.event);
+        handler.sendEmptyMessage(this.lotteryData.event);
     }
 
     @Override
@@ -150,25 +159,44 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
         } else if (i == R.id.btn_lottery_submit) {
             String submitNicknameStr = submitNickname.getText().toString();
             String submitPhoneStr = submitPhone.getText().toString();
+            if (TextUtils.isEmpty(submitNicknameStr)||TextUtils.isEmpty(submitPhoneStr)){
+                Toast.makeText(mContext, "信息不能为空", Toast.LENGTH_SHORT).show();
+                return;
+            }
             submit(submitNicknameStr, submitPhoneStr);
         }
     }
 
     public void submit(String nickname, String phone) {
-        if (!TextUtils.isEmpty(lottery.id) && !TextUtils.isEmpty(lottery.lottery_id)) {
-            VhallSDK.submitLotteryInfo(lottery.id, lottery.lottery_id, nickname, phone, new RequestCallback() {
-                @Override
-                public void onSuccess() {
-                    dismiss();
-                    Toast.makeText(mContext, "信息提交成功", Toast.LENGTH_SHORT).show();
-                }
+        if (!TextUtils.isEmpty(lottery.getId()) && !TextUtils.isEmpty(lottery.getLottery_id())) {
+            if (VssRoomManger.enter) {
+                Objects.requireNonNull(VssLotteryManger.getInstance()).lotteryAward(lottery.getLottery_id(), nickname, phone, "", new CallBack() {
+                    @Override
+                    public void onSuccess(Object result) {
+                        dismiss();
+                        Toast.makeText(mContext, "信息提交成功", Toast.LENGTH_SHORT).show();
+                    }
 
-                @Override
-                public void onError(int errorCode, String reason) {
-                    Toast.makeText(mContext, "信息提交失败", Toast.LENGTH_SHORT).show();
-                }
-            });
+                    @Override
+                    public void onError(int eventCode, String msg) {
+                        Toast.makeText(mContext, "信息提交失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                VhallSDK.submitLotteryInfo(lottery.getId(), lottery.getLottery_id(), nickname, phone, new RequestCallback() {
+                    @Override
+                    public void onSuccess() {
+                        dismiss();
+                        Toast.makeText(mContext, "信息提交成功", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(int errorCode, String reason) {
+                        Toast.makeText(mContext, "信息提交失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
         }
-    }
 
+    }
 }

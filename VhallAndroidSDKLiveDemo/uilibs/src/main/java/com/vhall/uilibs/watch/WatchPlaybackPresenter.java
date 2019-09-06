@@ -15,27 +15,21 @@ import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.WatchPlayback;
 import com.vhall.business.data.RequestCallback;
-import com.vhall.business.data.WebinarInfo;
-
 import com.vhall.business.data.Survey;
-
+import com.vhall.business.data.WebinarInfo;
 import com.vhall.player.Constants;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.ChatFragment;
+import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 
-//TODO  投屏相关
-//import com.vhall.business_support.Watch_Support;
-//import com.vhall.business_support.dlna.DeviceDisplay;
-//import com.vhall.business_support.WatchLive;
-//import com.vhall.business_support.WatchPlayback;
-//import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
@@ -43,8 +37,15 @@ import java.util.TimerTask;
 
 import static com.vhall.business.MessageServer.EVENT_SHOWBOARD;
 import static com.vhall.business.MessageServer.EVENT_SHOWDOC;
-import static com.vhall.business.WatchPlayback.BOARD_KEY;
 import static com.vhall.business.WatchPlayback.SHOW_DOC_KEY;
+
+//TODO  投屏相关
+//import com.vhall.business_support.Watch_Support;
+//import com.vhall.business_support.dlna.DeviceDisplay;
+//import com.vhall.business_support.WatchLive;
+//import com.vhall.business_support.WatchPlayback;
+//import org.fourthline.cling.android.AndroidUpnpService;
+
 /**
  * 观看回放的Presenter
  */
@@ -112,7 +113,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         playbackView.setScaleTypeText(scaleType);
         initWatch();
     }
-
     private void initCommentData(int pos) {
         if (loadingComment)
             return;
@@ -122,7 +122,11 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
                 chatView.clearChatData();
                 loadingComment = false;
-                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, list);
+                List<MessageChatData> list1=new ArrayList<>();
+                for (ChatServer.ChatInfo chatInfo : list) {
+                    list1.add(MessageChatData.getChatData(chatInfo));
+                }
+                chatView.notifyDataChangedChat(ChatFragment.CHAT_EVENT_CHAT, list1);
             }
 
             @Override
@@ -175,6 +179,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             return;
         playbackView.setPlayIcon(false);
         getWatchPlayback().start();
+
     }
 
     @Override
@@ -263,8 +268,8 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         if (watchPlayback == null) {
             WatchPlayback.Builder builder = new WatchPlayback.Builder()
                     .context(watchView.getActivity())
-                    .vodPlayView(playbackView.getVideoView())
-//                    .surfaceView(playbackView.getVideoView())
+                    //.vodPlayView(playbackView.getVideoView())
+                    .surfaceView(playbackView.getVideoView())
                     .callback(new WatchCallback())
                     .docCallback(new DocCallback());
             watchPlayback = builder.build();
@@ -277,6 +282,11 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     }
 
+
+    @Override
+    public void submitSurvey(String result) {
+
+    }
 
     @Override
     public void submitSurvey(Survey survey, String result) {
@@ -487,9 +497,8 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     @Override
-    public void onFreshData() {
-        pos = pos + limit;
-        initCommentData(pos);
+    public void showSurvey(String url,String title) {
+
     }
 
     @Override
