@@ -2,6 +2,7 @@ package com.vhall.uilibs.watch;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import java.util.List;
 public class DocumentFragment extends Fragment implements WatchContract.DocumentView {
     private PPTView iv_doc;
     private WhiteBoardView board;
+    private int showType = 0;
     private String url = "";
 
     public static DocumentFragment newInstance() {
@@ -45,8 +47,13 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
         board = (WhiteBoardView) getView().findViewById(R.id.board);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        showType(showType);
+    }
 
-//    @Override
+    //    @Override
 //    public void showDoc(String docUrl) {
 //        if (!url.equals(docUrl))
 //            Glide.with(this).load(docUrl).into(iv_doc);
@@ -54,27 +61,39 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
 
     @Override
     public void paintBoard(MessageServer.MsgInfo msgInfo) {
-        board.setStep(msgInfo);
+        if (board != null) {
+            board.setStep(msgInfo);
+        }
     }
 
     @Override
     public void paintBoard(String key, List<MessageServer.MsgInfo> msgInfos) {
-        board.setSteps(key, msgInfos);
+        if (board != null) {
+            board.setSteps(key, msgInfos);
+        }
     }
 
     @Override
     public void paintPPT(MessageServer.MsgInfo msgInfo) {
-        iv_doc.setStep(msgInfo);
+        if (board != null) {
+            iv_doc.setStep(msgInfo);
+        }
     }
 
     @Override
     public void paintPPT(String key, List<MessageServer.MsgInfo> msgInfos) {
-        iv_doc.setSteps(key, msgInfos);
+        if (iv_doc != null) {
+            iv_doc.setSteps(key, msgInfos);
+        }
     }
 
 
     @Override
     public void showType(int type) {
+        if (iv_doc == null) {
+            showType = type;
+            return;
+        }
         switch (type) {
             case 0://文档
                 iv_doc.setVisibility(View.VISIBLE);
@@ -90,6 +109,8 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
                 iv_doc.setVisibility(View.GONE);
                 board.setVisibility(View.GONE);
                 board.setShowDoc(false);
+                break;
+            default:
                 break;
         }
     }

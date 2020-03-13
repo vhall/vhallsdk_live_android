@@ -14,8 +14,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vhall.push.VHLivePushFormat;
 import com.vhall.push.VHVideoCaptureView;
-import com.vhall.push.renderer.filter.VHBeautyFilter;
 import com.vhall.uilibs.R;
 
 /**
@@ -27,6 +27,7 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     private VHVideoCaptureView cameraview;
     private TextView mSpeed;
     private Button mPublish, mChangeCamera, mChangeFlash, mChangeAudio, mChangeFilter, mBackBtn;
+    private TextView tvMode;
     private SeekBar seekBar;
 
     private Activity mActivity;
@@ -58,6 +59,7 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         cameraview = (VHVideoCaptureView) getView().findViewById(R.id.cameraview);
+        cameraview.setCameraDrawMode(VHLivePushFormat.DRAW_MODE_ASPECTFILL);
         mSpeed = (TextView) getView().findViewById(R.id.tv_upload_speed);
         mPublish = (Button) getView().findViewById(R.id.btn_publish);
         mPublish.setOnClickListener(this);
@@ -71,8 +73,9 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         mChangeFilter.setOnClickListener(this);
         mBackBtn = (Button) getView().findViewById(R.id.btn_back);
         mBackBtn.setOnClickListener(this);
+        tvMode = getView().findViewById(R.id.tv_mode);
+        tvMode.setOnClickListener(this);
         mPresenter.start();
-
         seekBar = (SeekBar) getView().findViewById(R.id.seekbar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -108,6 +111,8 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
             mPresenter.changeFlash();
         } else if (i == R.id.btn_changeFilter) {
             showPopupWindow();
+        } else if (i == R.id.tv_mode) {
+            mPresenter.changeMode();
         } else if (i == R.id.btn_back) {
             getActivity().finish();
         } else {
@@ -165,6 +170,11 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     }
 
     @Override
+    public void setModeText(String mode) {
+        tvMode.setText(mode);
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         mPresenter.stopBroadcast();
@@ -189,7 +199,6 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     }
 
 
-    VHBeautyFilter beautyFilter = null;
 
     private void showPopupWindow() {
         if (mPopupWindow == null) {
@@ -200,11 +209,9 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
                 @Override
                 public void onCheckedChanged(RadioGroup group, int checkedId) {
                     if (checkedId == R.id.radio_0) {
-                        cameraview.setFilter(null);
+                        cameraview.setFilterEnable(false);
                     } else {
-                        if (beautyFilter == null)
-                            beautyFilter = new VHBeautyFilter();
-                        cameraview.setFilter(beautyFilter);
+                        cameraview.setFilterEnable(true);
                         int level = 1;
                         if (checkedId == R.id.radio_1) {
                             level = 1;
@@ -218,7 +225,7 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
 //                            cameraview.setFilterAdjuster(100);
                             level = 5;
                         }
-                        beautyFilter.setBeautyLevel(level);
+                        cameraview.setBeautyLevel(level);
                     }
                 }
             });

@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.vhall.business.VhallSDK;
-import com.vhall.uilibs.util.handler.WeakHandler;
 
 /**
  * 程序启动页的Activity
@@ -17,7 +16,7 @@ public class SplashActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_activity);
-        new WeakHandler(new Handler.Callback() {
+        new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
                 Intent intent;

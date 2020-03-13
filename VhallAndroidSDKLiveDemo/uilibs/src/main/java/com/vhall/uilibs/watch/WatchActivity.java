@@ -9,7 +9,6 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -21,13 +20,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vhall.business.VhallSDK;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.WebinarInfoDataSource;
-import com.vhall.business.data.source.WebinarInfoRepository;
-import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
 import com.vhall.uilibs.interactive.InteractiveActivity;
 import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.Param;
@@ -49,15 +48,9 @@ import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
 import com.vhall.uilibs.util.handler.WeakHandler;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import vhall.com.vss.VssSdk;
-import vhall.com.vss.api.ApiConstant;
 import vhall.com.vss.module.room.VssRoomManger;
 import vhall.com.vss.module.rtc.VssRtcManger;
 
-import static com.vhall.business.VhallSDK.getUserId;
 import static com.vhall.uilibs.util.SurveyView.EVENT_JS_BACK;
 import static com.vhall.uilibs.util.SurveyView.EVENT_PAGE_LOADED;
 
@@ -87,6 +80,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     private LinearLayout ll_detail;
     private CircleView mHand;
     ExtendTextView tv_notice;
+    private TextView tvOnlineNum;
     private Param param;
     private int type;
     private WatchContract.WatchView watchView;
@@ -146,88 +140,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         }
 
         watchView = this;
-        initWatch(param, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
-            @Override
-            public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
-                if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
-                    liveFragment = WatchLiveFragment.newInstance();
-                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                            liveFragment, R.id.contentVideo);
-                    param.webinar_id = webinarInfo.webinar_id;
-                    if (!TextUtils.isEmpty(webinarInfo.vss_room_id) && !TextUtils.isEmpty(webinarInfo.vss_token)) {
-                        param.vssRoomId = webinarInfo.vss_room_id;
-                        param.vssToken = webinarInfo.vss_token;
-                        param.join_id = webinarInfo.join_id;
-                        if (docFragment == null) {
-                            docFragment = new DocumentFragmentVss();
-                            fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
-                        }
-                        if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
-                            param.noticeContent = webinarInfo.notice.content;
-                        }
-                        //VssSdk.getInstance().init(getApplicationContext(), ApiConstant.APP_ID, getUserId());
-                        new WatchLivePresenterVss(liveFragment, (WatchContract.DocumentViewVss) docFragment, chatFragment, questionFragment, watchView, param);
-                    } else {
-                        if (docFragment == null) {
-                            docFragment = new DocumentFragment();
-                            fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
-                        }
-                        new WatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param);
-                    }
-                }
-                if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
-                    playbackFragment = WatchPlaybackFragment.newInstance();
-                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                            playbackFragment, R.id.contentVideo);
-                    if (webinarInfo != null && !TextUtils.isEmpty(webinarInfo.vss_room_id) && !TextUtils.isEmpty(webinarInfo.vss_token)) {
-                        param.vssRoomId = webinarInfo.vss_room_id;
-                        param.vssToken = webinarInfo.vss_token;
-                        param.join_id = webinarInfo.join_id;
-                        param.webinar_id = webinarInfo.webinar_id;
-                        if (docFragment == null) {
-                            docFragment = new DocumentFragmentVss();
-                            fragmentManager.beginTransaction().replace(R.id.contentDoc, docFragment).commit();
-                        }
-                        if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
-                            param.noticeContent = webinarInfo.notice.content;
-                        }
-                        if (webinarInfo.filters != null && webinarInfo.filters.size() > 0) {
-                            param.filters.clear();
-                            param.filters.addAll(webinarInfo.filters);
-                        }
-                        //VssSdk.getInstance().init(getApplicationContext(), ApiConstant.APP_ID, getUserId());
-                        new WatchPlaybackPresenterVss(playbackFragment, (WatchContract.DocumentViewVss) docFragment, chatFragment, watchView, param);
-                    } else {
-                        if (docFragment == null) {
-                            docFragment = new DocumentFragment();
-                            fragmentManager.beginTransaction().replace(R.id.contentDoc, docFragment).commit();
-                        }
-                        new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param);
-                    }
-                }
-            }
 
-            @Override
-            public void onError(int errorCode, String errorMsg) {
-                if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
-                    liveFragment = WatchLiveFragment.newInstance();
-                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                            liveFragment, R.id.contentVideo);
-                    docFragment = new DocumentFragment();
-                    fragmentManager.beginTransaction().replace(R.id.contentDoc, (Fragment) docFragment).commit();
-                    new WatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param);
-                }
-                if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
-                    playbackFragment = WatchPlaybackFragment.newInstance();
-                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                            playbackFragment, R.id.contentVideo);
-                    docFragment = new DocumentFragment();
-                    fragmentManager.beginTransaction().replace(R.id.contentDoc, (Fragment) docFragment).commit();
-                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param);
-                }
-            }
-        });
-
+        initWatch(param);
 
         //TODO 投屏相关
 //        org.seamless.util.logging.LoggingUtil.resetRootHandler(
@@ -241,19 +155,95 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     }
 
-    public void initWatch(Param params, WebinarInfoDataSource.LoadWebinarInfoCallback callback) {
+
+    public void initWatch(Param params) {
         String customeId = Build.BOARD + Build.DEVICE + Build.SERIAL;
         String customNickname = Build.BRAND + "手机用户";
-        String vhallId = getUserId();
-        if (TextUtils.isEmpty(vhallId) && (TextUtils.isEmpty(customNickname) || TextUtils.isEmpty(customeId))) {
-            callback.onError(-1, "error data");
-            return;
+        int watchType;
+        if (type == VhallUtil.WATCH_LIVE) {
+            watchType = WebinarInfo.LIVE;
+        } else {
+            watchType = WebinarInfo.VIDEO;
         }
-        WebinarInfoRepository repository = WebinarInfoRepository.getInstance(WebinarInfoRemoteDataSource.getInstance());
-        repository.getWatchWebinarInfo(params.watchId, customNickname, customeId, params.key, vhallId, "", callback);
+        VhallSDK.initWatch(params.watchId, customeId, customNickname, params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+            @Override
+            public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                param.webinar_id = webinarInfo.webinar_id;
+                /**
+                 * 重要说明
+                 * 房间类型为H5是 webinarInfo 中vssToken，vssRoomId 有值，必需使用H5播放器播放，使用 PresenterVss
+                 * 房间类型为Flash时   vssToken，vssRoomId 空，必需使用Flash播放器播放 Presenter
+                 */
+                //敏感词过滤信息，发送聊天、评论通用
+                if (webinarInfo.filters != null && webinarInfo.filters.size() > 0) {
+                    param.filters.clear();
+                    param.filters.addAll(webinarInfo.filters);
+                }
+                if (!TextUtils.isEmpty(webinarInfo.vss_room_id) && !TextUtils.isEmpty(webinarInfo.vss_room_id)) {
+                    param.vssRoomId = webinarInfo.vss_room_id;
+                    param.vssToken = webinarInfo.vss_token;
+                    param.join_id = webinarInfo.join_id;
+                    if (docFragment == null) {
+                        docFragment = new DocumentFragmentVss();
+                        fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
+                    }
+                } else {
+                    if (docFragment == null) {
+                        docFragment = new DocumentFragment();
+                        fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
+                    }
+                }
+                if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
+                    //直播间，公告信息
+                    if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
+                        param.noticeContent = webinarInfo.notice.content;
+                    }
+                    liveFragment = WatchLiveFragment.newInstance();
+                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                            liveFragment, R.id.contentVideo);
+                    if (!TextUtils.isEmpty(webinarInfo.vss_room_id)) {
+                        new WatchLivePresenterVss(liveFragment, (WatchContract.DocumentViewVss) docFragment, chatFragment, questionFragment, watchView, param);
+                    } else {
+                        new WatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param, webinarInfo);
+                    }
+                } else if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
+                    playbackFragment = WatchPlaybackFragment.newInstance();
+                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                            playbackFragment, R.id.contentVideo);
+                    if (!TextUtils.isEmpty(webinarInfo.vss_room_id)) {
+                        new WatchPlaybackPresenterVss(playbackFragment, (WatchContract.DocumentViewVss) docFragment, chatFragment, watchView, param);
+                    } else {
+                        new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, webinarInfo);
+                    }
+                }
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                showToast(errorMsg);
+                if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
+                    liveFragment = WatchLiveFragment.newInstance();
+                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                            liveFragment, R.id.contentVideo);
+                    docFragment = new DocumentFragment();
+                    fragmentManager.beginTransaction().replace(R.id.contentDoc, (Fragment) docFragment).commit();
+                    new WatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param, null);
+                }
+                if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
+                    playbackFragment = WatchPlaybackFragment.newInstance();
+                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                            playbackFragment, R.id.contentVideo);
+                    docFragment = new DocumentFragment();
+                    fragmentManager.beginTransaction().replace(R.id.contentDoc, (Fragment) docFragment).commit();
+                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, null);
+                }
+            }
+        });
     }
 
     private void initView() {
+        tvOnlineNum = findViewById(R.id.tv_online_num);
+
         inputView = new InputView(this, KeyBoardManager.getKeyboardHeight(this), KeyBoardManager.getKeyboardHeightLandspace(this));
         inputView.add2Window(this);
         inputView.setClickCallback(new InputView.ClickCallback() {
@@ -355,8 +345,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     @Override
     public void showChatView(boolean isShowEmoji, InputUser user, int contentLengthLimit) {
-        if (contentLengthLimit > 0)
+        if (contentLengthLimit > 0) {
             inputView.setLimitNo(contentLengthLimit);
+        }
         inputView.show(isShowEmoji, user);
     }
 
@@ -378,8 +369,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     @Override
     public void dismissSignIn() {
-        if (signInDialog != null)
+        if (signInDialog != null) {
             signInDialog.dismiss();
+        }
     }
 
     @Override
@@ -399,7 +391,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                                 @Override
                                 public void run() {
                                     popuVss.dismiss();
-                                   // mPresenter.submitSurvey(eventMsg);
+                                    // mPresenter.submitSurvey(eventMsg);
                                 }
                             });
                             break;
@@ -512,14 +504,26 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                 }
             });
         }
+        invitedDialog.setRefuseInviteListener(new InvitedDialog.RefuseInviteListener() {
+            @Override
+            public void refuseInvite() {
+                mPresenter.replyInvite(2);
+            }
+        });
         invitedDialog.show();
+    }
+
+    @Override
+    public void setOnlineNum(int onlineNum) {
+        tvOnlineNum.setText("在线人数：" + onlineNum);
     }
 
 
     @Override
     public void showNotice(String content) {
-        if (TextUtils.isEmpty(content))
+        if (TextUtils.isEmpty(content)) {
             return;
+        }
         tv_notice.setText(content);
         tv_notice.setVisibility(View.VISIBLE);
     }
@@ -554,9 +558,11 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     @Override
     protected void onDestroy() {
-        VssRoomManger.leaveRoom();
         super.onDestroy();
         VssRtcManger.leaveRoom();
+        VssRoomManger.leaveRoom();
+
+
 //        if (upnpService != null) {
 //            upnpService.getRegistry().removeListener(registryListener);
 //        }

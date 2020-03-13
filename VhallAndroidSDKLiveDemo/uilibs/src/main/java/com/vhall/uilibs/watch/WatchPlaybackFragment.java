@@ -95,6 +95,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             }
         });
         mPresenter.start();
+
     }
 
     @Override
@@ -143,14 +144,14 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     @Override
     public void setScaleTypeText(int text) {
         switch (text) {
-            case 0://fitXy
-                btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_xy));
+            case 0://none
+                btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_default));
                 break;
             case 1://fit
                 btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_center));
                 break;
             case 2://fill
-                btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_y));
+                btn_changescaletype.setBackground(getResources().getDrawable(R.drawable.fit_xy));
                 break;
                 default:
                     break;
@@ -223,13 +224,14 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        surface_view.getLayoutParams().width=ViewGroup.LayoutParams.MATCH_PARENT;
+        surface_view.getLayoutParams().height=ViewGroup.LayoutParams.MATCH_PARENT;
     }
 
     @Override
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.image_action_back) {
-            mPresenter.onFragmentDestory();
             getActivity().finish();
         } else if (i == R.id.iv_play) {
             mPresenter.onPlayClick();

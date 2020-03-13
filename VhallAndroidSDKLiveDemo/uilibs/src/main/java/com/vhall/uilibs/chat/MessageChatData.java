@@ -23,7 +23,7 @@ public class MessageChatData implements Serializable {
     private String avatar;
     private String userId;
     private String time;
-    private String id;
+    private String id;//供问答时使用的 问答id，其他情况无效
     private String url;
     private boolean isMy;
     public String event = eventMsgKey;

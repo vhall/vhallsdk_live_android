@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.vhall.business.Broadcast;
+import com.vhall.business.MessageServer;
+import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.utils.LogManager;
 import com.vhall.ims.VHIM;
 import com.vhall.lss.push.VHLivePusher;
@@ -12,6 +14,7 @@ import com.vhall.player.Constants;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.push.VHAudioCapture;
 import com.vhall.push.VHLivePushConfig;
+import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.MessageChatData;
@@ -42,6 +45,8 @@ public class BroadcastPresenterVss implements BroadcastContract.Presenter, ChatC
     private VHLivePusher pusher;
     private String paasToken;
     private VHAudioCapture mAudioCapture;
+
+    private int mode = VHLivePushFormat.DRAW_MODE_ASPECTFILL;
 
     public BroadcastPresenterVss(Param params, BroadcastContract.BroadcastView mBraodcastView, final BroadcastContract.View mView, ChatContract.ChatView chatView) {
         this.param = params;
@@ -143,6 +148,24 @@ public class BroadcastPresenterVss implements BroadcastContract.Presenter, ChatC
         mView.setFlashBtnImage(isFlashOpen);
     }
 
+    @Override
+    public void changeMode() {
+        if (mView.getCameraView() == null) {
+            return;
+        }
+        if (mode == VHLivePushFormat.DRAW_MODE_ASPECTFILL) {
+            mode = VHLivePushFormat.DRAW_MODE_ASPECTFIT;
+            mView.setModeText("FIT");
+        } else if (mode == VHLivePushFormat.DRAW_MODE_ASPECTFIT) {
+            mode = VHLivePushFormat.DRAW_MODE_NONE;
+            mView.setModeText("NONE");
+        } else if (mode == VHLivePushFormat.DRAW_MODE_NONE) {
+            mode = VHLivePushFormat.DRAW_MODE_ASPECTFILL;
+            mView.setModeText("FILL");
+        }
+        mView.getCameraView().setCameraDrawMode(mode);
+    }
+
     /**
      * 切换摄像头
      *
@@ -192,7 +215,7 @@ public class BroadcastPresenterVss implements BroadcastContract.Presenter, ChatC
                 mView.showMsg("roomStartLive：" + msg);
             }
         });
-        if (pusher!=null){
+        if (pusher != null) {
             pusher.release();
         }
         VssRoomManger.leaveRoom();
@@ -311,6 +334,7 @@ public class BroadcastPresenterVss implements BroadcastContract.Presenter, ChatC
     public void sendQuestion(String content) {
 
     }
+
     @Override
     public void onLoginReturn() {
 

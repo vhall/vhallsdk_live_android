@@ -57,6 +57,18 @@
 
         </LinearLayout>
 
+
+        <TextView
+            android:id="@+id/tv_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:textColor="@color/white"
+            android:padding="5dp"
+            android:background="@color/alpha"
+            android:text="FILL"/>
+
+
         <Button
             android:id="@+id/btn_changeFlash"
             android:layout_width="30dp"

@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -65,12 +67,18 @@ public class DocumentFragmentVss extends Fragment implements WatchContract.Docum
 
     @Override
     public void refreshView(DocumentView view) {
+        /**
+         * 文档缩放功能不完善，暂不建议使用
+         * view.getSettings().setBuiltInZoomControls(true);
+         * view.getSettings().setSupportZoom(true);
+         */
         if (rlContainer != null) {
             rlContainer.removeAllViews();
             rlContainer.addView(view);
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            params.addRule(RelativeLayout.CENTER_IN_PARENT);
-            view.setLayoutParams(params);
+//            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(1280*5, ViewGroup.LayoutParams.MATCH_PARENT);
+//            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+//            params.addRule(RelativeLayout.CENTER_IN_PARENT);
+//            view.setLayoutParams(params);
         } else {
             tempView = view;
         }

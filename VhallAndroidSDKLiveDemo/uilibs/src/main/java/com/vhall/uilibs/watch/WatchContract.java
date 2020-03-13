@@ -71,6 +71,8 @@ public class WatchContract {
         //显示被邀请上麦
         void showInvited();
 
+        void setOnlineNum(int onlineNum);
+
     }
 
     interface DocumentView extends BaseView<BasePresenter> {

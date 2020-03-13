@@ -15,6 +15,7 @@ import com.vhall.vhallrtc.client.VHRenderView;
 
 import org.json.JSONException;
 import org.webrtc.RendererCommon;
+import org.webrtc.SurfaceViewRenderer;
 
 public class InteractivePresenter implements InteractiveContract.InteractiveFraPresenter {
     private InteractiveContract.InteractiveActView interActView;
@@ -112,7 +113,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
      */
     private void setLocalView() {
         vhRenderView = new VHRenderView(interActView.getContext());
-        vhRenderView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+        vhRenderView.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFit);
         vhRenderView.init(interactive.getEglBase().getEglBaseContext(), null);
         interactive.setLocalView(vhRenderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo, null);
         interFraView.addLocalView(vhRenderView);

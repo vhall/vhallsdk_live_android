@@ -40,6 +40,7 @@ public class LoginActivity extends Activity {
             @Override
             public void onSuccess(UserInfo userInfo) {
                 Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
+                VhallApplication.param.key=userpass;
                 skipMain();
             }
 

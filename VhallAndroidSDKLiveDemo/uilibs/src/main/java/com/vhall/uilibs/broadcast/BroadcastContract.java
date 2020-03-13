@@ -34,6 +34,7 @@ public class BroadcastContract {
         void showMsg(String msg);
 
         void setSpeedText(String text);
+        void setModeText(String mode);
     }
 
     interface Presenter extends BasePresenter {
@@ -48,6 +49,8 @@ public class BroadcastContract {
         void finishBroadcast();
 
         void changeFlash();
+
+        void changeMode();
 
         void changeCamera();
 

@@ -6,7 +6,8 @@
     <com.vhall.business.widget.PPTView
         android:id="@+id/iv_doc"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
 
     <com.vhall.business.widget.WhiteBoardView
         android:id="@+id/board"

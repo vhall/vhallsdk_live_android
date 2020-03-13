@@ -16,8 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:background="@drawable/filter_close_selector"
-            android:button="@null"
-            android:checked="true" />
+            android:button="@null"/>
 
         <RadioButton
             android:id="@+id/radio_1"
@@ -25,7 +24,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:background="@drawable/filter_one_selector"
-            android:button="@null" />
+            android:button="@null"
+            android:checked="true"/>
 
         <RadioButton
             android:id="@+id/radio_2"
@@ -53,14 +53,13 @@
 
         <RadioButton
             android:id="@+id/radio_5"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:background="@drawable/filter_five_selector"
             android:button="@null" />
 
-
     </RadioGroup>
-
 
 </LinearLayout>

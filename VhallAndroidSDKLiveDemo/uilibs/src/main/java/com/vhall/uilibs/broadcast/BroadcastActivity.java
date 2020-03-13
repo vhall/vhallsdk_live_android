@@ -7,12 +7,8 @@ import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.vhall.business.data.WebinarInfo;
-import com.vhall.business.data.source.WebinarInfoDataSource;
-import com.vhall.business.data.source.WebinarInfoRepository;
-import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatFragment;
@@ -21,12 +17,6 @@ import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
-
-import vhall.com.vss.VssSdk;
-import vhall.com.vss.api.ApiConstant;
-
-import static com.vhall.business.VhallSDK.getUserId;
-
 
 /**
  * 发直播界面的Activity
@@ -42,9 +32,9 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
 //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-        final Param param = (Param) getIntent().getSerializableExtra("param");
-        int screenOri = param.screenOri;
-        if (screenOri == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+        WebinarInfo webinarInfo = (WebinarInfo) getIntent().getSerializableExtra("webinarInfo");
+        Param param = (Param) getIntent().getSerializableExtra("param");
+        if (param.screenOri == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -90,8 +80,8 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     mainFragment, R.id.broadcastFrame);
         }
-        if (TextUtils.isEmpty(param.vssToken)) {
-            new BroadcastPresenter(param, this, mainFragment, chatFragment);
+        if (TextUtils.isEmpty(webinarInfo.vss_token)) {
+            new BroadcastPresenter(param, webinarInfo, this, mainFragment, chatFragment);
         } else {
             new BroadcastPresenterVss(param, this, mainFragment, chatFragment);
         }

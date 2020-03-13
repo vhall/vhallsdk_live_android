@@ -4,6 +4,8 @@ import android.graphics.PixelFormat;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.vhall.business.VhallSDK;
@@ -13,12 +15,14 @@ import com.vhall.business.data.source.WebinarInfoRepository;
 import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.util.handler.WeakHandler;
+import com.vhall.vhallrtc.client.Room;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.RendererCommon;
+import org.webrtc.SurfaceViewRenderer;
 
 import vhall.com.vss.data.MessageData;
 import vhall.com.vss.CallBack;
@@ -135,7 +139,7 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
      */
     private void setLocalView() {
         vhRenderView = new VHRenderView(interActView.getContext());
-        vhRenderView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+        vhRenderView.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFit);
         vhRenderView.init(null, null);
         localStream = VssRtcManger.getLocalStream();
         vhRenderView.setStream(localStream);
@@ -171,9 +175,9 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
                     onDownMic();
                     break;
                 case "room_kickout":
+                case "live_over":
                     onDownMic();
                     break;
-
                 default:
                     break;
             }
@@ -211,6 +215,11 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
 
     class MyVssLister implements IVssRtcLister {
 
+        /**
+         * 有流加入并订阅成功
+         *
+         * @param stream
+         */
         @Override
         public void addStream(final Stream stream) {
             if (stream == null) {
@@ -230,6 +239,11 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
             });
         }
 
+        /**
+         * 有流退出或去掉订阅某路流后回调
+         *
+         * @param stream
+         */
         @Override
         public void removeStream(final Stream stream) {
             if (stream == null) {
@@ -243,6 +257,11 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
             });
         }
 
+        /**
+         * 更新流状态，有流的音视频状态发生改变
+         *
+         * @param stream
+         */
         @Override
         public void updateStream(final Stream stream) {
             if (stream == null) {
@@ -257,18 +276,54 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
             });
         }
 
+        /**
+         * 互动房间重连
+         *
+         * @param i  总重连次数
+         * @param i1 当前重连次数
+         */
         @Override
-        public void messageChange(int status) {
-            Log.e(TAG, "S");
+        public void onReconnect(int i, int i1) {
+
         }
 
+        /**
+         * 房间连接状态变化
+         *
+         * @param room
+         * @param status
+         */
         @Override
-        public void onMessage(JSONObject jsonObject) {
+        public void roomStatusMessageChange(Room room, int status) {
 
         }
 
+        /**
+         * 房间内人数更新
+         *
+         * @param jsonObject
+         */
         @Override
         public void onRefreshMembers(JSONObject jsonObject) {
+
+        }
+
+        /**
+         * 房间内成员状态变化
+         */
+        @Override
+        public void onRefreshMemberState() {
+
+        }
+
+        /**
+         * 有流加入并重新开始混流操作
+         * 可用于作为开启旁路直播判定
+         *
+         * @param jsonObject
+         */
+        @Override
+        public void onStreamMixed(JSONObject jsonObject) {
 
         }
 

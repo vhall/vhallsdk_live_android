@@ -13,6 +13,7 @@ import com.vhall.business.ChatServer;
 import com.vhall.business.ErrorCode;
 import com.vhall.business.VhallCallback;
 import com.vhall.business.VhallSDK;
+import com.vhall.business.Watch;
 import com.vhall.business.common.Constants;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
@@ -176,7 +177,12 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
             if (event.equals(KEY_OPERATE)) {
                 if (type.equals(TYPE_ACTIVE)) {
                     documentView.refreshView(mDocument.getActiveView());
-                } else if (type.equals(TYPE_SWITCHOFF) || type.equals(TYPE_SWITCHON)) {
+                } else if (type.equals(TYPE_SWITCHOFF)) {
+                    //文档演示 开关
+                    watchView.showToast("主持人关闭文档");
+                    documentView.switchType(type);
+                } else if (type.equals(TYPE_SWITCHON)) {
+                    watchView.showToast("主持人打开文档");
                     //文档演示 开关
                     documentView.switchType(type);
                 }
@@ -276,10 +282,11 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
             watchView.showToast(R.string.vhall_login_first);
             return;
         }
-        if ("1".equals(canSpeak)) {
+        //自定义消息与禁言无关
+        /*if ("1".equals(canSpeak)) {
             watchView.showToast("你被禁言了");
             return;
-        }
+        }*/
         VssRoomManger.getInstance().sendMsg(text.toString(), VHIM.TYPE_CUSTOM, new CallBack<ResponseRoomInfo>() {
             @Override
             public void onSuccess(ResponseRoomInfo result) {
@@ -394,8 +401,9 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
 
     @Override
     public void onDestory() {
-        if (getPlayer() != null) {
-            getPlayer().release();
+        if (mPlayer != null) {
+            mPlayer.release();
+            mPlayer = null;
         }
         if (mDocument != null) {
             mDocument.leave();
@@ -540,7 +548,6 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
             VssRtcManger.getInstance(context).apply(new CallBack() {
                 @Override
                 public void onSuccess(Object result) {
-                    Log.e(TAG, "举手成功");
                     startDownTimer(durationSec);
                     isHand = true;
                 }
@@ -554,7 +561,6 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
             VssRtcManger.getInstance(context).cancelApply(new CallBack() {
                 @Override
                 public void onSuccess(Object result) {
-                    Log.e(TAG, "取消举手成功");
                     isHand = false;
                     watchView.refreshHand(0);
                     if (onHandDownTimer != null) {
@@ -645,7 +651,6 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                         HashMap<String, Integer> map = new HashMap<>();
                         for (int i = 0; i < array.length(); i++) {
                             String dpi = (String) array.opt(i);
-                            Log.e(TAG, "DPI=" + dpi);
                             map.put(dpi, 1);
                         }
                         liveView.showRadioButton(map);
@@ -666,7 +671,6 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
         public void onError(int errorCode, int innerCode, String msg) {
             switch (errorCode) {
                 case com.vhall.player.Constants.ErrorCode.ERROR_CONNECT:
-                    Log.e(TAG, "ERROR_CONNECT  ");
                     isWatching = false;
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
@@ -834,6 +838,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                     join.setNickname(joinObject.optString("name"));
                     join.setAvatar(joinObject.optString("avatar"));
                     chatView.notifyDataChangedChat(join);
+                    watchView.setOnlineNum(msg.getImMessageInfo().getPv());
                     break;
                 case "Leave":
                     JSONObject leaveObject = (JSONObject) msg.getT();
@@ -843,6 +848,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                     leave.setAvatar(leaveObject.optString("avatar"));
                     leave.event = MessageChatData.eventOfflineKey;
                     chatView.notifyDataChangedChat(leave);
+                    watchView.setOnlineNum(msg.getImMessageInfo().getPv());
                     break;
                 case "question_answer_open":
                     watchView.showToast("问答开始");
@@ -951,6 +957,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                     //聊天消息
                     VssMessageChatData messageChatData = (VssMessageChatData) msg.getT();
                     MessageChatData data = new MessageChatData();
+                    String textContent = "";
                     if (messageChatData != null) {
                         data.setType(messageChatData.getType());
                         data.setAvatar(messageChatData.getAvatar());
@@ -960,15 +967,24 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                         data.setTime(messageChatData.getTime());
                         data.event = messageChatData.event;
                         data.setRoom_id(messageChatData.getRoom_id());
-                        data.setText_content(messageChatData.getText_content());
                         data.setImage_urls(messageChatData.getImage_urls());
                         data.setImage_url(messageChatData.getImage_url());
+                        try {
+                            //处理回复消息
+                            JSONObject context = new JSONObject(msg.getImMessageInfo().getContext());
+                            JSONObject replyMsg = context.getJSONObject("replyMsg");
+                            if (replyMsg != null) {
+                                textContent = replyMsg.optString("nickName") + "：   "+replyMsg.optJSONObject("content").optString("text_content") + "\n" + "回复：";
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        data.setText_content(textContent + messageChatData.getText_content());
                         chatView.notifyDataChangedChat(data);
                         liveView.addDanmu(messageChatData.getText_content());
                     }
                     break;
                 case "questionnaire_push":
-                    Log.e(TAG, "onMessage: " + msg);
                     JSONObject obj = (JSONObject) msg.getT();
                     MessageChatData surveyData = new MessageChatData();
                     surveyData.event = MessageChatData.eventSurveyKey;

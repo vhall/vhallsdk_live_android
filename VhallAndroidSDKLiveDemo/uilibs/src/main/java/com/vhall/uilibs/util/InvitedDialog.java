@@ -24,6 +24,12 @@ public class InvitedDialog extends AlertDialog implements View.OnClickListener {
     private MyCount count;
     private int countTime = 30;
 
+    private RefuseInviteListener refuseInviteListener;
+
+    public void setRefuseInviteListener(RefuseInviteListener refuseInviteListener) {
+        this.refuseInviteListener = refuseInviteListener;
+    }
+
     public InvitedDialog(Context context) {
         super(context);
         mContext = context;
@@ -36,12 +42,21 @@ public class InvitedDialog extends AlertDialog implements View.OnClickListener {
         initView();
     }
 
+
     private void initView() {
         View rootView = LayoutInflater.from(mContext).inflate(R.layout.alert_dialog_show_invitedmic, null);
         imgClose = rootView.findViewById(R.id.image_invited_close);
         tvAgree = rootView.findViewById(R.id.tv_invited_agree);
         tvDisagree = rootView.findViewById(R.id.tv_invited_disagree);
-        imgClose.setOnClickListener(this);
+        imgClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+                if (refuseInviteListener!=null){
+                    refuseInviteListener.refuseInvite();
+                }
+            }
+        });
         setView(rootView);
         setCanceledOnTouchOutside(false);
 
@@ -104,6 +119,13 @@ public class InvitedDialog extends AlertDialog implements View.OnClickListener {
             if (isShowing()) {
                 dismiss();
             }
+            if (refuseInviteListener!=null){
+                refuseInviteListener.refuseInvite();
+            }
         }
     }
+
+   public interface RefuseInviteListener {
+        void refuseInvite();
+   }
 }

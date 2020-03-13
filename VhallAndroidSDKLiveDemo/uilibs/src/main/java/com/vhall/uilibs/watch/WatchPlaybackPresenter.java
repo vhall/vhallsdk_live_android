@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -52,6 +53,7 @@ import static com.vhall.business.WatchPlayback.SHOW_DOC_KEY;
 public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, ChatContract.ChatPresenter {
     private static final String TAG = "PlaybackPresenter";
     private Param param;
+    private WebinarInfo webinarInfo;
     WatchContract.PlaybackView playbackView;
     WatchContract.DocumentView documentView;
     WatchContract.WatchView watchView;
@@ -97,12 +99,13 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         }
     };
 
-    public WatchPlaybackPresenter(WatchContract.PlaybackView playbackView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, WatchContract.WatchView watchView, Param param) {
+    public WatchPlaybackPresenter(WatchContract.PlaybackView playbackView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, WatchContract.WatchView watchView, Param param, WebinarInfo webinarInfo) {
         this.playbackView = playbackView;
         this.documentView = documentView;
         this.watchView = watchView;
         this.chatView = chatView;
         this.param = param;
+        this.webinarInfo = webinarInfo;
         this.playbackView.setPresenter(this);
         this.chatView.setPresenter(this);
         this.watchView.setPresenter(this);
@@ -110,9 +113,9 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     @Override
     public void start() {
-        playbackView.setScaleTypeText(scaleType);
-        initWatch();
+
     }
+
     private void initCommentData(int pos) {
         if (loadingComment)
             return;
@@ -122,7 +125,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
                 chatView.clearChatData();
                 loadingComment = false;
-                List<MessageChatData> list1=new ArrayList<>();
+                List<MessageChatData> list1 = new ArrayList<>();
                 for (ChatServer.ChatInfo chatInfo : list) {
                     list1.add(MessageChatData.getChatData(chatInfo));
                 }
@@ -138,30 +141,15 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     private void initWatch() {
-        if (loadingVideo) return;
-        loadingVideo = true;
-        //游客ID及昵称 已登录用户可传空
-        TelephonyManager telephonyMgr = (TelephonyManager) watchView.getActivity().getSystemService(Context.TELEPHONY_SERVICE);
-        @SuppressLint("MissingPermission") String customeId = telephonyMgr.getDeviceId();
-        String customNickname = Build.BRAND + "手机用户";
-        VhallSDK.initWatch(param.watchId, customeId, customNickname, param.key, getWatchPlayback(), WebinarInfo.VIDEO, new RequestCallback() {
-            @Override
-            public void onSuccess() {
-                loadingVideo = false;
-                handlePosition();
-                pos = 0;
-                initCommentData(pos);
-                watchView.showNotice(getWatchPlayback().getNotice()); //显示公告
-                playbackView.setQuality(getWatchPlayback().getQualities());
-                operationDocument();
-            }
-
-            @Override
-            public void onError(int errorCode, String reason) {
-                loadingVideo = false;
-                watchView.showToast(reason);
-            }
-        });
+        if (webinarInfo != null) {
+            getWatchPlayback().setWebinarInfo(webinarInfo);
+            handlePosition();
+            pos = 0;
+            initCommentData(pos);
+            watchView.showNotice(getWatchPlayback().getNotice()); //显示公告
+            playbackView.setQuality(getWatchPlayback().getQualities());
+            operationDocument();
+        }
     }
 
     @Override
@@ -227,12 +215,17 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     @Override
     public void onResume() {
-        getWatchPlayback().onResume();
-
-        if (getWatchPlayback().isAvaliable()) {
-            playbackView.setPlayIcon(false);
+        if (!getWatchPlayback().isAvaliable()) {
+            playbackView.setScaleTypeText(scaleType);
+            initWatch();
         } else {
-            playbackView.setPlayIcon(true);
+            getWatchPlayback().onResume();
+
+            if (getWatchPlayback().isAvaliable()) {
+                playbackView.setPlayIcon(false);
+            } else {
+                playbackView.setPlayIcon(true);
+            }
         }
     }
 
@@ -497,7 +490,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     @Override
-    public void showSurvey(String url,String title) {
+    public void showSurvey(String url, String title) {
 
     }
 

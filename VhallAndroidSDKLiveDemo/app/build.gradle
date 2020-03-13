@@ -3,10 +3,10 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.vhall.live"
-        minSdkVersion 21
+        minSdkVersion 16
         targetSdkVersion 28
-        versionCode 350
-        versionName "4.0.0"
+        versionCode 351
+        versionName "4.1.0"
     }
     buildTypes {
         release {

@@ -8,9 +8,12 @@ import com.vhall.business.Broadcast;
 import com.vhall.business.ChatServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
+import com.vhall.business.data.WebinarInfo;
+import com.vhall.business.data.source.WebinarInfoDataSource;
 import com.vhall.player.Constants;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.push.VHLivePushConfig;
+import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.MessageChatData;
@@ -24,17 +27,20 @@ import org.json.JSONObject;
 public class BroadcastPresenter implements BroadcastContract.Presenter, ChatContract.ChatPresenter {
     private static final String TAG = "BroadcastPresenter";
     private Param param;
+    private WebinarInfo webinarInfo;
     private BroadcastContract.View mView;
     private BroadcastContract.BroadcastView mBraodcastView;
     ChatContract.ChatView chatView;
     private Broadcast broadcast;
     private boolean isPublishing = false;
-    private boolean isFinish = true;
+    private boolean isFinish = false;
     private boolean isFlashOpen = false;
+    private int mode = VHLivePushFormat.DRAW_MODE_ASPECTFILL;
 
 
-    public BroadcastPresenter(Param params, BroadcastContract.BroadcastView mBraodcastView, BroadcastContract.View mView, ChatContract.ChatView chatView) {
+    public BroadcastPresenter(Param params, WebinarInfo webinarInfo, BroadcastContract.BroadcastView mBraodcastView, BroadcastContract.View mView, ChatContract.ChatView chatView) {
         this.param = params;
+        this.webinarInfo = webinarInfo;
         this.mView = mView;
         this.mBraodcastView = mBraodcastView;
         this.chatView = chatView;
@@ -67,9 +73,9 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         if (isPublishing) {
             finishBroadcast();
         } else {
-            if (getBroadcast().isAvaliable() && !isFinish) {
-                startBroadcast();
-            } else {
+            if(getBroadcast().isAvaliable() && !isFinish){
+                getBroadcast().start();
+            }else{
                 initBroadcast();
             }
         }
@@ -77,18 +83,23 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void initBroadcast() {
-        VhallSDK.initBroadcast(param.broId, param.broToken, getBroadcast(), new RequestCallback() {
-            @Override
-            public void onSuccess() {
-                isFinish = false;
-                startBroadcast();
-            }
+        if (webinarInfo != null && !getBroadcast().isAvaliable()) {
+            getBroadcast().setWebinarInfo(webinarInfo);
+            getBroadcast().start();
+        } else {
+            VhallSDK.initBroadcast(param.broId, param.broToken, getBroadcast(), new RequestCallback() {
+                @Override
+                public void onSuccess() {
+                    isFinish = false;
+                    getBroadcast().start();
+                }
 
-            @Override
-            public void onError(int errorCode, String reason) {
-                mView.showMsg("initBroadcastFailed：" + reason);
-            }
-        });
+                @Override
+                public void onError(int errorCode, String errorMsg) {
+                    mView.showMsg("initBroadcastFailed：" + errorMsg);
+                }
+            });
+        }
     }
 
     @Override
@@ -104,7 +115,16 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void finishBroadcast() {
-        VhallSDK.finishBroadcast(param.broId, param.broToken, getBroadcast(), new RequestCallback() {
+        String broId;
+        String broToken;
+        if (webinarInfo != null) {
+            broId = webinarInfo.webinar_id;
+            broToken = webinarInfo.broadcastToken;
+        } else {
+            broId = param.broId;
+            broToken = param.broToken;
+        }
+        VhallSDK.finishBroadcast(broId, broToken, getBroadcast(), new RequestCallback() {
             @Override
             public void onSuccess() {
                 isFinish = true;
@@ -124,6 +144,23 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     }
 
     @Override
+    public void changeMode() {
+        if (mode == VHLivePushFormat.DRAW_MODE_ASPECTFILL) {
+            getBroadcast().changeMode(VHLivePushFormat.DRAW_MODE_ASPECTFIT);
+            mode = VHLivePushFormat.DRAW_MODE_ASPECTFIT;
+            mView.setModeText("FIT");
+        } else if (mode == VHLivePushFormat.DRAW_MODE_ASPECTFIT) {
+            getBroadcast().changeMode(VHLivePushFormat.DRAW_MODE_NONE);
+            mode = VHLivePushFormat.DRAW_MODE_NONE;
+            mView.setModeText("NONE");
+        } else if (mode == VHLivePushFormat.DRAW_MODE_NONE) {
+            getBroadcast().changeMode(VHLivePushFormat.DRAW_MODE_ASPECTFILL);
+            mode = VHLivePushFormat.DRAW_MODE_ASPECTFILL;
+            mView.setModeText("FILL");
+        }
+    }
+
+    @Override
     public void changeCamera() {
         int cameraId = getBroadcast().changeCamera();
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
@@ -139,11 +176,12 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     public void changeAudio() {
         boolean isMute = getBroadcast().isMute();
         getBroadcast().setMute(!isMute);
-        mView.setAudioBtnImage(isMute);
+        mView.setAudioBtnImage(!isMute);
     }
 
     @Override
     public void destroyBroadcast() {
+        finishBroadcast();
         getBroadcast().destroy();
     }
 
@@ -155,7 +193,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     private Broadcast getBroadcast() {
         if (broadcast == null) {
             VHLivePushConfig config = new VHLivePushConfig(param.pixel_type);
-            Log.e("onCreate","param.screenOri    "+param.screenOri);
+            Log.e("onCreate", "param.screenOri    " + param.screenOri);
             config.screenOri = param.screenOri;//横竖屏设置 重要
             //可不设置
             config.videoFrameRate = param.videoFrameRate;//帧率
