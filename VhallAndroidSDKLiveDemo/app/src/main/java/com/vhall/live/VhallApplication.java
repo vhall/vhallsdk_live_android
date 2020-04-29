@@ -31,10 +31,9 @@ public class VhallApplication extends Application {
         getParam();
         VhallSDK.setLogEnable(true);
 
-        VhallSDK.init(this, getResources().getString(R.string.vhall_app_key), getResources().getString(R.string.vhall_app_secret_key));
-        VssSdk.getInstance().init(getApplicationContext(), getUserId());
-
         if (isAppProcess()) {
+            VhallSDK.init(this, getResources().getString(R.string.vhall_app_key), getResources().getString(R.string.vhall_app_secret_key));
+            VssSdk.getInstance().init(getApplicationContext(), getUserId());
         }
     }
 

@@ -5,11 +5,18 @@ android {
         applicationId "com.vhall.live"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 351
-        versionName "4.1.0"
+        versionCode 355
+        versionName "4.2.3"
+
+        multiDexEnabled true
     }
     buildTypes {
         release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -18,22 +25,20 @@ android {
 //        exclude 'META-INF/beans.xml'
 //    }
 
-    signingConfigs {
-        debug {
-            storeFile file("vhall_android_app.keystore")
-            storePassword '123456'
-            keyAlias 'yanting lin'
-            keyPassword '123456'
-        }
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
+    lintOptions {
+        abortOnError false
     }
 
+    packagingOptions{
+        exclude 'META-INF/beans.xml'
+    }
+
+}
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':uilibs')

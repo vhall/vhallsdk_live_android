@@ -16,16 +16,12 @@ import com.bumptech.glide.Glide;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.WebinarInfoDataSource;
-import com.vhall.business.data.source.WebinarInfoRepository;
-import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
 import com.vhall.live.webWatch.WebViewActivity;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.broadcast.BroadcastActivity;
 import com.vhall.uilibs.util.CircleImageView;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.watch.WatchActivity;
-
-import static com.vhall.business.VhallSDK.getUserId;
 
 /**
  * 主界面的Activity

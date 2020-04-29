@@ -7,11 +7,16 @@ import android.widget.SeekBar;
 
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
+import com.vhall.business_support.dlna.DMCControl;
+import com.vhall.business_support.dlna.DMCControlListener;
+import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.document.DocumentView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.emoji.InputUser;
+
+import org.fourthline.cling.android.AndroidUpnpService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,9 +67,9 @@ public class WatchContract {
 
         void enterInteractive(); // 进入互动
         // 投屏使用
-        // void showDevices();
+         void showDevices();
         // 投屏使用
-        // void dismissDevices();
+         void dismissDevices();
 
         void refreshHand(int second);
 
@@ -215,10 +220,10 @@ public class WatchContract {
 
         void replyInvite(int type);
 
-        // void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
+         DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
 
-        // void showDevices();
+         void showDevices();
 
-        // void dismissDevices();
+         void dismissDevices();
     }
 }

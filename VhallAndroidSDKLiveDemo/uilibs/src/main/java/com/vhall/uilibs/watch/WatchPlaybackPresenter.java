@@ -1,12 +1,7 @@
 package com.vhall.uilibs.watch;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -18,6 +13,7 @@ import com.vhall.business.WatchPlayback;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
+import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.player.Constants;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.uilibs.Param;
@@ -31,7 +27,6 @@ import com.vhall.uilibs.util.emoji.InputUser;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -41,11 +36,9 @@ import static com.vhall.business.MessageServer.EVENT_SHOWDOC;
 import static com.vhall.business.WatchPlayback.SHOW_DOC_KEY;
 
 //TODO  投屏相关
-//import com.vhall.business_support.Watch_Support;
-//import com.vhall.business_support.dlna.DeviceDisplay;
-//import com.vhall.business_support.WatchLive;
-//import com.vhall.business_support.WatchPlayback;
-//import org.fourthline.cling.android.AndroidUpnpService;
+import com.vhall.business_support.dlna.DeviceDisplay;
+
+import org.fourthline.cling.android.AndroidUpnpService;
 
 /**
  * 观看回放的Presenter
@@ -297,30 +290,22 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     //TODO 投屏相关
-//    @Override
-//    public void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
-//        getWatchPlayback().dlnaPost(deviceDisplay, service, new Watch_Support.DLNACallback() {
-//            @Override
-//            public void onError(int errorCode) {
-//                watchView.showToast("投屏失败，errorCode:" + errorCode);
-//            }
-//
-//            @Override
-//            public void onSuccess() {
-//                watchView.showToast("投屏成功!");
-//            }
-//        });
-//    }
-//
-//    @Override
-//    public void showDevices() {
-//        watchView.showDevices();
-//    }
-//
-//    @Override
-//    public void dismissDevices() {
-//        watchView.dismissDevices();
-//    }
+    @Override
+    public DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
+        DMCControl dmcControl = new DMCControl(deviceDisplay,service,getWatchPlayback().getOriginalUrl(),webinarInfo);
+        return dmcControl;
+    }
+
+    @Override
+    public void showDevices() {
+        watchView.showDevices();
+        getWatchPlayback().onPause();
+    }
+
+    @Override
+    public void dismissDevices() {
+        watchView.dismissDevices();
+    }
 
     /**
      * 根据文档状态选择展示
@@ -439,7 +424,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     //每秒获取一下进度
     private void handlePosition() {
-        if (timer != null)
+        if (timer != null )
             return;
         timer = new Timer();
         timer.schedule(new TimerTask() {

@@ -143,12 +143,17 @@ public class MessageChatData implements Serializable {
         data.setAvatar(chatInfo.avatar);
         data.setType("text");
         data.event = chatInfo.event;
+        //处理回复消息
+        String textContent = "";
+        if (chatInfo.replyMsg != null) {
+            textContent = chatInfo.replyMsg.user_name + ": " + chatInfo.replyMsg.content.textContent + "\n" + "回复：";
+        }
         if (chatInfo.msgData != null) {
-            data.setText_content(chatInfo.msgData.text);
+            data.setText_content(textContent + chatInfo.msgData.text);
         }
         data.setMy(false);
         if (!TextUtils.isEmpty(VhallSDK.getUserId())) {
-            String userId =VhallSDK.getUserId();
+            String userId = VhallSDK.getUserId();
             data.setMy(Objects.equals(chatInfo.account_id, userId));
         }
         return data;
@@ -164,12 +169,16 @@ public class MessageChatData implements Serializable {
         data.setAvatar(chatInfo.getAvatar());
         if (chatInfo.getData() != null) {
             data.setType(chatInfo.getData().getType());
-            data.setText_content(chatInfo.getData().getText_content());
+            String textContent = "";
+            if (chatInfo.getContext().getReplyMsg() != null) {
+                textContent = chatInfo.getContext().getReplyMsg().getNickName() + ":" + chatInfo.getContext().getReplyMsg().getContent().getText_content() + "\n" + "回复：";
+            }
+            data.setText_content(textContent + chatInfo.getData().getText_content());
         }
         data.setTime(chatInfo.getDate_time());
         data.setMy(false);
         if (!TextUtils.isEmpty(VhallSDK.getUserId())) {
-            String userId =VhallSDK.getUserId();
+            String userId = VhallSDK.getUserId();
             data.setMy(Objects.equals(chatInfo.getThird_party_user_id(), userId));
         }
         return data;

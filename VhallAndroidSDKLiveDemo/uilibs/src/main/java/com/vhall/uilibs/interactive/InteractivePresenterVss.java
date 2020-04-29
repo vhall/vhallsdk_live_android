@@ -4,15 +4,7 @@ import android.graphics.PixelFormat;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import com.vhall.business.VhallSDK;
-import com.vhall.business.data.WebinarInfo;
-import com.vhall.business.data.source.InteractiveDataSource;
-import com.vhall.business.data.source.WebinarInfoRepository;
-import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.util.handler.WeakHandler;
 import com.vhall.vhallrtc.client.Room;
@@ -21,7 +13,6 @@ import com.vhall.vhallrtc.client.VHRenderView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.RendererCommon;
 import org.webrtc.SurfaceViewRenderer;
 
 import vhall.com.vss.data.MessageData;
@@ -142,8 +133,17 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
         vhRenderView.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFit);
         vhRenderView.init(null, null);
         localStream = VssRtcManger.getLocalStream();
-        vhRenderView.setStream(localStream);
+        localStream.removeAllRenderView();
+        localStream.addRenderView(vhRenderView);
         interFraView.addLocalView(vhRenderView);
+
+        //设置预览镜像
+        vhRenderView.setMirror(true);
+        //美颜设置，仅本地流可用
+        localStream.setEnableBeautify(true);//默认等级2
+        //美颜等级设置，建议渲染可见后使用
+//        localStream.setBeautifyLevel(2);//美颜等级1-4 默认 2
+
     }
 
     class MyCallBack implements IVssMessageLister {
@@ -233,7 +233,8 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
                     newRenderView.init(null, null);
                     newRenderView.getHolder().setFormat(PixelFormat.TRANSPARENT);
                     newRenderView.setZOrderMediaOverlay(true);
-                    newRenderView.setStream(stream);
+                    stream.removeAllRenderView();
+                    stream.addRenderView(newRenderView);
                     interFraView.addStream(newRenderView);
                 }
             });
@@ -299,7 +300,7 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
         }
 
         /**
-         * 房间内人数更新
+         * 房间内成员状态变化
          *
          * @param jsonObject
          */
@@ -309,7 +310,8 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
         }
 
         /**
-         * 房间内成员状态变化
+         *
+         * 房间内人数更新
          */
         @Override
         public void onRefreshMemberState() {

@@ -17,6 +17,8 @@ import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 
+import org.json.JSONObject;
+
 
 public class InteractiveFragment extends Fragment implements InteractiveContract.InteractiveFraView, View.OnClickListener {
     private InteractiveContract.InteractiveFraPresenter mPresenter;
@@ -103,10 +105,10 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
     public void updateAudioFrame(int status) {
         if (status == 1) {
             mSwitchAudio.setImageDrawable(getResources().getDrawable(R.drawable.icon_audio_open));
-            hasAudioOpen=false;
+            hasAudioOpen = false;
         } else {
             mSwitchAudio.setImageDrawable(getResources().getDrawable(R.drawable.icon_audio_close));
-            hasAudioOpen=true;
+            hasAudioOpen = true;
         }
     }
 
@@ -132,17 +134,11 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
 
     @Override
     public void updateStream(Stream stream) {
-        if (stream == null) return;
-        int childCount = mContainar.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            VHRenderView view = (VHRenderView) mContainar.getChildAt(i);
-            Log.e("updateStream  id1   ", view.getStream().userId + "");
-            Log.e("updateStream   id2   ", stream.userId + "");
-            if (view.getStream().userId.equals(stream.userId)) {
-                view.setStream(stream);
-                break;
-            }
-        }
+        //流状态变更 ，如需同步订阅端 音视频禁止状态标识可在此处处理；
+        JSONObject obj = stream.muteStream;
+        boolean muteAudio = obj.optBoolean("audio");// true 禁音、false 未禁音
+        boolean muteVideo = obj.optBoolean("video");// true 禁视频、 false 未禁视频
+
     }
 
     @Override
@@ -154,10 +150,10 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
             mPresenter.onSwitchCamera();
         } else if (i == R.id.image_switch_video) {
             mPresenter.onSwitchVideo(hasVideoOpen);
-           // hasVideoOpen = !hasVideoOpen;
+            // hasVideoOpen = !hasVideoOpen;
         } else if (i == R.id.image_switch_audio) {
             mPresenter.onSwitchAudio(hasAudioOpen);
-           // hasAudioOpen = !hasAudioOpen;
+            // hasAudioOpen = !hasAudioOpen;
         }
     }
 

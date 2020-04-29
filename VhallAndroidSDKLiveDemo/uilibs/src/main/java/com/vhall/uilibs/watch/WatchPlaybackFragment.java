@@ -241,7 +241,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             mPresenter.changeScaleType();
         } else if (i == R.id.iv_dlna_playback) {
             // Todo 投屏相关
-            // mPresenter.showDevices();
+             mPresenter.showDevices();
         } else if (i == R.id.tv_play_speed) {
             mPresenter.setSpeed();
         }

@@ -240,7 +240,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
                 public void run() {
                     newRenderView.getHolder().setFormat(PixelFormat.TRANSPARENT);
                     newRenderView.setZOrderMediaOverlay(true);
-                    newRenderView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT);
+                    newRenderView.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFit);
                     interFraView.addStream(newRenderView);
                 }
             });

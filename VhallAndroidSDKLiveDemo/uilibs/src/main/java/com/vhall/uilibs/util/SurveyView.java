@@ -85,7 +85,7 @@ public class SurveyView extends WebView {
                                 if (eventListener != null) {
                                     eventListener.onEvent(EVENT_JS_BACK, data);
                                 }
-                            }else {
+                            } else {
                                 Toast.makeText(context, result.optString("msg"), Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -106,6 +106,12 @@ public class SurveyView extends WebView {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
+            /*
+            //js 注入隐藏问卷头部图片
+            String js = "var script = document.querySelector('.header').style.backgroundImage='url()';";
+            js += "var child=document.querySelector('.header').style.minHeight='30px';";
+            loadUrl("javascript:" + js);*/
+
             if (eventListener != null) {
                 eventListener.onEvent(EVENT_PAGE_LOADED, "on page finished");
             }

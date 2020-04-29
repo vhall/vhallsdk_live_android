@@ -14,6 +14,7 @@ import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
+import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.player.stream.play.impl.VHVideoPlayerView;
 import com.vhall.uilibs.Param;
@@ -24,6 +25,7 @@ import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.emoji.InputUser;
 
+import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,10 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 //TODO 投屏相关
-//import com.vhall.business_support.Watch_Support;
-//import com.vhall.business_support.dlna.DeviceDisplay;
-//import com.vhall.business_support.WatchLive;
-//import org.fourthline.cling.android.AndroidUpnpService;
+import com.vhall.business_support.dlna.DeviceDisplay;
 
 
 /**
@@ -65,14 +64,14 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     CountDownTimer onHandDownTimer;
     private int durationSec = 30; // 举手上麦倒计时
-    private boolean canSpeak=true;
+    private boolean canSpeak = true;
 
 
-    public WatchLivePresenter(WatchContract.LiveView liveView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, ChatContract.ChatView questionView, WatchContract.WatchView watchView, Param param,WebinarInfo webinarInfo) {
+    public WatchLivePresenter(WatchContract.LiveView liveView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, ChatContract.ChatView questionView, WatchContract.WatchView watchView, Param param, WebinarInfo webinarInfo) {
         this.params = param;
         this.webinarInfo = webinarInfo;
         this.liveView = liveView;
-        this.documentView =  documentView;
+        this.documentView = documentView;
         this.watchView = watchView;
         this.questionView = questionView;
         this.chatView = chatView;
@@ -342,7 +341,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     .bufferDelay(params.bufferSecond)
                     .callback(new WatchCallback())
                     .messageCallback(new MessageEventCallback())
-                    .connectTimeoutMils(5000)
+                    .connectTimeoutMils(10000)
                     .chatCallback(new ChatCallback());
             watchLive = builder.build();
         }
@@ -417,8 +416,9 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     @Override
     public void submitSurvey(Survey survey, String result) {
-        if (survey == null)
+        if (survey == null) {
             return;
+        }
         if (!VhallSDK.isLogin()) {
             watchView.showToast("请先登录！");
             return;
@@ -433,8 +433,9 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             @Override
             public void onError(int errorCode, String errorMsg) {
                 watchView.showToast(errorMsg);
-                if (errorCode == 10821)
+                if (errorCode == 10821) {
                     watchView.dismissSurvey();
+                }
             }
         });
     }
@@ -481,34 +482,23 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
 
     //TODO 投屏相关
-//
-//    @Override
-//    public void dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
-//        getWatchLive().dlnaPost(deviceDisplay, service, new Watch_Support.DLNACallback() {
-//
-//            @Override
-//            public void onError(int errorCode) {
-//                watchView.showToast("投屏失败，errorCode:" + errorCode);
-////            }
-//
-//            @Override
-//            public void onSuccess() {
-//                watchView.showToast("投屏成功!");
-//                stopWatch();
-//            }
-//
-//        });
-//    }
-//
-//    @Override
-//    public void showDevices() {
-//        watchView.showDevices();
-//    }
-//
-//    @Override
-//    public void dismissDevices() {
-//        watchView.dismissDevices();
-//    }
+
+    @Override
+    public DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
+        DMCControl dmcControl = new DMCControl(deviceDisplay, service, getWatchLive().getOriginalUrl(),webinarInfo);
+        return dmcControl;
+    }
+
+    @Override
+    public void showDevices() {
+        watchView.showDevices();
+        getWatchLive().stop();
+    }
+
+    @Override
+    public void dismissDevices() {
+        watchView.dismissDevices();
+    }
 
     /**
      * 观看过程中事件监听
@@ -596,7 +586,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             switch (messageInfo.event) {
                 case MessageServer.EVENT_DISABLE_CHAT://禁言
                     watchView.showToast("您已被禁言");
-                    canSpeak=false;
+                    canSpeak = false;
                     break;
                 case MessageServer.EVENT_KICKOUT://踢出
                     watchView.showToast("您已被踢出");
@@ -604,17 +594,17 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_PERMIT_CHAT://解除禁言
                     watchView.showToast("您已被解除禁言");
-                    canSpeak=true;
+                    canSpeak = true;
                     break;
                 case MessageServer.EVENT_CHAT_FORBID_ALL://全员禁言
                     if (messageInfo.status == 0) {
                         //取消全员禁言
                         watchView.showToast("解除全员禁言");
-                        canSpeak=true;
+                        canSpeak = true;
                     } else {
                         //全员禁言
                         watchView.showToast("全员禁言");
-                        canSpeak=false;
+                        canSpeak = false;
                     }
                     break;
                 case MessageServer.EVENT_OVER://直播结束
@@ -800,13 +790,13 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case ChatServer.eventCustomKey:
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
-                    if(chatInfo.onlineData != null){
+                    if (chatInfo.onlineData != null) {
                         watchView.setOnlineNum(chatInfo.onlineData.tracksNum);
                     }
                     break;
                 case ChatServer.eventOnlineKey:
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
-                    if(chatInfo.onlineData != null){
+                    if (chatInfo.onlineData != null) {
                         watchView.setOnlineNum(chatInfo.onlineData.tracksNum);
                     }
                     break;

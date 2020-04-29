@@ -13,10 +13,10 @@ import com.vhall.business.ChatServer;
 import com.vhall.business.ErrorCode;
 import com.vhall.business.VhallCallback;
 import com.vhall.business.VhallSDK;
-import com.vhall.business.Watch;
 import com.vhall.business.common.Constants;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
+import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.UserInfoRepository;
 import com.vhall.business.data.source.local.UserInfoLocalDataSource;
 import com.vhall.business.data.source.remote.UserInfoRemoteDataSource;
@@ -34,6 +34,7 @@ import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.emoji.InputUser;
 
+import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,7 +56,6 @@ import vhall.com.vss.data.VssMessageLotteryData;
 import vhall.com.vss.data.VssMessageQuestionData;
 import vhall.com.vss.data.VssMessageSignData;
 import vhall.com.vss.module.chat.VssChatManger;
-import vhall.com.vss.module.question.VssQuestionManger;
 import vhall.com.vss.module.room.VssRoomManger;
 import vhall.com.vss.module.room.callback.IVssCallBackLister;
 import vhall.com.vss.module.room.callback.IVssMessageLister;
@@ -69,6 +69,9 @@ import static com.vhall.ops.VHOPS.KEY_OPERATE;
 import static com.vhall.ops.VHOPS.TYPE_ACTIVE;
 import static com.vhall.ops.VHOPS.TYPE_SWITCHOFF;
 import static com.vhall.ops.VHOPS.TYPE_SWITCHON;
+
+import com.vhall.business_support.dlna.DMCControl;
+import com.vhall.business_support.dlna.DeviceDisplay;
 
 
 /**
@@ -100,9 +103,16 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
     private String roomId;
     private String accessToken;
     private String currentDPI = "";
-    private String canSpeak = "0";
+    private boolean canSpeak = true;
     private Param params;
     private boolean isBroadcast = false;
+    private WebinarInfo webinarInfo;
+
+    public WatchLivePresenterVss(WatchContract.LiveView liveView, WatchContract.DocumentViewVss documentView, ChatContract.ChatView chatView, ChatContract.ChatView questionView, final WatchContract.WatchView watchView, Param param, WebinarInfo webinarInfo) {
+        this(liveView, documentView, chatView, questionView, watchView, param);
+        this.webinarInfo = webinarInfo;
+    }
+
 
     public WatchLivePresenterVss(WatchContract.LiveView liveView, WatchContract.DocumentViewVss documentView, ChatContract.ChatView chatView, ChatContract.ChatView questionView, final WatchContract.WatchView watchView, Param param) {
         this.params = param;
@@ -124,19 +134,14 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                     VssSdk.getInstance().setUserId(result.getThird_party_user_id());
                 }
                 if (VhallSDK.isLogin()) {
-                    VssRtcManger vssRtcManger = new VssRtcManger();
-                    vssRtcManger.getUserStatus(new CallBack<ResponseUserStatus>() {
-                        @Override
-                        public void onSuccess(ResponseUserStatus userStatus) {
-                            if (userStatus != null && !TextUtils.isEmpty(userStatus.getIs_banned())) {
-                                canSpeak = userStatus.getIs_banned();
-                            }
-                        }
+                    if (result == null) {
+                        return;
+                    }
+                    ResponseUserStatus userStatus = result.getUserStatus();
+                    if (userStatus != null && !TextUtils.isEmpty(userStatus.getIs_banned())) {
+                        canSpeak = !("1".equals(userStatus.getIs_banned()) || "1".equals(result.getAttributes().getAll_banned()));
+                    }
 
-                        @Override
-                        public void onError(int eventCode, String msg) {
-                        }
-                    });
                 }
                 if (result.getStatus() == 1) {
                     isBroadcast = true;
@@ -258,7 +263,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
             watchView.showToast(R.string.vhall_login_first);
             return;
         }
-        if ("1".equals(canSpeak)) {
+        if (!canSpeak) {
             watchView.showToast("你被禁言了");
             return;
         }
@@ -306,7 +311,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
             watchView.showToast(R.string.vhall_login_first);
             return;
         }
-        if ("1".equals(canSpeak)) {
+        if (!canSpeak) {
             watchView.showToast("你被禁言了");
             return;
         }
@@ -491,7 +496,8 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
     }
 
     @Override
-    public void submitSurvey(String result) {
+    public void submitSurvey(String result) {//Web 页嵌入不需要再额外提交
+        /*
         if (!VhallSDK.isLogin()) {
             watchView.showToast("请先登录！");
             return;
@@ -530,7 +536,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+*/
     }
 
     @Override
@@ -545,6 +551,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
             return;
         }
         if (!isHand) {
+            isHand = true;
             VssRtcManger.getInstance(context).apply(new CallBack() {
                 @Override
                 public void onSuccess(Object result) {
@@ -555,6 +562,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                 @Override
                 public void onError(int eventCode, String msg) {
                     watchView.showToast("举手失败，errorMsg:" + msg);
+                    isHand = false;
                 }
             });
         } else {
@@ -603,6 +611,24 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                 }
             });
         }
+    }
+
+    @Override
+    public DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
+        DMCControl dmcControl = new DMCControl(deviceDisplay, service, mPlayer.getOriginalUrl(), webinarInfo);
+        return dmcControl;
+
+    }
+
+    @Override
+    public void showDevices() {
+        watchView.showDevices();
+        getPlayer().stop();
+    }
+
+    @Override
+    public void dismissDevices() {
+        watchView.dismissDevices();
     }
 
     /**
@@ -703,7 +729,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
     }
 
     private void getChatHistory() {
-        VssChatManger.getInstance().chatLists("", "", "", new CallBack<List<ResponseChatInfo>>() {
+        VssChatManger.getInstance().chatList("", "", "", new CallBack<List<ResponseChatInfo>>() {
             @Override
             public void onSuccess(List<ResponseChatInfo> result) {
                 if (result == null || result.size() == 0) {
@@ -821,13 +847,13 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                 case "disable":
                 case "disable_all":
                     watchView.showToast("您已被禁言");
-                    canSpeak = "1";
+                    canSpeak = false;
                     break;
 
                 case "permit":
                 case "permit_all":
                     watchView.showToast("您已被取消禁言");
-                    canSpeak = "0";
+                    canSpeak = true;
                     break;
 
                 case "Join":
@@ -974,7 +1000,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                             JSONObject context = new JSONObject(msg.getImMessageInfo().getContext());
                             JSONObject replyMsg = context.getJSONObject("replyMsg");
                             if (replyMsg != null) {
-                                textContent = replyMsg.optString("nickName") + "：   "+replyMsg.optJSONObject("content").optString("text_content") + "\n" + "回复：";
+                                textContent = replyMsg.optString("nickName") + "：   " + replyMsg.optJSONObject("content").optString("text_content") + "\n" + "回复：";
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -984,7 +1010,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                         liveView.addDanmu(messageChatData.getText_content());
                     }
                     break;
-                case "questionnaire_push":
+                case "questionnaire_push"://问卷发布
                     JSONObject obj = (JSONObject) msg.getT();
                     MessageChatData surveyData = new MessageChatData();
                     surveyData.event = MessageChatData.eventSurveyKey;

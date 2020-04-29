@@ -14,11 +14,14 @@ import com.vhall.business.VhallCallback;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
+import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.UserInfoRepository;
 import com.vhall.business.data.source.WebinarInfoRepository;
 import com.vhall.business.data.source.local.UserInfoLocalDataSource;
 import com.vhall.business.data.source.remote.UserInfoRemoteDataSource;
-import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
+import com.vhall.business.data.WebinarInfoRemoteDataSource;
+import com.vhall.business_support.dlna.DMCControl;
+import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.ops.VHOPS;
 import com.vhall.player.Constants;
 import com.vhall.player.VHPlayerListener;
@@ -32,6 +35,7 @@ import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.handler.WeakHandler;
 import com.vhall.vod.VHVodPlayer;
 
+import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -63,6 +67,7 @@ public class WatchPlaybackPresenterVss implements WatchContract.PlaybackPresente
     WatchContract.WatchView watchView;
     ChatContract.ChatView chatView;
     private Context context;
+    private WebinarInfo webinarInfo;
 
     //FIT_XY = 0;FIT = 1;FILL= 2;
     int[] scaleTypeList = new int[]{0, 1, 2};
@@ -104,6 +109,11 @@ public class WatchPlaybackPresenterVss implements WatchContract.PlaybackPresente
             return false;
         }
     });
+
+    public WatchPlaybackPresenterVss(WatchContract.PlaybackView playbackView, final WatchContract.DocumentViewVss documentView, ChatContract.ChatView chatView, final WatchContract.WatchView watchView, Param param,WebinarInfo webinarInfo) {
+        this(playbackView,documentView,chatView,watchView,param);
+        this.webinarInfo = webinarInfo;
+    }
 
     public WatchPlaybackPresenterVss(WatchContract.PlaybackView playbackView, final WatchContract.DocumentViewVss documentView, ChatContract.ChatView chatView, final WatchContract.WatchView watchView, Param param) {
         this.playbackView = playbackView;
@@ -364,6 +374,23 @@ public class WatchPlaybackPresenterVss implements WatchContract.PlaybackPresente
 
     }
 
+    @Override
+    public DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
+        DMCControl dmcControl = new DMCControl(deviceDisplay, service, mPlayer.getOriginalUrl(),webinarInfo);
+        return dmcControl;
+    }
+
+    @Override
+    public void showDevices() {
+        watchView.showDevices();
+        getPlay().pause();
+    }
+
+    @Override
+    public void dismissDevices() {
+        watchView.dismissDevices();
+    }
+
 
     //每秒获取一下进度
     private void handlePosition() {
@@ -402,7 +429,7 @@ public class WatchPlaybackPresenterVss implements WatchContract.PlaybackPresente
 
     private void sendComment(String content, final RequestCallback callback) {
         if (TextUtils.isEmpty(param.webinar_id)) {
-            VhallCallback.ErrorCallback(callback, ErrorCode.ERROR_INIT, "获取视频信息失败！");
+            VhallCallback.ErrorCallback(callback, ErrorCode.ERROR_PARAM, "房间ID不能为空！");
             return;
         }
         if (param.filters != null) {

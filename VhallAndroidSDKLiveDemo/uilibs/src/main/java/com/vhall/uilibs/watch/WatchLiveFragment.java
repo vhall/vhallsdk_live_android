@@ -236,7 +236,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
         } else if (i == R.id.iv_dlna) {
             // TODO 投屏相关
-            //mPresenter.showDevices();
+            mPresenter.showDevices();
         }
     }
 

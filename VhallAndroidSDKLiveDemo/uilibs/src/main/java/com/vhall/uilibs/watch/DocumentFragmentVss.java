@@ -1,6 +1,7 @@
 package com.vhall.uilibs.watch;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -66,19 +67,19 @@ public class DocumentFragmentVss extends Fragment implements WatchContract.Docum
 
 
     @Override
-    public void refreshView(DocumentView view) {
-        /**
-         * 文档缩放功能不完善，暂不建议使用
-         * view.getSettings().setBuiltInZoomControls(true);
-         * view.getSettings().setSupportZoom(true);
-         */
+    public void refreshView(final DocumentView view) {
+
         if (rlContainer != null) {
             rlContainer.removeAllViews();
             rlContainer.addView(view);
-//            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(1280*5, ViewGroup.LayoutParams.MATCH_PARENT);
-//            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//            params.addRule(RelativeLayout.CENTER_IN_PARENT);
-//            view.setLayoutParams(params);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    params.addRule(RelativeLayout.CENTER_IN_PARENT);
+                    view.setLayoutParams(params);
+                }
+            },500);
         } else {
             tempView = view;
         }

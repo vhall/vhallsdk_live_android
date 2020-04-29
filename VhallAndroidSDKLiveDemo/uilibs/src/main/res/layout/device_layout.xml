@@ -6,7 +6,52 @@
 
     <ListView
         android:id="@+id/lv_device"
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="0dp"/>
+    <TextView
+        android:id="@+id/tv_no_device"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="当前WIFI下无可投屏设备"
+        android:layout_gravity="center"
+        android:padding="5dp"
+        android:visibility="gone"/>
+<LinearLayout
+    android:id="@+id/ll_control"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    android:visibility="gone">
+    <CheckBox
+        android:id="@+id/cb_play_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:button="@null"
+        android:background="@drawable/selector_img_play_pause"/>
+    <TextView
+        android:id="@+id/tv_current_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="00:00:00"
+        android:layout_gravity="center_vertical"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"/>
+    <SeekBar
+        android:id="@+id/seekbar_tv"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"/>
+    <TextView
+        android:id="@+id/tv_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="01:15:00"
+        android:layout_gravity="center_vertical"
+        android:paddingLeft="5dp"/>
+
+</LinearLayout>
 
 </LinearLayout>

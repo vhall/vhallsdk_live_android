@@ -3,6 +3,7 @@ package com.vhall.uilibs.util;
 
 import android.content.Context;
 
+
 /**
  * 常用方法工具类
  */
@@ -11,6 +12,7 @@ public class VhallUtil {
     public static final int BROADCAST = 0x00;
     public static final int WATCH_LIVE = 0x01;
     public static final int WATCH_PLAYBACK = 0x02;
+    private static final String TAG = "VhallUtil";
 
     /**
      * 将长整型值转化成字符串
@@ -35,6 +37,16 @@ public class VhallUtil {
         } else {
             return "00:" + strMinute + ":" + strSecond;
         }
+    }
+
+    public static int converTimeStrToSecond(String time) {
+        String s = time;
+        int index1 = s.indexOf(":");
+        int index2 = s.indexOf(":", index1 + 1);
+        int hour = Integer.parseInt(s.substring(0, index1));
+        int minute = Integer.parseInt(s.substring(index1 + 1, index2));
+        int second = Integer.parseInt(s.substring(index2 + 1));
+        return hour * 60 * 60 + minute * 60 + second;
     }
 
     /**

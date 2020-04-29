@@ -1,18 +1,11 @@
 package com.vhall.uilibs.interactive;
 
 import android.content.Context;
-import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.vhall.business.VhallSDK;
-import com.vhall.business.data.WebinarInfo;
-import com.vhall.business.data.source.InteractiveDataSource;
-import com.vhall.business.data.source.WebinarInfoRepository;
-import com.vhall.business.data.source.remote.WebinarInfoRemoteDataSource;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.ActivityUtils;
@@ -42,18 +35,6 @@ public class InteractiveActivity extends FragmentActivity implements Interactive
         if (interactiveFragment == null) {
             interactiveFragment = InteractiveFragment.newInstance();
             if (VssRoomManger.enter) {
-                WebinarInfoRepository repository = WebinarInfoRepository.getInstance(WebinarInfoRemoteDataSource.getInstance());
-                repository.getInteractiveInfo(param.webinar_id, VhallSDK.getUserNickname(), "", param.key, VhallSDK.getUserId(), new InteractiveDataSource.InteractiveCallback() {
-                    @Override
-                    public void onSuccess(Object something) {
-                        WebinarInfo webinarInfo = (WebinarInfo) something;
-                    }
-
-                    @Override
-                    public void onError(int errorCode, String errorMsg) {
-                        showToast(errorMsg);
-                    }
-                });
                 new InteractivePresenterVss(this, interactiveFragment, param);
             } else {
                 new InteractivePresenter(this, interactiveFragment, param);
@@ -79,6 +60,12 @@ public class InteractiveActivity extends FragmentActivity implements Interactive
 
     @Override
     public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
         finish();
     }
 }
