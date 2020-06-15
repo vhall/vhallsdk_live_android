@@ -217,9 +217,6 @@ public class WatchPlaybackPresenterVss implements WatchContract.PlaybackPresente
         VssRoomManger.getInstance().enterRoom(param.vssToken, param.vssRoomId, new CallBack<ResponseRoomInfo>() {
             @Override
             public void onSuccess(ResponseRoomInfo result) {
-                if (!VhallSDK.isLogin()) {
-                    VssSdk.getInstance().setUserId(result.getThird_party_user_id());
-                }
                 getPlay().init(result.getRecord_id(), result.getPaas_access_token());
                 mDocument = new VHOPS(context, result.getRecord_id(), null);
                 mDocument.setListener(opsListener);
@@ -258,6 +255,7 @@ public class WatchPlaybackPresenterVss implements WatchContract.PlaybackPresente
             getPlay().seekto(0);
             mDocument.seekTo(0);
         } else {
+            getPlay().setWaterMark(webinarInfo.watermark.imgUrl,webinarInfo.watermark.imgPosition,webinarInfo.watermark.imgAlpha);
             getPlay().start();
         }
     }

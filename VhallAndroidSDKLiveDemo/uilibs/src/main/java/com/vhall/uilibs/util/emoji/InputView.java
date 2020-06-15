@@ -179,6 +179,7 @@ public class InputView {
                 return false;
             }
         });
+
         et_content.setHint("我来说两句");
     }
 
@@ -331,7 +332,7 @@ public class InputView {
                 if (previousKeyboardHeight != keyboardHeight) {
                     boolean hide = (double) displayHeight / height > 0.8;
                     if (hide && !showEmoji) {
-                        //dismiss();
+                        dismiss();
                     }
                     if (!hide) {
                         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) contentView.getLayoutParams();

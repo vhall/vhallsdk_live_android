@@ -11,6 +11,7 @@ import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.business_support.dlna.DMCControlListener;
 import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.document.DocumentView;
+import com.vhall.player.vod.VodPlayerView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.MessageLotteryData;
@@ -136,7 +137,11 @@ public class WatchContract {
 
         void showProgressbar(boolean show);
 
-        SurfaceView getVideoView();
+        //TODO VodPlayView 更换为SurfaceView 原因说明
+//        SurfaceView getVideoView();
+
+        VodPlayerView getVideoView();
+
 
         void setScaleTypeText(int type);
 

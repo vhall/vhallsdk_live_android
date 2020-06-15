@@ -254,8 +254,8 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         if (watchPlayback == null) {
             WatchPlayback.Builder builder = new WatchPlayback.Builder()
                     .context(watchView.getActivity())
-                    //.vodPlayView(playbackView.getVideoView())
-                    .surfaceView(playbackView.getVideoView())
+                    .vodPlayView(playbackView.getVideoView())
+//                    .surfaceView(playbackView.getVideoView())
                     .callback(new WatchCallback())
                     .docCallback(new DocCallback());
             watchPlayback = builder.build();

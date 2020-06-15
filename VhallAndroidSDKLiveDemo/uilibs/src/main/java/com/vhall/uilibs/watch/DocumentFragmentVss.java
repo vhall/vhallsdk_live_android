@@ -4,11 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -71,15 +67,17 @@ public class DocumentFragmentVss extends Fragment implements WatchContract.Docum
 
         if (rlContainer != null) {
             rlContainer.removeAllViews();
-            rlContainer.addView(view);
+            final RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            params.addRule(RelativeLayout.CENTER_IN_PARENT);
+            view.setLayoutParams(params);
+            //推荐使用方式，能避免param不生效引起的适配问题
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                    params.addRule(RelativeLayout.CENTER_IN_PARENT);
-                    view.setLayoutParams(params);
+                    rlContainer.addView(view,params);
                 }
-            },500);
+            },200);
+
         } else {
             tempView = view;
         }

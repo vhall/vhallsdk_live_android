@@ -17,6 +17,7 @@ import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.vhall.player.vod.VodPlayerView;
 import com.vhall.uilibs.R;
 
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.List;
 public class WatchPlaybackFragment extends Fragment implements WatchContract.PlaybackView, View.OnClickListener {
     private final String TAG = WatchPlaybackFragment.class.getName();
     WatchContract.PlaybackPresenter mPresenter;
-    SurfaceView surface_view;//视频区容器
+    VodPlayerView surface_view;//视频区容器
     ImageView iv_play, btn_changescaletype;
     SeekBar seekbar;
     TextView tv_current_time, tv_end_time, tv_play_speed;
@@ -137,7 +138,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     }
 
     @Override
-    public SurfaceView getVideoView() {
+    public VodPlayerView getVideoView() {
         return surface_view;
     }
 

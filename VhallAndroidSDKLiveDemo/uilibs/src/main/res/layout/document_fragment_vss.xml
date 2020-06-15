@@ -3,10 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-<RelativeLayout
-    android:id="@+id/rl_doc_container"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-</RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/rl_doc_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>

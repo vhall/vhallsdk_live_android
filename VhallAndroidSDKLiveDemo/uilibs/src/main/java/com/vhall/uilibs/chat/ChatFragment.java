@@ -288,7 +288,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                                 viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.getText_content()), TextView.BufferType.SPANNABLE);
                             }
                             viewHolder.tv_chat_content.setVisibility(View.VISIBLE);
-                            viewHolder.tv_chat_name.setText(data.getNickname());
+                            viewHolder.tv_chat_name.setText(data.getNickname() +"角色："+data.getRoleName()+"("+data.getRole()+")");
                             break;
                         case MessageChatData.eventCustomKey:
                             viewHolder.tv_chat_content.setVisibility(View.VISIBLE);
@@ -296,11 +296,11 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                             viewHolder.tv_chat_name.setText(data.getNickname());
                             break;
                         case MessageChatData.eventOnlineKey:
-                            viewHolder.tv_chat_name.setText(String.format("%s上线了！", data.getNickname()));
+                            viewHolder.tv_chat_name.setText(String.format("%s上线了！角色：%s(%s)", data.getNickname(),data.getRoleName(),data.getRole()));
                             viewHolder.tv_chat_content.setVisibility(View.INVISIBLE);
                             break;
                         case MessageChatData.eventOfflineKey:
-                            viewHolder.tv_chat_name.setText(String.format("%s下线了！", data.getNickname()));
+                            viewHolder.tv_chat_name.setText(String.format("%s下线了！角色：%s(%s)", data.getNickname(),data.getRoleName(),data.getRole()));
                             viewHolder.tv_chat_content.setVisibility(View.INVISIBLE);
                             break;
                         default:

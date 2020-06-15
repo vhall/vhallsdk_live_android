@@ -29,6 +29,8 @@ public class MessageChatData implements Serializable {
     public String event = eventMsgKey;
     private List<String> image_urls;
     private String image_url;
+    private String roleName;
+    private String role;
 
     public static final String eventOnlineKey = "online";// 上线
     public static final String eventOfflineKey = "offline";// 下线
@@ -133,6 +135,41 @@ public class MessageChatData implements Serializable {
         this.image_url = image_url;
     }
 
+
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+        switch (roleName) {
+            case "1":
+            case "host":
+                this.role = "host";
+                break;
+            case "2":
+            case "user":
+                this.role = "user";
+                break;
+            case "3":
+            case "assistant":
+                this.role = "assistant";
+                break;
+            case "4":
+            case "guest":
+                this.role = "guest";
+                break;
+        }
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public static MessageChatData getChatData(ChatServer.ChatInfo chatInfo) {
         MessageChatData data = new MessageChatData();
         if (chatInfo == null) {
@@ -141,6 +178,8 @@ public class MessageChatData implements Serializable {
         data.setUserId(chatInfo.account_id);
         data.setNickname(chatInfo.user_name);
         data.setAvatar(chatInfo.avatar);
+        data.setRoleName(chatInfo.roleName);
+        data.setRole(chatInfo.role);
         data.setType("text");
         data.event = chatInfo.event;
         //处理回复消息
@@ -167,6 +206,7 @@ public class MessageChatData implements Serializable {
         data.setUserId(chatInfo.getThird_party_user_id());
         data.setNickname(chatInfo.getNickname());
         data.setAvatar(chatInfo.getAvatar());
+        data.setRoleName(chatInfo.getRole_name());
         if (chatInfo.getData() != null) {
             data.setType(chatInfo.getData().getType());
             String textContent = "";

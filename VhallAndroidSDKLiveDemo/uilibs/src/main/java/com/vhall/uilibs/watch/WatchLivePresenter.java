@@ -3,6 +3,7 @@ package com.vhall.uilibs.watch;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.vhall.business.ChatServer;
@@ -294,7 +295,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     @Override
     public void initWatch() {
-        if(webinarInfo !=null){
+        if (webinarInfo != null) {
             getWatchLive().setWebinarInfo(webinarInfo);
             operationDocument();
             liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
@@ -552,7 +553,6 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
                     break;
                 case com.vhall.player.Constants.Event.EVENT_STREAM_STOP://发起端停止推流
-
                     break;
                 default:
                     break;
@@ -569,6 +569,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
                     watchView.showToast(msg);
+
                     break;
                 default:
                     watchView.showToast(msg);

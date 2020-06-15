@@ -23,14 +23,17 @@ public class ChatContract {
 
         void notifyDataChangedQe(ChatServer.ChatInfo data);
 
+        //TODO type 类型作用说明补充
         void notifyDataChangedChat(int type, List<MessageChatData> list);
 
+        //TODO type 类型作用说明补充
         void notifyDataChangedQe(int type, List<ChatServer.ChatInfo> list);
 
         void showToast(String content);
 
         void clearChatData();
 
+        //TODO 该方法实际使用场景
         Context getContext();
 
         void performSend(String content, int chatEvent);

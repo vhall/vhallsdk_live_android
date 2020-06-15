@@ -4,6 +4,7 @@ import android.graphics.PixelFormat;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.util.handler.WeakHandler;
@@ -236,6 +237,12 @@ public class InteractivePresenterVss implements InteractiveContract.InteractiveF
                     stream.removeAllRenderView();
                     stream.addRenderView(newRenderView);
                     interFraView.addStream(newRenderView);
+                    newRenderView.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+
+                        }
+                    });
                 }
             });
         }

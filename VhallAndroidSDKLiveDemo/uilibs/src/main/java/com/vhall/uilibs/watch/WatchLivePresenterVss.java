@@ -56,6 +56,7 @@ import vhall.com.vss.data.VssMessageLotteryData;
 import vhall.com.vss.data.VssMessageQuestionData;
 import vhall.com.vss.data.VssMessageSignData;
 import vhall.com.vss.module.chat.VssChatManger;
+import vhall.com.vss.module.room.MessageTypeData;
 import vhall.com.vss.module.room.VssRoomManger;
 import vhall.com.vss.module.room.callback.IVssCallBackLister;
 import vhall.com.vss.module.room.callback.IVssMessageLister;
@@ -130,9 +131,6 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
         VssRoomManger.getInstance().enterRoom(param.vssToken, param.vssRoomId, new CallBack<ResponseRoomInfo>() {
             @Override
             public void onSuccess(final ResponseRoomInfo result) {
-                if (!VhallSDK.isLogin()) {
-                    VssSdk.getInstance().setUserId(result.getThird_party_user_id());
-                }
                 if (VhallSDK.isLogin()) {
                     if (result == null) {
                         return;
@@ -248,6 +246,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                 getPlayer().resume();
             } else {
                 getPlayer().start(roomId, accessToken);
+                getPlayer().setWaterMark(webinarInfo.watermark.imgUrl, webinarInfo.watermark.imgPosition,webinarInfo.watermark.imgAlpha);
             }
         }
     }
@@ -863,6 +862,12 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                     join.setTime(joinObject.optString("time"));
                     join.setNickname(joinObject.optString("name"));
                     join.setAvatar(joinObject.optString("avatar"));
+                    try {
+                        JSONObject context = new JSONObject(msg.getImMessageInfo().getContext());
+                        join.setRoleName(context.optString("role_name"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     chatView.notifyDataChangedChat(join);
                     watchView.setOnlineNum(msg.getImMessageInfo().getPv());
                     break;
@@ -872,6 +877,12 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                     leave.setTime(leaveObject.optString("time"));
                     leave.setNickname(leaveObject.optString("name"));
                     leave.setAvatar(leaveObject.optString("avatar"));
+                    try {
+                        JSONObject context = new JSONObject(msg.getImMessageInfo().getContext());
+                        leave.setRoleName(context.optString("role_name"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     leave.event = MessageChatData.eventOfflineKey;
                     chatView.notifyDataChangedChat(leave);
                     watchView.setOnlineNum(msg.getImMessageInfo().getPv());
@@ -992,6 +1003,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                         data.setUserId(messageChatData.getUserId());
                         data.setTime(messageChatData.getTime());
                         data.event = messageChatData.event;
+                        data.setRoleName(messageChatData.getRoleName());
                         data.setRoom_id(messageChatData.getRoom_id());
                         data.setImage_urls(messageChatData.getImage_urls());
                         data.setImage_url(messageChatData.getImage_url());
