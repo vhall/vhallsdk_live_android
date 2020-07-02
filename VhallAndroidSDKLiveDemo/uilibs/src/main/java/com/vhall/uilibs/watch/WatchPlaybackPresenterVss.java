@@ -264,7 +264,7 @@ public class WatchPlaybackPresenterVss implements WatchContract.PlaybackPresente
     public void onPlayClick() {
         if (getPlay().isPlaying()) {
             onStop();
-        } else {
+        } else if(webinarInfo.status == WebinarInfo.VIDEO || webinarInfo.status == WebinarInfo.MEDIA) {
             if (getPlay().getState() == Constants.State.END) {
                 getPlay().seekto(0);
             }

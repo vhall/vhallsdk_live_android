@@ -184,6 +184,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                 } else {
                     Toast.makeText(WatchActivity.this, "问答未开启", Toast.LENGTH_SHORT).show();
                 }
+                questionBtn.setVisibility((webinarInfo.question_status == 1)?View.VISIBLE:View.GONE);
+                if(webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
+                    watchView.showToast("还没开始直播");
                 /**
                  *
                  * 重要说明
@@ -321,7 +324,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             }
         });
         if (type == VhallUtil.WATCH_LIVE) {
-            questionBtn.setVisibility(View.VISIBLE);
+//            questionBtn.setVisibility(View.VISIBLE);
             contentChat.setVisibility(View.VISIBLE);
             chatBtn.setText("聊天");
         }
@@ -445,6 +448,17 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         if (popu != null) {
             popu.dismiss();
         }
+    }
+    //显示问答
+    @Override
+    public void showQAndA(){
+        questionBtn.setVisibility(View.VISIBLE);
+    }
+
+    //隐藏问答
+    public void dismissQAndA(){
+        questionBtn.setVisibility(View.GONE);
+        chatBtn.setChecked(true);
     }
 
     @Override

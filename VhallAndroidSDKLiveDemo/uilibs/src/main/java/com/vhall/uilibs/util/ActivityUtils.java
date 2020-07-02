@@ -13,7 +13,7 @@ public class ActivityUtils {
                                              Fragment fragment, int frameId) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(frameId, fragment);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
     }
 
 }

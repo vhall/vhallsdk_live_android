@@ -170,7 +170,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         } else {
             if (!getWatchPlayback().isAvaliable()) {
                 initWatch();
-            } else {
+            } else  if(webinarInfo.status == WebinarInfo.VIDEO || webinarInfo.status == WebinarInfo.MEDIA){
                 if (getWatchPlayback().getPlayerState() == Constants.State.END) {
                     getWatchPlayback().seekTo(0);
                 }

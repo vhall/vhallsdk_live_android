@@ -636,6 +636,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_QUESTION: // 问答开关
                     watchView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
+                    if(messageInfo.status == 1)
+                        watchView.showQAndA();
+                    else
+                        watchView.dismissQAndA();
                     break;
                 case MessageServer.EVENT_SURVEY://问卷
 
@@ -678,6 +682,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case MessageServer.EVENT_RESTART:
                     force = true;
                     //onSwitchPixel(WatchLive.DPI_DEFAULT);
+                    watchView.showToast("主持人已开启直播");
                     break;
                 case MessageServer.EVENT_INTERACTIVE_HAND:
                     Log.e(TAG, " status " + messageInfo.status);

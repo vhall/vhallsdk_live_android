@@ -4,6 +4,7 @@ import android.hardware.Camera;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.alibaba.fastjson.JSON;
 import com.vhall.business.Broadcast;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.WebinarInfo;
@@ -21,6 +22,8 @@ import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.emoji.InputUser;
 
 import org.json.JSONObject;
+
+import java.net.URLDecoder;
 
 import vhall.com.vss.data.MessageData;
 import vhall.com.vss.data.ResponseRoomInfo;
@@ -358,13 +361,23 @@ public class BroadcastPresenterVss implements BroadcastContract.Presenter, ChatC
             if (msg == null || TextUtils.isEmpty(msg.getType())) {
                 return;
             }
+
             switch (msg.getType()) {
                 case "Join":
                     JSONObject joinObject = (JSONObject) msg.getT();
                     MessageChatData join = new MessageChatData();
                     join.event = MessageChatData.eventOnlineKey;
                     join.setTime(joinObject.optString("time"));
-                    join.setNickname(joinObject.optString("name"));
+//                    join.setNickname(joinObject.optString("name"));
+                    try {
+                        JSONObject context =new JSONObject(URLDecoder.decode(msg.getImMessageInfo().getContext()));
+                        join.setRoleName(context.optString("role_name"));
+                        join.setAvatar(context.optString("avatar"));
+                        join.setNickname(context.optString("nick_name"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     chatView.notifyDataChangedChat(join);
                     break;
                 case "Leave":
@@ -373,6 +386,14 @@ public class BroadcastPresenterVss implements BroadcastContract.Presenter, ChatC
                     leave.setTime(leaveObject.optString("time"));
                     leave.setNickname(leaveObject.optString("name"));
                     leave.event = MessageChatData.eventOfflineKey;
+                    try {
+                        JSONObject context =new JSONObject(URLDecoder.decode(msg.getImMessageInfo().getContext()));
+                        leave.setRoleName(context.optString("role_name"));
+                        leave.setAvatar(context.optString("avatar"));
+                        leave.setNickname(context.optString("nick_name"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     chatView.notifyDataChangedChat(leave);
                     break;
                 case "service_im":
@@ -392,6 +413,14 @@ public class BroadcastPresenterVss implements BroadcastContract.Presenter, ChatC
                         data.setText_content(messageChatData.getText_content());
                         data.setImage_urls(messageChatData.getImage_urls());
                         data.setImage_url(messageChatData.getImage_url());
+                        try {
+                            JSONObject context =new JSONObject(URLDecoder.decode(msg.getImMessageInfo().getContext()));
+                            data.setRoleName(context.optString("role_name"));
+                            data.setAvatar(context.optString("avatar"));
+                            data.setNickname(context.optString("nick_name"));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         chatView.notifyDataChangedChat(data);
                     }
                     break;

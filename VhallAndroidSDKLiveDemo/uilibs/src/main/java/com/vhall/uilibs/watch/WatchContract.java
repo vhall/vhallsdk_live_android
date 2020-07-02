@@ -52,6 +52,12 @@ public class WatchContract {
         //隐藏问卷
         void dismissSurvey();
 
+        //显示问答
+        void showQAndA();
+
+        //隐藏问答
+        void dismissQAndA();
+
         //横竖屏切换
         int changeOrientation();
 

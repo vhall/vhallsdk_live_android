@@ -244,7 +244,7 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
         } else {
             if (getPlayer().resumeAble()) {
                 getPlayer().resume();
-            } else {
+            } else if(webinarInfo.status == WebinarInfo.LIVE){
                 getPlayer().start(roomId, accessToken);
                 getPlayer().setWaterMark(webinarInfo.watermark.imgUrl, webinarInfo.watermark.imgPosition,webinarInfo.watermark.imgAlpha);
             }
@@ -889,10 +889,12 @@ public class WatchLivePresenterVss implements WatchContract.LivePresenter, ChatC
                     break;
                 case "question_answer_open":
                     watchView.showToast("问答开始");
+                    watchView.showQAndA();
                     break;
 
                 case "question_answer_close":
                     watchView.showToast("问答结束");
+                    watchView.dismissQAndA();
                     break;
                 case "question_answer_create":
                 case "question_answer_commit":

@@ -293,7 +293,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                         case MessageChatData.eventCustomKey:
                             viewHolder.tv_chat_content.setVisibility(View.VISIBLE);
                             viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.getText_content()), TextView.BufferType.SPANNABLE);
-                            viewHolder.tv_chat_name.setText(data.getNickname());
+                            viewHolder.tv_chat_name.setText(data.getNickname()+"【自定义消息】");
                             break;
                         case MessageChatData.eventOnlineKey:
                             viewHolder.tv_chat_name.setText(String.format("%s上线了！角色：%s(%s)", data.getNickname(),data.getRoleName(),data.getRole()));
