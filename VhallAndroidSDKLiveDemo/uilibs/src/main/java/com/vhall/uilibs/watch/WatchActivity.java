@@ -55,8 +55,6 @@ import com.vhall.uilibs.util.emoji.InputView;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
 import com.vhall.uilibs.util.handler.WeakHandler;
 
-import vhall.com.vss.module.room.VssRoomManger;
-import vhall.com.vss.module.rtc.VssRtcManger;
 
 import static com.vhall.uilibs.util.SurveyView.EVENT_JS_BACK;
 import static com.vhall.uilibs.util.SurveyView.EVENT_PAGE_LOADED;
@@ -184,33 +182,17 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                 } else {
                     Toast.makeText(WatchActivity.this, "问答未开启", Toast.LENGTH_SHORT).show();
                 }
-                questionBtn.setVisibility((webinarInfo.question_status == 1)?View.VISIBLE:View.GONE);
-                if(webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
+                questionBtn.setVisibility((webinarInfo.question_status == 1) ? View.VISIBLE : View.GONE);
+                if (webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
                     watchView.showToast("还没开始直播");
-                /**
-                 *
-                 * 重要说明
-                 * 房间类型为H5是 webinarInfo 中vssToken，vssRoomId 有值，必需使用H5播放器播放，使用 PresenterVss
-                 * 房间类型为Flash时   vssToken，vssRoomId 空，必需使用Flash播放器播放 Presenter
-                 */
                 //敏感词过滤信息，发送聊天、评论通用
                 if (webinarInfo.filters != null && webinarInfo.filters.size() > 0) {
                     param.filters.clear();
                     param.filters.addAll(webinarInfo.filters);
                 }
-                if (!TextUtils.isEmpty(webinarInfo.vss_room_id) && !TextUtils.isEmpty(webinarInfo.vss_room_id)) {
-                    param.vssRoomId = webinarInfo.vss_room_id;
-                    param.vssToken = webinarInfo.vss_token;
-                    param.join_id = webinarInfo.join_id;
-                    if (docFragment == null) {
-                        docFragment = new DocumentFragmentVss();
-                        fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
-                    }
-                } else {
-                    if (docFragment == null) {
-                        docFragment = new DocumentFragment();
-                        fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
-                    }
+                if (docFragment == null) {
+                    docFragment = new DocumentFragment();
+                    fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
                 }
                 if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
                     //直播间，公告信息
@@ -220,20 +202,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     liveFragment = WatchLiveFragment.newInstance();
                     ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                             liveFragment, R.id.contentVideo);
-                    if (!TextUtils.isEmpty(webinarInfo.vss_room_id)) {
-                        new WatchLivePresenterVss(liveFragment, (WatchContract.DocumentViewVss) docFragment, chatFragment, questionFragment, watchView, param, webinarInfo);
-                    } else {
-                        new WatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param, webinarInfo);
-                    }
+                    new WatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param, webinarInfo);
                 } else if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
                     playbackFragment = WatchPlaybackFragment.newInstance();
                     ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                             playbackFragment, R.id.contentVideo);
-                    if (!TextUtils.isEmpty(webinarInfo.vss_room_id)) {
-                        new WatchPlaybackPresenterVss(playbackFragment, (WatchContract.DocumentViewVss) docFragment, chatFragment, watchView, param, webinarInfo);
-                    } else {
-                        new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, webinarInfo);
-                    }
+                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, webinarInfo);
                 }
             }
 
@@ -449,14 +423,15 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             popu.dismiss();
         }
     }
+
     //显示问答
     @Override
-    public void showQAndA(){
+    public void showQAndA() {
         questionBtn.setVisibility(View.VISIBLE);
     }
 
     //隐藏问答
-    public void dismissQAndA(){
+    public void dismissQAndA() {
         questionBtn.setVisibility(View.GONE);
         chatBtn.setChecked(true);
     }
@@ -529,15 +504,16 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             invitedDialog.setNegativeOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mPresenter.replyInvite(2);
+                    mPresenter.replyInvite(3);
                     invitedDialog.dismiss();
-                    //发送拒绝上麦信息
+                    //邀请超时上麦信息
                 }
             });
         }
         invitedDialog.setRefuseInviteListener(new InvitedDialog.RefuseInviteListener() {
             @Override
             public void refuseInvite() {
+                //拒绝上麦
                 mPresenter.replyInvite(2);
             }
         });
@@ -590,10 +566,6 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        VssRtcManger.leaveRoom();
-        VssRoomManger.leaveRoom();
-
-
         if (upnpService != null) {
             upnpService.getRegistry().removeListener(registryListener);
         }
@@ -618,6 +590,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     private AndroidUpnpService upnpService;
     private ServiceConnection serviceConnection = new ServiceConnection() {
 
+        @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.e("Service ", "mUpnpServiceConnection onServiceConnected");
             upnpService = (AndroidUpnpService) service;

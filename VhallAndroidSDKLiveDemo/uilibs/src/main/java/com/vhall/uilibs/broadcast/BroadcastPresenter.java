@@ -9,7 +9,6 @@ import com.vhall.business.ChatServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.WebinarInfo;
-import com.vhall.business.data.source.WebinarInfoDataSource;
 import com.vhall.player.Constants;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.push.VHLivePushConfig;

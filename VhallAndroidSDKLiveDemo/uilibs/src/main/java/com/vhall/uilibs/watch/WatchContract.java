@@ -2,6 +2,7 @@ package com.vhall.uilibs.watch;
 
 import android.app.Activity;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
@@ -99,12 +100,8 @@ public class WatchContract {
 
         void showType(int type);
 
-    }
+        void paintH5DocView(View docView);
 
-    interface DocumentViewVss extends BaseView<BasePresenter> {
-        void refreshView(com.vhall.document.DocumentView view);
-
-        void switchType(String type);
     }
 
     interface DetailView extends BaseView<BasePresenter> {
@@ -206,7 +203,7 @@ public class WatchContract {
 
         int changeOriention();
 
-        void onDestory();
+        void onDestroy();
 
         void submitLotteryInfo(String id, String lottery_id, String nickname, String phone);
 

@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.vhall.business.MessageServer;
 import com.vhall.uilibs.BasePresenter;
@@ -23,6 +24,7 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
     private WhiteBoardView board;
     private int showType = 0;
     private String url = "";
+    private FrameLayout h5FrameLayout;
 
     public static DocumentFragment newInstance() {
         DocumentFragment articleFragment = new DocumentFragment();
@@ -45,6 +47,7 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
         super.onActivityCreated(savedInstanceState);
         iv_doc = (PPTView) getView().findViewById(R.id.iv_doc);
         board = (WhiteBoardView) getView().findViewById(R.id.board);
+        h5FrameLayout = (FrameLayout) getView().findViewById(R.id.fl_h5_doc);
     }
 
     @Override
@@ -97,22 +100,36 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
         switch (type) {
             case 0://文档
                 iv_doc.setVisibility(View.VISIBLE);
+                h5FrameLayout.setVisibility(View.VISIBLE);
                 board.setVisibility(View.GONE);
                 board.setShowDoc(true);
                 break;
             case 1://白板
                 iv_doc.setVisibility(View.VISIBLE);
                 board.setVisibility(View.VISIBLE);
+                h5FrameLayout.setVisibility(View.VISIBLE);
                 board.setShowDoc(true);
                 break;
             case 2://关闭文档
                 iv_doc.setVisibility(View.GONE);
                 board.setVisibility(View.GONE);
+                h5FrameLayout.setVisibility(View.GONE);
                 board.setShowDoc(false);
+                break;
+            case 3://打开h5文档
+                iv_doc.setVisibility(View.GONE);
+                board.setVisibility(View.GONE);
+                h5FrameLayout.setVisibility(View.VISIBLE);
                 break;
             default:
                 break;
         }
+    }
+
+    @Override
+    public void paintH5DocView(View docView) {
+        h5FrameLayout.removeAllViews();
+        h5FrameLayout.addView(docView);
     }
 
     @Override

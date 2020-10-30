@@ -434,7 +434,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     @Override
     public void onDestroy() {
         if (mPresenter != null) {
-            mPresenter.onDestory();
+            mPresenter.onDestroy();
         }
         if (mDanmakuView != null) {
             // dont forget release!

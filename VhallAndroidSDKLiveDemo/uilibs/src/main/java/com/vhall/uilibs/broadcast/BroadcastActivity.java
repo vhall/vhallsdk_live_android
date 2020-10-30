@@ -4,7 +4,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManager;
 
@@ -80,11 +79,8 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     mainFragment, R.id.broadcastFrame);
         }
-        if (TextUtils.isEmpty(webinarInfo.vss_token)) {
-            new BroadcastPresenter(param, webinarInfo, this, mainFragment, chatFragment);
-        } else {
-            new BroadcastPresenterVss(param, this, mainFragment, chatFragment);
-        }
+        new BroadcastPresenter(param, webinarInfo, this, mainFragment, chatFragment);
+
         Log.e("onCreate", "onCreate");
     }
 

@@ -161,7 +161,7 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
     public void onDestroy() {
         Log.e("onDestroy", "onDestroy");
         if (mPresenter != null) {
-            mPresenter.onDestory();
+            mPresenter.onDestroy();
         }
         super.onDestroy();
     }

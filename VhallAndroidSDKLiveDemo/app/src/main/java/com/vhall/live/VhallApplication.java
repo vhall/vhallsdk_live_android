@@ -11,10 +11,6 @@ import com.vhall.uilibs.Param;
 
 import java.util.Iterator;
 
-import vhall.com.vss.VssSdk;
-
-import static com.vhall.business.VhallSDK.getUserId;
-
 /**
  * 主Application类
  */
@@ -33,7 +29,6 @@ public class VhallApplication extends Application {
 
         if (isAppProcess()) {
             VhallSDK.init(this, getResources().getString(R.string.vhall_app_key), getResources().getString(R.string.vhall_app_secret_key));
-            VssSdk.getInstance().init(getApplicationContext(), getUserId());
         }
     }
 

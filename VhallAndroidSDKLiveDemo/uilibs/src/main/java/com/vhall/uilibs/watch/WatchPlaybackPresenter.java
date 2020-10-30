@@ -3,6 +3,7 @@ package com.vhall.uilibs.watch;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -34,6 +36,13 @@ import java.util.TimerTask;
 import static com.vhall.business.MessageServer.EVENT_SHOWBOARD;
 import static com.vhall.business.MessageServer.EVENT_SHOWDOC;
 import static com.vhall.business.WatchPlayback.SHOW_DOC_KEY;
+import static com.vhall.ops.VHOPS.ERROR_CONNECT;
+import static com.vhall.ops.VHOPS.ERROR_DOC_INFO;
+import static com.vhall.ops.VHOPS.ERROR_SEND;
+import static com.vhall.ops.VHOPS.KEY_OPERATE;
+import static com.vhall.ops.VHOPS.TYPE_ACTIVE;
+import static com.vhall.ops.VHOPS.TYPE_SWITCHOFF;
+import static com.vhall.ops.VHOPS.TYPE_SWITCHON;
 
 //TODO  投屏相关
 import com.vhall.business_support.dlna.DeviceDisplay;
@@ -151,7 +160,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             timer.cancel();
             timer = null;
         }
-        getWatchPlayback().destory();
+        getWatchPlayback().destroy();
     }
 
     @Override
@@ -354,6 +363,41 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                     documentView.paintBoard(msgInfo);
                 }
                 documentView.paintPPT(msgInfo);
+            }
+        }
+
+        @Override
+        public void onEvent(String event, String type, View docView) {
+            if (documentView != null) {
+                if (event.equals(KEY_OPERATE)) {
+                    if (type.equals(TYPE_ACTIVE)) {
+                        documentView.paintH5DocView(docView);
+                    } else if (type.equals(TYPE_SWITCHOFF)) {
+                        documentView.showType(2);
+                    } else if (type.equals(TYPE_SWITCHON)) {
+                        documentView.showType(3);
+                    }
+                }
+            }
+        }
+        @Override
+        public void onError(int errorCode, int innerError, String errorMsg) {
+            switch (errorCode) {
+                case ERROR_CONNECT://文档服务链接错误
+                case ERROR_SEND://文档信息发送错误，演示端生效
+                    break;
+                case ERROR_DOC_INFO://文档加载错误
+                    try {
+                        JSONObject obj = new JSONObject(errorMsg);
+                        String msg = obj.optString("msg");
+                        String cid = obj.optString("cid");
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }

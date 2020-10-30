@@ -20,11 +20,6 @@ import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.handler.WeakHandler;
 
 import java.util.List;
-import java.util.Objects;
-
-import vhall.com.vss.CallBack;
-import vhall.com.vss.module.lottery.VssLotteryManger;
-import vhall.com.vss.module.room.VssRoomManger;
 
 /**
  * Created by qing on 2017/4/6.
@@ -169,20 +164,7 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
 
     public void submit(String nickname, String phone) {
         if (!TextUtils.isEmpty(lottery.getId()) && !TextUtils.isEmpty(lottery.getLottery_id())) {
-            if (VssRoomManger.enter) {
-                Objects.requireNonNull(VssLotteryManger.getInstance()).lotteryAward(lottery.getLottery_id(), nickname, phone, "", new CallBack() {
-                    @Override
-                    public void onSuccess(Object result) {
-                        dismiss();
-                        Toast.makeText(mContext, "信息提交成功", Toast.LENGTH_SHORT).show();
-                    }
 
-                    @Override
-                    public void onError(int eventCode, String msg) {
-                        Toast.makeText(mContext, "信息提交失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } else {
                 VhallSDK.submitLotteryInfo(lottery.getId(), lottery.getLottery_id(), nickname, phone, new RequestCallback() {
                     @Override
                     public void onSuccess() {
@@ -196,7 +178,5 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
                     }
                 });
             }
-        }
-
     }
 }

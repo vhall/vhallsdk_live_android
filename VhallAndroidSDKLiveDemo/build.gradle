@@ -21,6 +21,10 @@ allprojects {
         }
         jcenter()
 
+        maven{
+            url 'https://raw.githubusercontent.com/vhall/VHLibs_SDK_Android/master'
+        }
+
     }
 
     tasks.withType(Javadoc) {

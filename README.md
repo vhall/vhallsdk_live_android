@@ -4,8 +4,40 @@
 
 APP直接依赖uilib库即可，界面可在UI库中自定义
 具体API调用方式请参考uilib，或官方文档
+####注释
+uilib里面的aar替换为maven依赖
+具体使用 参考demo
+项目的 build.gradle里面添加
+
+```
+ maven{
+        url 'https://raw.githubusercontent.com/vhall/VHLibs_SDK_Android/master'
+       }
+``` 
+
+ 在uilib里面添加 具体使用依赖
+
+```
+ //SaaSSDK
+    api 'com.vhall.android.library:vh-saas-sdk:5.0.0'
+    api 'com.vhall.android.library:vh-saas-interactive:5.0.0'
+    //投屏相关
+    api 'com.vhall.android.library:vh-saas-sdk-support:2.0.0'
+    
+```
 
 二、版本更新信息：  
+
+版本5.0.0 更新时间 2020.10.30  
+1.优化用户使用 h5和flash统一使用方法
+2.优化日志上报
+3.添加h5文档显示 具体可以参考demo实现
+4.修改bug
+####sdk更新方法
+删除全部vss相关代码（目前升级后vss的会报错 全部删除即可）
+以后统一h5和flash
+
+
 版本：v4.3.1 更新时间 2020.07.02  
 1.支持预告活动，进入后可收到开始直播消息；  
 2.Demo 问答显示隐藏优化；  

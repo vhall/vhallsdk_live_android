@@ -24,38 +24,24 @@ android {
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
-
+//configurations {
+//    all*.exclude group: 'com.vhall.android.base', module: 'log-manager'
+//}
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar','*.aar'])
     implementation "com.android.support:appcompat-v7:${SUPPORT_VERSION}"
     api "com.github.bumptech.glide:glide:${GLIDE_VERSION}"
     //SaaSSDK
-    api("io.socket:socket.io-client:${SOCKET_IO_VERSION}") {
-        exclude group: 'org.json', module: 'json'
-    }
-    api 'com.google.android.exoplayer:exoplayer-core:2.9.1'
-    api 'com.google.android.exoplayer:exoplayer-hls:2.9.1'
+    api 'com.vhall.android.library:vh-saas-sdk:5.0.0'
+    api 'com.vhall.android.library:vh-saas-interactive:5.0.0'
+    //投屏相关
+    api 'com.vhall.android.library:vh-saas-sdk-support:2.0.0'
 
     implementation 'com.github.ctiao:DanmakuFlameMaster:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-armv7a:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-armv5:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-x86:0.6.4'
 
-    //投屏相关
-    api 'org.eclipse.jetty:jetty-server:8.1.8.v20121106'
-    api 'org.eclipse.jetty:jetty-servlet:8.1.8.v20121106'
-    api 'org.eclipse.jetty:jetty-client:8.1.8.v20121106'
-    api 'org.fourthline.cling:cling-core:2.1.1'
-    api 'org.fourthline.cling:cling-support:2.1.1'
-
-    //VssSDK
-    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
-    implementation 'com.alibaba:fastjson:1.2.47'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-    implementation "io.reactivex.rxjava2:rxjava:2.2.6"
-    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
-    implementation 'org.ligboy.retrofit2:converter-fastjson-android:2.1.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
 }
 repositories {
     mavenCentral()

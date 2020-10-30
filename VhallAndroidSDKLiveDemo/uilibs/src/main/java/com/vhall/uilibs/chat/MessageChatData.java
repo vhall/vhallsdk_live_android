@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-import vhall.com.vss.data.ResponseChatInfo;
 
 /**
  * @author hkl
@@ -29,8 +28,8 @@ public class MessageChatData implements Serializable {
     public String event = eventMsgKey;
     private List<String> image_urls;
     private String image_url;
-    private String roleName;
-    private String role;
+    private String roleName="2";
+    private String role="user";
 
     public static final String eventOnlineKey = "online";// 上线
     public static final String eventOfflineKey = "offline";// 下线
@@ -194,32 +193,6 @@ public class MessageChatData implements Serializable {
         if (!TextUtils.isEmpty(VhallSDK.getUserId())) {
             String userId = VhallSDK.getUserId();
             data.setMy(Objects.equals(chatInfo.account_id, userId));
-        }
-        return data;
-    }
-
-    public static MessageChatData getChatData(ResponseChatInfo chatInfo) {
-        MessageChatData data = new MessageChatData();
-        if (chatInfo == null) {
-            return data;
-        }
-        data.setUserId(chatInfo.getThird_party_user_id());
-        data.setNickname(chatInfo.getNickname());
-        data.setAvatar(chatInfo.getAvatar());
-        data.setRoleName(chatInfo.getRole_name());
-        if (chatInfo.getData() != null) {
-            data.setType(chatInfo.getData().getType());
-            String textContent = "";
-            if (chatInfo.getContext().getReplyMsg() != null) {
-                textContent = chatInfo.getContext().getReplyMsg().getNickName() + ":" + chatInfo.getContext().getReplyMsg().getContent().getText_content() + "\n" + "回复：";
-            }
-            data.setText_content(textContent + chatInfo.getData().getText_content());
-        }
-        data.setTime(chatInfo.getDate_time());
-        data.setMy(false);
-        if (!TextUtils.isEmpty(VhallSDK.getUserId())) {
-            String userId = VhallSDK.getUserId();
-            data.setMy(Objects.equals(chatInfo.getThird_party_user_id(), userId));
         }
         return data;
     }

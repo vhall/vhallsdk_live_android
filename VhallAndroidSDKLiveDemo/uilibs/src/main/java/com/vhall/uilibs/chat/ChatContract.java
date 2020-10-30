@@ -3,7 +3,6 @@ package com.vhall.uilibs.chat;
 import android.content.Context;
 
 import com.vhall.business.ChatServer;
-import com.vhall.business.data.Survey;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;

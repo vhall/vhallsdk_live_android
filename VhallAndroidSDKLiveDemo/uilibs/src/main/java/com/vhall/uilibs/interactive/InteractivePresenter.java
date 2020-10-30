@@ -13,8 +13,6 @@ import com.vhall.vhallrtc.client.Room;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 
-import org.json.JSONException;
-import org.webrtc.RendererCommon;
 import org.webrtc.SurfaceViewRenderer;
 
 public class InteractivePresenter implements InteractiveContract.InteractiveFraPresenter {
@@ -114,7 +112,10 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
     private void setLocalView() {
         vhRenderView = new VHRenderView(interActView.getContext());
         vhRenderView.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFit);
-        vhRenderView.init(interactive.getEglBase().getEglBaseContext(), null);
+        /**
+         * 不传 可以直接写空
+         */
+        vhRenderView.init(null, null);
         interactive.setLocalView(vhRenderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo, null);
         interFraView.addLocalView(vhRenderView);
         interactive.enterRoom();
@@ -274,10 +275,10 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
     }
 
     @Override
-    public void onDestory() {
+    public void onDestroy() {
         onDownMic();
 //        interactive.leaveRoom();
-        interactive.onDestory();
+        interactive.onDestroy();
         interactive = null;
     }
 

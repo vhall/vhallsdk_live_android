@@ -244,8 +244,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     @Override
-    public void onDestory() {
-        getWatchLive().destory();
+    public void onDestroy() {
+        getWatchLive().destroy();
     }
 
     @Override
@@ -657,6 +657,15 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     Log.e(TAG, "onEvent:show_docType:watchType= " + messageInfo.watchType);
                     getWatchLive().setIsUseDoc(messageInfo.watchType);
                     operationDocument();
+                    break;
+                case MessageServer.EVENT_SHOWH5DOC:
+                    if (documentView!=null){
+                        if (messageInfo.watchType==1){
+                            documentView.showType(3);
+                        }else {
+                            documentView.showType(2);
+                        }
+                    }
                     break;
                 case MessageServer.EVENT_CLEARBOARD:
                 case MessageServer.EVENT_DELETEBOARD:

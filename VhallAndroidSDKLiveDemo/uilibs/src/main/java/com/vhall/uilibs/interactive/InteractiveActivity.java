@@ -10,8 +10,6 @@ import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.ActivityUtils;
 
-import vhall.com.vss.module.room.VssRoomManger;
-
 /**
  * @author other
  */
@@ -34,11 +32,7 @@ public class InteractiveActivity extends FragmentActivity implements Interactive
         interactiveFragment = (InteractiveFragment) getSupportFragmentManager().findFragmentById(R.id.contentVideo);
         if (interactiveFragment == null) {
             interactiveFragment = InteractiveFragment.newInstance();
-            if (VssRoomManger.enter) {
-                new InteractivePresenterVss(this, interactiveFragment, param);
-            } else {
-                new InteractivePresenter(this, interactiveFragment, param);
-            }
+            new InteractivePresenter(this, interactiveFragment, param);
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), interactiveFragment, R.id.contentVideo);
         }
     }
