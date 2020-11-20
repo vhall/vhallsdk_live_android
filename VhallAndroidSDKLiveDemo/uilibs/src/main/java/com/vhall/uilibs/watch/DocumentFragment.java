@@ -56,11 +56,6 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
         showType(showType);
     }
 
-    //    @Override
-//    public void showDoc(String docUrl) {
-//        if (!url.equals(docUrl))
-//            Glide.with(this).load(docUrl).into(iv_doc);
-//    }
 
     @Override
     public void paintBoard(MessageServer.MsgInfo msgInfo) {
@@ -100,21 +95,19 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
         switch (type) {
             case 0://文档
                 iv_doc.setVisibility(View.VISIBLE);
-                h5FrameLayout.setVisibility(View.VISIBLE);
                 board.setVisibility(View.GONE);
                 board.setShowDoc(true);
                 break;
             case 1://白板
                 iv_doc.setVisibility(View.VISIBLE);
                 board.setVisibility(View.VISIBLE);
-                h5FrameLayout.setVisibility(View.VISIBLE);
                 board.setShowDoc(true);
                 break;
             case 2://关闭文档
                 iv_doc.setVisibility(View.GONE);
                 board.setVisibility(View.GONE);
-                h5FrameLayout.setVisibility(View.GONE);
                 board.setShowDoc(false);
+                h5FrameLayout.setVisibility(View.GONE);
                 break;
             case 3://打开h5文档
                 iv_doc.setVisibility(View.GONE);

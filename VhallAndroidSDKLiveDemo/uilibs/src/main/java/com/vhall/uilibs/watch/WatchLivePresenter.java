@@ -3,7 +3,6 @@ package com.vhall.uilibs.watch;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.vhall.business.ChatServer;
@@ -21,7 +20,7 @@ import com.vhall.player.stream.play.impl.VHVideoPlayerView;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
-import com.vhall.uilibs.chat.ChatFragment;
+import com.vhall.uilibs.chat.PushChatFragment;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.emoji.InputUser;
@@ -297,7 +296,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     public void initWatch() {
         if (webinarInfo != null) {
             getWatchLive().setWebinarInfo(webinarInfo);
-            operationDocument();
+           // operationDocument();
             liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
             chatView.clearChatData();
             getChatHistory();
@@ -309,7 +308,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         VhallSDK.getAnswerList(params.watchId, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                questionView.notifyDataChangedQe(ChatFragment.CHAT_EVENT_QUESTION, list);
+                questionView.notifyDataChangedQe(PushChatFragment.CHAT_EVENT_QUESTION, list);
             }
 
             @Override
@@ -486,7 +485,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     @Override
     public DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
-        DMCControl dmcControl = new DMCControl(deviceDisplay, service, getWatchLive().getOriginalUrl(),webinarInfo);
+        DMCControl dmcControl = new DMCControl(deviceDisplay, service, getWatchLive().getOriginalUrl(), webinarInfo);
         return dmcControl;
     }
 
@@ -636,10 +635,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_QUESTION: // 问答开关
                     watchView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
-                    if(messageInfo.status == 1)
+                    if (messageInfo.status == 1) {
                         watchView.showQAndA();
-                    else
+                    } else {
                         watchView.dismissQAndA();
+                    }
                     break;
                 case MessageServer.EVENT_SURVEY://问卷
 
@@ -665,6 +665,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                         }else {
                             documentView.showType(2);
                         }
+                    }
+                    break;
+                case MessageServer.EVENT_PAINTH5DOC:
+                    if (documentView!=null){
+                        documentView.paintH5DocView(messageInfo.h5DocView);
                     }
                     break;
                 case MessageServer.EVENT_CLEARBOARD:
@@ -839,7 +844,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 for (ChatServer.ChatInfo chatInfo : list) {
                     list1.add(MessageChatData.getChatData(chatInfo));
                 }
-                chatView.notifyDataChangedChat(ChatFragment.CHAT_EVENT_CHAT, list1);
+                chatView.notifyDataChangedChat(PushChatFragment.CHAT_EVENT_CHAT, list1);
             }
 
             @Override

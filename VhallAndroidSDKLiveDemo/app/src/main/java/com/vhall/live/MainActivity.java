@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,7 +22,9 @@ import com.vhall.uilibs.Param;
 import com.vhall.uilibs.broadcast.BroadcastActivity;
 import com.vhall.uilibs.util.CircleImageView;
 import com.vhall.uilibs.util.VhallUtil;
+import com.vhall.uilibs.watch.VWatchActivity;
 import com.vhall.uilibs.watch.WatchActivity;
+
 
 /**
  * 主界面的Activity
@@ -61,10 +64,34 @@ public class MainActivity extends FragmentActivity {
             }
         });
         requestPermission();
+
+//        String json = "[\n" +
+//                "  {\"name\":\"zhangsan\"},\n" +
+//                "  {\"name\":\"zhangsan\"},\n" +
+//                "  {\"name\":\"zhangsan\"},\n" +
+//                "  {\"name\":\"zhangsan\"},\n" +
+//                "  {\"name\":\"zhangsan\"},\n" +
+//                "  {\"name\":\"zhangsan\"},\n" +
+//                "  {\"name\":\"zhangsan\"},\n" +
+//                "  {\"name\":\"zhangsan\"},\n" +
+//                "  {\"name\":\"zhangsan\"},\n" +
+//                "  {\"name\":\"zhangsan\"},\n" +
+//                "  {\"name\":\"zhangsan\"}\n" +
+//                "]";
+        //for list
+//        ArrayList<Person> personList = VHJSON.parseObject(json,new ArrayList<Person>(){}.getClass());
+
+//       for object
+//        json = "{\"name\":\"zhangsan\"}";
+//        Person person = VHJSON.parseObject(json,Person.class);
+//        Log.e("","");
+
     }
 
     public void requestPermission() {
-        if (Build.VERSION.SDK_INT < 23) return;
+        if (Build.VERSION.SDK_INT < 23) {
+            return;
+        }
         ActivityCompat.requestPermissions(this, permissions, REQUEST_PERMISSIONS);
     }
 
@@ -127,10 +154,7 @@ public class MainActivity extends FragmentActivity {
     }
 
     public void onWatchLive(View view) {
-        Intent intent = new Intent(this, WatchActivity.class);
-        intent.putExtra("param", param);
-        intent.putExtra("type", VhallUtil.WATCH_LIVE);
-        startActivity(intent);
+        findViewById(R.id.select_window).setVisibility(View.VISIBLE);
     }
 
     public void onWatchPlayback(View view) {
@@ -149,6 +173,33 @@ public class MainActivity extends FragmentActivity {
     public void onH5Watch(View view) {
         Intent intent = new Intent(this, WebViewActivity.class);
         intent.putExtra("param",param);
+        startActivity(intent);
+    }
+
+    public void onHeadClick(View view) {
+        if (VhallSDK.isLogin()) {
+            Intent intent = new Intent(this, LiveListActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    public void onSelectWindowClick(View view) {
+        view.setVisibility(View.GONE);
+    }
+
+    public void onHScreenClick(View view) {
+        findViewById(R.id.select_window).setVisibility(View.GONE);
+        Intent intent = new Intent(this, WatchActivity.class);
+        intent.putExtra("param", param);
+        intent.putExtra("type", VhallUtil.WATCH_LIVE);
+        startActivity(intent);
+    }
+
+    public void onVScreenClick(View view) {
+        findViewById(R.id.select_window).setVisibility(View.GONE);
+        Intent intent = new Intent(this, VWatchActivity.class);
+        intent.putExtra("param", param);
+        intent.putExtra("type", VhallUtil.WATCH_LIVE);
         startActivity(intent);
     }
 }

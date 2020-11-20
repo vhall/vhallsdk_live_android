@@ -119,10 +119,11 @@ public class SurveyPopu extends PopupWindow {
 
                                 @Override
                                 public void afterTextChanged(Editable s) {
-                                    if (question.answer.isEmpty())
+                                    if (question.answer.isEmpty()) {
                                         question.answer.add(s.toString());
-                                    else
+                                    } else {
                                         question.answer.set(0, s.toString());
+                                    }
                                 }
                             });
                             ll_content.addView(editText);
@@ -142,10 +143,11 @@ public class SurveyPopu extends PopupWindow {
                                     @Override
                                     public void onCheckedChanged(RadioGroup group, int checkedId) {
                                         RadioButton radioButton = (RadioButton) group.findViewById(checkedId);
-                                        if (question.answer.isEmpty())
+                                        if (question.answer.isEmpty()) {
                                             question.answer.add(radioButton.getText().toString());
-                                        else
+                                        } else {
                                             question.answer.set(0, radioButton.getText().toString());
+                                        }
                                     }
                                 });
                                 ll_content.addView(radioGroup);
@@ -234,15 +236,17 @@ public class SurveyPopu extends PopupWindow {
                                 }
                                 jsonArray.put(obj);
                             }
-                            if (!isAvailable)
+                            if (!isAvailable) {
                                 return;
+                            }
                             if (isEmpty) {
                                 Toast.makeText(context, "提交成功！", Toast.LENGTH_SHORT).show();
                                 SurveyPopu.this.dismiss();
                                 return;
                             }
-                            if (onSubmitClickListener != null && isAvailable)
+                            if (onSubmitClickListener != null && isAvailable) {
                                 onSubmitClickListener.onSubmitClick(survey, jsonArray.toString());
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

@@ -11,21 +11,20 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.UserInfo;
 import com.vhall.business.data.source.UserInfoDataSource;
 
-/**
- * 登录界面
- */
 public class LoginActivity extends Activity {
 
     private static final String TAG = "LoginActivity";
     private EditText mTextInputUsername;
     private EditText mTextInputPassword;
     public AlertDialog alertDialog;
+    private TextView mVerTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +32,8 @@ public class LoginActivity extends Activity {
         setContentView(R.layout.login_activity);
         mTextInputUsername = this.findViewById(R.id.text_input_username);
         mTextInputPassword = this.findViewById(R.id.text_input_password);
+        mVerTextView       = this.findViewById(R.id.label_ver);
+        mVerTextView.setText(VhallSDK.getVersion());
     }
 
     public void login(String username, String userpass) {
@@ -51,6 +52,14 @@ public class LoginActivity extends Activity {
         });
     }
 
+//    /**
+//     * 判断是否缺少权限
+//     */
+//    private boolean lacksPermission() {
+//        return ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.CAMERA) ==
+//                PackageManager.PERMISSION_DENIED && ContextCompat.checkSelfPermission(LoginActivity.this, Manifest.permission.RECORD_AUDIO) ==
+//                PackageManager.PERMISSION_DENIED;
+//    }
 
     public void loginClick(View view) {
         checkUserInfo();

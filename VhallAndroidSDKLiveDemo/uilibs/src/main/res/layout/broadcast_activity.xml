@@ -12,9 +12,9 @@
     <FrameLayout
         android:id="@+id/chatFrame"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_alignParentBottom="true"
+        android:layout_height="400dp"
         android:layout_alignParentLeft="true"
-        android:layout_marginRight="70dp"/>
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="70dp" />
 
 </RelativeLayout>

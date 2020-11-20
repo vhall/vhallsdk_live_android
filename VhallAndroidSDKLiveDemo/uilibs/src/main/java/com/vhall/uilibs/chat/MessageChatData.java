@@ -7,8 +7,6 @@ import com.vhall.business.VhallSDK;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
-
 
 /**
  * @author hkl
@@ -28,8 +26,9 @@ public class MessageChatData implements Serializable {
     public String event = eventMsgKey;
     private List<String> image_urls;
     private String image_url;
-    private String roleName="2";
-    private String role="user";
+    private String roleName = "2";
+    private String role = "user";
+    public ChatServer.ChatInfo.OnlineData onlineData;
 
     public static final String eventOnlineKey = "online";// 上线
     public static final String eventOfflineKey = "offline";// 下线
@@ -158,6 +157,8 @@ public class MessageChatData implements Serializable {
             case "guest":
                 this.role = "guest";
                 break;
+            default:
+                break;
         }
     }
 
@@ -174,12 +175,13 @@ public class MessageChatData implements Serializable {
         if (chatInfo == null) {
             return data;
         }
+        data.onlineData = chatInfo.onlineData;
         data.setUserId(chatInfo.account_id);
         data.setNickname(chatInfo.user_name);
         data.setAvatar(chatInfo.avatar);
         data.setRoleName(chatInfo.roleName);
         data.setRole(chatInfo.role);
-        data.setType("text");
+        data.setTime(chatInfo.time);
         data.event = chatInfo.event;
         //处理回复消息
         String textContent = "";
@@ -188,11 +190,17 @@ public class MessageChatData implements Serializable {
         }
         if (chatInfo.msgData != null) {
             data.setText_content(textContent + chatInfo.msgData.text);
+            data.setType(chatInfo.msgData.type);
+            if (TextUtils.isEmpty(data.getType())) {
+                data.setType("text");
+            }
+            data.setImage_url(chatInfo.msgData.resourceUrl);
+            data.setImage_urls(chatInfo.msgData.imageUrls);
         }
         data.setMy(false);
         if (!TextUtils.isEmpty(VhallSDK.getUserId())) {
             String userId = VhallSDK.getUserId();
-            data.setMy(Objects.equals(chatInfo.account_id, userId));
+            data.setMy(TextUtils.equals(chatInfo.account_id, userId));
         }
         return data;
     }

@@ -9,6 +9,7 @@ android {
         versionName "4.2.3"
 
         multiDexEnabled true
+        signingConfig signingConfigs.debug
     }
     buildTypes {
         release {
@@ -24,6 +25,22 @@ android {
 //    packagingOptions {
 //        exclude 'META-INF/beans.xml'
 //    }
+
+    signingConfigs {
+        release {
+            storeFile file("vhall_android_app.keystore")
+            storePassword '123456'
+            keyAlias 'yanting lin'
+            keyPassword '123456'
+        }
+
+        debug {
+            storeFile file("vhall_android_app.keystore")
+            storePassword '123456'
+            keyAlias 'yanting lin'
+            keyPassword '123456'
+        }
+    }
 
 
     compileOptions {
@@ -43,6 +60,9 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':uilibs')
     implementation "com.android.support:appcompat-v7:${SUPPORT_VERSION}"
+    implementation 'com.android.support.constraint:constraint-layout:2.0.2'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    implementation 'com.alibaba:fastjson:1.2.73'
 }
 
 //repositories {

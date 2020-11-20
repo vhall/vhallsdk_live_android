@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.vhall.business.ChatServer;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.VhallUtil;
@@ -185,6 +188,10 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
 
     @Override
     public void performSend(String content, int chatEvent) {
+        if (TextUtils.isEmpty(content)) {
+            Toast.makeText(getContext(), "发送的消息不能为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
         switch (status) {
             case VhallUtil.BROADCAST://直播界面只能发聊天
                 mPresenter.sendChat(content);
@@ -273,9 +280,10 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
 
                     String avatar = data.getAvatar();
                     if (!TextUtils.isEmpty(avatar) && !avatar.startsWith("http")) {
-                        avatar = String.format("http:%s", avatar);
+                        avatar = String.format("https:%s", avatar);
                     }
-                    Glide.with(getActivity()).load(avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_chat_avatar);
+                    RequestOptions options = new RequestOptions().placeholder(R.drawable.icon_vhall).transform(new CircleCrop());
+                    Glide.with(getActivity()).load(avatar).apply(options).into(viewHolder.iv_chat_avatar);
                     switch (data.event) {
                         case MessageChatData.eventMsgKey:
                             if (data.getType().equals("image")) {
@@ -374,8 +382,9 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
             }
             ChatServer.ChatInfo data = questionData.get(position);
             ChatServer.ChatInfo.QuestionData questionData = data.questionData;
+            RequestOptions options = new RequestOptions().placeholder(R.drawable.icon_vhall);
             if (questionData != null && !TextUtils.isEmpty(questionData.avatar)) {
-                Glide.with(getActivity()).load(questionData.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_question_avatar);
+                Glide.with(getActivity()).load(questionData.avatar).apply(options).into(viewHolder.iv_question_avatar);
             }
             //TODO 头像设置
             viewHolder.tv_question_name.setText(questionData.nick_name);
@@ -386,10 +395,10 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                 viewHolder.tv_answer_content.setText(EmojiUtils.getEmojiText(mActivity, questionData.answer.content), TextView.BufferType.SPANNABLE);
                 viewHolder.tv_answer_name.setText(questionData.answer.nick_name);
                 viewHolder.tv_answer_time.setText(questionData.answer.created_at);
-                Glide.with(getActivity()).load(questionData.answer.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_answer_avatar);
-                Glide.with(getActivity()).load(questionData.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_question_avatar);
+                Glide.with(getActivity()).load(questionData.answer.avatar).apply(options).into(viewHolder.iv_answer_avatar);
+                Glide.with(getActivity()).load(questionData.avatar).apply(options).into(viewHolder.iv_question_avatar);
             } else {
-                Glide.with(getActivity()).load(data.avatar).placeholder(R.drawable.icon_vhall).into(viewHolder.iv_question_avatar);
+                Glide.with(getActivity()).load(data.avatar).apply(options).into(viewHolder.iv_question_avatar);
                 viewHolder.ll_answer.setVisibility(View.GONE);
             }
             return convertView;

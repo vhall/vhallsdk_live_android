@@ -1,215 +1,258 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="2"
-        android:background="@drawable/main_bg_top"
-        android:padding="10dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <RelativeLayout
-
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:background="@drawable/main_bg_top"
+            android:padding="10dp">
 
-            <TextView
-                android:id="@+id/tv_phone"
+            <RelativeLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_phone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawableLeft="@drawable/icon_cellphone"
+                    android:drawablePadding="5dp"
+                    android:gravity="center_vertical"
+                    android:text="华为荣耀"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/common_button_textsize" />
+
+                <TextView
+                    android:id="@+id/tv_login"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/login"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/common_button_textsize" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_avatar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/icon_cellphone"
-                android:drawablePadding="5dp"
-                android:gravity="center_vertical"
-                android:text="华为荣耀"
-                android:textColor="@color/white"
-                android:textSize="@dimen/common_button_textsize" />
-
-            <TextView
-                android:id="@+id/tv_login"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text="@string/login"
-                android:textColor="@color/white"
-                android:textSize="@dimen/common_button_textsize" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rl_avatar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@drawable/icon_avatar_bg">
-
-            <com.vhall.uilibs.util.CircleImageView
-                android:id="@+id/iv_avatar"
-                android:layout_width="104dp"
-                android:layout_height="104dp"
                 android:layout_centerInParent="true"
-                android:src="@drawable/icon_default_avatar" />
+                android:background="@drawable/icon_avatar_bg">
+
+                <com.vhall.uilibs.util.CircleImageView
+                    android:id="@+id/iv_avatar"
+                    android:layout_width="104dp"
+                    android:layout_height="104dp"
+                    android:layout_centerInParent="true"
+                    android:onClick="onHeadClick"
+                    android:src="@drawable/icon_default_avatar" />
+            </RelativeLayout>
+
+
+            <TextView
+                android:id="@+id/text_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rl_avatar"
+                android:layout_centerInParent="true"
+                android:text="KoreaHank"
+                android:textColor="@color/white"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
         </RelativeLayout>
 
-
-        <TextView
-            android:id="@+id/text_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/rl_avatar"
-            android:layout_centerInParent="true"
-            android:text="KoreaHank"
-            android:textColor="@color/white"
-            android:textSize="18dp"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
-        android:background="@drawable/fuc_bg">
-
-        <TableLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:showDividers="none">
+            android:layout_height="0dp"
+            android:layout_weight="3"
+            android:background="@drawable/fuc_bg">
 
-            <TableRow
-                android:layout_height="0dp"
-                android:layout_marginBottom="1dp"
-                android:layout_weight="1">
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:showDividers="none">
 
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="1dp"
-                    android:layout_weight="1"
-                    android:background="@color/white">
+                <TableRow
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_weight="1">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_gravity="center"
-                        android:clickable="true"
-                        android:drawablePadding="10dp"
-                        android:drawableTop="@drawable/selector_bro_landspace"
-                        android:gravity="center"
-                        android:onClick="onBroadcastLandspace"
-                        android:padding="30dp"
-                        android:text="横屏直播"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/common_button_textsize" />
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="1dp"
+                        android:layout_weight="1"
+                        android:background="@color/white">
 
-                </RelativeLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_gravity="center"
+                            android:clickable="true"
+                            android:drawablePadding="10dp"
+                            android:drawableTop="@drawable/selector_bro_landspace"
+                            android:gravity="center"
+                            android:onClick="onBroadcastLandspace"
+                            android:padding="30dp"
+                            android:text="横屏直播"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/common_button_textsize" />
 
-
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@android:color/white">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_gravity="center"
-                        android:clickable="true"
-                        android:drawablePadding="10dp"
-                        android:drawableTop="@drawable/selector_bro_portrait"
-                        android:gravity="center"
-                        android:onClick="onBroadcastPortrait"
-                        android:padding="30dp"
-                        android:text="竖屏直播"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/common_button_textsize" />
-
-                </RelativeLayout>
-
-            </TableRow>
-
-            <TableRow
-                android:layout_height="0dp"
-                android:layout_weight="1">
-
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginRight="1dp"
-                    android:layout_weight="1"
-                    android:background="@android:color/white">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_gravity="center"
-                        android:clickable="true"
-                        android:drawablePadding="10dp"
-                        android:drawableTop="@drawable/selector_watch_live"
-                        android:gravity="center"
-                        android:onClick="onWatchLive"
-                        android:padding="20dp"
-                        android:text="观看直播"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/common_button_textsize" />
-
-                </RelativeLayout>
+                    </RelativeLayout>
 
 
-                <RelativeLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="@android:color/white">
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@android:color/white">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:layout_gravity="center"
-                        android:clickable="true"
-                        android:drawablePadding="10dp"
-                        android:drawableTop="@drawable/selector_watch_playback"
-                        android:gravity="center"
-                        android:onClick="onWatchPlayback"
-                        android:padding="20dp"
-                        android:text="观看回放"
-                        android:textColor="@color/black"
-                        android:textSize="@dimen/common_button_textsize" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_gravity="center"
+                            android:clickable="true"
+                            android:drawablePadding="10dp"
+                            android:drawableTop="@drawable/selector_bro_portrait"
+                            android:gravity="center"
+                            android:onClick="onBroadcastPortrait"
+                            android:padding="30dp"
+                            android:text="竖屏直播"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/common_button_textsize" />
 
-                </RelativeLayout>
-            </TableRow>
+                    </RelativeLayout>
 
-        </TableLayout>
+                </TableRow>
+
+                <TableRow
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginRight="1dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/white">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_gravity="center"
+                            android:clickable="true"
+                            android:drawablePadding="10dp"
+                            android:drawableTop="@drawable/selector_watch_live"
+                            android:gravity="center"
+                            android:onClick="onWatchLive"
+                            android:padding="20dp"
+                            android:text="观看直播"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/common_button_textsize" />
+
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@android:color/white">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_gravity="center"
+                            android:clickable="true"
+                            android:drawablePadding="10dp"
+                            android:drawableTop="@drawable/selector_watch_playback"
+                            android:gravity="center"
+                            android:onClick="onWatchPlayback"
+                            android:padding="20dp"
+                            android:text="观看回放"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/common_button_textsize" />
+
+                    </RelativeLayout>
+                </TableRow>
+
+            </TableLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:background="@drawable/btn_set_param"
+                android:clickable="true"
+                android:text="@string/app_set"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="12dp"
+                android:onClick="onSetParam" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_set_param"
+                android:text="网页观看"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:onClick="onH5Watch"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/select_window"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:onClick="onSelectWindowClick"
+        android:visibility="gone">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:background="@drawable/btn_set_param"
-            android:clickable="true"
-            android:text="@string/app_set"
+            android:id="@+id/h_screen"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="1dp"
+            android:background="#ff3029"
             android:gravity="center"
-            android:textColor="@color/white"
-            android:textSize="12dp"
-            android:onClick="onSetParam" />
+            android:onClick="onHScreenClick"
+            android:text="横屏观看"
+            android:textColor="#ffffff"
+            app:layout_constraintBottom_toTopOf="@+id/v_screen"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/btn_set_param"
-            android:text="网页观看"
+            android:id="@+id/v_screen"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:background="#ff3029"
             android:gravity="center"
-            android:textColor="@color/white"
-            android:onClick="onH5Watch"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"/>
-    </RelativeLayout>
+            android:onClick="onVScreenClick"
+            android:text="竖屏观看"
+            android:textColor="#ffffff"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </android.support.constraint.ConstraintLayout>
 
-
-</LinearLayout>
+</RelativeLayout>

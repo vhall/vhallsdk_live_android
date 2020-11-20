@@ -10,7 +10,7 @@ import android.view.WindowManager;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.chat.ChatFragment;
+import com.vhall.uilibs.chat.PushChatFragment;
 import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
@@ -22,7 +22,7 @@ import com.vhall.uilibs.util.emoji.KeyBoardManager;
  */
 public class BroadcastActivity extends FragmentActivity implements BroadcastContract.BroadcastView {
     InputView inputView;
-    ChatFragment chatFragment;
+    PushChatFragment chatFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +52,9 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             inputView.setOnSendClickListener(new InputView.SendMsgClickListener() {
                 @Override
                 public void onSendClick(String msg, InputUser user) {
-                    if (chatFragment != null)
-                        chatFragment.performSend(msg, ChatFragment.CHAT_EVENT_CHAT);
+                    if (chatFragment != null) {
+                        chatFragment.performSend(msg, PushChatFragment.CHAT_EVENT_CHAT);
+                    }
                 }
             });
             inputView.setOnHeightReceivedListener(new InputView.KeyboardHeightListener() {
@@ -67,9 +68,9 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
                 }
             });
         }
-        chatFragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.chatFrame);
+        chatFragment = (PushChatFragment) getSupportFragmentManager().findFragmentById(R.id.chatFrame);
         if (chatFragment == null) {
-            chatFragment = ChatFragment.newInstance(VhallUtil.BROADCAST, false);
+            chatFragment = PushChatFragment.newInstance(VhallUtil.BROADCAST, false);
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     chatFragment, R.id.chatFrame);
         }
@@ -80,15 +81,14 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
                     mainFragment, R.id.broadcastFrame);
         }
         new BroadcastPresenter(param, webinarInfo, this, mainFragment, chatFragment);
-
-        Log.e("onCreate", "onCreate");
     }
 
 
     @Override
     public void showChatView(boolean isShowEmoji, InputUser user, int contentLengthLimit) {
-        if (contentLengthLimit > 0)
+        if (contentLengthLimit > 0) {
             inputView.setLimitNo(contentLengthLimit);
+        }
         inputView.show(isShowEmoji, user);
     }
 

@@ -77,8 +77,9 @@ public class SignInDialog extends AlertDialog {
         btn_signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (onSignInClickListener != null)
+                if (onSignInClickListener != null) {
                     onSignInClickListener.signIn(signInId);
+                }
             }
         });
         this.setView(root);

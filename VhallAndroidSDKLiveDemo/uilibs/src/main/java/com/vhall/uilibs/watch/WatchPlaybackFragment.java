@@ -92,7 +92,6 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mPresenter.onStopTrackingTouch(seekBar);
-                Log.e(TAG, "onStopTrackingTouch == " + seekBar.getProgress());
             }
         });
         mPresenter.start();
@@ -131,10 +130,11 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
 
     @Override
     public void showProgressbar(boolean show) {
-        if (show)
+        if (show) {
             pb.setVisibility(View.VISIBLE);
-        else
+        } else {
             pb.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -183,12 +183,14 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     @Override
     public void setQualityChecked(String dpi) {
         int count = rg_quality.getChildCount();
-        if (TextUtils.isEmpty(dpi) || count <= 0)
+        if (TextUtils.isEmpty(dpi) || count <= 0) {
             return;
+        }
         for (int i = 0; i < count; i++) {
             RadioButton rb = (RadioButton) rg_quality.getChildAt(i);
-            if (rb.getText().equals(dpi))
+            if (rb.getText().equals(dpi)) {
                 rb.setChecked(true);
+            }
         }
     }
 

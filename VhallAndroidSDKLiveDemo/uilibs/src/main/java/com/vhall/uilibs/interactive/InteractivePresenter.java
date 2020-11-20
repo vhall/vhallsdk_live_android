@@ -15,6 +15,9 @@ import com.vhall.vhallrtc.client.VHRenderView;
 
 import org.webrtc.SurfaceViewRenderer;
 
+/**
+ * @author huohuo
+ */
 public class InteractivePresenter implements InteractiveContract.InteractiveFraPresenter {
     private InteractiveContract.InteractiveActView interActView;
     private InteractiveContract.InteractiveFraView interFraView;
@@ -112,9 +115,6 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
     private void setLocalView() {
         vhRenderView = new VHRenderView(interActView.getContext());
         vhRenderView.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFit);
-        /**
-         * 不传 可以直接写空
-         */
         vhRenderView.init(null, null);
         interactive.setLocalView(vhRenderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo, null);
         interFraView.addLocalView(vhRenderView);
@@ -165,12 +165,8 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
                     }
                     break;
                 case MessageServer.EVENT_INTERACTIVE_DOWN_MIC:
-                    if (interactive != null && interactive.getWebinarInfo() != null) {
-                        if (messageInfo.user_id.equals(interactive.getWebinarInfo().join_id)) {
-                            if (interactive != null) {
-                                interActView.finish();
-                            }
-                        }
+                    if (interActView != null) {
+                        interActView.finish();
                     }
                     break;
                 default:
@@ -277,9 +273,8 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
     @Override
     public void onDestroy() {
         onDownMic();
-//        interactive.leaveRoom();
+      //  interactive.leaveRoom();
         interactive.onDestroy();
-        interactive = null;
     }
 
 }

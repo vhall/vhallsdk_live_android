@@ -292,8 +292,9 @@ public class InputView {
     }
 
     public void dismiss() {
-        if (contentView.getVisibility() == View.GONE)
+        if (contentView.getVisibility() == View.GONE) {
             return;
+        }
         KeyBoardManager.closeKeyboard(et_content, activity);
         showEmoji = false;
         new Handler() {//延时0.2秒显示表情
@@ -338,13 +339,15 @@ public class InputView {
                         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) contentView.getLayoutParams();
                         if (activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                             keyboardHeight_portrait = keyboardHeight;
-                            if (onHeightReceivedListener != null)
+                            if (onHeightReceivedListener != null) {
                                 onHeightReceivedListener.onHeightReceived(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT, keyboardHeight_portrait);
+                            }
                             params.setMargins(0, 0, 0, keyboardHeight);
                         } else if (activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
                             keyboardHeight_landspace = keyboardHeight;
-                            if (onHeightReceivedListener != null)
+                            if (onHeightReceivedListener != null) {
                                 onHeightReceivedListener.onHeightReceived(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE, keyboardHeight_landspace);
+                            }
                             params.setMargins(0, 0, 0, keyboardHeight);
                         }
                         contentView.setLayoutParams(params);

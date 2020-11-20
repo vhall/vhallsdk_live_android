@@ -195,10 +195,11 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
     @Override
     public void showLoading(boolean isShow) {
-        if (isShow)
+        if (isShow) {
             progressbar.setVisibility(View.VISIBLE);
-        else
+        } else {
             progressbar.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -224,8 +225,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
                 mPresenter.onMobileSwitchRes(Constants.Rate.DPI_AUDIO);
             }
         }*/ else if (i == R.id.btn_danmaku) {
-            if (mDanmakuView == null || !mDanmakuView.isPrepared())
+            if (mDanmakuView == null || !mDanmakuView.isPrepared()) {
                 return;
+            }
             if (mDanmakuView.isShown()) {
                 mDanmakuView.hide();
                 btn_danmaku.setImageResource(R.drawable.vhall_icon_danmaku_close);
@@ -247,8 +249,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
      */
     @Override
     public void showRadioButton(HashMap map) {
-        if (map == null)
+        if (map == null) {
             return;
+        }
         Iterator iter = map.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry entry = (Map.Entry) iter.next();
@@ -257,37 +260,42 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             switch (key) {
                 case "A":
                 case "a":
-                    if (value == 1)
+                    if (value == 1) {
                         radioButtonShowA.setVisibility(View.VISIBLE);
-                    else
+                    } else {
                         radioButtonShowA.setVisibility(View.GONE);
+                    }
                     break;
                 case "SD":
                 case "360p":
-                    if (value == 1)
+                    if (value == 1) {
                         radioButtonShowSD.setVisibility(View.VISIBLE);
-                    else
+                    } else {
                         radioButtonShowSD.setVisibility(View.GONE);
+                    }
                     break;
                 case "HD":
                 case "480p":
-                    if (value == 1)
+                    if (value == 1) {
                         radioButtonShowHD.setVisibility(View.VISIBLE);
-                    else
+                    } else {
                         radioButtonShowHD.setVisibility(View.GONE);
+                    }
                     break;
                 case "UHD":
                 case "720p":
-                    if (value == 1)
+                    if (value == 1) {
                         radioButtonShowUHD.setVisibility(View.VISIBLE);
-                    else
+                    } else {
                         radioButtonShowUHD.setVisibility(View.GONE);
+                    }
                     break;
                 case "same":
-                    if (value == 1)
+                    if (value == 1) {
                         radioButtonShowDEFAULT.setVisibility(View.VISIBLE);
-                    else
+                    } else {
                         radioButtonShowDEFAULT.setVisibility(View.GONE);
+                    }
                     break;
                 default:
                     break;

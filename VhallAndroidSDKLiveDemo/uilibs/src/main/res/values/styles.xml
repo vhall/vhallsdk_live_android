@@ -11,4 +11,9 @@
         <item name="android:textSize">@dimen/common_content_size_16</item>
     </style>
 
+    <style name="style0">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">#FF961F</item>
+    </style>
+
 </resources>

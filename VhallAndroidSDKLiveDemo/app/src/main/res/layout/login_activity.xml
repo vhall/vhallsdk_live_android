@@ -86,4 +86,15 @@
         android:layout_marginBottom="41dp"
         android:src="@drawable/vhall_dev" />
 
+    <TextView
+        android:id="@+id/label_ver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="41dp"
+        android:gravity="right"
+        android:padding="5dp"
+        android:text="v"
+        android:textColor="@color/gray_normal" />
 </RelativeLayout>

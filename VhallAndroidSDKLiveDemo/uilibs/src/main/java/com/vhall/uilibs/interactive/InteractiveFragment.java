@@ -120,7 +120,9 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
 
     @Override
     public void removeStream(Stream stream) {
-        if (stream == null) return;
+        if (stream == null) {
+            return;
+        }
         int childCount = mContainar.getChildCount();
         for (int i = 0; i < childCount; i++) {
             VHRenderView view = (VHRenderView) mContainar.getChildAt(i);

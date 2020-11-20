@@ -2,6 +2,7 @@ package com.vhall.uilibs.interactive;
 
 
 import android.content.Context;
+import android.support.annotation.AnyRes;
 
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;

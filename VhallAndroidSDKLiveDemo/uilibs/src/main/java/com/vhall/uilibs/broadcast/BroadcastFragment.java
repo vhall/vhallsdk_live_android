@@ -99,10 +99,11 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     public void onClick(View v) {
         int i = v.getId();
         if (i == R.id.btn_publish) {
-            if (cameraAvailable)
+            if (cameraAvailable) {
                 mPresenter.onstartBtnClick();
-            else
+            } else {
                 Toast.makeText(mActivity, "camera is not available...", Toast.LENGTH_SHORT).show();
+            }
         } else if (i == R.id.btn_changeAudio) {
             mPresenter.changeAudio();
         } else if (i == R.id.btn_changeCamera) {
@@ -126,26 +127,29 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
 
     @Override
     public void setStartBtnImage(boolean start) {
-        if (start)
+        if (start) {
             mPublish.setBackgroundResource(R.drawable.icon_start_bro);
-        else
+        } else {
             mPublish.setBackgroundResource(R.drawable.icon_pause_bro);
+        }
     }
 
     @Override
     public void setFlashBtnImage(boolean open) {
-        if (open)
+        if (open) {
             mChangeFlash.setBackgroundResource(R.drawable.img_round_flash_open);
-        else
+        } else {
             mChangeFlash.setBackgroundResource(R.drawable.img_round_flash_close);
+        }
     }
 
     @Override
     public void setAudioBtnImage(boolean open) {
-        if (open)
+        if (open) {
             mChangeAudio.setBackgroundResource(R.drawable.img_round_audio_open);
-        else
+        } else {
             mChangeAudio.setBackgroundResource(R.drawable.img_round_audio_close);
+        }
     }
 
     @Override
@@ -160,8 +164,9 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
 
     @Override
     public void showMsg(String msg) {
-        if (this.isAdded())
+        if (this.isAdded()) {
             Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

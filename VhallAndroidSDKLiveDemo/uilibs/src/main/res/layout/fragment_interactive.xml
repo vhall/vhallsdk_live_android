@@ -6,7 +6,8 @@
     <RelativeLayout
         android:id="@+id/local"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></RelativeLayout>
+        android:layout_height="match_parent"
+        android:background="#000000"/>
 
     <ImageView
         android:id="@+id/local_view_layer"

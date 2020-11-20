@@ -1,6 +1,8 @@
 package com.vhall.live;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -49,6 +51,12 @@ public class SetParamActivity extends FragmentActivity {
         radioButtonSD = this.findViewById(R.id.interactive_param_sd);
         radioButtonUHD = this.findViewById(R.id.interactive_param_uhd);
         radioButtonSD.isChecked();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        param = VhallApplication.getParam();
         initData();
     }
 
@@ -69,6 +77,13 @@ public class SetParamActivity extends FragmentActivity {
         } else if (param.pixel_type == VHLivePushFormat.PUSH_MODE_XXHD) {
             rb_xhdpi.setChecked(true);
         }
+//        try {
+//            PackageManager pm = getPackageManager();
+//            pm.getPackageInfo("com.vhall.appset", PackageManager.GET_ACTIVITIES);
+//        } catch (PackageManager.NameNotFoundException e) {
+//            e.printStackTrace();
+//            findViewById(R.id.app_set).setVisibility(View.GONE);
+//        }
     }
 
     public void backClick(View view) {

@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
@@ -50,22 +51,27 @@ public class WebViewActivity extends FragmentActivity {
 
         webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        webSettings.setDomStorageEnabled(true);
 
         //设置自适应屏幕，两者合用
         webSettings.setUseWideViewPort(true); //将图片调整到适合webview的大小
         webSettings.setLoadWithOverviewMode(true); // 缩放至屏幕的大小
+        webSettings.setDomStorageEnabled(true);////启用或禁用DOM缓存
 
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             webSettings.setMediaPlaybackRequiresUserGesture(false);
         }
 
-        baseUrl = baseUrl + param.watchId;
+        baseUrl = baseUrl + roomId;
 
         webView.loadUrl(baseUrl);
 //        webView.loadData(Html.fromHtml(url).toString(),"text/html","UTF-8");
 
         webView.setWebViewClient(new WebViewClient() {
+
+
+
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -82,6 +88,7 @@ public class WebViewActivity extends FragmentActivity {
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
                 super.onShowCustomView(view, callback);
+                //实现播放器全屏响应
                 if(mCustomView != null){
                     callback.onCustomViewHidden();
                     return;
@@ -96,6 +103,7 @@ public class WebViewActivity extends FragmentActivity {
             @Override
             public void onHideCustomView() {
                 super.onHideCustomView();
+                //实现播放器退出全屏响应
                 webView.setVisibility(View.VISIBLE);
                 webView.requestFocus(View.FOCUS_DOWN);
                 if(mCustomView == null){

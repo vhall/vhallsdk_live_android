@@ -184,7 +184,15 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                 }
                 questionBtn.setVisibility((webinarInfo.question_status == 1) ? View.VISIBLE : View.GONE);
                 if (webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
+                {
                     watchView.showToast("还没开始直播");
+                }
+                /**
+                 *
+                 * 重要说明
+                 * 房间类型为H5是 webinarInfo 中vssToken，vssRoomId 有值，必需使用H5播放器播放，使用 PresenterVss
+                 * 房间类型为Flash时   vssToken，vssRoomId 空，必需使用Flash播放器播放 Presenter
+                 */
                 //敏感词过滤信息，发送聊天、评论通用
                 if (webinarInfo.filters != null && webinarInfo.filters.size() > 0) {
                     param.filters.clear();
@@ -214,22 +222,6 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             @Override
             public void onError(int errorCode, String errorMsg) {
                 showToast(errorMsg);
-                if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
-                    liveFragment = WatchLiveFragment.newInstance();
-                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                            liveFragment, R.id.contentVideo);
-                    docFragment = new DocumentFragment();
-                    fragmentManager.beginTransaction().replace(R.id.contentDoc, (Fragment) docFragment).commit();
-                    new WatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param, null);
-                }
-                if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
-                    playbackFragment = WatchPlaybackFragment.newInstance();
-                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                            playbackFragment, R.id.contentVideo);
-                    docFragment = new DocumentFragment();
-                    fragmentManager.beginTransaction().replace(R.id.contentDoc, (Fragment) docFragment).commit();
-                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, null);
-                }
             }
         });
     }
@@ -431,6 +423,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     //隐藏问答
+    @Override
     public void dismissQAndA() {
         questionBtn.setVisibility(View.GONE);
         chatBtn.setChecked(true);
@@ -504,17 +497,17 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             invitedDialog.setNegativeOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mPresenter.replyInvite(3);
+                    mPresenter.replyInvite(2);
                     invitedDialog.dismiss();
-                    //邀请超时上麦信息
+                    //发送拒绝上麦信息
                 }
             });
         }
         invitedDialog.setRefuseInviteListener(new InvitedDialog.RefuseInviteListener() {
             @Override
             public void refuseInvite() {
-                //拒绝上麦
-                mPresenter.replyInvite(2);
+                //超时
+                mPresenter.replyInvite(3);
             }
         });
         invitedDialog.show();
@@ -595,8 +588,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             Log.e("Service ", "mUpnpServiceConnection onServiceConnected");
             upnpService = (AndroidUpnpService) service;
             // Clear the list
-            if (devicePopu != null)
+            if (devicePopu != null) {
                 devicePopu.clear();
+            }
             // Get ready for future device advertisements
             upnpService.getRegistry().addListener(registryListener);
             // Now add all devices to the list we already know about
@@ -607,6 +601,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             upnpService.getControlPoint().search(); // 搜索设备
         }
 
+        @Override
         public void onServiceDisconnected(ComponentName className) {
             upnpService = null;
         }
@@ -660,6 +655,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
         public void deviceAdded(final Device device) {
             runOnUiThread(new Runnable() {
+                @Override
                 public void run() {
                     if (devicePopu == null) {
                         devicePopu = new DevicePopu(WatchActivity.this);
@@ -672,6 +668,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
         public void deviceRemoved(final Device device) {
             runOnUiThread(new Runnable() {
+                @Override
                 public void run() {
                     if (devicePopu == null) {
                         devicePopu = new DevicePopu(WatchActivity.this);
@@ -701,8 +698,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
      */
     @Nullable
     public Collection<Device> getDmrDevices() {
-        if (upnpService == null)
+        if (upnpService == null) {
             return null;
+        }
         Collection<Device> devices = upnpService.getRegistry().getDevices(DMR_DEVICE_TYPE);
         return devices;
     }
@@ -718,8 +716,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     @Override
     public void dismissDevices() {
-        if (devicePopu != null)
+        if (devicePopu != null) {
             devicePopu.dismiss();
+        }
     }
 
     public String[] permissions = new String[]{

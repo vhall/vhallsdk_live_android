@@ -20,6 +20,8 @@ import com.vhall.uilibs.util.emoji.InputUser;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 /**
  * 发直播的Presenter
  */
@@ -85,6 +87,17 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         if (webinarInfo != null && !getBroadcast().isAvaliable()) {
             getBroadcast().setWebinarInfo(webinarInfo);
             getBroadcast().start();
+            getBroadcast().acquireChatRecord(true, new ChatServer.ChatRecordCallback() {
+                @Override
+                public void onDataLoaded(List<ChatServer.ChatInfo> list) {
+
+                }
+
+                @Override
+                public void onFailed(int errorcode, String messaage) {
+
+                }
+            });
         } else {
             VhallSDK.initBroadcast(param.broId, param.broToken, getBroadcast(), new RequestCallback() {
                 @Override
@@ -108,8 +121,9 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void stopBroadcast() {//停止直播
-        if (isPublishing)
+        if (isPublishing) {
             getBroadcast().stop();
+        }
     }
 
     @Override
@@ -227,8 +241,9 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void sendChat(String text) {
-        if (TextUtils.isEmpty(text))
+        if (TextUtils.isEmpty(text)) {
             return;
+        }
         request++;
         Log.e(TAG, "请求：" + request);
         getBroadcast().sendChat(String.valueOf(text), new RequestCallback() {

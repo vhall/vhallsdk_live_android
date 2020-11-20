@@ -255,13 +255,14 @@ public class EmojiUtils {
             Matcher matcher = entry.getKey().matcher(spannable);
             while (matcher.find()) {
                 boolean set = true;
-                for (ImageSpan span : spannable.getSpans(matcher.start(), matcher.end(), ImageSpan.class))
-                    if (spannable.getSpanStart(span) >= matcher.start() && spannable.getSpanEnd(span) <= matcher.end())
+                for (ImageSpan span : spannable.getSpans(matcher.start(), matcher.end(), ImageSpan.class)) {
+                    if (spannable.getSpanStart(span) >= matcher.start() && spannable.getSpanEnd(span) <= matcher.end()) {
                         spannable.removeSpan(span);
-                    else {
+                    } else {
                         set = false;
                         break;
                     }
+                }
                 if (set) {
                     hasChanges = true;
                     spannable.setSpan(new ImageSpan(context, entry.getValue()), matcher.start(), matcher.end(),
@@ -358,10 +359,11 @@ public class EmojiUtils {
                                 int i = tempStr.lastIndexOf("[");// 获取最后一个表情的位置
                                 if (i != -1) {
                                     CharSequence cs = tempStr.substring(i, selectionStart);
-                                    if (EmojiUtils.containsKey(cs.toString()))
+                                    if (EmojiUtils.containsKey(cs.toString())) {
                                         et_chat.getEditableText().delete(i, selectionStart);
-                                    else
+                                    } else {
                                         et_chat.getEditableText().delete(selectionStart - 1, selectionStart);
+                                    }
                                 } else {
                                     et_chat.getEditableText().delete(selectionStart - 1, selectionStart);
                                 }

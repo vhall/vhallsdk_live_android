@@ -1,5 +1,6 @@
 package com.vhall.uilibs.watch;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -15,16 +16,18 @@ import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business_support.dlna.DMCControl;
+import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.player.Constants;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
-import com.vhall.uilibs.chat.ChatFragment;
+import com.vhall.uilibs.chat.PushChatFragment;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 
+import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,9 +48,6 @@ import static com.vhall.ops.VHOPS.TYPE_SWITCHOFF;
 import static com.vhall.ops.VHOPS.TYPE_SWITCHON;
 
 //TODO  投屏相关
-import com.vhall.business_support.dlna.DeviceDisplay;
-
-import org.fourthline.cling.android.AndroidUpnpService;
 
 /**
  * 观看回放的Presenter
@@ -82,20 +82,20 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     private boolean loadingComment = false;
 
     private Timer timer;
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-
             switch (msg.what) {
-                case 0: // 每秒更新SeekBar
+                case 0:
                     if (getWatchPlayback().isPlaying()) {
                         playerCurrentPosition = getWatchPlayback().getCurrentPosition();
                         playbackView.setSeekbarCurrentPosition((int) playerCurrentPosition);
-                        //                String playerCurrentPositionStr = VhallUtil.converLongTimeToStr(playerCurrentPosition);
-                        //                //playbackView.setProgressLabel(playerCurrentPositionStr + "/" + playerDurationTimeStr);
-                        //                playbackView.setProgressLabel(playerCurrentPositionStr, playerDurationTimeStr);
+                        Log.e(TAG,""+(int) playerCurrentPosition);
                     }
+                    break;
+                default:
                     break;
             }
         }
@@ -119,8 +119,9 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     private void initCommentData(int pos) {
-        if (loadingComment)
+        if (loadingComment) {
             return;
+        }
         loadingComment = true;
         watchPlayback.requestCommentHistory(param.watchId, limit, pos, new ChatServer.ChatRecordCallback() {
             @Override
@@ -131,7 +132,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 for (ChatServer.ChatInfo chatInfo : list) {
                     list1.add(MessageChatData.getChatData(chatInfo));
                 }
-                chatView.notifyDataChangedChat(ChatFragment.CHAT_EVENT_CHAT, list1);
+                chatView.notifyDataChangedChat(PushChatFragment.CHAT_EVENT_CHAT, list1);
             }
 
             @Override
@@ -165,8 +166,9 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     @Override
     public void startPlay() {
-        if (!getWatchPlayback().isAvaliable())
+        if (!getWatchPlayback().isAvaliable()) {
             return;
+        }
         playbackView.setPlayIcon(false);
         getWatchPlayback().start();
 
@@ -179,7 +181,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         } else {
             if (!getWatchPlayback().isAvaliable()) {
                 initWatch();
-            } else  if(webinarInfo.status == WebinarInfo.VIDEO || webinarInfo.status == WebinarInfo.MEDIA){
+            } else if (webinarInfo.status == WebinarInfo.VIDEO || webinarInfo.status == WebinarInfo.MEDIA) {
                 if (getWatchPlayback().getPlayerState() == Constants.State.END) {
                     getWatchPlayback().seekTo(0);
                 }
@@ -301,7 +303,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     //TODO 投屏相关
     @Override
     public DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
-        DMCControl dmcControl = new DMCControl(deviceDisplay,service,getWatchPlayback().getOriginalUrl(),webinarInfo);
+        DMCControl dmcControl = new DMCControl(deviceDisplay, service, getWatchPlayback().getOriginalUrl(), webinarInfo);
         return dmcControl;
     }
 
@@ -320,17 +322,17 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
      * 根据文档状态选择展示
      */
     private void operationDocument() {
-        if (!getWatchPlayback().isUseDoc()) {
-            documentView.showType(2);//关闭文档
-        } else {
-            //展示文档
-            if (getWatchPlayback().isUseBoard()) {
-                //当前为白板
-                documentView.showType(1);
-            } else {
-                documentView.showType(0);
-            }
+        if (getWatchPlayback().isUseDoc()) {
+            documentView.showType(0);//关闭文档
+            return;
         }
+
+        if (getWatchPlayback().isUseBoard()) {
+            documentView.showType(1);
+            return;
+        }
+        documentView.showType(2);
+
     }
 
     private class DocCallback implements WatchPlayback.DocumentEventCallback {
@@ -344,6 +346,8 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 }
             } else {
                 if (msgInfos != null && msgInfos.size() > 0) {
+                    getWatchPlayback().setIsUseBoard(msgInfos.get(msgInfos.size() - 1).showType);
+                    operationDocument();
                     documentView.paintBoard(key, msgInfos);
                     documentView.paintPPT(key, msgInfos);
                 }
@@ -359,7 +363,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 if (msgInfo.event == EVENT_SHOWBOARD) {
                     getWatchPlayback().setIsUseBoard(msgInfo.showType);
                 }
-                if (getWatchPlayback().isUseDoc()) {
+                if (getWatchPlayback().isUseBoard()) {
                     documentView.paintBoard(msgInfo);
                 }
                 documentView.paintPPT(msgInfo);
@@ -424,15 +428,18 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 case STOP:
                     playbackView.showProgressbar(false);
                     Log.e(TAG, "STATE_STOP");
-//                    getWatchPlayback().stop();
                     playbackView.setPlayIcon(true);
                     break;
                 case END:
+                    Log.e(TAG, "STATE_END"+(int) playerDuration);
+                    playerCurrentPosition = getWatchPlayback().getCurrentPosition();
+                    playbackView.setSeekbarCurrentPosition((int) playerCurrentPosition);
                     playbackView.showProgressbar(false);
-                    Log.e(TAG, "STATE_ENDED");
                     playerCurrentPosition = 0;
-//                    getWatchPlayback().stop();
                     playbackView.setPlayIcon(true);
+                    playbackView.setSeekbarCurrentPosition((int) playerDuration);
+                    break;
+                default:
                     break;
             }
         }
@@ -454,10 +461,10 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             Log.e(TAG, "errorCode:" + errorCode + "  errorMsg:" + msg);
             switch (errorCode) {
                 case Constants.ErrorCode.ERROR_INIT:
-
                     break;
                 case Constants.ErrorCode.ERROR_INIT_FIRST:
-
+                    break;
+                default:
                     break;
             }
             playbackView.showProgressbar(false);
@@ -468,8 +475,9 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     //每秒获取一下进度
     private void handlePosition() {
-        if (timer != null )
+        if (timer != null) {
             return;
+        }
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override

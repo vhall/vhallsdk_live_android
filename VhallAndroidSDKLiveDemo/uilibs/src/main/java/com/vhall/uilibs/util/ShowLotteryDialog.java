@@ -96,7 +96,8 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
             }
             return false;
         }
-    }) ;
+    });
+
     private void initView() {
         if (mContext != null) {
             //getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -154,7 +155,7 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
         } else if (i == R.id.btn_lottery_submit) {
             String submitNicknameStr = submitNickname.getText().toString();
             String submitPhoneStr = submitPhone.getText().toString();
-            if (TextUtils.isEmpty(submitNicknameStr)||TextUtils.isEmpty(submitPhoneStr)){
+            if (TextUtils.isEmpty(submitNicknameStr) || TextUtils.isEmpty(submitPhoneStr)) {
                 Toast.makeText(mContext, "信息不能为空", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -164,19 +165,20 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
 
     public void submit(String nickname, String phone) {
         if (!TextUtils.isEmpty(lottery.getId()) && !TextUtils.isEmpty(lottery.getLottery_id())) {
+            VhallSDK.submitLotteryInfo(lottery.getId(), lottery.getLottery_id(), nickname, phone, new RequestCallback() {
+                @Override
+                public void onSuccess() {
+                    dismiss();
+                    Toast.makeText(mContext, "信息提交成功", Toast.LENGTH_SHORT).show();
+                }
 
-                VhallSDK.submitLotteryInfo(lottery.getId(), lottery.getLottery_id(), nickname, phone, new RequestCallback() {
-                    @Override
-                    public void onSuccess() {
-                        dismiss();
-                        Toast.makeText(mContext, "信息提交成功", Toast.LENGTH_SHORT).show();
-                    }
+                @Override
+                public void onError(int errorCode, String reason) {
+                    Toast.makeText(mContext, "信息提交失败", Toast.LENGTH_SHORT).show();
+                }
+            });
 
-                    @Override
-                    public void onError(int errorCode, String reason) {
-                        Toast.makeText(mContext, "信息提交失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
+        }
+
     }
 }

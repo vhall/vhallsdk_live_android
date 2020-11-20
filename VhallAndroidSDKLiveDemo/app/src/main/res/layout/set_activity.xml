@@ -9,7 +9,7 @@
         android:id="@+id/layout_common_head"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black">
+        android:background="#ec3642">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -28,7 +28,7 @@
             android:padding="10dp"
             android:singleLine="true"
             android:text="@string/app_set"
-            android:textColor="@color/gray_edit_text"
+            android:textColor="#ffffff"
             android:textSize="@dimen/common_title_size" />
 
     </RelativeLayout>

@@ -1,7 +1,6 @@
 package com.vhall.uilibs.watch;
 
 import android.app.Activity;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -9,9 +8,7 @@ import android.widget.SeekBar;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
 import com.vhall.business_support.dlna.DMCControl;
-import com.vhall.business_support.dlna.DMCControlListener;
 import com.vhall.business_support.dlna.DeviceDisplay;
-import com.vhall.document.DocumentView;
 import com.vhall.player.vod.VodPlayerView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
@@ -102,6 +99,12 @@ public class WatchContract {
 
         void paintH5DocView(View docView);
 
+    }
+
+    interface DocumentViewVss extends BaseView<BasePresenter> {
+        void refreshView(com.vhall.document.DocumentView view);
+
+        void switchType(String type);
     }
 
     interface DetailView extends BaseView<BasePresenter> {
