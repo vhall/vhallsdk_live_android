@@ -6,7 +6,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 355
-        versionName "4.2.3"
+        versionName "5.0.2"
 
         multiDexEnabled true
         signingConfig signingConfigs.debug
