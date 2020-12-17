@@ -13,18 +13,11 @@ buildscript {
 
 allprojects {
     repositories {
-        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-        mavenCentral()
         google()
-        maven {
-            url 'http://4thline.org/m2'
-        }
         jcenter()
 
-        maven{
-            url 'https://raw.githubusercontent.com/vhall/VHLibs_SDK_Android/master'
-        }
-
+        maven {url 'http://4thline.org/m2'}
+        maven {url 'https://dl.bintray.com/tiandiyinghun/maven'}
     }
 
     tasks.withType(Javadoc) {
