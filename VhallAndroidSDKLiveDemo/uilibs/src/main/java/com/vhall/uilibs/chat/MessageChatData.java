@@ -182,7 +182,9 @@ public class MessageChatData implements Serializable {
         data.setRoleName(chatInfo.roleName);
         data.setRole(chatInfo.role);
         data.setTime(chatInfo.time);
-        data.event = chatInfo.event;
+        if (chatInfo.event != null) {
+            data.event = chatInfo.event;
+        }
         //处理回复消息
         String textContent = "";
         if (chatInfo.replyMsg != null) {

@@ -99,7 +99,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                 }
             });
         } else {
-            VhallSDK.initBroadcast(param.broId, param.broToken, getBroadcast(), new RequestCallback() {
+            VhallSDK.initBroadcast(param.broId, param.broToken,param.broName, getBroadcast(), new RequestCallback() {
                 @Override
                 public void onSuccess() {
                     isFinish = false;

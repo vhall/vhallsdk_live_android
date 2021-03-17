@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,10 +25,12 @@ public class SignInDialog extends AlertDialog {
     private Context mContext;
     private ImageView iv_close;
     private TextView tv_content;
+    private TextView tv_title;
     private Button btn_signin;
 
 
     private String signInId;
+    private String showTitle;
     private int countDownTime = 0;
     private OnSignInClickListener onSignInClickListener;
 
@@ -37,6 +40,13 @@ public class SignInDialog extends AlertDialog {
 
     public void setSignInId(String signInId) {
         this.signInId = signInId;
+    }
+
+    public void setShowTitle(String showTitle) {
+        this.showTitle = showTitle;
+        if (!TextUtils.isEmpty(showTitle) && tv_title != null) {
+            tv_title.setText(showTitle);
+        }
     }
 
     public void setCountDownTime(int countDownTime) {
@@ -73,7 +83,11 @@ public class SignInDialog extends AlertDialog {
             }
         });
         tv_content = (TextView) root.findViewById(R.id.tv_signin_content);
+        tv_title = (TextView) root.findViewById(R.id.tv_title);
         btn_signin = (Button) root.findViewById(R.id.btn_signin);
+        if (!TextUtils.isEmpty(showTitle)) {
+            tv_title.setText(showTitle);
+        }
         btn_signin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -10,10 +10,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.uilibs.R;
@@ -33,8 +35,8 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
     private Context mContext;
     private Button mBtnSkip, mBtnSubmit;
     private EditText submitNickname, submitPhone;
-    MessageLotteryData lotteryData;
-    MessageLotteryData.LotteryWinnersBean lottery;
+    MessageServer.MsgInfo  lotteryData;
+    MessageServer.Lottery lottery;
 
     public ShowLotteryDialog(Context context) {
         super(context);
@@ -48,7 +50,7 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
         initView();
     }
 
-    public void setMessageInfo(MessageLotteryData lotteryData) {
+    public void setMessageInfo(MessageServer.MsgInfo lotteryData) {
         this.lotteryData = lotteryData;
         initData();
     }
@@ -57,29 +59,30 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
-                case MessageLotteryData.EVENT_START_LOTTERY:
+                case MessageServer.EVENT_START_LOTTERY:
                     mTextStatusStart.setVisibility(View.VISIBLE);
                     mLayoutStatusShow.setVisibility(View.GONE);
                     mLayoutStatusSubmit.setVisibility(View.GONE);
                     mTextTitleStr.setText(R.string.vhall_lottery_title_start);
                     break;
-                case MessageLotteryData.EVENT_END_LOTTERY:
+                case MessageServer.EVENT_END_LOTTERY:
                     mNameView.removeAllViews();  //清除原有的数据
                     lottery = null;
                     mTextStatusStart.setVisibility(View.GONE);
                     mLayoutStatusSubmit.setVisibility(View.GONE);
                     mLayoutStatusShow.setVisibility(View.VISIBLE);
                     mTextTitleStr.setText(R.string.vhall_lottery_title_show);
-                    if (lotteryData != null && lotteryData.getLottery_winners() != null && lotteryData.getLottery_winners().size() > 0) {
-                        List<MessageLotteryData.LotteryWinnersBean> lottery_winners = lotteryData.getLottery_winners();
+
+                    if (lotteryData != null && lotteryData.lotteries != null && lotteryData.lotteries.size() > 0) {
+                        List<MessageServer.Lottery> lottery_winners = lotteryData.lotteries;
                         for (int i = 0; i < lottery_winners.size(); i++) {
                             if (lottery_winners.get(i).isSelf) {
                                 lottery = lottery_winners.get(i);
                             }
                             View view = View.inflate(mContext, R.layout.item_common_list, null);
                             TextView mName = (TextView) view.findViewById(R.id.tv_common_name);
-                            CircleImageView mCirlceAvatar = (CircleImageView) view.findViewById(R.id.circle_common_avatar);
-                            mName.setText(lottery_winners.get(i).getLottery_user_nickname());
+                            ImageView mCirlceAvatar = view.findViewById(R.id.circle_common_avatar);
+                            mName.setText(lottery_winners.get(i).nick_name);
                             mNameView.addView(view);
                         }
                         if (lottery != null) {
@@ -164,8 +167,8 @@ public class ShowLotteryDialog extends AlertDialog implements View.OnClickListen
     }
 
     public void submit(String nickname, String phone) {
-        if (!TextUtils.isEmpty(lottery.getId()) && !TextUtils.isEmpty(lottery.getLottery_id())) {
-            VhallSDK.submitLotteryInfo(lottery.getId(), lottery.getLottery_id(), nickname, phone, new RequestCallback() {
+        if (!TextUtils.isEmpty(lottery.id) && !TextUtils.isEmpty(lottery.lottery_id)) {
+            VhallSDK.submitLotteryInfo(lottery.id, lottery.lottery_id, nickname, phone,"", new RequestCallback() {
                 @Override
                 public void onSuccess() {
                     dismiss();

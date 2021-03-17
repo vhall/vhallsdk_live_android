@@ -77,6 +77,20 @@
                     android:textSize="@dimen/common_content_size_16"
                     android:visibility="gone" />
 
+                <RadioButton
+                    android:id="@+id/rb_lottery"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_radiobutton_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="抽奖"
+                    android:textColor="@drawable/tabs_red_color_selector"
+                    android:textSize="@dimen/common_content_size_16" />
+
 
                 <RadioButton
                     android:id="@+id/rb_detail"
@@ -102,8 +116,8 @@
                 android:background="#f5f5f5"
                 android:clickable="true"
                 android:drawableLeft="@drawable/vhall_icon_notice"
-                android:drawablePadding="20dp"
                 android:drawableRight="@drawable/vhall_icon_marquee_close"
+                android:drawablePadding="20dp"
                 android:ellipsize="marquee"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
@@ -138,6 +152,12 @@
                     android:visibility="gone"></FrameLayout>
 
                 <FrameLayout
+                    android:id="@+id/contentLottery"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+                <FrameLayout
                     android:id="@+id/contentDetail"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -169,5 +189,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="在线人数:0"
-        android:textColor="@color/red_main"/>
+        android:textColor="@color/red_main" />
+
+    <TextView
+        android:id="@+id/tv_pv_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tv_online_num"
+        android:layout_toEndOf="@id/tv_online_num"
+        android:text="  pv:0"
+        android:textColor="@color/red_main" />
 </RelativeLayout>

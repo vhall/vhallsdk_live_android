@@ -25,7 +25,9 @@ public class SurveyView extends WebView {
     public static final int EVENT_JS_BACK = 2;//JS 回调
     public static final int EVENT_JS_FINASH = 3;//JS 回调
     private WebSettings mSettings;
-    private static final String JSNAME = "android";
+    private static final String JSNAME = "messageHandlers";
+
+    private static final String JSNAME1 = "android";
     private Context context;
 
     private EventListener eventListener;
@@ -63,6 +65,7 @@ public class SurveyView extends WebView {
         mSettings = getSettings();
         mSettings.setJavaScriptEnabled(true);
         addJavascriptInterface(new JS2Android(), JSNAME);
+        addJavascriptInterface(new JS2Android(), JSNAME1);
         setWebViewClient(new MyWebViewClient());
     }
 

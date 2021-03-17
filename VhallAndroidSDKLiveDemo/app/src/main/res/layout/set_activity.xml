@@ -31,12 +31,14 @@
             android:textColor="#ffffff"
             android:textSize="@dimen/common_title_size" />
 
+
     </RelativeLayout>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:background="@color/pink_background"
         android:gravity="center"
         android:padding="@dimen/space_size_10">
@@ -94,6 +96,26 @@
 
         <EditText
             android:id="@+id/et_bro_id"
+            style="@style/AppLineEditInputTheme"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.7" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:weightSum="1.0">
+
+        <TextView
+            style="@style/AppLineTitleTheme"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/app_settings_string_name" />
+
+        <EditText
+            android:id="@+id/et_bro_name"
             style="@style/AppLineEditInputTheme"
             android:layout_width="0dp"
             android:layout_height="match_parent"

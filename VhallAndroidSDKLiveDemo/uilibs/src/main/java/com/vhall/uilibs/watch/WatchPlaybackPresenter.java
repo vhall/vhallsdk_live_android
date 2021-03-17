@@ -71,8 +71,8 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     String[] speedStrs = new String[]{"0.25", "0.50", "1.00", "1.25", "1.50", "2.00"};
     int currentSpeed = 2;
 
-    private int limit = 5;
-    private int pos = 0;
+    private int limit = 20;
+    private int pos = 1;
 
     private long playerCurrentPosition = 0L; // 当前的进度
     private long playerDuration;
@@ -147,7 +147,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         if (webinarInfo != null) {
             getWatchPlayback().setWebinarInfo(webinarInfo);
             handlePosition();
-            pos = 0;
+            pos = 1;
             initCommentData(pos);
             watchView.showNotice(getWatchPlayback().getNotice()); //显示公告
             playbackView.setQuality(getWatchPlayback().getQualities());
@@ -268,6 +268,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                     .vodPlayView(playbackView.getVideoView())
 //                    .surfaceView(playbackView.getVideoView())
                     .callback(new WatchCallback())
+                    .chatCallback(new ChatCallback())
                     .docCallback(new DocCallback());
             watchPlayback = builder.build();
         }
@@ -501,7 +502,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         getWatchPlayback().sendComment(text, new RequestCallback() {
             @Override
             public void onSuccess() {
-                initCommentData(pos = 0);
+//                initCommentData(pos = 1);
             }
 
             @Override
@@ -510,7 +511,33 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             }
         });
     }
+    private class ChatCallback implements ChatServer.Callback {
+        @Override
+        public void onChatServerConnected() {
 
+        }
+
+        @Override
+        public void onConnectFailed() {
+        }
+
+        @Override
+        public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
+            Log.e("ddd","ChatServer.eventMsgKey"+ChatServer.eventMsgKey);
+            switch (chatInfo.event) {
+                case ChatServer.eventMsgKey:
+                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void onChatServerClosed() {
+
+        }
+    }
     @Override
     public void sendCustom(JSONObject text) {
 

@@ -10,17 +10,19 @@ import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.RequestOptions;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.WebinarInfoDataSource;
 import com.vhall.live.webWatch.WebViewActivity;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.broadcast.BroadcastActivity;
-import com.vhall.uilibs.util.CircleImageView;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.watch.VWatchActivity;
 import com.vhall.uilibs.watch.WatchActivity;
@@ -31,7 +33,7 @@ import com.vhall.uilibs.watch.WatchActivity;
  */
 public class MainActivity extends FragmentActivity {
     TextView tv_phone, tv_name, tv_login;
-    CircleImageView mCircleViewAvatar;
+    ImageView mCircleViewAvatar;
     Param param = null;
 
     private static final int REQUEST_PERMISSIONS = 1;
@@ -104,12 +106,10 @@ public class MainActivity extends FragmentActivity {
     private void initPage() {
         param = VhallApplication.param;
         tv_phone.setText(Build.MODEL);
+        RequestOptions requestOptions = RequestOptions.bitmapTransform(new CircleCrop()).placeholder(R.drawable.icon_default_avatar);
+        Glide.with(this).load(VhallSDK.getUserAvatar()).apply(requestOptions).into(mCircleViewAvatar);
         tv_name.setText(TextUtils.isEmpty(VhallSDK.getUserNickname()) ? Build.BRAND + getString(R.string.phone_user) : VhallSDK.getUserNickname());
-        if (!TextUtils.isEmpty(VhallSDK.getUserAvatar())) {
-            Glide.with(this).load(VhallSDK.getUserAvatar()).into(mCircleViewAvatar);
-        } else {
-            mCircleViewAvatar.setImageDrawable(getResources().getDrawable(R.drawable.icon_default_avatar));
-        }
+
         if (!VhallSDK.isLogin()) {
             tv_login.setText(R.string.login);
         } else {
@@ -133,7 +133,7 @@ public class MainActivity extends FragmentActivity {
 
     private void startBroadcastActivity(int orientation) {
         Intent intent = new Intent(this, BroadcastActivity.class);
-        VhallSDK.initBroadcast(param.broId, param.broToken, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.initBroadcast(param.broId, param.broToken,param.broName, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                 param.vssToken = webinarInfo.vss_token;

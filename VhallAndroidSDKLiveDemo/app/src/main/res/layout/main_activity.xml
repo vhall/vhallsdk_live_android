@@ -49,7 +49,7 @@
                 android:layout_centerInParent="true"
                 android:background="@drawable/icon_avatar_bg">
 
-                <com.vhall.uilibs.util.CircleImageView
+                <ImageView
                     android:id="@+id/iv_avatar"
                     android:layout_width="104dp"
                     android:layout_height="104dp"
@@ -101,8 +101,8 @@
                             android:layout_centerInParent="true"
                             android:layout_gravity="center"
                             android:clickable="true"
-                            android:drawablePadding="10dp"
                             android:drawableTop="@drawable/selector_bro_landspace"
+                            android:drawablePadding="10dp"
                             android:gravity="center"
                             android:onClick="onBroadcastLandspace"
                             android:padding="30dp"
@@ -125,8 +125,8 @@
                             android:layout_centerInParent="true"
                             android:layout_gravity="center"
                             android:clickable="true"
-                            android:drawablePadding="10dp"
                             android:drawableTop="@drawable/selector_bro_portrait"
+                            android:drawablePadding="10dp"
                             android:gravity="center"
                             android:onClick="onBroadcastPortrait"
                             android:padding="30dp"
@@ -155,8 +155,8 @@
                             android:layout_centerInParent="true"
                             android:layout_gravity="center"
                             android:clickable="true"
-                            android:drawablePadding="10dp"
                             android:drawableTop="@drawable/selector_watch_live"
+                            android:drawablePadding="10dp"
                             android:gravity="center"
                             android:onClick="onWatchLive"
                             android:padding="20dp"
@@ -179,8 +179,8 @@
                             android:layout_centerInParent="true"
                             android:layout_gravity="center"
                             android:clickable="true"
-                            android:drawablePadding="10dp"
                             android:drawableTop="@drawable/selector_watch_playback"
+                            android:drawablePadding="10dp"
                             android:gravity="center"
                             android:onClick="onWatchPlayback"
                             android:padding="20dp"
@@ -199,22 +199,23 @@
                 android:layout_centerInParent="true"
                 android:background="@drawable/btn_set_param"
                 android:clickable="true"
-                android:text="@string/app_set"
                 android:gravity="center"
+                android:onClick="onSetParam"
+                android:text="@string/app_set"
                 android:textColor="@color/white"
-                android:textSize="12dp"
-                android:onClick="onSetParam" />
+                android:textSize="12dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/btn_set_param"
-                android:text="网页观看"
-                android:gravity="center"
-                android:textColor="@color/white"
-                android:onClick="onH5Watch"
+                android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_alignParentBottom="true"/>
+                android:background="@drawable/btn_set_param"
+                android:gravity="center"
+                android:textSize="10dp"
+                android:onClick="onH5Watch"
+                android:text="web嵌入观看"
+                android:textColor="@color/white" />
 
         </RelativeLayout>
 
@@ -235,7 +236,7 @@
             android:background="#ff3029"
             android:gravity="center"
             android:onClick="onHScreenClick"
-            android:text="横屏观看"
+            android:text="半屏观看"
             android:textColor="#ffffff"
             app:layout_constraintBottom_toTopOf="@+id/v_screen"
             app:layout_constraintEnd_toEndOf="parent"
@@ -248,7 +249,7 @@
             android:background="#ff3029"
             android:gravity="center"
             android:onClick="onVScreenClick"
-            android:text="竖屏观看"
+            android:text="全屏观看"
             android:textColor="#ffffff"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

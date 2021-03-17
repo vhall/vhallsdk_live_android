@@ -29,7 +29,7 @@ public class VhallApplication extends MultiDexApplication {
         getParam();
         VHGlobalConfig vhGlobalConfig = new VHGlobalConfig.Builder()
                 .setEnableLog(false)
-                .setLogTag("saas_50")
+                .setLogTag("saas_60")
                 .setVHNetLogCallback(new IVHNetLogCallback() {
                     @Override
                     public void log(String url, String message) {
@@ -57,6 +57,8 @@ public class VhallApplication extends MultiDexApplication {
 
         //发直播，直播间ID
         param.broId = sp.getString("broid", "465735486");
+        //直播时候修改昵称
+        param.broName = sp.getString("broname", VhallSDK.getUserName());
         //发直播token
         param.broToken = sp.getString("brotoken", "8734e1c56b8b5b6f1f4ce1b1c072121a");
         //直播分辨率类型

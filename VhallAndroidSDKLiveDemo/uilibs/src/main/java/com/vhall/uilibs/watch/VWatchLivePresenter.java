@@ -14,6 +14,7 @@ import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
+import com.vhall.business.utils.SurveyInternal;
 import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.player.VHPlayerListener;
@@ -23,8 +24,8 @@ import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.chat.VChatFragment;
-import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.vhss.TokenManger;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONArray;
@@ -32,7 +33,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import vhall.com.vss2.VssSdk;
 
 //TODO 投屏相关
 
@@ -62,7 +67,6 @@ public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatCon
 
     CountDownTimer onHandDownTimer;
     private int durationSec = 30; // 举手上麦倒计时
-    private boolean canSpeak = true;
 
 
     public VWatchLivePresenter(WatchContract.LiveView liveView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, WatchContract.WatchView watchView, Param param, WebinarInfo webinarInfo) {
@@ -109,7 +113,7 @@ public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatCon
             watchView.showToast(R.string.vhall_login_first);
             return;
         }
-        if (!canSpeak) {
+        if (webinarInfo.chatforbid) {
             watchView.showToast("你被禁言了");
             return;
         }
@@ -245,7 +249,7 @@ public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatCon
     @Override
     public void submitLotteryInfo(String id, String lottery_id, String nickname, String phone) {
         if (!TextUtils.isEmpty(id) && !TextUtils.isEmpty(lottery_id)) {
-            VhallSDK.submitLotteryInfo(id, lottery_id, nickname, phone, new RequestCallback() {
+            VhallSDK.submitLotteryInfo(id, lottery_id, nickname, phone, "", new RequestCallback() {
                 @Override
                 public void onSuccess() {
                     watchView.showToast("信息提交成功");
@@ -480,7 +484,7 @@ public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatCon
 
     @Override
     public DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
-        DMCControl dmcControl = new DMCControl(deviceDisplay, service, getWatchLive().getOriginalUrl(),webinarInfo);
+        DMCControl dmcControl = new DMCControl(deviceDisplay, service, getWatchLive().getOriginalUrl(), webinarInfo);
         return dmcControl;
     }
 
@@ -581,7 +585,6 @@ public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatCon
             switch (messageInfo.event) {
                 case MessageServer.EVENT_DISABLE_CHAT://禁言
                     watchView.showToast("您已被禁言");
-                    canSpeak = false;
                     break;
                 case MessageServer.EVENT_KICKOUT://踢出
                     watchView.showToast("您已被踢出");
@@ -589,17 +592,14 @@ public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatCon
                     break;
                 case MessageServer.EVENT_PERMIT_CHAT://解除禁言
                     watchView.showToast("您已被解除禁言");
-                    canSpeak = true;
                     break;
                 case MessageServer.EVENT_CHAT_FORBID_ALL://全员禁言
                     if (messageInfo.status == 0) {
                         //取消全员禁言
                         watchView.showToast("解除全员禁言");
-                        canSpeak = true;
                     } else {
                         //全员禁言
                         watchView.showToast("全员禁言");
-                        canSpeak = false;
                     }
                     break;
                 case MessageServer.EVENT_OVER://直播结束
@@ -615,22 +615,22 @@ public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatCon
 //                    }
                     break;
                 case MessageServer.EVENT_START_LOTTERY://抽奖开始
-                    watchView.showLottery(MessageLotteryData.getData(messageInfo));
+                    watchView.showLottery(messageInfo);
                     break;
                 case MessageServer.EVENT_END_LOTTERY://抽奖结束
-                    watchView.showLottery(MessageLotteryData.getData(messageInfo));
+                    watchView.showLottery(messageInfo);
                     break;
                 case MessageServer.EVENT_NOTICE:
                     watchView.showNotice(messageInfo.content);
                     break;
                 case MessageServer.EVENT_SIGNIN: //签到消息
                     if (!TextUtils.isEmpty(messageInfo.id) && !TextUtils.isEmpty(messageInfo.sign_show_time)) {
-                        watchView.showSignIn(messageInfo.id, parseTime(messageInfo.sign_show_time, 30));
+                        watchView.showSignIn(messageInfo.id, messageInfo.signTitle, parseTime(messageInfo.sign_show_time, 30));
                     }
                     break;
                 case MessageServer.EVENT_QUESTION: // 问答开关
                     watchView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
-                    if(messageInfo.status == 1)
+                    if (messageInfo.status == 1)
                         watchView.showQAndA();
                     else
                         watchView.dismissQAndA();
@@ -643,7 +643,19 @@ public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatCon
 
                     MessageChatData surveyData = new MessageChatData();
                     surveyData.event = MessageChatData.eventSurveyKey;
-                    surveyData.setUrl(VhallSDK.getSurveyUrl(messageInfo.id, messageInfo.webinar_id, messageInfo.user_id));
+                    Map<String, String> params = new HashMap<>();
+                    params.put(SurveyInternal.KEY_SURVEY_ID, messageInfo.id);
+                    params.put(SurveyInternal.KEY_ROOMID, webinarInfo.vss_room_id);
+                    params.put(SurveyInternal.KEY_WEBINAR_ID, webinarInfo.webinar_id);
+                    params.put(SurveyInternal.KEY_APPID, VssSdk.getInstance().getAppId());
+                    if (webinarInfo.getWebinarInfoData() != null) {
+                        params.put(SurveyInternal.KEY_PAAS_ACCESS_TOKEN, webinarInfo.getWebinarInfoData().interact.paas_access_token);
+                    }
+                    params.put(SurveyInternal.KEY_USER_ID, webinarInfo.user_id);
+                    params.put(SurveyInternal.KEY_TOKEN, TokenManger.getToken());
+                    params.put(SurveyInternal.KEY_INTERACT_TOKEN, TokenManger.getInteractToken());
+                    surveyData.setUrl(SurveyInternal.createSurveyUrl(params));
+
                     surveyData.setId(messageInfo.id);
                     chatView.notifyDataChangedChat(surveyData);
                     break;
@@ -791,13 +803,13 @@ public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatCon
                 case ChatServer.eventCustomKey:
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     if (chatInfo.onlineData != null) {
-                        watchView.setOnlineNum(chatInfo.onlineData.tracksNum);
+                        watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
                     }
                     break;
                 case ChatServer.eventOnlineKey:
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     if (chatInfo.onlineData != null) {
-                        watchView.setOnlineNum(chatInfo.onlineData.tracksNum);
+                        watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
                     }
                     break;
                 case ChatServer.eventOfflineKey:

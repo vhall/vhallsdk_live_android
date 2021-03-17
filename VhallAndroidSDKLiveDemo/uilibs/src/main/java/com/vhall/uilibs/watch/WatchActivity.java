@@ -1,6 +1,7 @@
 package com.vhall.uilibs.watch;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -30,6 +31,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
@@ -41,7 +43,6 @@ import com.vhall.uilibs.R;
 
 import com.vhall.uilibs.util.CircleView;
 import com.vhall.uilibs.util.InvitedDialog;
-import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.ShowLotteryDialog;
 import com.vhall.uilibs.util.SignInDialog;
 import com.vhall.uilibs.util.SurveyPopu;
@@ -82,13 +83,13 @@ import java.util.Collection;
  */
 public class WatchActivity extends FragmentActivity implements WatchContract.WatchView {
 
-    private FrameLayout contentDoc, contentDetail, contentChat, contentQuestion;
+    private FrameLayout contentDoc, contentDetail, contentChat, contentQuestion, contentLottery;
     private RadioGroup radio_tabs;
-    private RadioButton questionBtn, chatBtn;
+    private RadioButton questionBtn, chatBtn, lotteryBtn;
     private LinearLayout ll_detail;
     private CircleView mHand;
     ExtendTextView tv_notice;
-    private TextView tvOnlineNum;
+    private TextView tvOnlineNum, tvPvNum;
     private Param param;
     private int type;
     private WatchContract.WatchView watchView;
@@ -96,7 +97,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     public WatchPlaybackFragment playbackFragment;
     public WatchLiveFragment liveFragment;
     public ChatFragment chatFragment;
+    public LotteryFragment lotteryFragment;
     public ChatFragment questionFragment;
+    private int onlineVirtual = 0, pvVirtual = 0;
 
 
     InputView inputView;
@@ -127,6 +130,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         docFragment = fragmentManager.findFragmentById(R.id.contentDoc);
         chatFragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.contentChat);
         DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentById(R.id.contentDetail);
+        lotteryFragment = (LotteryFragment) getSupportFragmentManager().findFragmentById(R.id.contentLottery);
         questionFragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.contentQuestion);
         initView();
         if (chatFragment == null) {
@@ -146,6 +150,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     detailFragment, R.id.contentDetail);
         }
+        if (lotteryFragment == null) {
+            lotteryFragment = LotteryFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    lotteryFragment, R.id.contentLottery);
+        }
+
 
         watchView = this;
 
@@ -165,7 +175,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
 
     public void initWatch(Param params) {
-        String customeId = Build.BOARD + Build.DEVICE + Build.SERIAL;
+        String customeEmail = Build.BOARD + Build.DEVICE + Build.SERIAL + "@qq.com";
         String customNickname = Build.BRAND + "手机用户";
         int watchType;
         if (type == VhallUtil.WATCH_LIVE) {
@@ -173,9 +183,15 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         } else {
             watchType = WebinarInfo.VIDEO;
         }
-        VhallSDK.initWatch(params.watchId, customeId, customNickname, params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.initWatch(params.watchId, customeEmail, customNickname, params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                if (webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
+                {
+                    watchView.showToast("还没开始直播");
+                    finish();
+                    return;
+                }
                 param.webinar_id = webinarInfo.webinar_id;
                 if (webinarInfo.question_status == 1) {
                     Toast.makeText(WatchActivity.this, "问答已开启", Toast.LENGTH_SHORT).show();
@@ -183,16 +199,6 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     Toast.makeText(WatchActivity.this, "问答未开启", Toast.LENGTH_SHORT).show();
                 }
                 questionBtn.setVisibility((webinarInfo.question_status == 1) ? View.VISIBLE : View.GONE);
-                if (webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
-                {
-                    watchView.showToast("还没开始直播");
-                }
-                /**
-                 *
-                 * 重要说明
-                 * 房间类型为H5是 webinarInfo 中vssToken，vssRoomId 有值，必需使用H5播放器播放，使用 PresenterVss
-                 * 房间类型为Flash时   vssToken，vssRoomId 空，必需使用Flash播放器播放 Presenter
-                 */
                 //敏感词过滤信息，发送聊天、评论通用
                 if (webinarInfo.filters != null && webinarInfo.filters.size() > 0) {
                     param.filters.clear();
@@ -202,6 +208,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     docFragment = new DocumentFragment();
                     fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
                 }
+
                 if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
                     //直播间，公告信息
                     if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
@@ -217,6 +224,20 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                             playbackFragment, R.id.contentVideo);
                     new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, webinarInfo);
                 }
+                onlineVirtual = webinarInfo.onlineVirtual;
+                if (webinarInfo.onlineShow == 1) {
+                    tvOnlineNum.setVisibility(View.VISIBLE);
+                    tvOnlineNum.setText("在线人数：" + webinarInfo.online + " 虚拟在线人数：" + webinarInfo.onlineVirtual);
+                } else {
+                    tvOnlineNum.setVisibility(View.GONE);
+                }
+                pvVirtual = webinarInfo.pvVirtual;
+                if (webinarInfo.pvShow == 1) {
+                    tvPvNum.setVisibility(View.VISIBLE);
+                    tvPvNum.setText("pv：" + webinarInfo.pv + " 虚拟pv：" + webinarInfo.pvVirtual);
+                } else {
+                    tvPvNum.setVisibility(View.GONE);
+                }
             }
 
             @Override
@@ -229,6 +250,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     private void initView() {
         tvOnlineNum = findViewById(R.id.tv_online_num);
+
+        tvPvNum = findViewById(R.id.tv_pv_num);
 
         inputView = new InputView(this, KeyBoardManager.getKeyboardHeight(this), KeyBoardManager.getKeyboardHeightLandspace(this));
         inputView.add2Window(this);
@@ -263,10 +286,11 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         contentDetail = (FrameLayout) findViewById(R.id.contentDetail);
         contentChat = (FrameLayout) findViewById(R.id.contentChat);
         contentQuestion = (FrameLayout) findViewById(R.id.contentQuestion);
+        contentLottery = (FrameLayout) findViewById(R.id.contentLottery);
 
         questionBtn = (RadioButton) this.findViewById(R.id.rb_question);
         chatBtn = (RadioButton) this.findViewById(R.id.rb_chat);
-
+        lotteryBtn = (RadioButton) this.findViewById(R.id.rb_lottery);
         mHand = this.findViewById(R.id.image_hand);
         mHand.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -290,12 +314,11 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             }
         });
         if (type == VhallUtil.WATCH_LIVE) {
-//            questionBtn.setVisibility(View.VISIBLE);
             contentChat.setVisibility(View.VISIBLE);
             chatBtn.setText("聊天");
         }
         if (type == VhallUtil.WATCH_PLAYBACK) {
-            chatBtn.setText("评论");
+            chatBtn.setText("聊天");
             contentChat.setVisibility(View.VISIBLE);
         }
         radio_tabs = (RadioGroup) findViewById(R.id.radio_tabs);
@@ -308,20 +331,30 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     contentDoc.setVisibility(View.GONE);
                     contentDetail.setVisibility(View.GONE);
                     contentQuestion.setVisibility(View.GONE);
+                    contentLottery.setVisibility(View.GONE);
                 } else if (checkedId == R.id.rb_doc) {
                     contentDoc.setVisibility(View.VISIBLE);
                     contentChat.setVisibility(View.GONE);
                     contentDetail.setVisibility(View.GONE);
                     contentQuestion.setVisibility(View.GONE);
+                    contentLottery.setVisibility(View.GONE);
                 } else if (checkedId == R.id.rb_question) {
                     chatEvent = ChatFragment.CHAT_EVENT_QUESTION;
                     contentDoc.setVisibility(View.GONE);
                     contentDetail.setVisibility(View.GONE);
                     contentQuestion.setVisibility(View.VISIBLE);
                     contentChat.setVisibility(View.GONE);
+                    contentLottery.setVisibility(View.GONE);
+                } else if (checkedId == R.id.rb_lottery) {
+                    contentDoc.setVisibility(View.GONE);
+                    contentDetail.setVisibility(View.GONE);
+                    contentQuestion.setVisibility(View.GONE);
+                    contentLottery.setVisibility(View.VISIBLE);
+                    contentChat.setVisibility(View.GONE);
                 } else if (checkedId == R.id.rb_detail) {
                     contentDoc.setVisibility(View.GONE);
                     contentChat.setVisibility(View.GONE);
+                    contentLottery.setVisibility(View.GONE);
                     contentQuestion.setVisibility(View.GONE);
                     contentDetail.setVisibility(View.VISIBLE);
                 }
@@ -338,11 +371,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
-    public void showSignIn(String signId, int startTime) {
+    public void showSignIn(String signId, String title, int startTime) {
         if (signInDialog == null) {
             signInDialog = new SignInDialog(this);
         }
         signInDialog.setSignInId(signId);
+        signInDialog.setShowTitle(title);
         signInDialog.setCountDownTime(startTime);
         signInDialog.setOnSignInClickListener(new SignInDialog.OnSignInClickListener() {
             @Override
@@ -457,15 +491,18 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
-    public void showLottery(MessageLotteryData lotteryData) {
-        if (lotteryDialog == null) {
-            lotteryDialog = new ShowLotteryDialog(this);
-        }
-        lotteryDialog.setMessageInfo(lotteryData);
-        lotteryDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-        lotteryDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE |
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        lotteryDialog.show();
+    public void showLottery(MessageServer.MsgInfo lotteryData) {
+//        if (lotteryDialog == null) {
+//            lotteryDialog = new ShowLotteryDialog(this);
+//        }
+//        lotteryDialog.setMessageInfo(lotteryData);
+//        lotteryDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+//        lotteryDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE |
+//                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+//        lotteryDialog.show();
+
+        lotteryBtn.setChecked(true);
+        lotteryFragment.setLotteryData(lotteryData);
     }
 
     @Override
@@ -513,9 +550,16 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         invitedDialog.show();
     }
 
+    @SuppressLint("DefaultLocale")
     @Override
-    public void setOnlineNum(int onlineNum) {
-        tvOnlineNum.setText("在线人数：" + onlineNum);
+    public void setOnlineNum(int onlineNum, int virtual) {
+        tvOnlineNum.setText(String.format("在线人数：%d虚拟在线人数：%d", onlineNum, virtual == 0 ? onlineVirtual : virtual));
+    }
+
+    @SuppressLint("DefaultLocale")
+    @Override
+    public void setPvNum(int pvNum, int virtual) {
+        tvPvNum.setText(String.format("在线人数：%d虚拟在线人数：%d", pvNum, virtual == 0 ? pvVirtual : virtual));
     }
 
 

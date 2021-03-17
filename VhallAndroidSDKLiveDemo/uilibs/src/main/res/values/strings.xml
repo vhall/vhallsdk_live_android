@@ -17,6 +17,7 @@
     <string name="vhall_login_userpass">密码:</string>
 
     <string name="vhall_login_first">请先登录</string>
+    <string name="a">很遗憾，/n您与大奖擦肩而过，感谢您的参与！</string>
 
     <string name="test">test</string>
 
@@ -34,4 +35,11 @@
     <string name="vhall_agree">同意</string>
     <string name="vhall_disagree">取消</string>
     <string name="vhall_mic_invited_title">上麦邀请</string>
+    <string name="lottery_look_winner">查看中奖名单</string>
+    <string name="lottery_commit_success">信息提交成功</string>
+    <string name="lottery_commit_failed">信息提交失败</string>
+    <string name="lottery">礼品</string>
+    <string name="accept_the_prize">立即领奖</string>
+    <string name="lottery_lose">很遗憾，\n您与大奖擦肩而过，感谢您的参与！</string>
+    <string name="lottery_win">中奖啦，\n恭喜您获得" %s "</string>
 </resources>

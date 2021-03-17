@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
@@ -35,7 +36,6 @@ import com.vhall.uilibs.util.CircleView;
 import com.vhall.uilibs.util.DevicePopu;
 import com.vhall.uilibs.util.ExtendTextView;
 import com.vhall.uilibs.util.InvitedDialog;
-import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.ShowLotteryDialog;
 import com.vhall.uilibs.util.SignInDialog;
 import com.vhall.uilibs.util.SurveyPopu;
@@ -110,7 +110,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
 
 
     public void initWatch(Param params) {
-        String customeId = Build.BOARD + Build.DEVICE + Build.SERIAL;
+        String customeEmile = Build.BOARD + Build.DEVICE + Build.SERIAL+"@qq.com";
         String customNickname = Build.BRAND + "手机用户";
         int watchType;
         if (type == VhallUtil.WATCH_LIVE) {
@@ -118,18 +118,12 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
         } else {
             watchType = WebinarInfo.VIDEO;
         }
-        VhallSDK.initWatch(params.watchId, customeId, customNickname, params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.initWatch(params.watchId, customeEmile, customNickname, params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                 param.webinar_id = webinarInfo.webinar_id;
                 if(webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
                     watchView.showToast("还没开始直播");
-                /**
-                 *
-                 * 重要说明
-                 * 房间类型为H5是 webinarInfo 中vssToken，vssRoomId 有值，必需使用H5播放器播放，使用 PresenterVss
-                 * 房间类型为Flash时   vssToken，vssRoomId 空，必需使用Flash播放器播放 Presenter
-                 */
                 //敏感词过滤信息，发送聊天、评论通用
                 if (webinarInfo.filters != null && webinarInfo.filters.size() > 0) {
                     param.filters.clear();
@@ -248,11 +242,12 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
     }
 
     @Override
-    public void showSignIn(String signId, int startTime) {
+    public void showSignIn(String signId,String title, int startTime) {
         if (signInDialog == null) {
             signInDialog = new SignInDialog(this);
         }
         signInDialog.setSignInId(signId);
+        signInDialog.setShowTitle(title);
         signInDialog.setCountDownTime(startTime);
         signInDialog.setOnSignInClickListener(new SignInDialog.OnSignInClickListener() {
             @Override
@@ -362,7 +357,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
     }
 
     @Override
-    public void showLottery(MessageLotteryData lotteryData) {
+    public void showLottery(MessageServer.MsgInfo lotteryData) {
         if (lotteryDialog == null) {
             lotteryDialog = new ShowLotteryDialog(this);
         }
@@ -418,10 +413,13 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
     }
 
     @Override
-    public void setOnlineNum(int onlineNum) {
+    public void setOnlineNum(int onlineNum,int onlineVirtual) {
         tvOnlineNum.setText("在线人数：" + onlineNum);
     }
-
+    @Override
+    public void setPvNum(int pvNum,int pvVirtual) {
+       // tvPvNum.setText("在线人数：" + pvNum+"虚拟在线人数：" + pvVirtual);
+    }
 
     @Override
     public void showNotice(String content) {

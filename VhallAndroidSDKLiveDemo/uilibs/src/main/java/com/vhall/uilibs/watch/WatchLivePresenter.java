@@ -1,6 +1,7 @@
 package com.vhall.uilibs.watch;
 
 import android.os.CountDownTimer;
+import android.os.TokenWatcher;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RelativeLayout;
@@ -14,6 +15,7 @@ import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
+import com.vhall.business.utils.SurveyInternal;
 import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.player.stream.play.impl.VHVideoPlayerView;
@@ -22,7 +24,6 @@ import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.PushChatFragment;
 import com.vhall.uilibs.chat.MessageChatData;
-import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.emoji.InputUser;
 
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -31,10 +32,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //TODO 投屏相关
 import com.vhall.business_support.dlna.DeviceDisplay;
+import com.vhall.vhss.TokenManger;
+
+import vhall.com.vss2.VssSdk;
+import vhall.com.vss2.module.room.VssRoomManager;
+
+import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
 
 
 /**
@@ -250,7 +259,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     @Override
     public void submitLotteryInfo(String id, String lottery_id, String nickname, String phone) {
         if (!TextUtils.isEmpty(id) && !TextUtils.isEmpty(lottery_id)) {
-            VhallSDK.submitLotteryInfo(id, lottery_id, nickname, phone, new RequestCallback() {
+            VhallSDK.submitLotteryInfo(id, lottery_id, nickname, phone, "", new RequestCallback() {
                 @Override
                 public void onSuccess() {
                     watchView.showToast("信息提交成功");
@@ -296,7 +305,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     public void initWatch() {
         if (webinarInfo != null) {
             getWatchLive().setWebinarInfo(webinarInfo);
-           // operationDocument();
+            // operationDocument();
             liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
             chatView.clearChatData();
             getChatHistory();
@@ -541,6 +550,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     //支持的分辨率 msg
                     try {
                         JSONArray array = new JSONArray(msg);
+                        liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -552,6 +562,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
                     break;
                 case com.vhall.player.Constants.Event.EVENT_STREAM_STOP://发起端停止推流
+                    break;
+                case ERROR_LOGIN_MORE://被其他人提出
+                    watchView.showToast(msg);
+                    watchView.getActivity().finish();
                     break;
                 default:
                     break;
@@ -620,17 +634,17 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 //                    }
                     break;
                 case MessageServer.EVENT_START_LOTTERY://抽奖开始
-                    watchView.showLottery(MessageLotteryData.getData(messageInfo));
+                    watchView.showLottery(messageInfo);
                     break;
                 case MessageServer.EVENT_END_LOTTERY://抽奖结束
-                    watchView.showLottery(MessageLotteryData.getData(messageInfo));
+                    watchView.showLottery(messageInfo);
                     break;
                 case MessageServer.EVENT_NOTICE:
                     watchView.showNotice(messageInfo.content);
                     break;
                 case MessageServer.EVENT_SIGNIN: //签到消息
                     if (!TextUtils.isEmpty(messageInfo.id) && !TextUtils.isEmpty(messageInfo.sign_show_time)) {
-                        watchView.showSignIn(messageInfo.id, parseTime(messageInfo.sign_show_time, 30));
+                        watchView.showSignIn(messageInfo.id, messageInfo.signTitle, parseTime(messageInfo.sign_show_time, 30));
                     }
                     break;
                 case MessageServer.EVENT_QUESTION: // 问答开关
@@ -643,13 +657,25 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_SURVEY://问卷
 
+
                     /**
                      * 获取msg内容
                      */
 
                     MessageChatData surveyData = new MessageChatData();
                     surveyData.event = MessageChatData.eventSurveyKey;
-                    surveyData.setUrl(VhallSDK.getSurveyUrl(messageInfo.id, messageInfo.webinar_id, messageInfo.user_id));
+                    Map<String, String> params = new HashMap<>();
+                    params.put(SurveyInternal.KEY_SURVEY_ID, messageInfo.id);
+                    params.put(SurveyInternal.KEY_ROOMID, webinarInfo.vss_room_id);
+                    params.put(SurveyInternal.KEY_WEBINAR_ID, webinarInfo.webinar_id);
+                    params.put(SurveyInternal.KEY_APPID, VssSdk.getInstance().getAppId());
+                    if (webinarInfo.getWebinarInfoData() != null) {
+                        params.put(SurveyInternal.KEY_PAAS_ACCESS_TOKEN, webinarInfo.getWebinarInfoData().interact.paas_access_token);
+                    }
+                    params.put(SurveyInternal.KEY_USER_ID, webinarInfo.user_id);
+                    params.put(SurveyInternal.KEY_TOKEN, TokenManger.getToken());
+                    params.put(SurveyInternal.KEY_INTERACT_TOKEN, TokenManger.getInteractToken());
+                    surveyData.setUrl(SurveyInternal.createSurveyUrl(params));
                     surveyData.setId(messageInfo.id);
                     chatView.notifyDataChangedChat(surveyData);
                     break;
@@ -659,16 +685,16 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     operationDocument();
                     break;
                 case MessageServer.EVENT_SHOWH5DOC:
-                    if (documentView!=null){
-                        if (messageInfo.watchType==1){
+                    if (documentView != null) {
+                        if (messageInfo.watchType == 1) {
                             documentView.showType(3);
-                        }else {
+                        } else {
                             documentView.showType(2);
                         }
                     }
                     break;
                 case MessageServer.EVENT_PAINTH5DOC:
-                    if (documentView!=null){
+                    if (documentView != null) {
                         documentView.paintH5DocView(messageInfo.h5DocView);
                     }
                     break;
@@ -811,13 +837,13 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case ChatServer.eventCustomKey:
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     if (chatInfo.onlineData != null) {
-                        watchView.setOnlineNum(chatInfo.onlineData.tracksNum);
+                        watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
                     }
                     break;
                 case ChatServer.eventOnlineKey:
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     if (chatInfo.onlineData != null) {
-                        watchView.setOnlineNum(chatInfo.onlineData.tracksNum);
+                        watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
                     }
                     break;
                 case ChatServer.eventOfflineKey:

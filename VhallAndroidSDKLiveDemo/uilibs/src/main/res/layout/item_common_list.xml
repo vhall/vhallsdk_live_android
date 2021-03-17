@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:padding="6dp">
 
-    <com.vhall.uilibs.util.CircleImageView
+    <ImageView
         android:id="@+id/circle_common_avatar"
         android:layout_width="35dp"
         android:layout_height="35dp"

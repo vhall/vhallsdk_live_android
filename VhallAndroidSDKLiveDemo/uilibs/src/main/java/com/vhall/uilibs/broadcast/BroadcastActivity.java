@@ -28,7 +28,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+       getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         WebinarInfo webinarInfo = (WebinarInfo) getIntent().getSerializableExtra("webinarInfo");

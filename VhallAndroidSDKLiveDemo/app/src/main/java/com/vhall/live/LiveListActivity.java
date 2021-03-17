@@ -73,11 +73,9 @@ public class LiveListActivity extends Activity {
 
     private void getLiveList() {
         HashMap<String, String> hashMap = new HashMap<>();
-        hashMap.put("auth_type", "1");
-        hashMap.put("account", "v13812010");
-        hashMap.put("password", "a111111");
-//        hashMap.put("app_key", "183765c409e5fd09c1c9e83a513f111c");
-//        hashMap.put("is_origin", "1");
+        hashMap.put("auth_type", "");
+        hashMap.put("account", "");
+        hashMap.put("password", "");
         VHAPI.post(hashMap, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {

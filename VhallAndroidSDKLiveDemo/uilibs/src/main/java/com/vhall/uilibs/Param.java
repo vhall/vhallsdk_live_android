@@ -14,6 +14,7 @@ public class Param implements Serializable {
 
     //发直播相关
     public String broId = "";
+    public String broName = "";
     public String broToken = "5d56d034e933e1826c7c896859019e33";
     public int pixel_type = VHLivePushFormat.PUSH_MODE_HD;
     public int videoBitrate = 500;

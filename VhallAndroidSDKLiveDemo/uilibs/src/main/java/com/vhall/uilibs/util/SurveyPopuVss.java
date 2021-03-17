@@ -3,6 +3,7 @@ package com.vhall.uilibs.util;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
@@ -63,5 +64,6 @@ public class SurveyPopuVss extends PopupWindow {
     public void loadView(String url, String title) {
         tv_title.setText(title);
         wvSurvey.loadUrl(url);
+        Log.e("hkl",url);
     }
 }

@@ -1,13 +1,13 @@
 package com.vhall.live.webWatch;
 
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
@@ -17,6 +17,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 
+import com.vhall.business.data.WebinarInfo;
+import com.vhall.business.data.WebinarInfoRemote;
+import com.vhall.business.data.source.WebinarInfoDataSource;
 import com.vhall.live.R;
 import com.vhall.uilibs.Param;
 
@@ -29,11 +32,11 @@ public class WebViewActivity extends FragmentActivity {
     WebSettings webSettings;
     RelativeLayout rlContent;
     private Param param;
-    private String baseUrl = "https://e.vhall.com/webinar/inituser/";
+    private String baseUrl= "https://e.vhall.com/webinar/inituser/";
     //https://live.vhall.com/room/embedclient/854954136?
     //<iframe allow="camera *;microphone *;" allowfullscreen="true" border="0" src="https://live.vhall.com/webinar/inituser/263823730" width="800" height="600"></iframe>
     private String roomId = "";
-
+    private boolean inject = true;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -63,14 +66,39 @@ public class WebViewActivity extends FragmentActivity {
             webSettings.setMediaPlaybackRequiresUserGesture(false);
         }
 
-        baseUrl = baseUrl + roomId;
 
-        webView.loadUrl(baseUrl);
-//        webView.loadData(Html.fromHtml(url).toString(),"text/html","UTF-8");
+        WebinarInfoRemote.getInstance().getWatchWebinarInfo(roomId, "", "", "", "", "", new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+            @Override
+            public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                baseUrl = "https://t-webinar.e.vhall.com/v3/lives/watch/";
+                baseUrl = baseUrl + roomId;
+                webView.loadUrl(baseUrl);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                baseUrl = baseUrl + roomId;
+
+                webView.loadUrl(baseUrl);
+            }
+        });
+
+
+
 
         webView.setWebViewClient(new WebViewClient() {
 
-
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+//                StringBuilder builder = new StringBuilder();
+//                builder.append("function remainTime(){  \n" +
+//                        "    setTimeout(\"remainTime()\",10000);\n" +
+//                        "var f = document.activeElement == document.getElementsByTagName('textarea')[0]; \n");
+//                builder.append("alert(f);}");
+//                builder.append("remainTime();  ");
+//                view.loadUrl("javascript:"+builder.toString());
+            }
 
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
@@ -81,6 +109,7 @@ public class WebViewActivity extends FragmentActivity {
         });
 
         webView.setWebChromeClient(new WebChromeClient(){
+            AlertDialog alertDialog = null;
             private View mCustomView;
             private CustomViewCallback mCustomViewCallback;
 
@@ -114,10 +143,18 @@ public class WebViewActivity extends FragmentActivity {
                 mCustomViewCallback.onCustomViewHidden();
                 mCustomView =null;
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                alertDialog = new AlertDialog.Builder(webView.getContext()).create();
+                alertDialog.show();
+                webView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(alertDialog != null && alertDialog.isShowing())
+                            alertDialog.cancel();
+                    }
+                },50);
             }
 
         });
-
     }
 
     @Override

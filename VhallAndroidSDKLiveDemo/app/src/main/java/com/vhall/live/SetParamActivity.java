@@ -23,7 +23,7 @@ import com.vhall.uilibs.Param;
  */
 public class SetParamActivity extends FragmentActivity {
     Param param;
-    EditText et_bro_token, et_bro_id, et_video_bitrate, et_video_framerate, et_watch_id, et_key, et_buffersecond;
+    EditText et_bro_token,et_bro_name, et_bro_id, et_video_bitrate, et_video_framerate, et_watch_id, et_key, et_buffersecond;
     TextView et_userid, et_usernickname;
     RadioGroup rg_type;
     RadioButton rb_hdpi, rb_xhdpi, radioButtonHD, radioButtonSD, radioButtonUHD;
@@ -34,6 +34,7 @@ public class SetParamActivity extends FragmentActivity {
         setContentView(R.layout.set_activity);
         param = VhallApplication.param;
         et_bro_token = (EditText) this.findViewById(R.id.et_bro_token);
+        et_bro_name = (EditText) this.findViewById(R.id.et_bro_name);
         et_bro_id = (EditText) this.findViewById(R.id.et_bro_id);
         et_video_bitrate = (EditText) this.findViewById(R.id.et_video_bitrate);
         et_video_framerate = (EditText) this.findViewById(R.id.et_video_framerate);
@@ -64,6 +65,7 @@ public class SetParamActivity extends FragmentActivity {
     private void initData() {
         et_bro_token.setText(param.broToken);
         et_bro_id.setText(param.broId);
+        et_bro_name.setText(param.broName);
         et_video_bitrate.setText(String.valueOf(param.videoBitrate));
         et_video_framerate.setText(String.valueOf(param.videoFrameRate));
         et_watch_id.setText(param.watchId);
@@ -89,6 +91,7 @@ public class SetParamActivity extends FragmentActivity {
     public void backClick(View view) {
         param.broToken = et_bro_token.getText().toString();
         param.broId = et_bro_id.getText().toString();
+        param.broName = et_bro_name.getText().toString();
         int videoBitrate = 0;
         try {
             videoBitrate = Integer.parseInt(et_video_bitrate.getText().toString());
@@ -139,4 +142,5 @@ public class SetParamActivity extends FragmentActivity {
     public void onBackPressed() {
         backClick(null);
     }
+
 }

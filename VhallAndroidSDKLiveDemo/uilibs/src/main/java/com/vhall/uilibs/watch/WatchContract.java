@@ -12,7 +12,6 @@ import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.player.vod.VodPlayerView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
-import com.vhall.uilibs.util.MessageLotteryData;
 import com.vhall.uilibs.util.emoji.InputUser;
 
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -37,7 +36,7 @@ public class WatchContract {
         void dismissNotice();
 
         //显示签到框
-        void showSignIn(String signId, int startTime);
+        void showSignIn(String signId ,String title,int startTime);
 
         //隐藏签到框
         void dismissSignIn();
@@ -68,20 +67,24 @@ public class WatchContract {
         Activity getActivity();
 
         //显示抽奖
-        void showLottery(MessageLotteryData data);
+        void showLottery(MessageServer.MsgInfo data);
 
         void enterInteractive(); // 进入互动
+
         // 投屏使用
-         void showDevices();
+        void showDevices();
+
         // 投屏使用
-         void dismissDevices();
+        void dismissDevices();
 
         void refreshHand(int second);
 
         //显示被邀请上麦
         void showInvited();
 
-        void setOnlineNum(int onlineNum);
+        void setOnlineNum(int onlineNum, int onlineVirtual);
+
+        void setPvNum(int pvNum, int pvVirtual);
 
     }
 
@@ -108,6 +111,10 @@ public class WatchContract {
     }
 
     interface DetailView extends BaseView<BasePresenter> {
+    }
+
+    interface LotteryView extends BaseView<BasePresenter> {
+        void setLotteryData(MessageServer.MsgInfo lotteryData);
     }
 
     interface LiveView extends BaseView<LivePresenter> {
@@ -225,16 +232,16 @@ public class WatchContract {
 
         void submitSurvey(String result);
 
-        void submitSurvey(Survey survey,String result);
+        void submitSurvey(Survey survey, String result);
 
         void onRaiseHand(); // 举手
 
         void replyInvite(int type);
 
-         DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
+        DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
 
-         void showDevices();
+        void showDevices();
 
-         void dismissDevices();
+        void dismissDevices();
     }
 }

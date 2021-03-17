@@ -14,6 +14,7 @@
     <string name="app_settings_str_watch">观看直播/回放</string>
     <string name="app_settings_string_token">直播Token</string>
     <string name="app_settings_string_id">活动ID</string>
+    <string name="app_settings_string_name">主播昵称</string>
     <string name="app_settings_string_dp">分辨率</string>
     <string name="app_settings_string_code">视频码率(kbps)</string>
     <string name="app_settings_string_framerate">视频帧率(fps)</string>
@@ -32,5 +33,11 @@
     <string name="call">拨打</string>
 
     <string name="phone_user">手机用户</string>
+    <string name="app_account_login">账号登录</string>
+    <string name="app_id_login">三方ID登录</string>
+    <string name="app_login_hint">请输入用户名</string>
+    <string name="app_head_url_hint">请输入头像地址网络地址(非必填)</string>
+    <string name="app_id_hint">请输入三方ID</string>
+
 
 </resources>
