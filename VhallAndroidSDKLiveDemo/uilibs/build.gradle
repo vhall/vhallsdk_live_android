@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode 601
+        versionName "6.0.1"
     }
     buildTypes {
         release {
@@ -24,24 +24,22 @@ android {
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
-//configurations {
-//    all*.exclude group: 'com.vhall.android.base', module: 'log-manager'
-//}
+
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar','*.aar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "com.android.support:appcompat-v7:${SUPPORT_VERSION}"
     api "com.github.bumptech.glide:glide:4.8.0"
-    //SaaSSDK
-    api 'com.vhall.android.library:vh-saas-sdk:6.0.0'
-    api 'com.vhall.android.library:vh-saas-interactive:6.0.0'
-    //投屏相关
-    api 'com.vhall.android.library:vh-saas-sdk-support:2.0.1'
 
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    api 'com.vhall.android.library:vh-saas-sdk:6.0.1'
+    api 'com.vhall.android.library:vh-saas-interactive:6.0.1'
+    //投屏
+    api 'com.vhall.android.library:vh-saas-sdk-support:2.0.1'
     implementation 'com.github.ctiao:DanmakuFlameMaster:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-armv7a:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-armv5:0.6.4'
     implementation 'com.github.ctiao:ndkbitmap-x86:0.6.4'
+
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
 
 }
 repositories {

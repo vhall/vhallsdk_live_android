@@ -48,7 +48,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
     @Override
     public void initInteractive() {
         interactive = new InterActive(interActView.getContext(), new RoomCallback(), new MessageEventCallback());
-        interactive.init(mParam.watchId, "", "", "", new RequestCallback() {
+        interactive.init(mParam.watchId, "", "", mParam.key, new RequestCallback() {
             @Override
             public void onSuccess() {
                 setLocalView();
@@ -273,7 +273,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
     @Override
     public void onDestroy() {
         onDownMic();
-      //  interactive.leaveRoom();
+        //  interactive.leaveRoom();
         interactive.onDestroy();
     }
 

@@ -342,13 +342,13 @@ public class VChatFragment extends Fragment implements ChatContract.ChatView {
             }
             //TODO 头像设置
             viewHolder.tv_question_name.setText(questionData.nick_name);
-            viewHolder.tv_question_time.setText(questionData.created_at);
+            viewHolder.tv_question_time.setText(questionData.created_time);
             viewHolder.tv_question_content.setText(EmojiUtils.getEmojiText(getContext(), questionData.content), TextView.BufferType.SPANNABLE);
             if (questionData.answer != null) {
                 viewHolder.ll_answer.setVisibility(View.VISIBLE);
                 viewHolder.tv_answer_content.setText(EmojiUtils.getEmojiText(getContext(), questionData.answer.content), TextView.BufferType.SPANNABLE);
                 viewHolder.tv_answer_name.setText(questionData.answer.nick_name);
-                viewHolder.tv_answer_time.setText(questionData.answer.created_at);
+                viewHolder.tv_answer_time.setText(questionData.answer.created_time);
                 Glide.with(getActivity()).load(questionData.answer.avatar).apply(options).into(viewHolder.iv_answer_avatar);
                 Glide.with(getActivity()).load(questionData.avatar).apply(options).into(viewHolder.iv_question_avatar);
             } else {

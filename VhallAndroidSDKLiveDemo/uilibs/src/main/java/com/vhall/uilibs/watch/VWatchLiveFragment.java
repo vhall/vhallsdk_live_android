@@ -111,6 +111,15 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
             mDanmakuView.showFPS(false);
             mDanmakuView.enableDanmakuDrawingCache(true);
         }
+//        if (mPresenter != null) {
+//            mPresenter.start();
+//        }
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                mPresenter.start();
+            }
+        });
     }
 
     @Override
@@ -200,9 +209,9 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
     @Override
     public void onStop() {
         super.onStop();
-        if (mPresenter != null) {
-            mPresenter.stopWatch();
-        }
+//        if (mPresenter != null) {
+//            mPresenter.stopWatch();
+//        }
     }
 
     @Override
@@ -211,16 +220,6 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
         if (mDanmakuView != null && mDanmakuView.isPrepared() && mDanmakuView.isPaused()) {
             mDanmakuView.resume();
         }
-
-        // 直接调用start由于时机问题无法获取到view的宽高
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                if (mPresenter != null) {
-                    mPresenter.start();
-                }
-            }
-        });
     }
 
     @Override
