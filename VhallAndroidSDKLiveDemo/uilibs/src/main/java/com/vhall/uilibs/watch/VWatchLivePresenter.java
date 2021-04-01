@@ -45,7 +45,7 @@ import vhall.com.vss2.VssSdk;
 /**
  * 观看直播的Presenter
  */
-public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.ChatPresenter {
+class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.ChatPresenter {
     private static final String TAG = "WatchLivePresenter";
     private Param params;
     private WebinarInfo webinarInfo;
@@ -85,7 +85,7 @@ public class VWatchLivePresenter implements WatchContract.LivePresenter, ChatCon
     @Override
     public void start() {
         getWatchLive().setVRHeadTracker(true);
-        getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeAspectFit.getValue());
+        getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeNone.getValue());
         initWatch();
     }
 

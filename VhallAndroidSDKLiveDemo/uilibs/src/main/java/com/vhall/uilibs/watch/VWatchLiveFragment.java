@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -42,6 +43,8 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
     private DanmakuContext mDanmuContext;
     private BaseDanmakuParser mParser;
 
+    private ImageView btn_change_scaletype;
+
     public static VWatchLiveFragment newInstance() {
         return new VWatchLiveFragment();
     }
@@ -63,6 +66,8 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
         mContainerLayout = root.findViewById(R.id.rl_container);
         fragmentDownloadSpeed = root.findViewById(R.id.fragment_download_speed);
         progressbar = root.findViewById(R.id.progressbar);
+        btn_change_scaletype = (ImageView) root.findViewById(R.id.btn_change_scaletype);
+        btn_change_scaletype.setOnClickListener(this);
         root.findViewById(R.id.image_action_back).setOnClickListener(this);
         // 设置最大显示行数
         HashMap<Integer, Integer> maxLinesPair = new HashMap<>();
@@ -150,6 +155,8 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
         int i = view.getId();
         if (i == R.id.image_action_back) {
             getActivity().onBackPressed();
+        }else if (i == R.id.btn_change_scaletype) {
+            mPresenter.setScaleType();
         }
     }
 
@@ -165,7 +172,23 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
 
     @Override
     public void setScaleButtonText(int type) {
-
+        switch (type) {
+            case 0://FIT_DEFAULT
+                btn_change_scaletype.setBackground(getResources().getDrawable(R.drawable.fit_default));
+                break;
+            case 1://FIT_CENTER_INSIDE
+                btn_change_scaletype.setBackground(getResources().getDrawable(R.drawable.fit_center));
+                break;
+            case 2://FIT_X
+                btn_change_scaletype.setBackground(getResources().getDrawable(R.drawable.fit_x));
+                break;
+            case 3://FIT_Y
+                btn_change_scaletype.setBackground(getResources().getDrawable(R.drawable.fit_y));
+                break;
+            case 4://FIT_XY
+                btn_change_scaletype.setBackground(getResources().getDrawable(R.drawable.fit_xy));
+                break;
+        }
     }
 
     @Override
