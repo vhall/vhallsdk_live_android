@@ -1,5 +1,6 @@
 package com.vhall.uilibs.watch;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,6 +14,7 @@ import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.R;
 import com.vhall.business.widget.PPTView;
 import com.vhall.business.widget.WhiteBoardView;
+import com.vhall.uilibs.util.DocTouchListener;
 
 import java.util.List;
 
@@ -42,6 +44,7 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
         return inflater.inflate(R.layout.document_fragment, null);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -121,6 +124,7 @@ public class DocumentFragment extends Fragment implements WatchContract.Document
 
     @Override
     public void paintH5DocView(View docView) {
+        docView.setOnTouchListener(new DocTouchListener());
         h5FrameLayout.removeAllViews();
         h5FrameLayout.addView(docView);
     }

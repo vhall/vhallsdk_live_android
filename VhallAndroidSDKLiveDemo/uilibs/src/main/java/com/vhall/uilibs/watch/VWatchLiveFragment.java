@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
+import com.vhall.vhss.data.ScrollInfoData;
 
 import java.util.HashMap;
 
@@ -214,6 +215,11 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
         if (mPresenter != null) {
             setScaleButtonText(mPresenter.getScaleType());
         }
+    }
+
+    @Override
+    public void setScrollInfo(ScrollInfoData scrollInfo) {
+
     }
 
     @Override

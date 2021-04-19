@@ -13,6 +13,7 @@ import com.vhall.player.vod.VodPlayerView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.vhss.data.ScrollInfoData;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 
@@ -134,6 +135,8 @@ public class WatchContract {
         void addDanmu(String danmu);
 
         void reFreshView();
+
+        void setScrollInfo(ScrollInfoData scrollInfo); // 设置跑马灯
 
     }
 

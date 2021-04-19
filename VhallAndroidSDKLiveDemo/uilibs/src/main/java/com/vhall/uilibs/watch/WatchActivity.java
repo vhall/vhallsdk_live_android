@@ -175,8 +175,10 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
 
     public void initWatch(Param params) {
+        //可以不设置这两个参数
         String customeEmail = Build.BOARD + Build.DEVICE + Build.SERIAL + "@qq.com";
-        String customNickname = Build.BRAND + "手机用户";
+        String customNickname = TextUtils.isEmpty(VhallSDK.getUserName()) ? Build.BRAND + "手机用户" : VhallSDK.getUserName();
+
         int watchType;
         if (type == VhallUtil.WATCH_LIVE) {
             watchType = WebinarInfo.LIVE;

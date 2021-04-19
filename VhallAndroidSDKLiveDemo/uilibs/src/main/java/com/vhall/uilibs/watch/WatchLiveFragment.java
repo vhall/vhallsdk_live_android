@@ -24,7 +24,9 @@ import com.vhall.business.utils.LogManager;
 import com.vhall.business.widget.ContainerLayout;
 import com.vhall.player.Constants;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.MarqueeView;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
+import com.vhall.vhss.data.ScrollInfoData;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,6 +62,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
     private IDanmakuView mDanmakuView;
     private DanmakuContext mDanmuContext;
+    private MarqueeView marquee_view;
     private BaseDanmakuParser mParser;
     private Activity context;
 
@@ -130,6 +133,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
 
         mDanmakuView = (IDanmakuView) root.findViewById(R.id.sv_danmaku);
+        marquee_view = root.findViewById(R.id.marquee_view);
         mDanmakuView.hide();
         mDanmuContext = DanmakuContext.create();
         mDanmuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setScrollSpeedFactor(2.2f).setScaleTextSize(1.2f)
@@ -170,7 +174,6 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }
         if (mPresenter != null) {
             mPresenter.start();
-
         }
     }
 
@@ -361,6 +364,22 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }
     }
 
+   private ScrollInfoData scrollInfoData;
+
+    @Override
+    public void setScrollInfo(final ScrollInfoData scrollInfo) {
+        if (scrollInfoData != null || scrollInfo == null) {
+            //设置一次就好了
+            return;
+        }
+        scrollInfoData = scrollInfo;
+        if (marquee_view != null) {
+            marquee_view.setVisibility(View.VISIBLE);
+            //height        随机显示时 控件显示的的高度范围  默认 100 -500 可以自己根据需求改
+            marquee_view.setScrollingInfo(scrollInfoData, 450);
+        }
+    }
+
 
     private void addDanmaKuShowTextAndImage(boolean islive) {
         BaseDanmaku danmaku = mDanmuContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
@@ -421,7 +440,11 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         if (mDanmakuView != null && mDanmakuView.isPrepared()) {
             mDanmakuView.pause();
         }
+        if (marquee_view != null && marquee_view.getVisibility() == View.VISIBLE) {
+            marquee_view.stopScroll();
+        }
     }
+
 
     @Override
     public void onStop() {
@@ -437,6 +460,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         if (mDanmakuView != null && mDanmakuView.isPrepared() && mDanmakuView.isPaused()) {
             mDanmakuView.resume();
         }
+        if (marquee_view != null && marquee_view.getVisibility() == View.VISIBLE) {
+            marquee_view.startScroll();
+        }
     }
 
     @Override
@@ -448,6 +474,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             // dont forget release!
             mDanmakuView.release();
             mDanmakuView = null;
+        }
+        if (marquee_view != null) {
+            marquee_view.onDestroy();
         }
         super.onDestroy();
     }

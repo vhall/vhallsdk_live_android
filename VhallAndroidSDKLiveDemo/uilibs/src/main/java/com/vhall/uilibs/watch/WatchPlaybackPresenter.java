@@ -28,6 +28,7 @@ import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 
 import org.fourthline.cling.android.AndroidUpnpService;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -449,7 +450,12 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         public void onEvent(int event, String msg) {
             switch (event) {
                 case Constants.Event.EVENT_DPI_LIST:
-
+                    //支持的分辨率 msg
+                    try {
+                        JSONArray array = new JSONArray(msg);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case Constants.Event.EVENT_DPI_CHANGED:
                     playbackView.setQualityChecked(msg);

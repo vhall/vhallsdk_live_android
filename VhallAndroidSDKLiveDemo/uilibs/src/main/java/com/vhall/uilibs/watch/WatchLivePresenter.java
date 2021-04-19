@@ -1,6 +1,7 @@
 package com.vhall.uilibs.watch;
 
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.os.TokenWatcher;
 import android.text.TextUtils;
 import android.util.Log;
@@ -330,6 +331,9 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     @Override
     public void startWatch() {
         getWatchLive().start();
+        if (webinarInfo.getWebinarInfoData() != null && webinarInfo.getWebinarInfoData().scrollInfoData != null) {
+            liveView.setScrollInfo(webinarInfo.getWebinarInfoData().scrollInfoData);
+        }
     }
 
     @Override

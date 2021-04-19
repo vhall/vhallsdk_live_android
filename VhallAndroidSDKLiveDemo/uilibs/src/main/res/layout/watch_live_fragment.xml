@@ -15,6 +15,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible" />
+    <com.vhall.uilibs.util.MarqueeView
+        android:id="@+id/marquee_view"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -41,8 +46,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
             android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
             android:textColor="#E60000"
             android:textSize="16sp" />
 
@@ -78,13 +83,13 @@
                 android:layout_marginRight="5dp"
                 android:src="@drawable/vhall_icon_danmaku_close" />
 
-           <!-- <ImageView
-                android:id="@+id/btn_change_audio"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="5dp"
-                android:src="@drawable/audio_close" />-->
+            <!-- <ImageView
+                 android:id="@+id/btn_change_audio"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_centerVertical="true"
+                 android:layout_marginRight="5dp"
+                 android:src="@drawable/audio_close" />-->
 
             <ImageView
                 android:id="@+id/btn_change_scaletype"
@@ -136,12 +141,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:background="@drawable/bg_oval_black"
-                    android:text="原画"
+                    android:button="@null"
                     android:checked="true"
+                    android:gravity="center"
+                    android:text="原画"
                     android:textColor="@color/text_color_selector_white_red"
                     android:textSize="13sp"
-                    android:gravity="center"
-                    android:button="@null"
                     android:visibility="visible" />
 
                 <RadioButton
@@ -150,11 +155,11 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:background="@drawable/bg_oval_black"
+                    android:button="@null"
+                    android:gravity="center"
                     android:text="标清"
                     android:textColor="@color/text_color_selector_white_red"
                     android:textSize="13sp"
-                    android:gravity="center"
-                    android:button="@null"
                     android:visibility="invisible" />
 
                 <RadioButton
@@ -163,11 +168,11 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="5dp"
                     android:background="@drawable/bg_oval_black"
+                    android:button="@null"
+                    android:gravity="center"
                     android:text="高清"
                     android:textColor="@color/text_color_selector_white_red"
                     android:textSize="13sp"
-                    android:gravity="center"
-                    android:button="@null"
                     android:visibility="invisible" />
 
                 <RadioButton
@@ -175,23 +180,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_oval_black"
+                    android:button="@null"
+                    android:gravity="center"
                     android:text="超清"
                     android:textColor="@color/text_color_selector_white_red"
                     android:textSize="13sp"
-                    android:gravity="center"
-                    android:button="@null"
                     android:visibility="invisible" />
+
                 <RadioButton
                     android:id="@+id/radio_btn_a"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:background="@drawable/bg_oval_black"
                     android:button="@null"
-                    android:visibility="invisible"
+                    android:gravity="center"
                     android:text="音频"
                     android:textColor="@color/text_color_selector_white_red"
-                    android:textSize="13sp"/>
+                    android:textSize="13sp"
+                    android:visibility="invisible" />
             </RadioGroup>
         </LinearLayout>
 
