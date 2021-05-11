@@ -19,10 +19,6 @@ allprojects {
 
         maven {url 'http://4thline.org/m2'}
         maven {url 'https://dl.bintray.com/tiandiyinghun/maven'}
-
-        maven {url 'https://s01.oss.sonatype.org/content/repositories/releases/'}
-
-        maven {url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'}
     }
 
     tasks.withType(Javadoc) {
