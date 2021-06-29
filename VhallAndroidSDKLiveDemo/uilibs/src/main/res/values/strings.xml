@@ -42,4 +42,10 @@
     <string name="accept_the_prize">立即领奖</string>
     <string name="lottery_lose">很遗憾，\n您与大奖擦肩而过，感谢您的参与！</string>
     <string name="lottery_win">中奖啦，\n恭喜您获得" %s "</string>
+
+    <string name="start_broadcast">开始直播</string>
+    <string name="live_send_msg_hint">说点什么吧…</string>
+    <string name="sure">确定</string>
+    <string name="vhall_no_member">暂时没有成员列表</string>
+    <string name="vhall_forbit_member">暂时没有禁言或踢出成员</string>
 </resources>

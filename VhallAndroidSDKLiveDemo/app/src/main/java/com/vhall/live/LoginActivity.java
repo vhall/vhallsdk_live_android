@@ -2,6 +2,7 @@ package com.vhall.live;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vhall.business.VhallSDK;
+import com.vhall.business.data.ILoginRequest;
 import com.vhall.business.data.UserInfo;
 import com.vhall.business.data.source.UserInfoDataSource;
 
@@ -49,6 +51,9 @@ public class LoginActivity extends Activity implements RadioGroup.OnCheckedChang
         mVerTextView.setText(VhallSDK.getVersion());
 
         login_type_container.setOnCheckedChangeListener(this::onCheckedChanged);
+        mWaitingDialog = new ProgressDialog(this);
+        mWaitingDialog.setTitle("提示");
+        mWaitingDialog.setMessage("请稍后...");
     }
 
     @Override
@@ -65,7 +70,7 @@ public class LoginActivity extends Activity implements RadioGroup.OnCheckedChang
             mTextInputPassword.setVisibility(View.GONE);
         }
     }
-
+    private ProgressDialog mWaitingDialog;
 
     public void login(String username, String userPass) {
         VhallSDK.login(username, userPass, new LoginCallbackInternal(userPass));
@@ -87,11 +92,13 @@ public class LoginActivity extends Activity implements RadioGroup.OnCheckedChang
             Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
             VhallApplication.param.key = userPass;
             skipMain();
+            mWaitingDialog.cancel();
         }
 
         @Override
         public void onError(int errorCode, String reason) {
             Toast.makeText(LoginActivity.this, reason, Toast.LENGTH_SHORT).show();
+            mWaitingDialog.cancel();
         }
     }
 
@@ -105,6 +112,7 @@ public class LoginActivity extends Activity implements RadioGroup.OnCheckedChang
 //    }
 
     public void loginClick(View view) {
+        mWaitingDialog.show();
         if (account_login.isChecked()) {
             checkUserInfo();
         } else {

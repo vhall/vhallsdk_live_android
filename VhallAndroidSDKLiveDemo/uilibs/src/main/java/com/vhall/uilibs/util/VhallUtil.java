@@ -3,6 +3,14 @@ package com.vhall.uilibs.util;
 
 import android.content.Context;
 
+import com.vhall.business.core.VhallKey;
+import com.vhall.business.data.UserInfo;
+import com.vhall.business.utils.VHInternalUtils;
+import com.vhall.uilibs.interactive.bean.InteractiveUser;
+import com.vhall.vhallrtc.client.Stream;
+
+import org.json.JSONObject;
+
 
 /**
  * 常用方法工具类
@@ -61,5 +69,22 @@ public class VhallUtil {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);
     }
+
+    public static InteractiveUser parseStreamUser(Stream stream){
+        try {
+            JSONObject a = new JSONObject(stream.getAttributes());
+            if (a != null) {
+                String name = a.optString(VhallKey.KEY_NICK_NAME);
+                String role = a.optString(VhallKey.KEY_ROLE);
+                String avatar = a.optString(VhallKey.KEY_AVATAR);
+                return new InteractiveUser(name, VHInternalUtils.parseRoleNameToNum(role),avatar);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new InteractiveUser();
+
+    }
+
 
 }

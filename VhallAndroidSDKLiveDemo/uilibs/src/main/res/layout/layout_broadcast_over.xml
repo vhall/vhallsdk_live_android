@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_over"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_80"
+    android:visibility="gone">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@mipmap/icon_rtc_over_bg"
+        android:visibility="gone" />
+
+    <com.vhall.uilibs.widget.NiceImageView
+        android:id="@+id/over_avatar"
+        android:layout_width="@dimen/dimen_75dp"
+        android:layout_height="@dimen/dimen_75dp"
+        android:layout_marginTop="@dimen/dimen_100dp"
+        android:background="@mipmap/icon_avatar"
+        app:is_circle="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_error_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_12dp"
+        android:textColor="@color/color_F7"
+        android:textSize="@dimen/dimen_16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/over_avatar" />
+
+    <TextView
+        android:id="@+id/tv_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_25dp"
+        android:text="您的直播真精彩"
+        android:textColor="@color/color_FC5659"
+        android:textSize="@dimen/dimen_20dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_error_name" />
+
+    <View
+        android:id="@+id/v1"
+        android:layout_width="@dimen/dimen_280dp"
+        android:layout_height="@dimen/dimen_60dp"
+        android:layout_marginTop="@dimen/dimen_40dp"
+        android:visibility="visible"
+        android:background="@drawable/shape_over_40_white"
+        app:layout_constraintEnd_toStartOf="@id/v2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_hint" />
+
+    <View
+        android:id="@+id/v2"
+        android:layout_width="@dimen/dimen_130dp"
+        android:layout_height="@dimen/dimen_60dp"
+        android:layout_marginTop="@dimen/dimen_40dp"
+        android:background="@drawable/shape_over_40_white"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/v1"
+        app:layout_constraintTop_toBottomOf="@id/tv_hint" />
+
+    <View
+        android:id="@+id/v3"
+        android:layout_width="@dimen/dimen_130dp"
+        android:layout_height="@dimen/dimen_60dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:background="@drawable/shape_over_40_white"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/v4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/v1" />
+
+    <View
+        android:id="@+id/v4"
+        android:layout_width="@dimen/dimen_130dp"
+        android:layout_height="@dimen/dimen_60dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:background="@drawable/shape_over_40_white"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/v3"
+        app:layout_constraintTop_toBottomOf="@id/v1" />
+
+    <TextView
+        android:id="@+id/tv_over_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_8dp"
+        android:text="直播时长"
+        android:textColor="@color/color_AA"
+        android:textSize="@dimen/dimen_13dp"
+        app:layout_constraintEnd_toEndOf="@id/v1"
+        app:layout_constraintStart_toStartOf="@id/v1"
+        app:layout_constraintTop_toTopOf="@id/v1" />
+
+    <TextView
+        android:id="@+id/tv_over_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_8dp"
+        android:text="最高并发"
+        android:textColor="@color/color_AA"
+        android:textSize="@dimen/dimen_13dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/v2"
+        app:layout_constraintStart_toStartOf="@id/v2"
+        app:layout_constraintTop_toTopOf="@id/v2" />
+
+    <TextView
+        android:id="@+id/tv_over_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_8dp"
+        android:text="累计观看"
+        android:textColor="@color/color_AA"
+        android:textSize="@dimen/dimen_13dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/v3"
+        app:layout_constraintStart_toStartOf="@id/v3"
+        app:layout_constraintTop_toTopOf="@id/v3" />
+
+    <TextView
+        android:id="@+id/tv_over_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_8dp"
+        android:text="聊天条数"
+        android:textColor="@color/color_AA"
+        android:textSize="@dimen/dimen_13dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/v4"
+        app:layout_constraintStart_toStartOf="@id/v4"
+        app:layout_constraintTop_toTopOf="@id/v4" />
+
+    <TextView
+        android:id="@+id/tv_over_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_20dp"
+        app:layout_constraintEnd_toEndOf="@id/v1"
+        app:layout_constraintStart_toStartOf="@id/v1"
+        app:layout_constraintTop_toBottomOf="@id/tv_over_1" />
+
+    <TextView
+        android:id="@+id/tv_over_concurrence_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_20dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/v2"
+        app:layout_constraintStart_toStartOf="@id/v2"
+        app:layout_constraintTop_toBottomOf="@id/tv_over_2" />
+
+    <TextView
+        android:id="@+id/tv_over_look_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_20dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/v3"
+        app:layout_constraintStart_toStartOf="@id/v3"
+        app:layout_constraintTop_toBottomOf="@id/tv_over_3" />
+
+    <TextView
+        android:id="@+id/tv_over_chat_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_20dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/v4"
+        app:layout_constraintStart_toStartOf="@id/v4"
+        app:layout_constraintTop_toBottomOf="@id/tv_over_4" />
+
+    <TextView
+        android:id="@+id/tv_finish"
+        android:layout_width="@dimen/dimen_280dp"
+        android:layout_height="@dimen/dimen_45dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/dimen_50dp"
+        android:background="@drawable/shape_star_btn"
+        android:gravity="center"
+        android:text="返回首页"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</android.support.constraint.ConstraintLayout>

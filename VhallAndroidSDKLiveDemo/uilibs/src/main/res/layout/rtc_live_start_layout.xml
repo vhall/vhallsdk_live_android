@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_start"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black_30"
+    android:visibility="visible">
+
+    <ProgressBar
+        android:id="@+id/pr_time"
+        style="@style/Dialog_Fullscreen"
+        android:layout_width="@dimen/dimen_210dp"
+        android:layout_height="@dimen/dimen_210dp"
+        android:layout_gravity="center"
+        android:minWidth="30dp"
+        android:minHeight="30dp"
+        android:padding="10dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_time_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="3"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_70dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_start"
+        android:layout_width="@dimen/dimen_280dp"
+        android:layout_height="@dimen/dimen_45dp"
+        android:layout_marginTop="@dimen/dimen_30dp"
+        android:layout_marginBottom="@dimen/dimen_50dp"
+        android:background="@drawable/rtc_shape_start_btn"
+        android:gravity="center"
+        android:text="@string/start_broadcast"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</android.support.constraint.ConstraintLayout>

@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.vhall.business.utils.LogManager;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.widget.HeightProvider;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import java.util.List;
 /**
  * Created by huanan on 2016/3/14.
  */
-public class InputView {
+public class InputView implements View.OnClickListener {
 
     private static final String TAG = "InputView";
     private boolean showEmoji = false;
@@ -118,6 +119,32 @@ public class InputView {
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        if(v == bg){
+            dismiss();
+        }else if(v == iv_emoji){
+            showEmoji = !showEmoji;
+            show(showEmoji, null);
+        }else if(v == et_content){
+            showEmoji = false;
+            show(showEmoji, null);
+        }else if(v == tv_send){
+            if (onSendClickListener != null) {
+                String msg = et_content.getText().toString();
+                if (msg.contains("@") && msg.contains(":")) {
+                    msg = msg.substring(msg.indexOf(":") + 1);
+                }
+                if (user != null) {
+                    String text = String.format("@%s:",user.userName);
+                    msg = text + msg;
+                }
+                onSendClickListener.onSendClick(msg, user);
+                et_content.setText("");
+                dismiss();
+            }
+        }
+    }
 
     public void initView() {
         contentView = View.inflate(context, R.layout.emoji_inputview_layout, null);
@@ -128,46 +155,11 @@ public class InputView {
         contentView.setVisibility(View.GONE);
         bg = (View) contentView.findViewById(R.id.view_bg);
 
-        bg.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
 
-        iv_emoji.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showEmoji = !showEmoji;
-                show(showEmoji, null);
-
-            }
-        });
-        et_content.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showEmoji = false;
-                show(showEmoji, null);
-            }
-        });
-        tv_send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (onSendClickListener != null) {
-                    String msg = et_content.getText().toString();
-                    if (msg.contains("@") && msg.contains(":")) {
-                        msg = msg.substring(msg.indexOf(":") + 1);
-                    }
-                    if (user != null) {
-                        String text = "@" + user.userName + ":";
-                        msg = text + msg;
-                    }
-                    onSendClickListener.onSendClick(msg, user);
-                    et_content.setText("");
-                    dismiss();
-                }
-            }
-        });
+        bg.setOnClickListener(this);
+        iv_emoji.setOnClickListener(this);
+        et_content.setOnClickListener(this);
+        tv_send.setOnClickListener(this);
         et_content.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
@@ -179,7 +171,6 @@ public class InputView {
                 return false;
             }
         });
-
         et_content.setHint("我来说两句");
     }
 
@@ -193,6 +184,7 @@ public class InputView {
         vp_emoji.setAdapter(new EmojiPagerAdapter(views));
     }
 
+    private HeightProvider heightProvider;
     public void add2Window(Activity activity) {
         this.activity = activity;
         FrameLayout layout = (FrameLayout) activity.getWindow().getDecorView().findViewById(android.R.id.content);
@@ -200,13 +192,33 @@ public class InputView {
         params.gravity = Gravity.BOTTOM;
         layout.addView(contentView, params);
         observeSoftKeyboard(activity);
+        if(heightProvider == null){
+            heightProvider = new HeightProvider(activity).init();
+            heightProvider.setHeightListener(new HeightProvider.HeightListener() {
+                @Override
+                public void onHeightChanged(int height) {
+                    onKeyBoardChanged(height);
+                }
+            });
+        }
+    }
+
+    void onKeyBoardChanged(int height){
+        if(height > 0){
+            KeyBoardManager.setKeyboardHeight(context,height);
+            keyboardHeight_portrait = height;
+            keyboardHeight_landspace = height;
+            if(!showEmoji){
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) contentView.getLayoutParams();
+                params.setMargins(0, 0, 0, height);
+            }
+        }
     }
 
     public void show(boolean isShowEmoji, InputUser user) {
         this.user = user;
         if (user != null) {
-            String text = "@" + user.userName + ":";
-            et_content.setText(text);
+            et_content.setText(String.format("@%s:",user.userName));
             et_content.setSelection(et_content.getText().length());
         }
         et_content.requestFocus();
@@ -224,20 +236,21 @@ public class InputView {
         }
         final FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) contentView.getLayoutParams();
         KeyBoardManager.closeKeyboard(et_content, activity);
-        if (keyboardHeight > 0) {
-            vp_emoji.getLayoutParams().height = this.keyboardHeight;
+        if (keyboardHeight_portrait > 0) {
+            vp_emoji.getLayoutParams().height = this.keyboardHeight_portrait;
         }
         contentView.setVisibility(View.VISIBLE);
-        new Handler() {//延时0.2秒显示表情
+
+        //延时0.2秒显示表情
+        contentView.postDelayed(new Runnable() {
             @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
+            public void run() {
                 params.setMargins(0, 0, 0, 0);
                 contentView.setLayoutParams(params);
                 iv_emoji.setImageResource(R.mipmap.inputview_icon_keyboard);
                 vp_emoji.setVisibility(View.VISIBLE);
             }
-        }.sendEmptyMessageDelayed(1, 200);
+        },200);
     }
 
     private void showKeyboard() {
@@ -248,7 +261,7 @@ public class InputView {
                 params.setMargins(0, 0, 0, 800);
                 contentView.setLayoutParams(params);
                 KeyBoardManager.openKeyboard(et_content, activity);
-                new Handler().postDelayed(new Runnable() {
+                contentView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         params.setMargins(0, 0, 0, keyboardHeight_portrait);
@@ -262,11 +275,9 @@ public class InputView {
             }
             params.setMargins(0, 0, 0, keyboardHeight_portrait);
         } else {
-            if (keyboardHeight_landspace == 0) {
-                keyboardHeight_landspace = 840;
+            if (keyboardHeight_landspace != 0) {
+                params.setMargins(0, 0, 0, keyboardHeight_landspace);
             }
-            params.setMargins(0, 0, 0, keyboardHeight_landspace);
-
         }
         if (contentView.getVisibility() == View.VISIBLE) {
             contentView.setLayoutParams(params);
@@ -276,7 +287,7 @@ public class InputView {
             KeyBoardManager.openKeyboard(et_content, activity);
             KeyBoardManager.openKeyboard(et_content, activity);//保留
         } else {
-            new Handler().postDelayed(new Runnable() {
+            contentView.postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     contentView.setLayoutParams(params);
@@ -285,10 +296,8 @@ public class InputView {
                     contentView.setVisibility(View.VISIBLE);
                     KeyBoardManager.openKeyboard(et_content, activity);
                 }
-            }, 300);
+            }, 50);
         }
-
-
     }
 
     public void dismiss() {
@@ -297,10 +306,10 @@ public class InputView {
         }
         KeyBoardManager.closeKeyboard(et_content, activity);
         showEmoji = false;
-        new Handler() {//延时0.2秒显示表情
+        //延时0.2秒显示表情
+        contentView.postDelayed(new Runnable() {
             @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
+            public void run() {
                 FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) contentView.getLayoutParams();
                 params.setMargins(0, 0, 0, 0);
                 contentView.setLayoutParams(params);
@@ -308,8 +317,7 @@ public class InputView {
                 vp_emoji.setVisibility(View.GONE);
                 contentView.setVisibility(View.GONE);
             }
-        }.sendEmptyMessageDelayed(1, 200);
-
+        },200);
 
     }
 
@@ -360,5 +368,11 @@ public class InputView {
 
     public interface ClickCallback {
         void onEmojiClick();
+    }
+
+    public void destroyed(){
+        if(heightProvider != null){
+            heightProvider.destroyed();
+        }
     }
 }

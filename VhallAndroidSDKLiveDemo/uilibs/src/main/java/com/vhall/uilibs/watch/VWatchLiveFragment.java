@@ -218,6 +218,13 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
     }
 
     @Override
+    public void liveFinished() {
+        if(getActivity() != null && !getActivity().isFinishing()){
+            getActivity().finish();
+        }
+    }
+
+    @Override
     public void setScrollInfo(ScrollInfoData scrollInfo) {
 
     }

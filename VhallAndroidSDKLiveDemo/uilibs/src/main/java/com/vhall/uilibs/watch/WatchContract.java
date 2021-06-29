@@ -138,6 +138,8 @@ public class WatchContract {
 
         void setScrollInfo(ScrollInfoData scrollInfo); // 设置跑马灯
 
+        void liveFinished();//直播结束
+
     }
 
 

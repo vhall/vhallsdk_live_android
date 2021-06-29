@@ -3,6 +3,7 @@ package com.vhall.uilibs.broadcast;
 import android.hardware.Camera;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
 
 import com.vhall.business.Broadcast;
 import com.vhall.business.ChatServer;
@@ -211,6 +212,13 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
             //可不设置
             config.videoFrameRate = param.videoFrameRate;//帧率
             config.videoBitrate = param.videoBitrate;//码率
+            //2 音频直播
+            if (webinarInfo.layout == 2||webinarInfo.layout == 4) {
+                config.streamType = VHLivePushFormat.STREAM_TYPE_A;
+                mView.getCameraView().setVisibility(View.GONE);
+            } else {
+                config.streamType = VHLivePushFormat.STREAM_TYPE_AV;
+            }
             Broadcast.Builder builder = new Broadcast.Builder()
                     .cameraView(mView.getCameraView())
                     .config(config)

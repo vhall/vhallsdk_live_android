@@ -1,5 +1,6 @@
 package com.vhall.uilibs.util.emoji;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -7,6 +8,7 @@ import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -132,4 +134,55 @@ public class KeyBoardManager {
         }
         return sNavBarOverride;
     }
+
+    /**
+     * 获取虚拟按键的高度
+     *
+     * @param context 上下文
+     * @return
+     */
+    public static int getVirtualButtonHeightDoc(Context context) {
+        int vh = 0;
+        if (!hasVirtualButtonDoc((Activity) context)) {
+            return 0;
+        }
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        DisplayMetrics dm = new DisplayMetrics();
+        try {
+            @SuppressWarnings("rawtypes")
+            Class c = Class.forName("android.view.Display");
+            @SuppressWarnings("unchecked")
+            Method method = c.getMethod("getRealMetrics", DisplayMetrics.class);
+            method.invoke(display, dm);
+            vh = dm.heightPixels - display.getHeight();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return vh;
+    }
+
+    private static final String NAVIGATION = "navigationBarBackground";
+
+    /**
+     * 判断是否存在虚拟按键 例如小米MIX2(全面屏)
+     *
+     * @param activity 上下文
+     * @return
+     */
+    public static boolean hasVirtualButtonDoc(Activity activity) {
+        ViewGroup vp = (ViewGroup) activity.getWindow().getDecorView();
+        if (vp != null) {
+            for (int i = 0; i < vp.getChildCount(); i++) {
+                vp.getChildAt(i).getContext().getPackageName();
+                if (vp.getChildAt(i).getId() != -1 && NAVIGATION.equals(activity.getResources().getResourceEntryName(vp.getChildAt(i).getId()))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+
 }

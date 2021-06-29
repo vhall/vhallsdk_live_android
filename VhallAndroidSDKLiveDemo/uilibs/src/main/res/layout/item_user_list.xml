@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/dimen_60dp"
+    android:paddingStart="@dimen/dimen_15dp"
+    android:paddingEnd="@dimen/dimen_15dp"
+    tools:ignore="RtlCompat"
+    >
+
+    <com.vhall.uilibs.widget.NiceImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="@dimen/dimen_40dp"
+        android:layout_height="@dimen/dimen_40dp"
+        android:background="@mipmap/icon_avatar"
+        app:is_circle="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="@dimen/dimen_4dp"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toEndOf="@id/iv_avatar" />
+
+    <TextView
+        android:id="@+id/tv_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dimen_16dp"
+        android:layout_marginStart="@dimen/dimen_4dp"
+        android:background="@drawable/shape_user_main"
+        android:gravity="center"
+        android:paddingStart="@dimen/dimen_6dp"
+        android:paddingEnd="@dimen/dimen_6dp"
+        android:text="主持人"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_11dp"
+        app:layout_constraintBottom_toBottomOf="@id/view"
+        app:layout_constraintStart_toEndOf="@id/view"
+        app:layout_constraintTop_toTopOf="@id/view"
+         />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_4dp"
+        android:text="主持人"
+        android:textColor="@color/color_33"
+        android:textSize="@dimen/dimen_15dp"
+        app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+        app:layout_constraintStart_toEndOf="@id/tv_tag"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+
+    <ImageView
+        android:id="@+id/iv_more"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/svg_ic_user_list_more"
+        app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+
+    <TextView
+        android:id="@+id/tv_mic"
+        android:layout_width="@dimen/dimen_52dp"
+        android:layout_height="@dimen/dimen_26dp"
+        android:layout_marginEnd="@dimen/dimen_8dp"
+        android:background="@drawable/shape_user_main"
+        android:gravity="center"
+        android:text="上麦"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_14dp"
+        app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+        app:layout_constraintEnd_toStartOf="@id/iv_more"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+
+    <ImageView
+        android:id="@+id/iv_mic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dimen_8dp"
+        android:background="@drawable/svg_ic_no_equipment"
+        app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+        app:layout_constraintEnd_toStartOf="@id/tv_mic"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+
+    <ImageView
+        android:id="@+id/iv_kick_out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dimen_8dp"
+        android:background="@drawable/svg_ic_kicked"
+        app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+        app:layout_constraintEnd_toStartOf="@id/iv_mic"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+
+    <ImageView
+        android:id="@+id/iv_banned"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dimen_8dp"
+        android:background="@drawable/svg_ic_banned"
+        app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+        app:layout_constraintEnd_toStartOf="@id/iv_kick_out"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+
+    <ImageView
+        android:id="@+id/iv_keynote_speak"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dimen_8dp"
+        android:background="@drawable/svg_ic_keynote"
+        app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+        app:layout_constraintEnd_toStartOf="@id/iv_banned"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+</android.support.constraint.ConstraintLayout>

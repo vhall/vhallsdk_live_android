@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="RtlCompat"
+    >
+
+    <com.vhall.vhallrtc.client.VHRenderView
+        android:id="@+id/image1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_50dp"
+        android:background="@drawable/shape_item_rtc_bg"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageView
+        android:id="@+id/star1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dimen_6dp"
+        android:background="@drawable/svg_ic_keynote"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/image1"
+        app:layout_constraintTop_toTopOf="@id/image1" />
+
+    <ImageView
+        android:id="@+id/iv_audio1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dimen_6dp"
+        android:background="@mipmap/icon_stream_audio_close"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/image1"
+        app:layout_constraintEnd_toEndOf="@id/image1" />
+
+    <ImageView
+        android:id="@+id/iv_video1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dimen_6dp"
+        android:background="@mipmap/icon_stream_video_close"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/image1"
+        app:layout_constraintEnd_toStartOf="@id/iv_audio1" />
+
+    <com.vhall.uilibs.widget.NiceImageView
+        android:id="@+id/avatar1"
+        android:layout_width="@dimen/dimen_60dp"
+        android:layout_height="@dimen/dimen_60dp"
+        android:background="@mipmap/icon_avatar"
+        android:visibility="gone"
+        app:is_circle="true"
+        app:layout_constraintBottom_toBottomOf="@id/image1"
+        app:layout_constraintEnd_toEndOf="@id/image1"
+        app:layout_constraintStart_toStartOf="@id/image1"
+        app:layout_constraintTop_toTopOf="@id/image1" />
+
+    <TextView
+        android:id="@+id/tv_tag1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_12dp"
+        android:layout_marginBottom="@dimen/dimen_6dp"
+        android:visibility="gone"
+        android:textSize="@dimen/dimen_11dp"
+        app:layout_constraintBottom_toBottomOf="@id/image1"
+        app:layout_constraintStart_toStartOf="@id/image1"
+        />
+
+    <TextView
+        android:id="@+id/tv_name1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_6dp"
+        android:layout_marginBottom="@dimen/dimen_6dp"
+        android:textColor="@color/color_CC"
+        android:textSize="@dimen/dimen_11dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/image1"
+        app:layout_constraintStart_toEndOf="@id/tv_tag1" />
+
+</android.support.constraint.ConstraintLayout>

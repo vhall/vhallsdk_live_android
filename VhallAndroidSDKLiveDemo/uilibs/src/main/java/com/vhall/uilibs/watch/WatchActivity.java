@@ -177,7 +177,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     public void initWatch(Param params) {
         //可以不设置这两个参数
         String customeEmail = Build.BOARD + Build.DEVICE + Build.SERIAL + "@qq.com";
-        String customNickname = TextUtils.isEmpty(VhallSDK.getUserName()) ? Build.BRAND + "手机用户" : VhallSDK.getUserName();
+        String customNickname = TextUtils.isEmpty(VhallSDK.getUserNickname()) ? Build.BRAND + "手机用户" : VhallSDK.getUserName();
 
         int watchType;
         if (type == VhallUtil.WATCH_LIVE) {
@@ -185,7 +185,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         } else {
             watchType = WebinarInfo.VIDEO;
         }
-        VhallSDK.initWatch(params.watchId, customeEmail, customNickname, params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.initWatch(params.watchId, "", "", params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                 if (webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
@@ -193,6 +193,10 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     watchView.showToast("还没开始直播");
                     finish();
                     return;
+                }
+                String hand=webinarInfo.hands_up;
+                if (webinarInfo.getWebinarInfoData()!=null&&webinarInfo.getWebinarInfoData().roomToolsStatusData!=null){
+                    hand= String.valueOf(webinarInfo.getWebinarInfoData().roomToolsStatusData.is_handsup);
                 }
                 param.webinar_id = webinarInfo.webinar_id;
                 if (webinarInfo.question_status == 1) {

@@ -110,15 +110,13 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
 
 
     public void initWatch(Param params) {
-        String customeEmile = Build.BOARD + Build.DEVICE + Build.SERIAL+"@qq.com";
-        String customNickname = Build.BRAND + "手机用户";
         int watchType;
         if (type == VhallUtil.WATCH_LIVE) {
             watchType = WebinarInfo.LIVE;
         } else {
             watchType = WebinarInfo.VIDEO;
         }
-        VhallSDK.initWatch(params.watchId, customeEmile, customNickname, params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.initWatch(params.watchId, "", "", params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                 param.webinar_id = webinarInfo.webinar_id;

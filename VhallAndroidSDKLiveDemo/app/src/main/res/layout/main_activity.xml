@@ -106,7 +106,7 @@
                             android:gravity="center"
                             android:onClick="onBroadcastLandspace"
                             android:padding="30dp"
-                            android:text="横屏直播"
+                            android:text="发起直播"
                             android:textColor="@color/black"
                             android:textSize="@dimen/common_button_textsize" />
 
@@ -130,7 +130,7 @@
                             android:gravity="center"
                             android:onClick="onBroadcastPortrait"
                             android:padding="30dp"
-                            android:text="竖屏直播"
+                            android:text="互动直播"
                             android:textColor="@color/black"
                             android:textSize="@dimen/common_button_textsize" />
 
@@ -221,39 +221,12 @@
 
     </LinearLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <com.vhall.live.widget.LiveSelectMenuWidget
         android:id="@+id/select_window"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:onClick="onSelectWindowClick"
-        android:visibility="gone">
+        >
 
-        <TextView
-            android:id="@+id/h_screen"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="1dp"
-            android:background="#ff3029"
-            android:gravity="center"
-            android:onClick="onHScreenClick"
-            android:text="半屏观看"
-            android:textColor="#ffffff"
-            app:layout_constraintBottom_toTopOf="@+id/v_screen"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/v_screen"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:background="#ff3029"
-            android:gravity="center"
-            android:onClick="onVScreenClick"
-            android:text="全屏观看"
-            android:textColor="#ffffff"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-    </android.support.constraint.ConstraintLayout>
+    </com.vhall.live.widget.LiveSelectMenuWidget>
 
 </RelativeLayout>

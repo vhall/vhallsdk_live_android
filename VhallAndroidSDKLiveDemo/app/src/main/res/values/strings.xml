@@ -38,6 +38,6 @@
     <string name="app_login_hint">请输入用户名</string>
     <string name="app_head_url_hint">请输入头像地址网络地址(非必填)</string>
     <string name="app_id_hint">请输入三方ID</string>
-
+    <string name="app_please_input_rtc_id">请输入互动房间id</string>
 
 </resources>

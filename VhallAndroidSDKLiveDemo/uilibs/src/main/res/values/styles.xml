@@ -16,4 +16,22 @@
         <item name="android:textColor">#FF961F</item>
     </style>
 
+    <style name="Dialog_Fullscreen">
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:indeterminateDrawable">@drawable/progress_large</item>
+        <item name="android:windowCloseOnTouchOutside">false</item>
+    </style>
+
+    <!--底部弹出dialog使用-->
+    <style name="DialogBottomInAndOutStyle">
+        <item name="android:windowEnterAnimation">@null</item>
+        <item name="android:windowExitAnimation">@null</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+
+    <style name="MyCheckBox" parent="Theme.AppCompat.Light">
+        <item name="android:button">@drawable/check_box_selector</item>
+    </style>
+
 </resources>

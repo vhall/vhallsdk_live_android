@@ -16,6 +16,7 @@ public class Param implements Serializable {
     public String broId = "";
     public String broName = "";
     public String broToken = "5d56d034e933e1826c7c896859019e33";
+    public String guestPwd = "123456";//嘉宾口令
     public int pixel_type = VHLivePushFormat.PUSH_MODE_HD;
     public int videoBitrate = 500;
     public int videoFrameRate = 20;

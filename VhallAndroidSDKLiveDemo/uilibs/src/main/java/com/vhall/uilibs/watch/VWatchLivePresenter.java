@@ -510,6 +510,8 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
                     isWatching = true;
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
+                    //屏幕自适应
+                    getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeAspectFit.getValue());
                     break;
                 case BUFFER:
                     if (isWatching) {
@@ -604,6 +606,7 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
                     break;
                 case MessageServer.EVENT_OVER://直播结束
                     watchView.showToast("直播已结束");
+                    liveView.liveFinished();
                     stopWatch();
                     break;
                 case MessageServer.EVENT_DIFINITION_CHANGED:
@@ -614,77 +617,77 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
 //                        onSwitchPixel(WatchLive.DPI_DEFAULT);
 //                    }
                     break;
-                case MessageServer.EVENT_START_LOTTERY://抽奖开始
-                    watchView.showLottery(messageInfo);
-                    break;
-                case MessageServer.EVENT_END_LOTTERY://抽奖结束
-                    watchView.showLottery(messageInfo);
-                    break;
-                case MessageServer.EVENT_NOTICE:
-                    watchView.showNotice(messageInfo.content);
-                    break;
-                case MessageServer.EVENT_SIGNIN: //签到消息
-                    if (!TextUtils.isEmpty(messageInfo.id) && !TextUtils.isEmpty(messageInfo.sign_show_time)) {
-                        watchView.showSignIn(messageInfo.id, messageInfo.signTitle, parseTime(messageInfo.sign_show_time, 30));
-                    }
-                    break;
-                case MessageServer.EVENT_QUESTION: // 问答开关
-                    watchView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
-                    if (messageInfo.status == 1)
-                        watchView.showQAndA();
-                    else
-                        watchView.dismissQAndA();
-                    break;
-                case MessageServer.EVENT_SURVEY://问卷
-
-                    /**
-                     * 获取msg内容
-                     */
-
-                    MessageChatData surveyData = new MessageChatData();
-                    surveyData.event = MessageChatData.eventSurveyKey;
-                    Map<String, String> params = new HashMap<>();
-                    params.put(SurveyInternal.KEY_SURVEY_ID, messageInfo.id);
-                    params.put(SurveyInternal.KEY_ROOMID, webinarInfo.vss_room_id);
-                    params.put(SurveyInternal.KEY_WEBINAR_ID, webinarInfo.webinar_id);
-                    params.put(SurveyInternal.KEY_APPID, VssSdk.getInstance().getAppId());
-                    if (webinarInfo.getWebinarInfoData() != null) {
-                        params.put(SurveyInternal.KEY_PAAS_ACCESS_TOKEN, webinarInfo.getWebinarInfoData().interact.paas_access_token);
-                    }
-                    params.put(SurveyInternal.KEY_USER_ID, webinarInfo.user_id);
-                    params.put(SurveyInternal.KEY_TOKEN, TokenManger.getToken());
-                    params.put(SurveyInternal.KEY_INTERACT_TOKEN, TokenManger.getInteractToken());
-                    surveyData.setUrl(SurveyInternal.createSurveyUrl(params));
-
-                    surveyData.setId(messageInfo.id);
-                    chatView.notifyDataChangedChat(surveyData);
-                    break;
-                case MessageServer.EVENT_SHOWDOC://文档开关指令 1 使用文档 0 关闭文档
-                    Log.e(TAG, "onEvent:show_docType:watchType= " + messageInfo.watchType);
-                    getWatchLive().setIsUseDoc(messageInfo.watchType);
-                    operationDocument();
-                    break;
-                case MessageServer.EVENT_CLEARBOARD:
-                case MessageServer.EVENT_DELETEBOARD:
-                case MessageServer.EVENT_INITBOARD:
-                case MessageServer.EVENT_PAINTBOARD:
-                    if (getWatchLive().isUseDoc()) {
-                        documentView.paintBoard(messageInfo);
-                    }
-                    break;
-                case MessageServer.EVENT_SHOWBOARD:
-                    getWatchLive().setIsUseBoard(messageInfo.showType);
-                    if (getWatchLive().isUseDoc()) {
-                        documentView.paintBoard(messageInfo);
-                    }
-                    break;
-                case MessageServer.EVENT_CHANGEDOC://PPT翻页消息
-                case MessageServer.EVENT_CLEARDOC:
-                case MessageServer.EVENT_PAINTDOC:
-                case MessageServer.EVENT_DELETEDOC:
-                    Log.e(TAG, " event " + messageInfo.event);
-                    documentView.paintPPT(messageInfo);
-                    break;
+//                case MessageServer.EVENT_START_LOTTERY://抽奖开始
+//                    watchView.showLottery(messageInfo);
+//                    break;
+//                case MessageServer.EVENT_END_LOTTERY://抽奖结束
+//                    watchView.showLottery(messageInfo);
+//                    break;
+//                case MessageServer.EVENT_NOTICE:
+//                    watchView.showNotice(messageInfo.content);
+//                    break;
+//                case MessageServer.EVENT_SIGNIN: //签到消息
+//                    if (!TextUtils.isEmpty(messageInfo.id) && !TextUtils.isEmpty(messageInfo.sign_show_time)) {
+//                        watchView.showSignIn(messageInfo.id, messageInfo.signTitle, parseTime(messageInfo.sign_show_time, 30));
+//                    }
+//                    break;
+//                case MessageServer.EVENT_QUESTION: // 问答开关
+//                    watchView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
+//                    if (messageInfo.status == 1)
+//                        watchView.showQAndA();
+//                    else
+//                        watchView.dismissQAndA();
+//                    break;
+//                case MessageServer.EVENT_SURVEY://问卷
+//
+//                    /**
+//                     * 获取msg内容
+//                     */
+//
+//                    MessageChatData surveyData = new MessageChatData();
+//                    surveyData.event = MessageChatData.eventSurveyKey;
+//                    Map<String, String> params = new HashMap<>();
+//                    params.put(SurveyInternal.KEY_SURVEY_ID, messageInfo.id);
+//                    params.put(SurveyInternal.KEY_ROOMID, webinarInfo.vss_room_id);
+//                    params.put(SurveyInternal.KEY_WEBINAR_ID, webinarInfo.webinar_id);
+//                    params.put(SurveyInternal.KEY_APPID, VssSdk.getInstance().getAppId());
+//                    if (webinarInfo.getWebinarInfoData() != null) {
+//                        params.put(SurveyInternal.KEY_PAAS_ACCESS_TOKEN, webinarInfo.getWebinarInfoData().interact.paas_access_token);
+//                    }
+//                    params.put(SurveyInternal.KEY_USER_ID, webinarInfo.user_id);
+//                    params.put(SurveyInternal.KEY_TOKEN, TokenManger.getToken());
+//                    params.put(SurveyInternal.KEY_INTERACT_TOKEN, TokenManger.getInteractToken());
+//                    surveyData.setUrl(SurveyInternal.createSurveyUrl(params));
+//
+//                    surveyData.setId(messageInfo.id);
+//                    chatView.notifyDataChangedChat(surveyData);
+//                    break;
+//                case MessageServer.EVENT_SHOWDOC://文档开关指令 1 使用文档 0 关闭文档
+//                    Log.e(TAG, "onEvent:show_docType:watchType= " + messageInfo.watchType);
+//                    getWatchLive().setIsUseDoc(messageInfo.watchType);
+//                    operationDocument();
+//                    break;
+//                case MessageServer.EVENT_CLEARBOARD:
+//                case MessageServer.EVENT_DELETEBOARD:
+//                case MessageServer.EVENT_INITBOARD:
+//                case MessageServer.EVENT_PAINTBOARD:
+//                    if (getWatchLive().isUseDoc()) {
+//                        documentView.paintBoard(messageInfo);
+//                    }
+//                    break;
+//                case MessageServer.EVENT_SHOWBOARD:
+//                    getWatchLive().setIsUseBoard(messageInfo.showType);
+//                    if (getWatchLive().isUseDoc()) {
+//                        documentView.paintBoard(messageInfo);
+//                    }
+//                    break;
+//                case MessageServer.EVENT_CHANGEDOC://PPT翻页消息
+//                case MessageServer.EVENT_CLEARDOC:
+//                case MessageServer.EVENT_PAINTDOC:
+//                case MessageServer.EVENT_DELETEDOC:
+//                    Log.e(TAG, " event " + messageInfo.event);
+//                    documentView.paintPPT(messageInfo);
+//                    break;
                 case MessageServer.EVENT_RESTART:
                     force = true;
                     //onSwitchPixel(WatchLive.DPI_DEFAULT);

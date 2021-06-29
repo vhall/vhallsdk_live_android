@@ -1,10 +1,12 @@
 package com.vhall.uilibs.watch;
 
+import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.TokenWatcher;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.vhall.business.ChatServer;
@@ -18,14 +20,17 @@ import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
 import com.vhall.business.utils.SurveyInternal;
 import com.vhall.business_support.dlna.DMCControl;
+import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.player.VHPlayerListener;
+import com.vhall.player.stream.play.IVHVideoPlayer;
 import com.vhall.player.stream.play.impl.VHVideoPlayerView;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
-import com.vhall.uilibs.chat.PushChatFragment;
 import com.vhall.uilibs.chat.MessageChatData;
+import com.vhall.uilibs.chat.PushChatFragment;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.vhss.TokenManger;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONArray;
@@ -37,14 +42,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//TODO 投屏相关
-import com.vhall.business_support.dlna.DeviceDisplay;
-import com.vhall.vhss.TokenManger;
-
 import vhall.com.vss2.VssSdk;
-import vhall.com.vss2.module.room.VssRoomManager;
 
 import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
+
+//TODO 投屏相关
 
 
 /**
@@ -97,6 +99,13 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         getWatchLive().setVRHeadTracker(true);
         getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeAspectFit.getValue());
         initWatch();
+        //自动播放
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                getWatchLive().start();
+//            }
+//        },200);
     }
 
     @Override
@@ -345,9 +354,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         }
     }
 
+    private RelativeLayout watchLayout;
     public WatchLive getWatchLive() {
         if (watchLive == null) {
-            RelativeLayout watchLayout = liveView.getWatchLayout();
+            watchLayout = liveView.getWatchLayout();
             WatchLive.Builder builder = new WatchLive.Builder()
                     .context(watchView.getActivity().getApplicationContext())
                     .containerLayout(watchLayout)
@@ -373,6 +383,55 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 //            ((VRPlayView) mPlayView).getHolder().setFixedSize(640, 480);
 //        }
         return watchLive;
+    }
+
+    /**
+     * todo 水印和视频画面之间插入图层
+     * @param viewGroup
+     */
+    private void insertPic(final ViewGroup viewGroup){
+        if(viewGroup == null){
+            return;
+        }
+        viewGroup.post(new Runnable() {
+            @Override
+            public void run() {
+                View view = new View(viewGroup.getContext());
+                view.setBackgroundColor(Color.RED);
+                view.setTag("pic");
+                view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                Object o = viewGroup.getChildAt(0);
+                if(o instanceof ViewGroup){
+                    int count = ((ViewGroup) o).getChildCount();
+                    if(count == 1){
+                        ((ViewGroup) o).addView(view);
+                    }else if(count == 2){
+                        ((ViewGroup) o).addView(view,1);
+                    }
+                }
+            }
+        });
+    }
+
+    private void removePic(final ViewGroup viewGroup){
+        if(viewGroup == null){
+            return;
+        }
+        Object vGroup = viewGroup.getChildAt(0);
+        if(vGroup instanceof ViewGroup){
+            int count = ((ViewGroup) vGroup).getChildCount();
+            for (int i = count-1;i>=0;i--){
+                View view = ((ViewGroup) vGroup).getChildAt(i);
+                Object o = view.getTag();
+                if(o == null){
+                    continue;
+                }
+                if(TextUtils.equals("pic",o.toString())){
+                    ((ViewGroup) vGroup).removeView(view);
+                }
+            }
+        }
+
     }
 
     //签到
@@ -524,6 +583,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     isWatching = true;
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
+//                    if(TextUtils.equals(com.vhall.player.Constants.Rate.DPI_AUDIO,getWatchLive().getDefinition())){
+//                        insertPic(watchLayout);
+//                    }else{
+//                        removePic(watchLayout);
+//                    }
                     break;
                 case BUFFER:
                     if (isWatching) {
@@ -627,6 +691,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_OVER://直播结束
                     watchView.showToast("直播已结束");
+                    liveView.liveFinished();
                     stopWatch();
                     break;
                 case MessageServer.EVENT_DIFINITION_CHANGED:

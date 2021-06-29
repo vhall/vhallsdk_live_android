@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/dimen_15dp"
+    android:layout_marginTop="@dimen/dimen_5dp"
+    android:background="@drawable/shape_bg_black_chat"
+    android:paddingStart="@dimen/dimen_8dp"
+    android:paddingTop="@dimen/dimen_3dp"
+    android:paddingEnd="@dimen/dimen_8dp"
+    android:paddingBottom="@dimen/dimen_3dp"
+    tools:ignore="RtlCompat">
+
+    <TextView
+        android:id="@+id/tv_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="2019新潮搭配推201"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_14dp" />
+
+</FrameLayout>

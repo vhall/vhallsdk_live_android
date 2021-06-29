@@ -19,4 +19,34 @@
     <color name="color_22">#222222</color>
     <color name="color_FC5659">#FC5659</color>
 
+
+    <color name="white_25">#40ffffff</color>
+    <color name="white_30">#4dffffff</color>
+    <color name="white_40">#66ffffff</color>
+    <color name="black">#000000</color>
+    <color name="black_80">#CC000000</color>
+    <color name="black_60">#99000000</color>
+    <color name="black_50">#80000000</color>
+    <color name="black_45">#73000000</color>
+    <color name="black_30">#4d000000</color>
+    <color name="black_10">#1a000000</color>
+
+    <color name="color_F2">#FFF2F2F2</color>
+    <color name="color_F7">#FFF7F7F7</color>
+
+    <color name="color_99">#999999</color>
+    <color name="color_AA">#AAAAAA</color>
+    <color name="color_CC">#cccccc</color>
+    <color name="transparent">@android:color/transparent</color>
+    <color name="doc_blue">#3478F6</color>
+    <color name="doc_yellow">#F09A37</color>
+    <color name="doc_green">#83D754</color>
+    <color name="color_E2">#E2E2E2</color>
+    <color name="color_F5">#FFF5F5F5</color>
+    <color name="color_33">#333333</color>
+    <color name="color_BB">#BBBBBB</color>
+
+    <color name="color_5EA6EC">#5EA6EC</color>
+    <color name="color_66">#666666</color>
+    <color name="color_EFF6FE">#EFF6FE</color>
 </resources>

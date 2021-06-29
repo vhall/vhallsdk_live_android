@@ -364,7 +364,14 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }
     }
 
-   private ScrollInfoData scrollInfoData;
+    @Override
+    public void liveFinished() {
+        if(getActivity() != null && !getActivity().isFinishing()){
+            getActivity().finish();
+        }
+    }
+
+    private ScrollInfoData scrollInfoData;
 
     @Override
     public void setScrollInfo(final ScrollInfoData scrollInfo) {

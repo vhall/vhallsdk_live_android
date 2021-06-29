@@ -5,14 +5,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
-import android.util.Log;
+import com.vhall.business.ErrorCode;
 import com.vhall.business.VhallSDK;
-import com.vhall.httpclient.api.VHNetApi;
-import com.vhall.httpclient.core.IVHNetLogCallback;
-import com.vhall.httpclient.core.VHGlobalConfig;
+import com.vhall.business.core.IVHSDKListener;
 import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
-
+import com.vhall.uilibs.util.ToastUtil;
 import java.util.Iterator;
 
 
@@ -27,23 +25,27 @@ public class VhallApplication extends MultiDexApplication {
         super.onCreate();
         context = this;
         getParam();
-        VHGlobalConfig vhGlobalConfig = new VHGlobalConfig.Builder()
-                .setEnableLog(false)
-                .setLogTag("saas_60")
-                .setVHNetLogCallback(new IVHNetLogCallback() {
-                    @Override
-                    public void log(String url, String message) {
-                        Log.i("url message",message);
-                    }
-                })
-                .build();
-        VHNetApi.getNetApi().setGlobalConfig(vhGlobalConfig);
 
         if (isAppProcess()) {
             VhallSDK.setLogEnable(false);
             VhallSDK.init(this, "appKey", "appSecretKey");
         }
+
+        VhallSDK.addVHListener(mVHListener);
     }
+
+
+    /**
+     * 要求 必须通过全局变量进行注册   内部类注册可能会被回收并且接收不到重要事件回调
+     */
+    private IVHSDKListener mVHListener = (code, tips, args, bundle) -> {
+        if(ErrorCode.ERROR_TOKEN_EXPIRE == code){
+            // TODO: 6/29/21 可以尝试重新登陆SDK
+            ToastUtil.showToast("抱歉token 已过期,请重新登陆");
+        }
+    };
+
+
 
     @Override
     protected void attachBaseContext(Context base) {

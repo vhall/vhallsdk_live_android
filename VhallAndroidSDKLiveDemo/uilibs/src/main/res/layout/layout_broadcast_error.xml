@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_error"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_22"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tv_error_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="@dimen/dimen_30dp"
+            android:drawableTop="@mipmap/icon_net_error"
+            android:drawablePadding="@dimen/dimen_9dp"
+            android:text="网络被外星人切走了～"
+            android:textColor="@color/color_99"
+            android:textSize="@dimen/dimen_16dp"
+            app:layout_constraintBottom_toTopOf="@id/tv_error_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_error_btn"
+            android:layout_width="@dimen/dimen_180dp"
+            android:layout_height="@dimen/dimen_45dp"
+            android:layout_below="@id/tv_error_title"
+            android:background="@drawable/shape_star_btn"
+            android:gravity="center"
+            android:text="@string/start_broadcast"
+            android:textColor="@color/white"
+            android:textSize="@dimen/dimen_17dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
