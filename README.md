@@ -10,29 +10,37 @@ uilib里面的aar替换为maven依赖
 项目的 build.gradle里面添加
 
 ```
+allprojects {
  maven{
-        url 'https://raw.githubusercontent.com/vhall/VHLibs_SDK_Android/master'
+       mavenCentral()
        }
+}
 ``` 
 
  在uilib里面添加 具体使用依赖
 
 ```
  //SaaSSDK
-    api 'com.vhall.android.library:vh-saas-sdk:5.0.0'
-    api 'com.vhall.android.library:vh-saas-interactive:5.0.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.1.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.1.0'
     //投屏相关
-    api 'com.vhall.android.library:vh-saas-sdk-support:2.0.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
 ```
 
-二、版本更新信息：  
+二、版本更新信息： 
+版本6.1.0 更新时间 2021.06.30  
+1.增加主播/嘉宾互动  
+2.登陆token失效优化  
+3.bug修复  
+4.版本向下兼容  
+5.更多内容参考[官网](https://saas-doc.vhall.com/docs/show/1204)
 
 版本5.0.0 更新时间 2020.10.30  
-1.优化用户使用 h5和flash统一使用方法
-2.优化日志上报
-3.添加h5文档显示 具体可以参考demo实现
-4.修改bug
+1.优化用户使用 h5和flash统一使用方法  
+2.优化日志上报  
+3.添加h5文档显示 具体可以参考demo实现  
+4.修改bug  
 ####sdk更新方法
 删除全部vss相关代码（目前升级后vss的会报错 全部删除即可）
 以后统一h5和flash
