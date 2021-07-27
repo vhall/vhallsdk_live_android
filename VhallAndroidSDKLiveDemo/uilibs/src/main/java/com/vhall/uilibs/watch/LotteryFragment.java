@@ -31,6 +31,7 @@ import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.RequestDataCallback;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.ToastUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -216,19 +217,23 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
 
                     @Override
                     public void onError(int errorCode, String errorMsg) {
-                        Log.e("dd", errorMsg);
-                        llCommit.setVisibility(View.GONE);
-                        llEnd.setVisibility(View.VISIBLE);
-                        tvEndBtn.setText(getString(R.string.lottery_look_winner));
-                        if (lotteryData != null && lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.publish_winner == 0) {
-                            tvEndBtn.setVisibility(View.GONE);
-                        } else {
-                            tvEndBtn.setVisibility(View.VISIBLE);
+//                        llCommit.setVisibility(View.GONE);
+//                        llEnd.setVisibility(View.VISIBLE);
+//                        tvEndBtn.setText(getString(R.string.lottery_look_winner));
+//                        if (lotteryData != null && lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.publish_winner == 0) {
+//                            tvEndBtn.setVisibility(View.GONE);
+//                        } else {
+//                            tvEndBtn.setVisibility(View.VISIBLE);
+//                        }
+//                        tvEndHint.setTextColor(ContextCompat.getColor(getContext(), R.color.color_22));
+//                        endBtnGoLook = true;
+//                        tvEndHint.setText(getString(R.string.lottery_commit_failed));
+//                        ivEnd.setBackgroundResource(R.drawable.icon_error_commit_prize);
+                        String msg = errorMsg;
+                        if(TextUtils.isEmpty(msg)){
+                           msg = "提交失败，请重试!";
                         }
-                        tvEndHint.setTextColor(ContextCompat.getColor(getContext(), R.color.color_22));
-                        endBtnGoLook = true;
-                        tvEndHint.setText(getString(R.string.lottery_commit_failed));
-                        ivEnd.setBackgroundResource(R.drawable.icon_error_commit_prize);
+                        ToastUtil.showToast(msg);
                     }
                 });
             }

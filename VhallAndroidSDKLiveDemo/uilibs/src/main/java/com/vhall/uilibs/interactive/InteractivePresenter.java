@@ -133,6 +133,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
             switch (messageInfo.event) {
                 case MessageServer.EVENT_DISABLE_CHAT://禁言
                     interActView.showToast("您已被禁言");
+                    onDownMic();
                     break;
                 case MessageServer.EVENT_KICKOUT://踢出
                     interActView.showToast("您已被踢出");

@@ -341,7 +341,7 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
         initMainId(webinarInfo.getWebinarInfoData().getWebinar().userinfo);
         broadcastPresent.init(webinarInfo);
         if (broadcastRtcFragment != null && isRtc) {
-            if (webinarInfo.getWebinarInfoData().roomToolsStatusData.speaker_list != null) {
+            if (webinarInfo.getWebinarInfoData() != null && webinarInfo.getWebinarInfoData().roomToolsStatusData != null && webinarInfo.getWebinarInfoData().roomToolsStatusData.speaker_list != null) {
                 for (int i = 0; i < webinarInfo.getWebinarInfoData().roomToolsStatusData.speaker_list.size(); i++) {
                     if (webinarInfo.getWebinarInfoData().join_info.third_party_user_id.endsWith(webinarInfo.getWebinarInfoData().roomToolsStatusData.speaker_list.get(i).account_id)) {
                         mInterActive.setUserNoSpeak(null);

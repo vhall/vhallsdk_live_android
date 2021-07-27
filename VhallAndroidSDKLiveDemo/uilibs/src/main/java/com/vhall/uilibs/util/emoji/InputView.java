@@ -212,6 +212,10 @@ public class InputView implements View.OnClickListener {
                 FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) contentView.getLayoutParams();
                 params.setMargins(0, 0, 0, height);
             }
+        }else {
+            if(!showEmoji){
+                dismiss();
+            }
         }
     }
 

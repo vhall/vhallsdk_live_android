@@ -39,7 +39,9 @@ public class RenViewUtils {
             String attributes = stream.getAttributes();
             String avatar = "";
             String name = "", role = "2";
-            stream.removeAllRenderView();
+            if(stream.hasVideo()){
+                stream.removeAllRenderView();
+            }
 
             boolean hasAudio = 1 == streams.get(0).getVoice();
             boolean hasVideo = 1 == streams.get(0).getCamera();

@@ -481,6 +481,7 @@ public class DocumentPublicView extends RelativeLayout {
 
     public void destroy() {
         if (vhops != null) {
+            vhops.switchOff();
             vhops.leave();
         }
     }
@@ -543,6 +544,17 @@ public class DocumentPublicView extends RelativeLayout {
                             if (docViewLister != null) {
                                 docViewLister.setVisibility(GONE, VISIBLE);
                             }
+                            //强制刷新父布局
+                            post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if(getParent() != null){
+                                        View view = (View) getParent();
+                                        view.setVisibility(GONE);
+                                        view.setVisibility(VISIBLE);
+                                    }
+                                }
+                            });
                         }
                     }
                 } else if (type.equals(TYPE_CREATE)) {

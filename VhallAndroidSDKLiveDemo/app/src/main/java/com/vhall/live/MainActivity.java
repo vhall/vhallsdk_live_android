@@ -185,7 +185,7 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
                 hideLoading();
                 ToastUtil.showToast(MainActivity.this,errorMsg);
             }
-        });
+        },true);
     }
 
 

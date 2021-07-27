@@ -16,6 +16,7 @@ import java.util.Iterator;
 
 public class VhallApplication extends MultiDexApplication {
 
+    private final static String RSA_PRIVATE_KEY = "RSA 私钥";
 
     public static Param param;
     public static Context context;
@@ -27,8 +28,12 @@ public class VhallApplication extends MultiDexApplication {
         getParam();
 
         if (isAppProcess()) {
-            VhallSDK.setLogEnable(false);
-            VhallSDK.init(this, "appKey", "appSecretKey");
+            if (isAppProcess()) {
+                VhallSDK.setLogEnable(false);
+                //RSA 校验 必须设置否则校验不通过 从控制台 获取
+                VhallSDK.setRsaPrivateKey(RSA_PRIVATE_KEY);
+                VhallSDK.init(this, "appKey", "appSecretKey");
+            }
         }
 
         VhallSDK.addVHListener(mVHListener);

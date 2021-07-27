@@ -287,11 +287,17 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                     switch (data.event) {
                         case MessageChatData.eventMsgKey:
                             if (data.getType().equals("image")) {
-                                if (!TextUtils.isEmpty(data.getImage_url())) {
-                                    viewHolder.tv_chat_content.setText(String.format("收到图片---%s", data.getImage_url()));
-                                } else if (data.getImage_urls() != null) {
-                                    viewHolder.tv_chat_content.setText(String.format("收到%d张图片", data.getImage_urls().size()));
+                                StringBuilder builder = new StringBuilder();
+                                MessageChatData info = data;
+                                builder.append("收到图片");
+                                if (info.getImage_urls() != null && info.getImage_urls().size() > 0) {
+                                    for (String u : info.getImage_urls()) {
+                                        builder.append(String.format("%s;\n", u));
+                                    }
+                                } else if (!TextUtils.isEmpty(info.getImage_url())) {
+                                    builder.append(info.getImage_url());
                                 }
+                                viewHolder.tv_chat_content.setText(builder.toString());
                             } else {
                                 viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.getText_content()), TextView.BufferType.SPANNABLE);
                             }

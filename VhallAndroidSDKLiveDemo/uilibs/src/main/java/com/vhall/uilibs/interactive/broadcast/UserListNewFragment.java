@@ -194,22 +194,6 @@ public class UserListNewFragment extends BaseFragment {
         }
     }
 
-    private void sortUsers(List<UserStateListData.DataBeen> dataBeens){
-        Collections.sort(dataBeens, new Comparator<UserStateListData.DataBeen>() {
-            @Override
-            public int compare(UserStateListData.DataBeen o1, UserStateListData.DataBeen o2) {
-                int order1 = VHInternalUtils.getOrderNum(o1.getRole_name());
-                int order2 = VHInternalUtils.getOrderNum(o2.getRole_name());
-                if(order1 > order2){
-                    return -1;
-                }else if(order1 < order2){
-                    return 1;
-                }else {
-                    return 0;
-                }
-            }
-        });
-    }
 
     private void dealData(List<UserStateListData.DataBeen> lists) {
         if (page == 1) {
@@ -284,12 +268,6 @@ public class UserListNewFragment extends BaseFragment {
             public int compare(UserStateListData.DataBeen o1, UserStateListData.DataBeen o2) {
                 int order1 = VHInternalUtils.getOrderNum(o1.getRole_name());
                 int order2 = VHInternalUtils.getOrderNum(o2.getRole_name());
-                if(o1.is_speak == 1){
-                    order1 = 7;
-                }
-                if(o2.is_speak == 1){
-                    order2 = 7;
-                }
                 if(order1 > order2){
                     return -1;
                 }else if(order1 < order2){

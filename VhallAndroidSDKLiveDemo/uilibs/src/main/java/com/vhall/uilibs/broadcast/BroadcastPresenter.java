@@ -73,7 +73,8 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     @Override
     public void onstartBtnClick() {
         if (isPublishing) {
-            finishBroadcast();
+//            finishBroadcast();
+            mView.showEndLiveDialog();
         } else {
             if(getBroadcast().isAvaliable() && !isFinish){
                 getBroadcast().start();

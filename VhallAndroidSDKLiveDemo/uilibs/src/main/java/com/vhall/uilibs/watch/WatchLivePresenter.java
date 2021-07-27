@@ -29,6 +29,7 @@ import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.chat.PushChatFragment;
+import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.vhss.TokenManger;
 
@@ -514,6 +515,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     @Override
     public void onRaiseHand() {
+        if(!canSpeak){
+            ToastUtil.showToast("您已被禁言");
+            return;
+        }
         getWatchLive().onRaiseHand(params.watchId, isHand ? 0 : 1, new RequestCallback() {
             @Override
             public void onSuccess() {

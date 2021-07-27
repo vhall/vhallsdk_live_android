@@ -35,6 +35,8 @@ public class BroadcastContract {
 
         void setSpeedText(String text);
         void setModeText(String mode);
+        //是否结束直播弹窗
+        void showEndLiveDialog();
     }
 
     interface Presenter extends BasePresenter {

@@ -908,6 +908,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         VHRenderView tempRenderView = new VHRenderView(getActivity());
         mInteractive.setLocalView(tempRenderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo, null);
         localStream = mInteractive.getLocalStream();
+        mInteractive.unpublished();
         mInteractive.publish();
         if(deviceStatus != null){
             //从后台进入前台重置麦克风 摄像头状态

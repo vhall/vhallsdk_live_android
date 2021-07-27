@@ -1,6 +1,8 @@
 package com.vhall.uilibs.broadcast;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -246,4 +248,19 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
     }
 
 
+    @Override
+    public void showEndLiveDialog() {
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                .setTitle("提示")
+                .setMessage("您是否要结束直播？")
+                .setPositiveButton("结束", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        getActivity().finish();
+                    }
+                })
+                .setNegativeButton("取消",null)
+                .create();
+        alertDialog.show();
+    }
 }

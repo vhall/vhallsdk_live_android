@@ -59,6 +59,17 @@ public class ChatAdapter extends BaseQuickAdapter<MessageChatData, BaseViewHolde
             default:
                 break;
         }
+
+        if (info.getType().equals("image")) {
+            builder.append("收到图片");
+            if (info.getImage_urls() != null && info.getImage_urls().size() > 0) {
+                for (String u:info.getImage_urls()){
+                    builder.append(String.format("%s;\n",u));
+                }
+            } else if (!TextUtils.isEmpty(info.getImage_url())) {
+                builder.append(info.getImage_url());
+            }
+        }
         textView.setText(builder);
     }
 }

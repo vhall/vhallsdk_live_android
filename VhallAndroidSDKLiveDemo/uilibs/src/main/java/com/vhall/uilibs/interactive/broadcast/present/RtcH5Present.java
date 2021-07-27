@@ -87,8 +87,8 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                 if(chatInfo.onlineData != null){
                     pv = chatInfo.onlineData.attend_count;
                     uv = chatInfo.onlineData.concurrent_user;
+                    broadcastView.showLookNum(pv,uv);
                 }
-                broadcastView.showLookNum(pv,uv);
             }
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
@@ -194,23 +194,30 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                 break;
 
                 case MessageServer.EVENT_DISABLE_CHAT: {
+                    userId = msg.targetId;
                     if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())) {
                         break;
                     }
-                    if (isPublic) {
-                        mRtcFragmentView.noSpeak();
+                    if(TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)){
+                        if (isPublic) {
+                            mRtcFragmentView.noSpeak();
+                        }
+                        broadcastView.showToast("您已被禁言");
+                        canSpeak = false;
                     }
-                    broadcastView.showToast("您已被禁言");
-                    canSpeak = false;
+
                 }
                 break;
 
                 case MessageServer.EVENT_PERMIT_CHAT: {
+                    userId = msg.targetId;
                     if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())) {
                         break;
                     }
-                    broadcastView.showToast("您被取消禁言");
-                    canSpeak = true;
+                    if(TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)){
+                        broadcastView.showToast("您被取消禁言");
+                        canSpeak = true;
+                    }
                 }
                 break;
 
