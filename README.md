@@ -21,14 +21,19 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.1.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.1.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.1.2'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.1.2'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
 ```
 
-二、版本更新信息： 
+二、版本更新信息：
+版本6.1.2 更新时间 2021.07.27  
+1.新增设置RSA设置私钥接口 
+2.优化直播关闭交互方式
+3.优化已知bug
+ 
 版本6.1.0 更新时间 2021.06.30  
 1.增加主播/嘉宾互动  
 2.登陆token失效优化  
