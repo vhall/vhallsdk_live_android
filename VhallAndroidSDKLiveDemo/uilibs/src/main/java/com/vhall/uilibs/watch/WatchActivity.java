@@ -612,6 +612,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         if (upnpService != null) {
             upnpService.getRegistry().removeListener(registryListener);
         }
+        if (inputView!=null){
+            inputView.destroyed();
+        }
         this.unbindService(serviceConnection);
     }
 

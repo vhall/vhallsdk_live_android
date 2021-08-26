@@ -4,11 +4,11 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.pm.ActivityInfo;
 import android.text.TextUtils;
+
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.WebinarInfo;
-import com.vhall.business_interactive.InterActive;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.interactive.broadcast.config.RtcConfig;
 import com.vhall.uilibs.interactive.dialog.OutDialog;
@@ -22,10 +22,12 @@ import com.vhall.uilibs.util.emoji.KeyBoardManager;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhss.CallBack;
 import com.vhall.vhss.data.WebinarInfoData;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import static com.vhall.business.MessageServer.EVENT_CHAT_FORBID_ALL;
 import static com.vhall.business.MessageServer.EVENT_DISABLE_CHAT;
 import static com.vhall.business.MessageServer.EVENT_INTERACTIVE_DOWN_MIC;
@@ -62,12 +64,12 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
     }
 
     @Override
-    public void setRtcFragmentView(IBroadcastContract.RtcFragmentView rtcFragmentView){
+    public void setRtcFragmentView(IBroadcastContract.RtcFragmentView rtcFragmentView) {
         this.mRtcFragmentView = rtcFragmentView;
     }
 
     //聊天消息
-    class ChatCallback implements ChatServer.Callback , MessageServer.MessageSupportMsgFilterOther {
+    class ChatCallback implements ChatServer.Callback, MessageServer.MessageSupportMsgFilterOther {
         @Override
         public void onChatServerConnected() {
 
@@ -81,13 +83,13 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
         @Override
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             refreshUserList(chatInfo);
-            if(broadcastView != null){
+            if (broadcastView != null) {
                 int pv = 1;
                 int uv = 1;
-                if(chatInfo.onlineData != null){
+                if (chatInfo.onlineData != null) {
                     pv = chatInfo.onlineData.attend_count;
                     uv = chatInfo.onlineData.concurrent_user;
-                    broadcastView.showLookNum(pv,uv);
+                    broadcastView.showLookNum(pv, uv);
                 }
             }
             switch (chatInfo.event) {
@@ -111,11 +113,11 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
     }
 
     //自定义消息
-    class MessageCallback implements MessageServer.Callback,MessageServer.MessageSupportMsgFilterOther{
+    class MessageCallback implements MessageServer.Callback, MessageServer.MessageSupportMsgFilterOther {
         @Override
         public void onEvent(MessageServer.MsgInfo msg) {
 
-            if(msg == null){
+            if (msg == null) {
                 return;
             }
             //fill interactive cached
@@ -148,9 +150,9 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                     broadcastView.showToast(msg.status == 1 ? "允许用户上麦" : "不允许用户上麦");
                 }
                 break;
-                case MessageServer.EVENT_CONNECT_INVITE_REFUSED:{
-                    if(UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())){
-                        broadcastView.showToast(String.format("%s拒绝了您的邀请",msg.nick_name));
+                case MessageServer.EVENT_CONNECT_INVITE_REFUSED: {
+                    if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())) {
+                        broadcastView.showToast(String.format("%s拒绝了您的邀请", msg.nick_name));
                     }
                 }
                 break;
@@ -164,7 +166,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                             if (TextUtils.isEmpty(userId)) {
                                 userId = msg.roomJoinId;
                             }
-                            if(UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())&&!TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)){
+                            if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name()) && !TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
                                 showInvitedView(name, userId);
                             }
                         } catch (Exception e) {
@@ -184,9 +186,9 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                 break;
 
 
-                case EVENT_VRTC_CONNECT_REFUSED:{
+                case EVENT_VRTC_CONNECT_REFUSED: {
                     userId = msg.user_id;
-                    if(TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)){
+                    if (TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
                         broadcastView.showToast("主持人拒绝了您的上麦申请");
                         broadcastView.setMic(false);
                     }
@@ -198,7 +200,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                     if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())) {
                         break;
                     }
-                    if(TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)){
+                    if (TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
                         if (isPublic) {
                             mRtcFragmentView.noSpeak();
                         }
@@ -214,7 +216,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                     if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())) {
                         break;
                     }
-                    if(TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)){
+                    if (TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
                         broadcastView.showToast("您被取消禁言");
                         canSpeak = true;
                     }
@@ -231,13 +233,13 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                                 .onCancel(new OutDialog.ClickLister() {
                                     @Override
                                     public void click() {
-                                        RtcConfig.getInterActive().rejectInvite( new SimpleRequestCallback());
+                                        RtcConfig.getInterActive().rejectInvite(new SimpleRequestCallback());
                                     }
                                 })
                                 .onConfirm(new OutDialog.ClickLister() {
                                     @Override
                                     public void click() {
-                                        RtcConfig.getInterActive().agreeInvite( new RequestCallback() {
+                                        RtcConfig.getInterActive().agreeInvite(new RequestCallback() {
                                             @Override
                                             public void onSuccess() {
                                                 RtcConfig.getInterActive().publish();
@@ -262,6 +264,15 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                         broadcastView.refreshStream(userId, msg.status, -1);
                     } else {
                         broadcastView.refreshStream(userId, -1, msg.status);
+                    }
+                    if (TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
+                        //切换自己本身设备的摄像头和麦克风
+                        //更新UI
+                        if (msg.device == CAMERA_AUDIO) { // 麦克风
+                            switchAudioFrame(msg.status);
+                        } else {
+                            switchVideoFrame(msg.status);
+                        }
                     }
                     break;
                 case MessageServer.EVENT_INTERACTIVE_ALLOW_MIC:
@@ -292,7 +303,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                         if (!TextUtils.isEmpty(userId) && TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
                             //主播下麦用户/嘉宾
                             RtcConfig.getInterActive().unpublished();
-                            if(!UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())){
+                            if (!UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())) {
                                 broadcastView.setMic(false);
                             }
                             isPublic = false;
@@ -346,9 +357,9 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
     }
 
     private void cancelRtcDialog() {
-        if(mRtcDialogMap.containsKey(userId)){
+        if (mRtcDialogMap.containsKey(userId)) {
             Dialog dialog = mRtcDialogMap.remove(userId);
-            if(dialog!= null && dialog.isShowing()){
+            if (dialog != null && dialog.isShowing()) {
                 dialog.dismiss();
             }
         }
@@ -356,13 +367,13 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
 
     //刷新用户列表
     private void refreshUserList(MessageServer.MsgInfo msg) {
-        if(broadcastView != null && sRequireRefreshEvents.contains(msg.event)){
+        if (broadcastView != null && sRequireRefreshEvents.contains(msg.event)) {
             broadcastView.refreshUserList();
         }
     }
 
-    public void refreshUserList(ChatServer.ChatInfo chatInfo){
-        if(broadcastView != null && sRequireRefreshActions.contains(chatInfo.event)){
+    public void refreshUserList(ChatServer.ChatInfo chatInfo) {
+        if (broadcastView != null && sRequireRefreshActions.contains(chatInfo.event)) {
             broadcastView.refreshUserList();
         }
     }
@@ -428,7 +439,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
     }
 
     private void sendMessage(String msg) {
-        if(mRtcFragmentView != null){
+        if (mRtcFragmentView != null) {
             mRtcFragmentView.sendMsg(msg, "", new SimpleCallback());
         }
     }
@@ -454,20 +465,33 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
 
     @Override
     public void onSwitchVideo(final boolean isOpen) {
-        if ( mRtcFragmentView.getLocalStream() == null) {
+        if (mRtcFragmentView.getLocalStream() == null) {
             return;
         }
-        RtcConfig.getInterActive().setDeviceStatus( mWebinarInfo.getWebinarInfoData().join_info.third_party_user_id, "2", isOpen ? String.valueOf(CAMERA_DEVICE_OPEN) : String.valueOf(CAMERA_DEVICE_CLOSE), new SimpleRequestCallback());
-        switchVideoFrame(isOpen ? CAMERA_DEVICE_OPEN : CAMERA_DEVICE_CLOSE);
+        /**
+         * 请求 接口
+         */
+        RtcConfig.getInterActive().switchDevice(mWebinarInfo.getWebinarInfoData().join_info.third_party_user_id, "2", isOpen ? String.valueOf(CAMERA_DEVICE_OPEN) : String.valueOf(CAMERA_DEVICE_CLOSE), new SimpleRequestCallback());
+        /**
+         * 根据消息更改 这个不用了
+         */
+        //        switchVideoFrame(isOpen ? CAMERA_DEVICE_OPEN : CAMERA_DEVICE_CLOSE);
     }
 
     @Override
     public void onSwitchAudio(final boolean isOpen) {
-        if ( mRtcFragmentView.getLocalStream() == null) {
+        if (mRtcFragmentView.getLocalStream() == null) {
             return;
         }
-        RtcConfig.getInterActive().setDeviceStatus( mWebinarInfo.getWebinarInfoData().join_info.third_party_user_id, "1", isOpen ? String.valueOf(CAMERA_DEVICE_OPEN) : String.valueOf(CAMERA_DEVICE_CLOSE), new SimpleRequestCallback());
-        switchAudioFrame(isOpen ? CAMERA_DEVICE_OPEN : CAMERA_DEVICE_CLOSE);
+        /**
+         * 请求 接口
+         */
+        RtcConfig.getInterActive().switchDevice(mWebinarInfo.getWebinarInfoData().join_info.third_party_user_id, "1", isOpen ? String.valueOf(CAMERA_DEVICE_OPEN) : String.valueOf(CAMERA_DEVICE_CLOSE), new SimpleRequestCallback());
+
+        /**
+         * 根据消息更改 这个不用了
+         */
+        //        switchAudioFrame(isOpen ? CAMERA_DEVICE_OPEN : CAMERA_DEVICE_CLOSE);
     }
 
     @Override
@@ -478,24 +502,29 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
     }
 
     private void switchVideoFrame(int status) {
-        if ( mRtcFragmentView.getLocalStream() == null) {
+        if (mRtcFragmentView.getLocalStream() == null) {
             return;
         }
         if (status == CAMERA_DEVICE_OPEN) {
             //1打开
             broadcastView.updateVideoFrame(true);
+            mRtcFragmentView.getLocalStream().unmuteVideo(null);
         } else { // 0禁止
+            mRtcFragmentView.getLocalStream().muteVideo(null);
             broadcastView.updateVideoFrame(false);
         }
     }
 
     private void switchAudioFrame(int status) {
-        if ( mRtcFragmentView.getLocalStream() == null) {
+        if (mRtcFragmentView.getLocalStream() == null) {
             return;
         }
         if (status == CAMERA_DEVICE_OPEN) {
+            mRtcFragmentView.getLocalStream().unmuteAudio(null);
+            //开启自己麦克风
             broadcastView.updateAudioFrame(true);
         } else {
+            mRtcFragmentView.getLocalStream().muteAudio(null);
             broadcastView.updateAudioFrame(false);
         }
     }
@@ -525,7 +554,8 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
         sRequireRefreshActions.add(ChatServer.eventOfflineKey);
     }
 
-    private Map<String,OutTwoTitleDialog> mRtcDialogMap = new HashMap<>();
+    private Map<String, OutTwoTitleDialog> mRtcDialogMap = new HashMap<>();
+
     private void showInvitedView(String name, final String thisId) {
         OutTwoTitleDialog showApply = new OutDialogBuilder()
                 .title(name)
@@ -535,25 +565,25 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                 .onCancel(new OutDialog.ClickLister() {
                     @Override
                     public void click() {
-                        rejectOrAgreeApply(true,thisId);
+                        rejectOrAgreeApply(true, thisId);
                     }
                 })
                 .onConfirm(new OutDialog.ClickLister() {
                     @Override
                     public void click() {
-                        rejectOrAgreeApply(false,thisId);
+                        rejectOrAgreeApply(false, thisId);
                     }
                 })
                 .buildTwo(activity);
         showApply.show();
-        mRtcDialogMap.put(thisId,showApply);
+        mRtcDialogMap.put(thisId, showApply);
     }
 
-    private void rejectOrAgreeApply(boolean reject,String userId){
-        if(reject){
-            RtcConfig.getInterActive().rejectApply( userId, new SimpleRequestCallback());
-        }else{
-            RtcConfig.getInterActive().agreeApply( userId, new SimpleRequestCallback());
+    private void rejectOrAgreeApply(boolean reject, String userId) {
+        if (reject) {
+            RtcConfig.getInterActive().rejectApply(userId, new SimpleRequestCallback());
+        } else {
+            RtcConfig.getInterActive().agreeApply(userId, new SimpleRequestCallback());
         }
         cancelRtcDialog();
     }
@@ -596,7 +626,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
 
     @Override
     public void showBeauty(boolean showBeauty) {
-        if ( mRtcFragmentView.getLocalStream() != null) {
+        if (mRtcFragmentView.getLocalStream() != null) {
             if (showBeauty) {
                 RtcConfig.getInterActive().setEnableBeautify(true);
                 RtcConfig.getInterActive().setBeautifyLevel(3);

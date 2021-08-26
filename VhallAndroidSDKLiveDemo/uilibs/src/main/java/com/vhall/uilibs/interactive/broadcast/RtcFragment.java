@@ -1,9 +1,6 @@
 package com.vhall.uilibs.interactive.broadcast;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothProfile;
 import android.content.Context;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
@@ -30,7 +27,6 @@ import com.vhall.uilibs.interactive.bean.StreamData;
 import com.vhall.uilibs.interactive.broadcast.config.RtcConfig;
 import com.vhall.uilibs.interactive.broadcast.present.IBroadcastContract;
 import com.vhall.uilibs.util.DensityUtils;
-import com.vhall.uilibs.util.HeadsetUtil;
 import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.RenViewUtils;
 import com.vhall.uilibs.util.ToastUtil;
@@ -42,7 +38,7 @@ import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.CallBack;
 import com.vhall.vhss.data.WebinarInfoData;
-import org.json.JSONException;
+
 import org.json.JSONObject;
 import org.webrtc.SurfaceViewRenderer;
 import java.util.ArrayList;
@@ -798,7 +794,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
          *只要订阅到有人插播视频了，就把麦克风关一下。 解决插播时文件声音混入别人说话的声音。
          */
         if (stream.getStreamType() == 4 && isPublic) {
-            mInteractive.setDeviceStatus(roomInfo.join_info.third_party_user_id, "1", "0", null);
+            mInteractive.switchDevice(roomInfo.join_info.third_party_user_id, "1", "0", null);
         }
         if (stream.getStreamType() == 3 || stream.getStreamType() == 4) {
             addShareView(stream);
@@ -912,8 +908,8 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         mInteractive.publish();
         if(deviceStatus != null){
             //从后台进入前台重置麦克风 摄像头状态
-            mInteractive.setDeviceStatus(mWebinarInfo.user_id,"1",deviceStatus.getAudioStatus()?"1":"0",null);
-            mInteractive.setDeviceStatus(mWebinarInfo.user_id,"2",deviceStatus.getVideoStatus()?"1":"0",null);
+            mInteractive.switchDevice(mWebinarInfo.user_id,"1",deviceStatus.getAudioStatus()?"1":"0",null);
+            mInteractive.switchDevice(mWebinarInfo.user_id,"2",deviceStatus.getVideoStatus()?"1":"0",null);
         }
     }
 

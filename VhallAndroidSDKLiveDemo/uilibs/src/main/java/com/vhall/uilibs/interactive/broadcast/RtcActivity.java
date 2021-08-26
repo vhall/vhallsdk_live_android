@@ -41,6 +41,7 @@ import com.vhall.uilibs.interactive.RtcInternal;
 import com.vhall.uilibs.interactive.broadcast.config.RtcConfig;
 import com.vhall.uilibs.interactive.broadcast.present.IBroadcastContract;
 import com.vhall.uilibs.interactive.broadcast.present.RtcH5Present;
+import com.vhall.uilibs.interactive.dialog.ChooseDocDialog;
 import com.vhall.uilibs.interactive.dialog.OutDialog;
 import com.vhall.uilibs.interactive.dialog.OutDialogBuilder;
 import com.vhall.uilibs.interactive.dialog.UserListNewDialog;
@@ -899,7 +900,14 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
             if (broadcastRtcFragment != null) {
                 broadcastRtcFragment.setStop(false);
             }
-            DocChooseActivity.startActivityForResult(RtcActivity.this, webinarInfo.getWebinarInfoData(), 1);
+           new ChooseDocDialog(getActivity(), new ChooseDocDialog.ChooseIdClickLister() {
+               @Override
+               public void onChooseIdClick(String docId) {
+                   if (docFragment != null && !TextUtils.isEmpty(docId.trim())) {
+                       docFragment.setDocId(docId);
+                   }
+               }
+           }).show();
             return;
         }
         groupUser.setVisibility(View.GONE);
@@ -1123,19 +1131,6 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
             mainId = webinarInfo.getWebinarInfoData().roomToolsStatusData.doc_permission;
         } else {
             mainId = String.valueOf(userinfo.user_id);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (data == null || resultCode != RESULT_OK) {
-            return;
-        }
-        if (requestCode == 1) {
-            String docId = data.getStringExtra("docId");
-            if (docFragment != null && !TextUtils.isEmpty(docId.trim())) {
-                docFragment.setDocId(docId);
-            }
         }
     }
 

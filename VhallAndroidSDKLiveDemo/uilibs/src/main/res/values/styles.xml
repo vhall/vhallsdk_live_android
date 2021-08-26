@@ -29,6 +29,14 @@
         <item name="android:windowFullscreen">true</item>
     </style>
 
+    <style name="full_dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 
     <style name="MyCheckBox" parent="Theme.AppCompat.Light">
         <item name="android:button">@drawable/check_box_selector</item>

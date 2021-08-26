@@ -111,6 +111,14 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
     }
 
     @Override
+    protected void onDestroy() {
+        if (inputView!=null){
+            inputView.destroyed();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     protected void onUserLeaveHint() {
         if (null != inputView) {
             inputView.dismiss();

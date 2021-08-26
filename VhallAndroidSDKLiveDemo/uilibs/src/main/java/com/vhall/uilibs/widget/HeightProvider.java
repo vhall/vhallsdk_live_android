@@ -3,6 +3,7 @@ package com.vhall.uilibs.widget;
 import android.app.Activity;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,8 +40,8 @@ public class HeightProvider extends PopupWindow implements ViewTreeObserver.OnGl
         setInputMethodMode(PopupWindow.INPUT_METHOD_NEEDED);
     }
 
-    public HeightProvider  init() {
-        if (!isShowing()) {
+    public HeightProvider init() {
+        if (!isShowing() && !mActivity.isFinishing()) {
             final View view = mActivity.getWindow().getDecorView();
             // 延迟加载popupwindow，如果不加延迟就会报错
             view.post(new Runnable() {
@@ -53,7 +54,7 @@ public class HeightProvider extends PopupWindow implements ViewTreeObserver.OnGl
         return this;
     }
 
-    public  HeightProvider setHeightListener(HeightListener listener) {
+    public HeightProvider setHeightListener(HeightListener listener) {
         this.listener = listener;
         return this;
     }
@@ -77,8 +78,9 @@ public class HeightProvider extends PopupWindow implements ViewTreeObserver.OnGl
         void onHeightChanged(int height);
     }
 
-    public void destroyed(){
-        if(observer != null && observer.isAlive()){
+    public void destroyed() {
+        dismiss();
+        if (observer != null && observer.isAlive()) {
             observer.removeOnGlobalLayoutListener(this);
         }
     }
