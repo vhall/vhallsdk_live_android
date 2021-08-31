@@ -85,8 +85,8 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
     @Override
     public void start() {
         getWatchLive().setVRHeadTracker(true);
-        getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeNone.getValue());
         initWatch();
+        getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeNone.getValue());
     }
 
     @Override

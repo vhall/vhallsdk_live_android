@@ -458,6 +458,9 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
 
     @Override
     protected void onDestroy() {
+        if (inputView!=null){
+            inputView.destroyed();
+        }
         super.onDestroy();
     }
 

@@ -924,6 +924,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     break;
                 case ChatServer.eventQuestion:
+                    if (chatInfo.questionData != null && chatInfo.questionData.answer != null) {
+                        if (chatInfo.questionData.answer.is_open == 0 && !chatInfo.questionData.join_id.equals(webinarInfo.join_id)) {
+                            return;
+                        }
+                    }
                     questionView.notifyDataChangedQe(chatInfo);
                     break;
                 default:
