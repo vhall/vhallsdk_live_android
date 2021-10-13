@@ -21,8 +21,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.1.4'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.1.3'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.2.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.2.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -30,14 +30,25 @@ allprojects {
 
 二、版本更新信息：
 
+版本：v6.2.0 更新时间 2021.10.13
+
+1.嘉宾支持带头像进入 <br>
+2.调整用户设置互动分辨率 <br>
+3.活动信息增加部分字端 <br>
+4.demo支持多人互动上麦 <br>
+5.优化已知bug <br>
+
+
 版本：v6.1.4 更新时间 2021.09.06
+
 1. 优化已知bug 
 
 版本：v6.1.3 更新时间 2021.08.26
-1.更改 setDeviceStatus的方法名为switchDevice和之前保持一致 
-2.兼容服务器接口升级 
-3.修改问答判断逻辑，只能看自己和公开的问答 
-4.优化已知bug 
+
+1.更改 setDeviceStatus的方法名为switchDevice和之前保持一致  <br>
+2.兼容服务器接口升级  <br>
+3.修改问答判断逻辑，只能看自己和公开的问答  <br>
+4.优化已知bug  <br>
 
 版本6.1.2 更新时间 2021.07.27  
 1.新增设置RSA设置私钥接口  

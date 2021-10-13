@@ -87,6 +87,8 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
         getWatchLive().setVRHeadTracker(true);
         initWatch();
         getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeNone.getValue());
+//        Log.e("vhall_hkl",Thread.currentThread().getName());
+//        mPlayView.setDrawMode(Constants.DrawMode.kVHallDrawModeNone.getValue());
     }
 
     @Override
@@ -113,7 +115,7 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
             watchView.showToast(R.string.vhall_login_first);
             return;
         }
-        if (webinarInfo.chatforbid) {
+        if (webinarInfo != null && webinarInfo.chatforbid) {
             watchView.showToast("你被禁言了");
             return;
         }
@@ -232,6 +234,7 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
     public int setScaleType() {
         scaleType = scaleTypes[(++currentPos) % scaleTypes.length];
         getWatchLive().setScaleType(scaleType);
+//        mPlayView.setDrawMode(scaleType);
         liveView.setScaleButtonText(scaleType);
         return scaleType;
     }
@@ -336,13 +339,15 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
             RelativeLayout watchLayout = liveView.getWatchLayout();
             WatchLive.Builder builder = new WatchLive.Builder()
                     .context(watchView.getActivity().getApplicationContext())
-                    .containerLayout(watchLayout)
                     .bufferDelay(params.bufferSecond)
+                    .containerLayout(watchLayout)
                     .callback(new WatchCallback())
+//                    .playView(mPlayView = new VHVideoPlayerView(watchView.getActivity().getApplicationContext()))
                     .messageCallback(new MessageEventCallback())
                     .connectTimeoutMils(10000)
                     .chatCallback(new ChatCallback());
             watchLive = builder.build();
+//            watchLayout.addView(mPlayView);
         }
         //狄拍builder
 //        if (watchLive == null) {
@@ -510,8 +515,10 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
                     isWatching = true;
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
+//                    Log.e("vhall_hkl",Thread.currentThread().getName());
                     //屏幕自适应
                     getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeAspectFit.getValue());
+//                    mPlayView.setDrawMode(Constants.DrawMode.kVHallDrawModeAspectFit.getValue());
                     break;
                 case BUFFER:
                     if (isWatching) {

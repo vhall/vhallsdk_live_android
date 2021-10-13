@@ -7,7 +7,7 @@
         android:id="@+id/local"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#000000"/>
+        android:background="#000000" />
 
     <ImageView
         android:id="@+id/local_view_layer"
@@ -52,13 +52,15 @@
             android:src="@drawable/icon_lower" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/containar"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <ScrollView
+        android:layout_width="@dimen/dimen_100dp"
+        android:layout_height="wrap_content">
 
-    </LinearLayout>
-
+        <LinearLayout
+            android:id="@+id/containar"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
 
 </RelativeLayout>

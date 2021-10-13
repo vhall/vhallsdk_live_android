@@ -80,6 +80,8 @@ public class VhallApplication extends MultiDexApplication {
         param.key = sp.getString("key", "");
         //缓冲时长
         param.bufferSecond = sp.getInt("buffersecond", 6);
+        param.guestAvatar = sp.getString("guestAvatar", "https://t-alistatic01.e.vhall.com/upload/users/face-imgs/67/cf/67cf18a4250bc48ec9d1eb3ed82b741d.gif");
+
         return param;
     }
 
@@ -92,6 +94,7 @@ public class VhallApplication extends MultiDexApplication {
         SharedPreferences.Editor editor = sp.edit();
         editor.putString("broid", param.broId);
         editor.putString("brotoken", param.broToken);
+        editor.putString("guestAvatar", param.guestAvatar);
         editor.putInt("pixeltype", param.pixel_type);
         editor.putInt("videobitrate", param.videoBitrate);
         editor.putInt("videoframerate", param.videoFrameRate);

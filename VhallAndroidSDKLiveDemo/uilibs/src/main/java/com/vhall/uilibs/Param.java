@@ -17,6 +17,7 @@ public class Param implements Serializable {
     public String broName = "";
     public String broToken = "5d56d034e933e1826c7c896859019e33";
     public String guestPwd = "123456";//嘉宾口令
+    public String guestAvatar = "";//嘉宾头像
     public int pixel_type = VHLivePushFormat.PUSH_MODE_HD;
     public int videoBitrate = 500;
     public int videoFrameRate = 20;
@@ -30,6 +31,7 @@ public class Param implements Serializable {
     public String webinar_id;
     public String join_id;
     public String noticeContent;
+    public int inav_num;
     public List<String> filters=new ArrayList<>();
 
     //互动相关

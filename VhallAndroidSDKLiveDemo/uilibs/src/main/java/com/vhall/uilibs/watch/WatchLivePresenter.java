@@ -98,8 +98,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     @Override
     public void start() {
         getWatchLive().setVRHeadTracker(true);
-        getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeAspectFit.getValue());
         initWatch();
+        getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeAspectFit.getValue());
         //自动播放
 //        new Handler().postDelayed(new Runnable() {
 //            @Override

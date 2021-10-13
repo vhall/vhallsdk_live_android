@@ -1,12 +1,9 @@
 package com.vhall.live;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -15,6 +12,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.vhall.business.VhallSDK;
+import com.vhall.business.utils.VHInternalUtils;
 import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 
@@ -23,7 +21,7 @@ import com.vhall.uilibs.Param;
  */
 public class SetParamActivity extends FragmentActivity {
     Param param;
-    EditText et_bro_token,et_bro_name, et_bro_id, et_video_bitrate, et_video_framerate, et_watch_id, et_key, et_buffersecond;
+    EditText et_bro_token,et_bro_name, et_bro_id, et_video_bitrate, et_video_framerate, et_watch_id, et_key, et_buffersecond,et_guest_pwd,et_guest_avatar;
     TextView et_userid, et_usernickname;
     RadioGroup rg_type;
     RadioButton rb_hdpi, rb_xhdpi, radioButtonHD, radioButtonSD, radioButtonUHD;
@@ -38,6 +36,8 @@ public class SetParamActivity extends FragmentActivity {
         et_bro_id = (EditText) this.findViewById(R.id.et_bro_id);
         et_video_bitrate = (EditText) this.findViewById(R.id.et_video_bitrate);
         et_video_framerate = (EditText) this.findViewById(R.id.et_video_framerate);
+        et_guest_pwd = (EditText) this.findViewById(R.id.et_guest_pwd);
+        et_guest_avatar = (EditText) this.findViewById(R.id.et_guest_avatar);
         et_watch_id = (EditText) this.findViewById(R.id.et_watch_id);
         et_key = (EditText) this.findViewById(R.id.et_key);
         et_buffersecond = (EditText) this.findViewById(R.id.et_buffersecond);
@@ -64,15 +64,17 @@ public class SetParamActivity extends FragmentActivity {
     @SuppressLint("MissingPermission")
     private void initData() {
         et_bro_token.setText(param.broToken);
+        et_guest_pwd.setText(param.guestPwd);
         et_bro_id.setText(param.broId);
         et_bro_name.setText(param.broName);
+        et_guest_avatar.setText(param.guestAvatar);
         et_video_bitrate.setText(String.valueOf(param.videoBitrate));
         et_video_framerate.setText(String.valueOf(param.videoFrameRate));
         et_watch_id.setText(param.watchId);
         et_key.setText(param.key);
         et_buffersecond.setText(String.valueOf(param.bufferSecond));
-        TelephonyManager telephonyMgr = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
-        et_userid.setText(TextUtils.isEmpty(VhallSDK.getUserName()) ? telephonyMgr.getDeviceId() : VhallSDK.getUserName());
+
+        et_userid.setText(TextUtils.isEmpty(VhallSDK.getUserName()) ? VHInternalUtils.getDeviceId() : VhallSDK.getUserName());
         et_usernickname.setText(TextUtils.isEmpty(VhallSDK.getUserNickname()) ? Build.BRAND + getString(R.string.phone_user) : VhallSDK.getUserNickname());
         if (param.pixel_type == VHLivePushFormat.PUSH_MODE_HD) {
             rb_hdpi.setChecked(true);
@@ -110,6 +112,8 @@ public class SetParamActivity extends FragmentActivity {
         param.watchId = et_watch_id.getText().toString();
         param.key = et_key.getText().toString();
 
+        param.guestPwd = et_guest_pwd.getText().toString();
+        param.guestAvatar = et_guest_avatar.getText().toString();
         int bufferSeconds = -1;
         try {
             bufferSeconds = Integer.parseInt(et_buffersecond.getText().toString());

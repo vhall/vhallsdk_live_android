@@ -112,6 +112,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     WatchContract.WatchPresenter mPresenter;
     private Fragment docFragment;
     private FragmentManager fragmentManager;
+    private TextView status;
 
     private static final String TAG = "WatchActivity";
 
@@ -123,6 +124,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.watch_activity);
         fragmentManager = getSupportFragmentManager();
+        status=findViewById(R.id.status);
         param = (Param) getIntent().getSerializableExtra("param");
         type = getIntent().getIntExtra("type", VhallUtil.WATCH_LIVE);
 //        liveFragment = (WatchLiveFragment) getSupportFragmentManager().findFragmentById(R.id.contentVideo);
@@ -194,10 +196,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     finish();
                     return;
                 }
-                String hand=webinarInfo.hands_up;
-                if (webinarInfo.getWebinarInfoData()!=null&&webinarInfo.getWebinarInfoData().roomToolsStatusData!=null){
-                    hand= String.valueOf(webinarInfo.getWebinarInfoData().roomToolsStatusData.is_handsup);
-                }
+                status.setText(String.format("进入房间初始化值 举手开关=  %s  问答=  %d  禁言=  %s   自己的禁言=  %s  全体禁言=  %s", webinarInfo.hands_up, webinarInfo.question_status, webinarInfo.chatforbid, webinarInfo.chatOwnForbid, webinarInfo.chatAllForbid));
                 param.webinar_id = webinarInfo.webinar_id;
                 if (webinarInfo.question_status == 1) {
                     Toast.makeText(WatchActivity.this, "问答已开启", Toast.LENGTH_SHORT).show();

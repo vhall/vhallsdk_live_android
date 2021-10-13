@@ -9,6 +9,8 @@ import com.vhall.business.MessageServer;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business_interactive.InterActive;
 import com.vhall.uilibs.Param;
+import com.vhall.uilibs.interactive.broadcast.config.RtcConfig;
+import com.vhall.uilibs.util.UserManger;
 import com.vhall.vhallrtc.client.Room;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
@@ -52,6 +54,17 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
         interactive.init(mParam.watchId, "", "", mParam.key, new RequestCallback() {
             @Override
             public void onSuccess() {
+                /**
+                 * 主持人 建议 5 嘉宾建议根据上麦人数调整
+                 *  definition 设置上麦分辨率
+                 */
+                int definition = 3;
+                if (mParam.inav_num > 5 && 10 >= mParam.inav_num) {
+                    definition = 2;
+                } else if (mParam.inav_num > 10) {
+                    definition = 1;
+                }
+                interactive.setDefinition(definition);
                 setLocalView();
             }
 
@@ -158,6 +171,9 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
                     }
                     break;
                 case MessageServer.EVENT_SWITCH_DEVICE:
+                    /**
+                     * 新增 收到消息 切换自己设备
+                     */
                     if (messageInfo.device == CAMERA_AUDIO) { // 麦克风
                         switchAudioFrame(messageInfo.status);
                         interFraView.updateAudioFrame(messageInfo.status);

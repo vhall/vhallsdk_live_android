@@ -2,6 +2,10 @@ package com.vhall.uilibs.interactive.broadcast;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.UserManager;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.RequestCallback;
@@ -19,7 +24,6 @@ import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.utils.VHInternalUtils;
 import com.vhall.business_interactive.InterActive;
 import com.vhall.business_interactive.SimpleRoomCallbackV2;
-import com.vhall.ilss.VHInteractive;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.interactive.base.BaseFragment;
 import com.vhall.uilibs.interactive.bean.InteractiveUser;
@@ -33,18 +37,22 @@ import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.UserManger;
 import com.vhall.uilibs.util.VhallGlideUtils;
 import com.vhall.uilibs.util.VhallUtil;
+import com.vhall.uilibs.util.handler.WeakHandler;
 import com.vhall.vhallrtc.client.Room;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.CallBack;
 import com.vhall.vhss.data.WebinarInfoData;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.SurfaceViewRenderer;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 import static com.vhall.ilss.VHInteractive.CANVAS_LAYOUT_PATTERN_GRID_1;
 import static com.vhall.ilss.VHInteractive.CANVAS_LAYOUT_PATTERN_TILED_6_1T5D;
 
@@ -53,11 +61,11 @@ import static com.vhall.ilss.VHInteractive.CANVAS_LAYOUT_PATTERN_TILED_6_1T5D;
  * @author hkl
  * 互动页面
  */
-public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeListener , IBroadcastContract.RtcFragmentView {
+public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeListener, IBroadcastContract.RtcFragmentView {
 
     private final static String KEY_ORIENTATION = "orientation";
 
-    public static RtcFragment getInstance(String orientation, WebinarInfo webinarInfo,MessageServer.Callback callback, ChatServer.Callback chatCallback) {
+    public static RtcFragment getInstance(String orientation, WebinarInfo webinarInfo, MessageServer.Callback callback, ChatServer.Callback chatCallback) {
         RtcFragment fragment = new RtcFragment();
         Bundle bundle = new Bundle();
         bundle.putString(KEY_ORIENTATION, orientation);
@@ -68,6 +76,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         fragment.roomInfo = webinarInfo.getWebinarInfoData();
         return fragment;
     }
+
 
     private View rootView;
     private ViewPager viewPager;
@@ -125,10 +134,29 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
 
     /**
      * 互动工具
+     *
      * @return
      */
-    public InterActive getInteractive(){
+    public InterActive getInteractive() {
         return mInteractive;
+    }
+
+    private static final int handlerWhat = 101;
+    //每次刷新view间隔
+    private static final int handlerTime = 1000;
+    private final WeakHandler refreshHandler = new WeakHandler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            if (msg.what == handlerWhat) {
+                setViews();
+            }
+            return false;
+        }
+    });
+
+    public void updateViewHandler() {
+        refreshHandler.removeMessages(handlerWhat);
+        refreshHandler.sendEmptyMessageDelayed(handlerWhat, handlerTime);
     }
 
     @Override
@@ -169,6 +197,54 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
     public void onPageSelected(int position) {
         selectPoint = position;
         setChoose(selectPoint);
+
+
+        if (hasShare && position == 0) {
+            return;
+        }
+        if (hasShare) {
+            changeStreamVideo(position - 1);
+        } else {
+            changeStreamVideo(position);
+        }
+    }
+
+    /**
+     * 节省内存 自动关闭其他页面的画面
+     * 加载当前页面时候 在打开
+     * <p>
+     * 因为文档显示 所以 主画面不关闭 自己的也不关
+     *
+     * @param position 当前选的页面 不包含共享桌面那一页
+     */
+    private void changeStreamVideo(int position) {
+        if (ListUtils.isEmpty(views)) {
+            return;
+        }
+        if (views.size() <= 2) {
+            for (int i = 0; i < streams.size(); i++) {
+                StreamData streamData = streams.get(i);
+                if (streamData.getCamera() == 1) {
+                    streamData.getStream().unmuteVideo(null);
+                }
+            }
+            return;
+        }
+        int a, b;
+        a = position * 4;
+        b = a + 3;
+        for (int i = 0; i < streams.size(); i++) {
+            StreamData streamData = streams.get(i);
+            if (i >= a && i <= b) {
+                if (streamData.getCamera() == 1) {
+                    streamData.getStream().unmuteVideo(null);
+                }
+            } else {
+                if (!TextUtils.equals(streamData.getStream().userId, mainId) && !TextUtils.equals(streamData.getStream().userId, roomInfo.getJoin_info().third_party_user_id)) {
+                    streamData.getStream().muteVideo(null);
+                }
+            }
+        }
     }
 
     @Override
@@ -182,11 +258,12 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
     }
 
     private WebinarInfo mWebinarInfo;
-    public void setRoomInfo(Context context,CallBack callBack) {
-        setRoomInfo(context,null,callBack);
+
+    public void setRoomInfo(Context context, CallBack callBack) {
+        setRoomInfo(context, null, callBack);
     }
 
-    public void setRoomInfo(Context context,VHRenderView renderView,final CallBack callBack) {
+    public void setRoomInfo(Context context, VHRenderView renderView, final CallBack callBack) {
         if (roomInfo != null) {
             this.roomInfo = mWebinarInfo.getWebinarInfoData();
             if (roomInfo.roomToolsStatusData != null && !TextUtils.isEmpty(roomInfo.roomToolsStatusData.doc_permission)) {
@@ -195,7 +272,20 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 mainId = String.valueOf(roomInfo.getWebinar().userinfo.user_id);
             }
             if (mInteractive == null) {
-                mInteractive = new InterActive(context, mRoomCallback,mChatCallback,mMessageCallback);
+                mInteractive = new InterActive(context, mRoomCallback, mChatCallback, mMessageCallback);
+            }
+            /**
+             * 主持人 建议 5 嘉宾建议根据上麦人数调整
+             *  definition 设置上麦分辨率
+             */
+            int definition = 3;
+            if (mWebinarInfo.inav_num > 5 && 10 >= mWebinarInfo.inav_num) {
+                definition = 2;
+            } else if (mWebinarInfo.inav_num > 10) {
+                definition = 1;
+            }
+            if (UserManger.isHost(roomInfo.getJoin_info().role_name)) {
+                definition = 5;
             }
             mInteractive.init(mWebinarInfo, new RequestCallback() {
                 @Override
@@ -213,16 +303,17 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 }
             });
             VHRenderView tempRenderView = new VHRenderView(context);
-            if(renderView == null){
+            if (renderView == null) {
                 renderView = tempRenderView;
             }
+            mInteractive.setDefinition(definition);
             mInteractive.setLocalView(renderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo, null);
             localStream = mInteractive.getLocalStream();
             RtcConfig.setInteractive(mInteractive);
         }
     }
 
-    public void enterRoom(){
+    public void enterRoom() {
         mInteractive.enterRoom();
     }
 
@@ -231,7 +322,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
 
         @Override
         public void onDidConnect(Room room, JSONObject jsonObject) {
-            if(mInteractive != null){
+            if (mInteractive != null) {
                 mInteractive.publish();
             }
         }
@@ -267,7 +358,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             if (TextUtils.equals(stream.userId, mainId)) {
                 mainStream = stream;
             }
-            setViews();
+            updateViewHandler();
         }
 
         @Override
@@ -280,7 +371,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             if (TextUtils.equals(stream.userId, mainId)) {
                 mainStream = null;
             }
-            setViews();
+            updateViewHandler();
         }
 
         @Override
@@ -328,28 +419,40 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         @Override
         public void onStreamMixed(JSONObject jsonObject) {
             if (!isPush) {
-                broadCast(jsonObject, new CallBack() {
-                    @Override
-                    public void onSuccess(Object result) {
-                        isPush = true;
-                        //允许上麦
-                        mInteractive.setHandsUp( "1",null);
-                        onLiveSuccess();
-                    }
+                JSONObject config = new JSONObject();
+                try {
+                    /**
+                     * adaptiveLayoutMode
+                     * 支持 16人画面
+                     */
+                    config.put("profile", Room.getProfile(Room.BROADCAST_VIDEO_PROFILE_1080P_1));
+                    config.put("adaptiveLayoutMode", 2);
+                    config.put("precast_pic_exist", false);
+                    broadCast(config, new CallBack() {
+                        @Override
+                        public void onSuccess(Object result) {
+                            isPush = true;
+                            //允许上麦
+                            mInteractive.setHandsUp("1", null);
+                            onLiveSuccess();
+                        }
 
-                    @Override
-                    public void onError(int eventCode, String msg) {
-                        baseShowToast(msg);
-                        getActivity().finish();
-                    }
-                });
+                        @Override
+                        public void onError(int eventCode, String msg) {
+                            baseShowToast(msg);
+                            getActivity().finish();
+                        }
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     private void onLiveSuccess() {
-        if(updateMainStreamLister != null){
-            if(getActivity() != null){
+        if (updateMainStreamLister != null) {
+            if (getActivity() != null) {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -372,7 +475,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             return;
         }
         this.mainId = mainId;
-        setViews();
+        updateViewHandler();
     }
 
     public void updatePic(String userId, int voice, int camera) {
@@ -391,7 +494,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     streams.remove(i);
                     streams.add(i, streamData);
                     setViewPic(i, voice, camera, "");
-                    adapter.notifyDataSetChanged();
                     return;
                 }
                 if (camera != -1) {
@@ -399,7 +501,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     streams.remove(i);
                     streams.add(i, streamData);
                     setViewPic(i, voice, camera, streamData.getAvatar());
-                    adapter.notifyDataSetChanged();
                     return;
                 }
             }
@@ -416,11 +517,9 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             }
             //1主播
             if (UserManger.isHost(roomInfo.getJoin_info().getRole_name())) {
-//                mInteractive.broadcastRoom(2, null);
-
-                mInteractive.broadCastRoom(2,0,null);
+                mInteractive.broadCastRoom(2, 0, null);
             } else {
-                mInteractive.setUserNoSpeak( null);
+                mInteractive.setUserNoSpeak(null);
             }
         }
     }
@@ -430,13 +529,22 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             return;
         }
         View view;
-        switch (i) {
+        /**
+         * 当前的view 在一页4个中的第几个
+         */
+        int viewLocation = i % 4;
+        /**
+         *当前的view 在第几页
+         */
+        int viewNumber = i < 4 ? 0 : i / 4;
+
+        if (hasShare) {
+            view = views.get(viewNumber + 1);
+        } else {
+            view = views.get(viewNumber);
+        }
+        switch (viewLocation) {
             case 0:
-                if (hasShare) {
-                    view = views.get(1);
-                } else {
-                    view = views.get(0);
-                }
                 if (voice != -1) {
                     boolean hasAudio = 1 == streams.get(i).getVoice();
                     if (hasAudio) {
@@ -459,11 +567,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 }
                 break;
             case 1:
-                if (hasShare) {
-                    view = views.get(1);
-                } else {
-                    view = views.get(0);
-                }
                 if (voice != -1) {
                     boolean hasAudio = 1 == streams.get(i).getVoice();
                     if (hasAudio) {
@@ -486,11 +589,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 }
                 break;
             case 2:
-                if (hasShare) {
-                    view = views.get(1);
-                } else {
-                    view = views.get(0);
-                }
                 if (voice != -1) {
                     boolean hasAudio = 1 == streams.get(i).getVoice();
                     if (hasAudio) {
@@ -513,11 +611,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 }
                 break;
             case 3:
-                if (hasShare) {
-                    view = views.get(1);
-                } else {
-                    view = views.get(0);
-                }
                 if (voice != -1) {
                     boolean hasAudio = 1 == streams.get(i).getVoice();
                     if (hasAudio) {
@@ -539,74 +632,13 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     }
                 }
                 break;
-            case 4:
-                try {
-                    if (hasShare) {
-                        view = views.get(2);
-                    } else {
-                        view = views.get(1);
-                    }
-                } catch (Exception e) {
-                    return;
-                }
-                if (voice != -1) {
-                    boolean hasAudio = 1 == streams.get(i).getVoice();
-                    if (hasAudio) {
-                        view.findViewById(R.id.iv_audio1).setVisibility(View.GONE);
-                    } else {
-                        view.findViewById(R.id.iv_audio1).setVisibility(View.VISIBLE);
-                    }
-                }
-                if (camera != -1) {
-                    boolean hasVideo = 1 == streams.get(i).getCamera();
-                    if (!hasVideo) {
-                        ImageView ivAvatar = view.findViewById(R.id.avatar1);
-                        ivAvatar.setVisibility(View.VISIBLE);
-                        view.findViewById(R.id.iv_video1).setVisibility(View.VISIBLE);
-                        VhallGlideUtils.loadCircleImage(mContext, UserManger.judgePic(avatar), R.mipmap.ic_avatar, R.mipmap.ic_avatar, ivAvatar);
-                    } else {
-                        view.findViewById(R.id.avatar1).setVisibility(View.GONE);
-                        view.findViewById(R.id.iv_video1).setVisibility(View.GONE);
-                    }
-                }
-                break;
-            case 5:
-                try {
-                    if (hasShare) {
-                        view = views.get(2);
-                    } else {
-                        view = views.get(1);
-                    }
-                } catch (Exception e) {
-                    return;
-                }
-                if (voice != -1) {
-                    boolean hasAudio = 1 == streams.get(i).getVoice();
-                    if (hasAudio) {
-                        view.findViewById(R.id.iv_audio2).setVisibility(View.GONE);
-                    } else {
-                        view.findViewById(R.id.iv_audio2).setVisibility(View.VISIBLE);
-                    }
-                }
-                if (camera != -1) {
-                    boolean hasVideo = 1 == streams.get(i).getCamera();
-                    if (!hasVideo) {
-                        ImageView ivAvatar = view.findViewById(R.id.avatar2);
-                        ivAvatar.setVisibility(View.VISIBLE);
-                        view.findViewById(R.id.iv_video2).setVisibility(View.VISIBLE);
-                        VhallGlideUtils.loadCircleImage(mContext, UserManger.judgePic(avatar), R.mipmap.ic_avatar, R.mipmap.ic_avatar, ivAvatar);
-                    } else {
-                        view.findViewById(R.id.avatar2).setVisibility(View.GONE);
-                        view.findViewById(R.id.iv_video2).setVisibility(View.GONE);
-                    }
-                }
-                break;
             default:
                 break;
         }
 
     }
-    private void sortStreams(){
+
+    private void sortStreams() {
         Collections.sort(streams, new Comparator<StreamData>() {
             @Override
             public int compare(StreamData o1, StreamData o2) {
@@ -614,11 +646,11 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 InteractiveUser user2 = VhallUtil.parseStreamUser(o2.getStream());
                 int order1 = VHInternalUtils.getOrderNum(user1.role);
                 int order2 = VHInternalUtils.getOrderNum(user2.role);
-                if(order1 > order2){
+                if (order1 > order2) {
                     return -1;
-                }else if(order1 < order2){
+                } else if (order1 < order2) {
                     return 1;
-                }else {
+                } else {
                     return 0;
                 }
             }
@@ -628,15 +660,13 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
     /**
      * 重新设置视图
      */
-    public void setViews() {
+    private void setViews() {
         if (ListUtils.isEmpty(streams)) {
             clear();
             return;
         }
-
         sortStreams();
         StreamData main = null;
-
         for (StreamData streamData : streams) {
             Stream stream = streamData.getStream();
             if (stream == null || TextUtils.isEmpty(stream.streamId)) {
@@ -676,7 +706,15 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         }
         adapter.notifyDataSetChanged();
         viewPager.setCurrentItem(selectPoint);
-        adapter.notifyDataSetChanged();
+        if (hasShare) {
+            if (selectPoint == 0) {
+                changeStreamVideo(0);
+            } else {
+                changeStreamVideo(selectPoint - 1);
+            }
+        } else {
+            changeStreamVideo(selectPoint);
+        }
         setChoose(selectPoint);
     }
 
@@ -689,7 +727,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 //旁路主讲人设置未大画面
                 mainStream.setMixLayoutMainScreen("", null);
             }
-
             mInteractive.broadCastRoom(1, layout, null);
 
         } else {
@@ -722,6 +759,12 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
     }
 
     public void clear() {
+        if (!ListUtils.isEmpty(views))
+            for (View view : views) {
+                if (view instanceof OnlyRenderView) {
+                    ((OnlyRenderView) view).destroy();
+                }
+            }
         views.clear();
         streams.clear();
         pointLayout.removeAllViews();
@@ -778,6 +821,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
     @Override
     public void onDestroy() {
         clear();
+        RenViewUtils.destroy();
         super.onDestroy();
     }
 
@@ -814,39 +858,34 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         if (add) {
             streams.add(new StreamData(stream));
         }
-        setViews();
+        updateViewHandler();
         if (TextUtils.equals(stream.userId, mainId)) {
             mainStream = stream;
         }
     }
 
     void removeStream(Stream stream) {
+        if (stream == null) {
+            return;
+        }
+        stream.removeAllRenderView();
         if (stream.getStreamType() == 3 || stream.getStreamType() == 4) {
-            stream.removeAllRenderView();
             removeShareView();
             return;
         }
         streams.remove(new StreamData(stream));
-        setViews();
-        if (TextUtils.equals(stream.userId, mainId)) {
-            mainStream = null;
-            if (!TextUtils.equals(stream.userId, String.valueOf(roomInfo.getWebinar().userinfo.user_id)) && UserManger.isHost(roomInfo.getJoin_info().getRole_name())) {
-                mInteractive.setMainSpeaker(roomInfo.webinar.userinfo.user_id, new TipsCallback());
-            }
-        }
+        updateViewHandler();
+        /**
+         * 修改断流 收回主讲人 修改为 下麦收回主讲人
+         */
+//        if (TextUtils.equals(stream.userId, mainId)) {
+//            mainStream = null;
+//            if (!TextUtils.equals(stream.userId, String.valueOf(roomInfo.getWebinar().userinfo.user_id)) && UserManger.isHost(roomInfo.getJoin_info().getRole_name())) {
+//                mInteractive.setMainSpeaker(roomInfo.webinar.userinfo.user_id, new TipsCallback());
+//            }
+//        }
     }
 
-    class TipsCallback implements RequestCallback{
-        @Override
-        public void onSuccess() {
-
-        }
-
-        @Override
-        public void onError(int eventCode, String msg) {
-            baseShowToast(msg);
-        }
-    }
 
     void updateStream(Stream stream) {
         if (stream == null) {
@@ -870,7 +909,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 return;
             }
         }
-        //  setViews();
     }
 
     /**
@@ -882,7 +920,21 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
      */
     public void broadCast(JSONObject jsonObject, final CallBack callback) {
         if (UserManger.isHost(roomInfo.join_info.role_name)) {
-            mInteractive.broadCastRoom(1, VHInteractive.CANVAS_LAYOUT_PATTERN_TILED_6_1T5D, callback);
+            mInteractive.broadCastRoom(1, jsonObject, callback);
+        }
+    }
+
+    /**
+     * 轻享逻辑
+     * 上麦后默认推旁路直播
+     * SaaS 无需处理
+     *
+     * @param type
+     */
+    public void broadCast(int type, final CallBack callback) {
+        if (UserManger.isHost(roomInfo.join_info.role_name)) {
+
+            mInteractive.broadCastRoom(1, type, callback);
         }
     }
 
@@ -906,10 +958,10 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         localStream = mInteractive.getLocalStream();
         mInteractive.unpublished();
         mInteractive.publish();
-        if(deviceStatus != null){
+        if (deviceStatus != null) {
             //从后台进入前台重置麦克风 摄像头状态
-            mInteractive.switchDevice(mWebinarInfo.user_id,"1",deviceStatus.getAudioStatus()?"1":"0",null);
-            mInteractive.switchDevice(mWebinarInfo.user_id,"2",deviceStatus.getVideoStatus()?"1":"0",null);
+            mInteractive.switchDevice(mWebinarInfo.user_id, "1", deviceStatus.getAudioStatus() ? "1" : "0", null);
+            mInteractive.switchDevice(mWebinarInfo.user_id, "2", deviceStatus.getVideoStatus() ? "1" : "0", null);
         }
     }
 
@@ -959,7 +1011,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
 
     private IDeviceStatus deviceStatus;
 
-    public void setDeviceStatus(IDeviceStatus status){
+    public void setDeviceStatus(IDeviceStatus status) {
         this.deviceStatus = status;
     }
 
@@ -967,12 +1019,14 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
     public interface IDeviceStatus {
         /**
          * 获取音频状态
+         *
          * @return
          */
         boolean getAudioStatus();
 
         /**
          * 获取视频状态
+         *
          * @return
          */
         boolean getVideoStatus();

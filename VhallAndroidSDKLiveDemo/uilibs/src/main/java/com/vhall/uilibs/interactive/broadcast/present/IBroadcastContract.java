@@ -38,6 +38,7 @@ public interface IBroadcastContract {
         void showLookNum(int pv, int uv);
 
         void forbidBroadcast();
+        void userNoSpeaker(String userId);
     }
 
     interface RtcFragmentView extends IHostBaseView<IBroadcastPresent>{

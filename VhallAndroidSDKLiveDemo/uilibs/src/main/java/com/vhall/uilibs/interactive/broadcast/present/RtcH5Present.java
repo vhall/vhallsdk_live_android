@@ -120,14 +120,12 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
             if (msg == null) {
                 return;
             }
-            //fill interactive cached
             refreshUserList(msg);
 
             switch (msg.event) {
                 case MessageServer.EVENT_RESTART: {
                     //直播开始
                     if (UserManger.isHost(mWebinarInfo.getWebinarInfoData().getJoin_info().getRole_name())) {
-//                        mRtcFragmentView.getLocalStream().setEnableBeautify(true);
                         RtcConfig.getInterActive().setEnableBeautify(true);
                     } else {
                         broadcastView.showToast("直播开始");
@@ -300,6 +298,9 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                         userId = msg.user_id;
                         String name = msg.nick_name;
                         String roomJoinId = msg.roomJoinId;
+                        if (!TextUtils.isEmpty(userId)){
+                            broadcastView.userNoSpeaker(userId);
+                        }
                         if (!TextUtils.isEmpty(userId) && TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
                             //主播下麦用户/嘉宾
                             RtcConfig.getInterActive().unpublished();

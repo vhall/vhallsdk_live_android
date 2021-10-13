@@ -61,7 +61,7 @@ public class RtcInternal {
             collectionParam.put("t_start", dateToString());
             collectionParam.put("os", "10");
             collectionParam.put("device_id", TextUtils.isEmpty(Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID)) ? "" : Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
-            collectionParam.put("type", "1");
+            collectionParam.put("type", "6");
             collectionParam.put("user_agent", "user_agent");
             collectionParam.put("entry_time", dateToString());
         } catch (Exception e) {

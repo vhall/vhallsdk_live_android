@@ -4,17 +4,52 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:ignore="RtlCompat"
-    >
+    tools:ignore="RtlCompat">
+
+    <View
+        android:id="@+id/line1"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="@dimen/dimen_0dp"
+        app:layout_constraintBottom_toTopOf="@id/line3"
+        app:layout_constraintEnd_toStartOf="@id/line2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/line2"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="@dimen/dimen_0dp"
+        app:layout_constraintBottom_toTopOf="@id/line4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/line1"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/line3"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="@dimen/dimen_0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/line4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/line1" />
+
+    <View
+        android:id="@+id/line4"
+        android:layout_width="@dimen/dimen_0dp"
+        android:layout_height="@dimen/dimen_0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/line3"
+        app:layout_constraintTop_toBottomOf="@id/line2" />
 
     <com.vhall.vhallrtc.client.VHRenderView
         android:id="@+id/image1"
         android:layout_width="@dimen/dimen_0dp"
         android:layout_height="@dimen/dimen_0dp"
-        app:layout_constraintBottom_toTopOf="@id/image3"
-        app:layout_constraintEnd_toStartOf="@id/image2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/line1"
+        app:layout_constraintEnd_toEndOf="@id/line1"
+        app:layout_constraintStart_toStartOf="@id/line1"
+        app:layout_constraintTop_toTopOf="@id/line1" />
 
     <View
         android:layout_width="0dp"
@@ -94,10 +129,10 @@
         android:layout_width="@dimen/dimen_0dp"
         android:layout_height="@dimen/dimen_0dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@id/image4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/image1"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@id/line2"
+        app:layout_constraintEnd_toEndOf="@id/line2"
+        app:layout_constraintStart_toStartOf="@id/line2"
+        app:layout_constraintTop_toTopOf="@id/line2" />
 
     <View
         android:id="@+id/bg2"
@@ -179,10 +214,10 @@
         android:layout_width="@dimen/dimen_0dp"
         android:layout_height="@dimen/dimen_0dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/image4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/image1" />
+        app:layout_constraintBottom_toBottomOf="@id/line3"
+        app:layout_constraintEnd_toEndOf="@id/line3"
+        app:layout_constraintStart_toStartOf="@id/line3"
+        app:layout_constraintTop_toTopOf="@id/line3" />
 
     <View
         android:id="@+id/bg3"
@@ -264,10 +299,10 @@
         android:layout_width="@dimen/dimen_0dp"
         android:layout_height="@dimen/dimen_0dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/image3"
-        app:layout_constraintTop_toBottomOf="@id/image2" />
+        app:layout_constraintBottom_toBottomOf="@id/line4"
+        app:layout_constraintEnd_toEndOf="@id/line4"
+        app:layout_constraintStart_toStartOf="@id/line4"
+        app:layout_constraintTop_toTopOf="@id/line4"  />
 
     <View
         android:id="@+id/bg4"
@@ -298,8 +333,7 @@
         android:textSize="@dimen/dimen_14dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@id/image4"
-        app:layout_constraintStart_toStartOf="@id/image4"
-         />
+        app:layout_constraintStart_toStartOf="@id/image4" />
 
     <TextView
         android:id="@+id/tv_name4"

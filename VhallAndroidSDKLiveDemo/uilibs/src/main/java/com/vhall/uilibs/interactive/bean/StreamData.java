@@ -107,6 +107,22 @@ public class StreamData {
         return camera;
     }
 
+    public static int getCamera(Stream stream) {
+       int camera=1;
+        org.json.JSONObject muteStream = stream.muteStream;
+        org.json.JSONObject remoteMuteStream = stream.remoteMuteStream;
+        if (stream.isLocal) {
+            if (muteStream != null) {
+                camera = !muteStream.optBoolean("video", false) ? 1 : 0;
+            }
+        } else {
+            if (remoteMuteStream != null) {
+                camera = !remoteMuteStream.optBoolean("video", false) ? 1 : 0;
+            }
+        }
+        return camera;
+    }
+
     public void setCamera(int camera) {
         this.camera = camera;
     }

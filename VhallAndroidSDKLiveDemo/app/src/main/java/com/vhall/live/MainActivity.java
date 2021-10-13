@@ -143,7 +143,7 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         showLoading();
 
         //嘉宾加入
-        VhallSDK.joinWebinar(param.watchId, param.guestPwd, VhallSDK.getUserName(), "2", new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.joinWebinar(param.watchId, param.guestPwd, VhallSDK.getUserName(), param.guestAvatar,"2", new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                 RtcActivity.startActivity(MainActivity.this, true, webinarInfo);
@@ -245,6 +245,7 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
                 param.join_id = webinarInfo.join_id;
                 param.webinar_id = webinarInfo.webinar_id;
                 param.screenOri = orientation;
+                param.inav_num = webinarInfo.inav_num;
                 intent.putExtra("param",param);
                 intent.putExtra("webinarInfo", webinarInfo);
                 startActivity(intent);

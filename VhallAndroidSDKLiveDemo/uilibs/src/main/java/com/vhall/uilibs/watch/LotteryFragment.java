@@ -217,18 +217,6 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
 
                     @Override
                     public void onError(int errorCode, String errorMsg) {
-//                        llCommit.setVisibility(View.GONE);
-//                        llEnd.setVisibility(View.VISIBLE);
-//                        tvEndBtn.setText(getString(R.string.lottery_look_winner));
-//                        if (lotteryData != null && lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.publish_winner == 0) {
-//                            tvEndBtn.setVisibility(View.GONE);
-//                        } else {
-//                            tvEndBtn.setVisibility(View.VISIBLE);
-//                        }
-//                        tvEndHint.setTextColor(ContextCompat.getColor(getContext(), R.color.color_22));
-//                        endBtnGoLook = true;
-//                        tvEndHint.setText(getString(R.string.lottery_commit_failed));
-//                        ivEnd.setBackgroundResource(R.drawable.icon_error_commit_prize);
                         String msg = errorMsg;
                         if(TextUtils.isEmpty(msg)){
                            msg = "提交失败，请重试!";
@@ -253,6 +241,7 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
         this.lotteryData = lotteryData;
         switch (lotteryData.event) {
             case MessageServer.EVENT_START_LOTTERY:
+                tvJoin.setEnabled(true);
                 llIng.setVisibility(View.VISIBLE);
                 llCommit.setVisibility(View.GONE);
                 llEnd.setVisibility(View.GONE);
@@ -277,11 +266,13 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                                 @Override
                                 public void onSuccess() {
                                     Toast.makeText(getContext(), "send success", Toast.LENGTH_SHORT).show();
+                                    tvJoin.setEnabled(false);
                                 }
 
                                 @Override
                                 public void onError(int errorCode, String errorMsg) {
                                     Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
+                                    tvJoin.setEnabled(true);
                                 }
                             });
                         }
@@ -289,6 +280,7 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                 } else if (lotteryInfo != null) {
                     image = lotteryInfo.icon;
                     tvJoin.setVisibility(View.GONE);
+                    tvJoin.setEnabled(true);
                 }
                 RequestOptions options = new RequestOptions().placeholder(R.drawable.icon_gift);
                 Glide.with(getActivity()).load(image).apply(options).into(ivCover);
