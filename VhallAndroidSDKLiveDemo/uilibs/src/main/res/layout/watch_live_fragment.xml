@@ -2,29 +2,38 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/rl_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/black" />
+        android:background="@color/black"
+        android:gravity="center"
+        android:layout_marginBottom="@dimen/dimen_45dp" />
+
+    <com.vhall.vhallrtc.client.VHRenderView
+        android:id="@+id/share_render_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <com.vhall.uilibs.util.DanmuView
         android:id="@+id/sv_danmaku"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible" />
+
     <com.vhall.uilibs.util.MarqueeView
         android:id="@+id/marquee_view"
-        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:gravity="center">
+        android:layout_height="45dp">
 
         <ImageView
             android:id="@+id/image_action_back"

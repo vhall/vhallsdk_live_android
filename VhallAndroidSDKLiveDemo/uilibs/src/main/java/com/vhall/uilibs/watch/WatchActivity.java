@@ -96,6 +96,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     public WatchPlaybackFragment playbackFragment;
     public WatchLiveFragment liveFragment;
+    public WatchNoDelayLiveFragment noDelayLiveFragment;
     public ChatFragment chatFragment;
     public LotteryFragment lotteryFragment;
     public ChatFragment questionFragment;
@@ -113,6 +114,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     private Fragment docFragment;
     private FragmentManager fragmentManager;
     private TextView status;
+    //当前观看的是不是无延迟直播
+    private boolean noDelay = false;
 
     private static final String TAG = "WatchActivity";
 
@@ -124,11 +127,10 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         setContentView(R.layout.watch_activity);
         fragmentManager = getSupportFragmentManager();
-        status=findViewById(R.id.status);
+        status = findViewById(R.id.status);
         param = (Param) getIntent().getSerializableExtra("param");
         type = getIntent().getIntExtra("type", VhallUtil.WATCH_LIVE);
-//        liveFragment = (WatchLiveFragment) getSupportFragmentManager().findFragmentById(R.id.contentVideo);
-//        playbackFragment = (WatchPlaybackFragment) getSupportFragmentManager().findFragmentById(R.id.contentVideo);
+        noDelay = getIntent().getBooleanExtra("no_delay", false);
         docFragment = fragmentManager.findFragmentById(R.id.contentDoc);
         chatFragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.contentChat);
         DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentById(R.id.contentDetail);
@@ -190,6 +192,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         VhallSDK.initWatch(params.watchId, "", "", params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                if (getActivity().isFinishing()){
+                    return;
+                }
                 if (webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
                 {
                     watchView.showToast("还没开始直播");
@@ -198,11 +203,6 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                 }
                 status.setText(String.format("进入房间初始化值 举手开关=  %s  问答=  %d  禁言=  %s   自己的禁言=  %s  全体禁言=  %s", webinarInfo.hands_up, webinarInfo.question_status, webinarInfo.chatforbid, webinarInfo.chatOwnForbid, webinarInfo.chatAllForbid));
                 param.webinar_id = webinarInfo.webinar_id;
-                if (webinarInfo.question_status == 1) {
-                    Toast.makeText(WatchActivity.this, "问答已开启", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(WatchActivity.this, "问答未开启", Toast.LENGTH_SHORT).show();
-                }
                 questionBtn.setVisibility((webinarInfo.question_status == 1) ? View.VISIBLE : View.GONE);
                 //敏感词过滤信息，发送聊天、评论通用
                 if (webinarInfo.filters != null && webinarInfo.filters.size() > 0) {
@@ -214,7 +214,23 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
                 }
 
-                if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
+                if (noDelayLiveFragment == null && noDelay) {
+                    //不建议啊 观众没有上麦不建议直接进入互动房间 用户进入非无延迟 互动直播间 会增加 互动直播间的人数 造成 嘉宾助理进不去的情况
+                    if (webinarInfo.no_delay_webinar == 0 && "3".equals(webinarInfo.webinar_type)) {
+                        showToast("观众没有上麦不建议直接进入常规互动房间");
+                        finish();
+                        return;
+                    }
+                    //直播间，公告信息
+                    if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
+                        param.noticeContent = webinarInfo.notice.content;
+                    }
+                    noDelayLiveFragment = WatchNoDelayLiveFragment.newInstance(webinarInfo);
+                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                            noDelayLiveFragment, R.id.contentVideo);
+                    param.noDelay = true;
+                    new WatchNoDelayLivePresenter(noDelayLiveFragment, noDelayLiveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param, webinarInfo);
+                } else if (liveFragment == null && type == VhallUtil.WATCH_LIVE && !noDelay) {
                     //直播间，公告信息
                     if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
                         param.noticeContent = webinarInfo.notice.content;
@@ -222,6 +238,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     liveFragment = WatchLiveFragment.newInstance();
                     ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                             liveFragment, R.id.contentVideo);
+                    param.noDelay = false;
                     new WatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, questionFragment, watchView, param, webinarInfo);
                 } else if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
                     playbackFragment = WatchPlaybackFragment.newInstance();
@@ -242,6 +259,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     tvPvNum.setText("pv：" + webinarInfo.pv + " 虚拟pv：" + webinarInfo.pvVirtual);
                 } else {
                     tvPvNum.setVisibility(View.GONE);
+                }
+
+                if (webinarInfo.question_status == 1) {
+                    Toast.makeText(WatchActivity.this, "问答已开启", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(WatchActivity.this, "问答未开启", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -531,7 +554,11 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                 public void onClick(View v) {
                     //同意上麦
                     mPresenter.replyInvite(1);
-                    enterInteractive();
+                    if (param.noDelay) {
+                        noDelayLiveFragment.enterInteractive(true);
+                    } else {
+                        enterInteractive();
+                    }
                     invitedDialog.dismiss();
                     //发送同意上麦信息
                 }
@@ -566,7 +593,6 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     public void setPvNum(int pvNum, int virtual) {
         tvPvNum.setText(String.format("在线人数：%d虚拟在线人数：%d", pvNum, virtual == 0 ? pvVirtual : virtual));
     }
-
 
     @Override
     public void showNotice(String content) {
@@ -611,7 +637,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         if (upnpService != null) {
             upnpService.getRegistry().removeListener(registryListener);
         }
-        if (inputView!=null){
+        if (inputView != null) {
             inputView.destroyed();
         }
         this.unbindService(serviceConnection);

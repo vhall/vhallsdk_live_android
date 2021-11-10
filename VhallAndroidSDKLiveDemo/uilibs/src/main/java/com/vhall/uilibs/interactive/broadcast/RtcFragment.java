@@ -240,7 +240,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     streamData.getStream().unmuteVideo(null);
                 }
             } else {
-                if (!TextUtils.equals(streamData.getStream().userId, mainId) && !TextUtils.equals(streamData.getStream().userId, roomInfo.getJoin_info().third_party_user_id)) {
+                if (!TextUtils.equals(streamData.getStream().userId, mainId) && !TextUtils.equals(streamData.getStream().userId, roomInfo.getJoin_info().third_party_user_id) && !streamData.getStream().isLocal) {
                     streamData.getStream().muteVideo(null);
                 }
             }

@@ -1,6 +1,7 @@
 package com.vhall.uilibs.interactive;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.WindowManager;
@@ -54,6 +55,9 @@ public class InteractiveActivity extends FragmentActivity implements Interactive
 
     @Override
     public void onBackPressed() {
+       if (param.noDelay){
+           setResult(RESULT_OK, null);
+       }
         finish();
     }
 

@@ -312,6 +312,32 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         return getWatchLive().isVRHeadTracker();
     }
 
+    //无延迟 互动直播 使用
+    @Override
+    public void onSwitchCamera(){
+
+    }
+    //无延迟 互动直播 使用
+    @Override
+    public void onSwitchVideo(boolean isOpen){
+
+    }
+    //无延迟 互动直播 使用
+    @Override
+    public  void onSwitchAudio(boolean isOpen){
+
+    }
+    //无延迟 互动直播 使用
+    @Override
+    public void onDownMic(boolean own) {
+
+    }
+    //无延迟 互动直播 使用
+    @Override
+    public void onUpMic() {
+
+    }
+
     @Override
     public void initWatch() {
         if (webinarInfo != null) {

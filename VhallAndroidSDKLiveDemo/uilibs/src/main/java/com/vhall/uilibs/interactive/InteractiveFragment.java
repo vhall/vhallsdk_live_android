@@ -152,10 +152,8 @@ public class InteractiveFragment extends Fragment implements InteractiveContract
             mPresenter.onSwitchCamera();
         } else if (i == R.id.image_switch_video) {
             mPresenter.onSwitchVideo(hasVideoOpen);
-            // hasVideoOpen = !hasVideoOpen;
         } else if (i == R.id.image_switch_audio) {
             mPresenter.onSwitchAudio(hasAudioOpen);
-            // hasAudioOpen = !hasAudioOpen;
         }
     }
 

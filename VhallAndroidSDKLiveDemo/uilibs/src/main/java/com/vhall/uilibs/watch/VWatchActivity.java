@@ -8,6 +8,7 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -73,6 +74,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
 
     public WatchPlaybackFragment playbackFragment;
     public VWatchLiveFragment liveFragment;
+    public VWatchNoDelayLiveFragment noDelayLiveFragment;
     public VChatFragment chatFragment;
     InputView inputView;
     public int chatEvent = VChatFragment.CHAT_EVENT_CHAT;
@@ -84,6 +86,8 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
     WatchContract.WatchPresenter mPresenter;
     private Fragment docFragment;
     private FragmentManager fragmentManager;
+    //当前观看的是不是无延迟直播
+    private boolean noDelay = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +99,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
         fragmentManager = getSupportFragmentManager();
         param = (Param) getIntent().getSerializableExtra("param");
         type = getIntent().getIntExtra("type", VhallUtil.WATCH_LIVE);
+        noDelay = getIntent().getBooleanExtra("no_delay", false);
         docFragment = fragmentManager.findFragmentById(R.id.contentDoc);
         chatFragment = (VChatFragment) getSupportFragmentManager().findFragmentById(R.id.contentChat);
         initView();
@@ -119,9 +124,17 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
         VhallSDK.initWatch(params.watchId, "", "", params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                if (getActivity().isFinishing()) {
+                    return;
+                }
                 param.webinar_id = webinarInfo.webinar_id;
-                if(webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
+                if (webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
+                {
                     watchView.showToast("还没开始直播");
+                    finish();
+                    return;
+                }
+
                 //敏感词过滤信息，发送聊天、评论通用
                 if (webinarInfo.filters != null && webinarInfo.filters.size() > 0) {
                     param.filters.clear();
@@ -131,12 +144,29 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
                     docFragment = new DocumentFragment();
                     fragmentManager.beginTransaction().add(R.id.contentDoc, docFragment).commit();
                 }
-                if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
+                if (noDelayLiveFragment == null && noDelay) {
+                    //直播间，公告信息
+                    if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
+                        param.noticeContent = webinarInfo.notice.content;
+                    }
+                    //不建议啊 观众没有上麦不建议直接进入互动房间 用户进入非无延迟 互动直播间 会增加 互动直播间的人数 造成 嘉宾助理进不去的情况
+                    if (webinarInfo.no_delay_webinar == 0 && "3".equals(webinarInfo.webinar_type)) {
+                        showToast("观众没有上麦不建议直接进入常规互动房间");
+                        finish();
+                        return;
+                    }
+                    noDelayLiveFragment = VWatchNoDelayLiveFragment.newInstance(webinarInfo);
+                    ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                            noDelayLiveFragment, R.id.contentVideo);
+                    param.noDelay = true;
+                    new VWatchNoDelayLivePresenter(noDelayLiveFragment, noDelayLiveFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, webinarInfo);
+                } else if (liveFragment == null && type == VhallUtil.WATCH_LIVE) {
                     //直播间，公告信息
                     if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
                         param.noticeContent = webinarInfo.notice.content;
                     }
                     liveFragment = VWatchLiveFragment.newInstance();
+                    param.noDelay = false;
                     ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), liveFragment, R.id.contentVideo);
                     new VWatchLivePresenter(liveFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, webinarInfo);
                 } else if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
@@ -197,8 +227,8 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
                 }
             }
         });
-        ll_detail       = findViewById(R.id.ll_detail);
-        contentChat     = findViewById(R.id.contentChat);
+        ll_detail = findViewById(R.id.ll_detail);
+        contentChat = findViewById(R.id.contentChat);
 
         mHand = this.findViewById(R.id.image_hand);
         mHand.setOnClickListener(new View.OnClickListener() {
@@ -240,7 +270,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
     }
 
     @Override
-    public void showSignIn(String signId,String title, int startTime) {
+    public void showSignIn(String signId, String title, int startTime) {
         if (signInDialog == null) {
             signInDialog = new SignInDialog(this);
         }
@@ -318,13 +348,14 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
             popu.dismiss();
         }
     }
+
     //显示问答
     @Override
-    public void showQAndA(){
+    public void showQAndA() {
     }
 
     //隐藏问答
-    public void dismissQAndA(){
+    public void dismissQAndA() {
     }
 
     @Override
@@ -387,7 +418,12 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
                 public void onClick(View v) {
                     //同意上麦
                     mPresenter.replyInvite(1);
-                    enterInteractive();
+                    //无延迟在当前房间上麦 非无延迟 进入互动房间
+                    if (param.noDelay) {
+                        noDelayLiveFragment.enterInteractive(true);
+                    } else {
+                        enterInteractive();
+                    }
                     invitedDialog.dismiss();
                     //发送同意上麦信息
                 }
@@ -411,12 +447,13 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
     }
 
     @Override
-    public void setOnlineNum(int onlineNum,int onlineVirtual) {
+    public void setOnlineNum(int onlineNum, int onlineVirtual) {
         tvOnlineNum.setText("在线人数：" + onlineNum);
     }
+
     @Override
-    public void setPvNum(int pvNum,int pvVirtual) {
-       // tvPvNum.setText("在线人数：" + pvNum+"虚拟在线人数：" + pvVirtual);
+    public void setPvNum(int pvNum, int pvVirtual) {
+        // tvPvNum.setText("在线人数：" + pvNum+"虚拟在线人数：" + pvVirtual);
     }
 
     @Override
@@ -458,7 +495,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
 
     @Override
     protected void onDestroy() {
-        if (inputView!=null){
+        if (inputView != null) {
             inputView.destroyed();
         }
         super.onDestroy();

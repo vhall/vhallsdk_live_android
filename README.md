@@ -21,14 +21,22 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.2.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.2.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.2.1'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.2.1'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
 ```
 
 二、版本更新信息：
+
+版本：v6.2.1 更新时间 2021.11.11 <br>
+
+1.sdk 和 demo 增加无延迟直播 <br>
+2.互动sdk 增加 直播sdk方法 <br>
+3.活动信息无延迟直播字端 <br>
+4.新增提示：观众没有上麦不建议直接进入互动（非无延迟）房间内，否则会占用房间名额，导致嘉宾助理进不去。 <br>
+5.优化已知bug <br>
 
 版本：v6.2.0 更新时间 2021.10.13
 

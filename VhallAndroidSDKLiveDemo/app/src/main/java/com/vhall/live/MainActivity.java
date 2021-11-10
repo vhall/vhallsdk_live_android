@@ -43,7 +43,7 @@ import java.util.UUID;
 /**
  * 主界面的Activity
  */
-public class MainActivity extends FragmentActivity implements LiveSelectMenuWidget.OnMenuListener{
+public class MainActivity extends FragmentActivity implements LiveSelectMenuWidget.OnMenuListener {
     private final static String TAG = MainActivity.class.getSimpleName();
 
     TextView tv_phone, tv_name, tv_login;
@@ -62,11 +62,16 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
     };
 
     private final static String HALF_SCREEN_WATCH = "半屏观看";
+    private final static String HALF_SCREEN_NO_DELAY_WATCH = "半屏无延迟观看";
+    private final static String ALL_SCREEN_NO_DELAY_WATCH = "全屏无延迟观看";
     private final static String ALL_SCREEN_WATCH = "全屏观看";
     private final static String VERTICAL_LIVE = "竖屏直播";
+    private final static String VERTICAL_NO_DELAY_LIVE = "竖屏无延迟直播";
+    private final static String HORIZONTAL_NO_DELAY_LIVE = "横屏无延迟直播";
     private final static String HORIZONTAL_LIVE = "横屏直播";
     private final static String HOST_INTERACTIVE = "主持人互动";
     private final static String GUEST_INTERACTIVE = "嘉宾互动";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,19 +104,25 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
     }
 
 
-    public void showLoading(){
+    public void showLoading() {
         mLoading.show();
     }
 
-    public void hideLoading(){
+    public void hideLoading() {
         mLoading.hide();
     }
 
     @Override
     public void onClick(String name) {
-        switch (name){
+        switch (name) {
             case HALF_SCREEN_WATCH:
                 onHScreenClick();
+                break;
+            case HALF_SCREEN_NO_DELAY_WATCH:
+                onHNoDelayScreenClick();
+                break;
+            case ALL_SCREEN_NO_DELAY_WATCH:
+                onNoDelayVScreenClick();
                 break;
             case ALL_SCREEN_WATCH:
                 onVScreenClick();
@@ -122,6 +133,12 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
             case HORIZONTAL_LIVE:
                 startBroadcastActivity(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 break;
+            case VERTICAL_NO_DELAY_LIVE:
+                startNoDelayBroadcastActivity(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+                break;
+            case HORIZONTAL_NO_DELAY_LIVE:
+                startNoDelayBroadcastActivity(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                break;
             case HOST_INTERACTIVE:
                 startRtcActivity();
                 break;
@@ -131,19 +148,18 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         }
     }
 
-    void guestJoinMeeting(){
-        if(TextUtils.isEmpty(param.watchId) || TextUtils.isEmpty(param.guestPwd)){
+    void guestJoinMeeting() {
+        if (TextUtils.isEmpty(param.watchId) || TextUtils.isEmpty(param.guestPwd)) {
             ToastUtil.showToast("请输入直播id或嘉宾口令");
-        }else{
+        } else {
             requestGuestWeninarInfo();
         }
     }
 
-    void requestGuestWeninarInfo(){
+    void requestGuestWeninarInfo() {
         showLoading();
-
         //嘉宾加入
-        VhallSDK.joinWebinar(param.watchId, param.guestPwd, VhallSDK.getUserName(), param.guestAvatar,"2", new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.joinWebinar(param.watchId, param.guestPwd, VhallSDK.getUserName(), param.guestAvatar, "2", new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                 RtcActivity.startActivity(MainActivity.this, true, webinarInfo);
@@ -158,11 +174,11 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         });
     }
 
-    void startRtcActivity(){
-        if(!TextUtils.isEmpty(param.broId)){
+    void startRtcActivity() {
+        if (!TextUtils.isEmpty(param.broId)) {
             requestRtcInfo();
-        }else{
-            ToastUtil.showToast(MainActivity.this,R.string.app_please_input_rtc_id);
+        } else {
+            ToastUtil.showToast(MainActivity.this, R.string.app_please_input_rtc_id);
         }
     }
 
@@ -174,24 +190,29 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         VhallSDK.initBroadcast(param.broId, param.broToken, param.broName, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
-                L.e(TAG,"success");
+                L.e(TAG, "success");
                 hideLoading();
+
+                if (!TextUtils.equals("3", webinarInfo.webinar_type)) {
+                    ToastUtil.showToast(MainActivity.this, "只支持互动直播");
+                    return;
+                }
                 jumpRtcActivity(webinarInfo);
             }
 
             @Override
             public void onError(int errorCode, String errorMsg) {
-                L.e(TAG,errorMsg);
+                L.e(TAG, errorMsg);
                 hideLoading();
-                ToastUtil.showToast(MainActivity.this,errorMsg);
+                ToastUtil.showToast(MainActivity.this, errorMsg);
             }
-        },true);
+        }, true);
     }
 
 
     //跳转到互动activity
-    void jumpRtcActivity( WebinarInfo webinarInfo){
-        RtcActivity.startActivity(MainActivity.this,webinarInfo,param);
+    void jumpRtcActivity(WebinarInfo webinarInfo) {
+        RtcActivity.startActivity(MainActivity.this, webinarInfo, param);
     }
 
     public void requestPermission() {
@@ -228,16 +249,16 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
     }
 
     public void onBroadcastLandspace(View view) {
-        select_window.showMenus(VERTICAL_LIVE,HORIZONTAL_LIVE);
+        select_window.showMenus(VERTICAL_NO_DELAY_LIVE, HORIZONTAL_NO_DELAY_LIVE, VERTICAL_LIVE, HORIZONTAL_LIVE);
     }
 
     public void onBroadcastPortrait(View view) {
-        select_window.showMenus(HOST_INTERACTIVE,GUEST_INTERACTIVE);
+        select_window.showMenus(HOST_INTERACTIVE, GUEST_INTERACTIVE);
     }
 
     private void startBroadcastActivity(int orientation) {
         Intent intent = new Intent(this, BroadcastActivity.class);
-        VhallSDK.initBroadcast(param.broId, param.broToken,param.broName, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.initBroadcast(param.broId, param.broToken, param.broName, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                 param.vssToken = webinarInfo.vss_token;
@@ -246,7 +267,36 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
                 param.webinar_id = webinarInfo.webinar_id;
                 param.screenOri = orientation;
                 param.inav_num = webinarInfo.inav_num;
-                intent.putExtra("param",param);
+                param.noDelay = false;
+                intent.putExtra("param", param);
+                intent.putExtra("webinarInfo", webinarInfo);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void startNoDelayBroadcastActivity(int orientation) {
+        Intent intent = new Intent(this, BroadcastActivity.class);
+        VhallSDK.initBroadcast(param.broId, param.broToken, param.broName, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+            @Override
+            public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                if (webinarInfo.no_delay_webinar != 1) {
+                    Toast.makeText(MainActivity.this, "当前直播是常规直播", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                param.vssToken = webinarInfo.vss_token;
+                param.vssRoomId = webinarInfo.vss_room_id;
+                param.join_id = webinarInfo.join_id;
+                param.webinar_id = webinarInfo.webinar_id;
+                param.screenOri = orientation;
+                param.inav_num = webinarInfo.inav_num;
+                param.noDelay = true;
+                intent.putExtra("param", param);
                 intent.putExtra("webinarInfo", webinarInfo);
                 startActivity(intent);
             }
@@ -260,9 +310,8 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
 
     public void onWatchLive(View view) {
 //        findViewById(R.id.select_window).setVisibility(View.VISIBLE);
-        select_window.showMenus(HALF_SCREEN_WATCH,ALL_SCREEN_WATCH);
+        select_window.showMenus(HALF_SCREEN_NO_DELAY_WATCH, ALL_SCREEN_NO_DELAY_WATCH, HALF_SCREEN_WATCH, ALL_SCREEN_WATCH);
     }
-
 
 
     public void onWatchPlayback(View view) {
@@ -280,7 +329,7 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
 
     public void onH5Watch(View view) {
         Intent intent = new Intent(this, WebViewActivity.class);
-        intent.putExtra("param",param);
+        intent.putExtra("param", param);
         startActivity(intent);
     }
 
@@ -291,6 +340,13 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         }
     }
 
+    public void onHNoDelayScreenClick() {
+        Intent intent = new Intent(this, WatchActivity.class);
+        intent.putExtra("param", param);
+        intent.putExtra("type", VhallUtil.WATCH_LIVE);
+        intent.putExtra("no_delay", true);
+        startActivity(intent);
+    }
 
     public void onHScreenClick() {
         Intent intent = new Intent(this, WatchActivity.class);
@@ -303,6 +359,14 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         Intent intent = new Intent(this, VWatchActivity.class);
         intent.putExtra("param", param);
         intent.putExtra("type", VhallUtil.WATCH_LIVE);
+        startActivity(intent);
+    }
+
+    public void onNoDelayVScreenClick() {
+        Intent intent = new Intent(this, VWatchActivity.class);
+        intent.putExtra("param", param);
+        intent.putExtra("type", VhallUtil.WATCH_LIVE);
+        intent.putExtra("no_delay", true);
         startActivity(intent);
     }
 }

@@ -1,5 +1,6 @@
 package com.vhall.uilibs.broadcast;
 
+import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -23,12 +24,13 @@ import com.vhall.uilibs.util.emoji.KeyBoardManager;
 public class BroadcastActivity extends FragmentActivity implements BroadcastContract.BroadcastView {
     InputView inputView;
     PushChatFragment chatFragment;
+    private boolean noDelay = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-       getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN | WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         WebinarInfo webinarInfo = (WebinarInfo) getIntent().getSerializableExtra("webinarInfo");
@@ -38,6 +40,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
+        noDelay = param.noDelay;
         setContentView(R.layout.broadcast_activity);
 
         if (inputView == null) {
@@ -74,13 +77,23 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     chatFragment, R.id.chatFrame);
         }
-        BroadcastFragment mainFragment = (BroadcastFragment) getSupportFragmentManager().findFragmentById(R.id.broadcastFrame);
-        if (mainFragment == null) {
-            mainFragment = BroadcastFragment.newInstance();
-            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
-                    mainFragment, R.id.broadcastFrame);
+        if (noDelay) {
+            BroadcastNoDelayFragment mainFragment = (BroadcastNoDelayFragment) getSupportFragmentManager().findFragmentById(R.id.broadcastFrame);
+            if (mainFragment == null) {
+                mainFragment = BroadcastNoDelayFragment.newInstance();
+                ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                        mainFragment, R.id.broadcastFrame);
+            }
+            new BroadcastNoDelayPresenter(param, webinarInfo, this, mainFragment, chatFragment);
+        }else {
+            BroadcastFragment mainFragment = (BroadcastFragment) getSupportFragmentManager().findFragmentById(R.id.broadcastFrame);
+            if (mainFragment == null) {
+                mainFragment = BroadcastFragment.newInstance();
+                ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                        mainFragment, R.id.broadcastFrame);
+            }
+            new BroadcastPresenter(param, webinarInfo, this, mainFragment, chatFragment);
         }
-        new BroadcastPresenter(param, webinarInfo, this, mainFragment, chatFragment);
     }
 
 
@@ -90,6 +103,11 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             inputView.setLimitNo(contentLengthLimit);
         }
         inputView.show(isShowEmoji, user);
+    }
+
+    @Override
+    public Activity getActivity() {
+        return this;
     }
 
     @Override
@@ -112,7 +130,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
 
     @Override
     protected void onDestroy() {
-        if (inputView!=null){
+        if (inputView != null) {
             inputView.destroyed();
         }
         super.onDestroy();

@@ -119,6 +119,8 @@ public class RenViewUtils {
                         TextView tvName = nowView.findViewById(R.id.tv_name1);
                         if (TextUtils.equals(mainId, userId)) {
                             nowView.findViewById(R.id.star1).setVisibility(View.VISIBLE);
+                        }else {
+                            nowView.findViewById(R.id.star1).setVisibility(View.GONE);
                         }
 
                         ImageView ivAvatar = nowView.findViewById(R.id.avatar1);
@@ -149,6 +151,8 @@ public class RenViewUtils {
                         TextView tvName2 = nowView.findViewById(R.id.tv_name2);
                         if (TextUtils.equals(mainId, userId)) {
                             nowView.findViewById(R.id.star2).setVisibility(View.VISIBLE);
+                        }else {
+                            nowView.findViewById(R.id.star2).setVisibility(View.GONE);
                         }
 
                         ImageView ivAvatar2 = nowView.findViewById(R.id.avatar2);
@@ -180,6 +184,8 @@ public class RenViewUtils {
                         TextView tvName3 = nowView.findViewById(R.id.tv_name3);
                         if (TextUtils.equals(mainId, userId)) {
                             nowView.findViewById(R.id.star3).setVisibility(View.VISIBLE);
+                        }else {
+                            nowView.findViewById(R.id.star3).setVisibility(View.GONE);
                         }
                         setRole(tvName3, role, BaseUtil.getLimitString(name), context);
                         ImageView ivAvatar3 = nowView.findViewById(R.id.avatar3);
@@ -210,6 +216,8 @@ public class RenViewUtils {
                         nowView.findViewById(R.id.bg4).setVisibility(View.VISIBLE);
                         if (TextUtils.equals(mainId, userId)) {
                             nowView.findViewById(R.id.star4).setVisibility(View.VISIBLE);
+                        }else {
+                            nowView.findViewById(R.id.star4).setVisibility(View.GONE);
                         }
                         setRole(tvName4, role, BaseUtil.getLimitString(name), context);
 

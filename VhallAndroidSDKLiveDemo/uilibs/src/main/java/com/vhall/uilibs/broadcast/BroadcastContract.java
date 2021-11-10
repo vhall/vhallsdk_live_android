@@ -1,9 +1,12 @@
 package com.vhall.uilibs.broadcast;
 
+import android.app.Activity;
+
 import com.vhall.push.VHVideoCaptureView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.vhallrtc.client.VHRenderView;
 
 /**
  * 发直播的View接口类
@@ -12,6 +15,8 @@ public class BroadcastContract {
 
     interface BroadcastView extends BaseView<Presenter> {
         void showChatView(boolean emoji, InputUser user, int limit);
+        //获取当前activity实例
+        Activity getActivity();
     }
 
     interface View extends BaseView<Presenter> {
@@ -61,6 +66,12 @@ public class BroadcastContract {
         void destroyBroadcast();
 
         void setVolumeAmplificateSize(float size);
+
+        void setRenderView(VHRenderView vhRenderView);
+
+        void onResume();
+
+        void onPause();
 
     }
 }

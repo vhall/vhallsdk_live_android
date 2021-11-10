@@ -13,6 +13,8 @@ import com.vhall.player.vod.VodPlayerView;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.vhallrtc.client.Stream;
+import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.data.ScrollInfoData;
 
 import org.fourthline.cling.android.AndroidUpnpService;
@@ -142,6 +144,19 @@ public class WatchContract {
 
     }
 
+    interface LiveNoDelayView extends BaseView<LivePresenter> {
+
+        void updateMain(String mainId);
+        //无延迟直播专用
+        void updateStream(boolean del, Stream stream, VHRenderView newRenderView);//直播结束
+
+        void updateVideoFrame(int status);
+
+        void updateAudioFrame(int status);
+
+        void enterInteractive(boolean isEnter);
+
+    }
 
     interface PlaybackView extends BaseView<PlaybackPresenter> {
 
@@ -229,6 +244,16 @@ public class WatchContract {
         void setHeadTracker(); // 设置陀螺仪
 
         boolean isHeadTracker();  // 当前的陀螺仪
+        //无延迟 互动直播 使用
+        void onSwitchCamera(); // 切换摄像头
+        //无延迟 互动直播 使用
+        void onSwitchVideo(boolean isOpen); // 视频开关
+        //无延迟 互动直播 使用
+        void onSwitchAudio(boolean isOpen); // 音频开关
+
+        void onDownMic(boolean own);
+
+        void onUpMic();
     }
 
     interface WatchPresenter extends BasePresenter {

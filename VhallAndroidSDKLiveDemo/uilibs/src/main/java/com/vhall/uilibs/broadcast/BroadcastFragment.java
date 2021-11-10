@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.vhall.push.VHLivePushFormat;
 import com.vhall.push.VHVideoCaptureView;
 import com.vhall.uilibs.R;
+import com.vhall.vhallrtc.client.VHRenderView;
 
 /**
  * 发直播的Fragment

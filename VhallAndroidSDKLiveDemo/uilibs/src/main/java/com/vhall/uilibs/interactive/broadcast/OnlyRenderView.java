@@ -67,6 +67,8 @@ public class OnlyRenderView extends FrameLayout {
         TextView tvName = findViewById(R.id.tv_name1);
         if (TextUtils.equals(mainId, userId)) {
             findViewById(R.id.star1).setVisibility(VISIBLE);
+        }else {
+            findViewById(R.id.star1).setVisibility(GONE);
         }
         RenViewUtils.setRole(tvName, role, BaseUtil.getLimitString(name), context);
         ImageView ivAvatar = findViewById(R.id.avatar1);

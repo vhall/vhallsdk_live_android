@@ -33,6 +33,8 @@ public class Param implements Serializable {
     public String noticeContent;
     public int inav_num;
     public List<String> filters=new ArrayList<>();
+    //当前选择的是不是无延迟
+    public boolean noDelay=false;
 
     //互动相关
 //    public int interactive_definition = VHILSS.SD;

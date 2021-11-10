@@ -18,6 +18,7 @@ import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.vhallrtc.client.VHRenderView;
 
 import org.json.JSONObject;
 
@@ -205,6 +206,22 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         getBroadcast().setVolumeAmplificateSize(size);
     }
 
+    @Override
+    public void setRenderView(VHRenderView vhRenderView) {
+        //无延迟使用
+    }
+
+    @Override
+    public void onResume() {
+        //无延迟使用
+    }
+
+
+    @Override
+    public void onPause() {
+        //无延迟使用
+    }
+
     private Broadcast getBroadcast() {
         if (broadcast == null) {
             VHLivePushConfig config = new VHLivePushConfig(param.pixel_type);
@@ -223,6 +240,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
             Broadcast.Builder builder = new Broadcast.Builder()
                     .cameraView(mView.getCameraView())
                     .config(config)
+                    .callback(listener)
                     .callback(new BroadcastEventCallback())
                     .chatCallback(new ChatCallback());
             //狄拍
@@ -239,7 +257,22 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
         return broadcast;
     }
+    private VHPlayerListener listener = new VHPlayerListener() {
+        @Override
+        public void onStateChanged(Constants.State state) {
 
+        }
+
+        @Override
+        public void onEvent(int event, String msg) {
+
+        }
+
+        @Override
+        public void onError(int errorCode, int innerErrorCode, String msg) {
+            chatView.showToast(msg);
+        }
+    };
     @Override
     public void showChatView(boolean emoji, InputUser user, int limit) {
         mBraodcastView.showChatView(emoji, user, limit);

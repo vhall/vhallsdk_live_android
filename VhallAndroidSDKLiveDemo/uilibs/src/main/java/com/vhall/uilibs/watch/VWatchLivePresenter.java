@@ -294,6 +294,33 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
         return getWatchLive().isVRHeadTracker();
     }
 
+
+    //无延迟 互动直播 使用
+    @Override
+    public void onSwitchCamera(){
+
+    }
+    //无延迟 互动直播 使用
+    @Override
+    public void onSwitchVideo(boolean isOpen){
+
+    }
+    //无延迟 互动直播 使用
+    @Override
+    public  void onSwitchAudio(boolean isOpen){
+
+    }
+    //无延迟 互动直播 使用
+    @Override
+    public void onDownMic(boolean own) {
+
+    }
+    //无延迟 互动直播 使用
+    @Override
+    public void onUpMic() {
+
+    }
+
     @Override
     public void initWatch() {
         if (webinarInfo != null) {
@@ -390,32 +417,6 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
     //提交问卷 需要先登录且watch已初始化完成
     @Override
     public void submitSurvey(String result) {
-        /*if (!VhallSDK.isLogin()) {
-            watchView.showToast("请先登录！");
-            return;
-        }
-        JSONObject obj = null;
-        try {
-            obj = new JSONObject(result);
-            String qId = obj.optString("question_id");
-            VhallSDK.submitSurveyInfo(getWatchLive(), qId, result, new RequestCallback() {
-                @Override
-                public void onSuccess() {
-                    watchView.showToast("提交成功！");
-                    watchView.dismissSurvey();
-                }
-
-                @Override
-                public void onError(int errorCode, String errorMsg) {
-                    watchView.showToast(errorMsg);
-                    if (errorCode == 10821) {
-                        watchView.dismissSurvey();
-                    }
-                }
-            });
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
     }
 
     @Override
@@ -855,54 +856,5 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
         });
     }
 
-    /*
-    //核心模块中已经实现VR渲染器，可直接使用
-    //狄拍自定义渲染
-    public class VRPlayView extends GL_Preview_YUV implements IVHVideoPlayer {
-        AtomicBoolean mIsReady = new AtomicBoolean(false);
-        public VRPlayView(Context var1) {
-            super(var1);
-        }
-
-        public VRPlayView(Context var1, AttributeSet var2) {
-            super(var1, var2);
-        }
-
-        public void setDrawMode(int model) {
-            super.setDrawMode(model);
-        }
-
-        public void setIsHeadTracker(boolean head) {
-            super.setIsHeadTracker(head);
-        }
-
-        public boolean init(int width, int height) {
-            super.setPreviewW(width);
-            super.setPreviewH(height);
-            super.setIsFlip(true);
-            super.setColorFormat(19);
-            mIsReady.set(true);
-            return false;
-        }
-
-        @Override
-        public void play(byte[] bytes, int i, int i1) {
-
-        }
-
-        public void playView(byte[] YUV) {
-            if (this.isReady()) {
-                this.setdata(YUV);
-            }
-        }
-
-        public boolean isReady() {
-            return mIsReady.get();
-        }
-
-        public void release() {
-            this.setRelease();
-        }
-    }*/
 }
 
