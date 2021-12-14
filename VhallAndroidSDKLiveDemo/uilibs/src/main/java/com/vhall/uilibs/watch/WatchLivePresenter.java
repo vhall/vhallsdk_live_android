@@ -829,6 +829,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     /** 互动举手消息 status = 1  允许上麦  */
                     break;
                 case MessageServer.EVENT_INTERACTIVE_ALLOW_MIC:
+                    //主持人 同意上麦
 //                    getWatchLive().disconnectMsgServer(); // 关闭watchLive中的消息
 //                    replyInvite(1);
                     watchView.enterInteractive();

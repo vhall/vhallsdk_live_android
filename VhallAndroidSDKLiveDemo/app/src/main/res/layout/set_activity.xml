@@ -11,14 +11,16 @@
         android:layout_height="wrap_content"
         android:background="#ec3642">
 
-        <ImageView
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:clickable="true"
             android:onClick="backClick"
-            android:padding="10dp"
-            android:src="@drawable/icon_back" />
+            android:text="保存"
+            android:textColor="@color/white"
+            android:drawablePadding="10dp"
+            android:drawableStart="@drawable/icon_back" />
 
         <TextView
             android:layout_width="wrap_content"

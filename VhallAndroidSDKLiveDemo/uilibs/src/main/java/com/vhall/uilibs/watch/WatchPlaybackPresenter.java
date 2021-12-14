@@ -253,6 +253,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         getWatchPlayback().setDefinition(pix);
     }
 
+    //设置观看倍速
     @Override
     public void setSpeed() {
         String speed = speedStrs[(++currentSpeed) % speedStrs.length];

@@ -218,8 +218,8 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                     @Override
                     public void onError(int errorCode, String errorMsg) {
                         String msg = errorMsg;
-                        if(TextUtils.isEmpty(msg)){
-                           msg = "提交失败，请重试!";
+                        if (TextUtils.isEmpty(msg)) {
+                            msg = "提交失败，请重试!";
                         }
                         ToastUtil.showToast(msg);
                     }
@@ -281,6 +281,9 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                     image = lotteryInfo.icon;
                     tvJoin.setVisibility(View.GONE);
                     tvJoin.setEnabled(true);
+                }
+                if (!image.startsWith("http")) {
+                    image = "http:" + image;
                 }
                 RequestOptions options = new RequestOptions().placeholder(R.drawable.icon_gift);
                 Glide.with(getActivity()).load(image).apply(options).into(ivCover);

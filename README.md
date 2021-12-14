@@ -21,14 +21,19 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.2.1'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.2.1'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.2.2'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.2.2'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
 ```
 
 二、版本更新信息：
+
+版本：v6.2.2 更新时间 2021.12.14 <br>
+1.完善sdk 关键词过滤功能 <br>
+2.优化已知bug <br>
+
 
 版本：v6.2.1 更新时间 2021.11.11 <br>
 
@@ -38,7 +43,8 @@ allprojects {
 4.新增提示：观众没有上麦不建议直接进入互动（非无延迟）房间内，否则会占用房间名额，导致嘉宾助理进不去。 <br>
 5.优化已知bug <br>
 
-版本：v6.2.0 更新时间 2021.10.13
+
+版本：v6.2.0 更新时间 2021.10.13 <br>
 
 1.嘉宾支持带头像进入 <br>
 2.调整用户设置互动分辨率 <br>
@@ -47,34 +53,37 @@ allprojects {
 5.优化已知bug <br>
 
 
-版本：v6.1.4 更新时间 2021.09.06
+版本：v6.1.4 更新时间 2021.09.06 <br>
 
-1. 优化已知bug 
+1. 优化已知bug <br>
 
-版本：v6.1.3 更新时间 2021.08.26
+版本：v6.1.3 更新时间 2021.08.26 <br>
 
 1.更改 setDeviceStatus的方法名为switchDevice和之前保持一致  <br>
 2.兼容服务器接口升级  <br>
 3.修改问答判断逻辑，只能看自己和公开的问答  <br>
 4.优化已知bug  <br>
 
-版本6.1.2 更新时间 2021.07.27  
-1.新增设置RSA设置私钥接口  
-2.优化直播关闭交互方式  
-3.优化已知bug 
- 
-版本6.1.0 更新时间 2021.06.30  
-1.增加主播/嘉宾互动  
-2.登陆token失效优化  
-3.bug修复  
-4.版本向下兼容  
-5.更多内容参考[官网](https://saas-doc.vhall.com/docs/show/1204)
+版本6.1.2 更新时间 2021.07.27  <br>
 
-版本5.0.0 更新时间 2020.10.30  
-1.优化用户使用 h5和flash统一使用方法  
-2.优化日志上报  
-3.添加h5文档显示 具体可以参考demo实现  
-4.修改bug  
+1.新增设置RSA设置私钥接口  <br>
+2.优化直播关闭交互方式  <br>
+3.优化已知bug <br>
+ 
+版本6.1.0 更新时间 2021.06.30  <br>
+
+1.增加主播/嘉宾互动  <br>
+2.登陆token失效优化  <br>
+3.bug修复  <br>
+4.版本向下兼容  <br>
+5.更多内容参考[官网](https://saas-doc.vhall.com/docs/show/1204) <br>
+
+版本5.0.0 更新时间 2020.10.30  <br>
+1.优化用户使用 h5和flash统一使用方法  <br>
+2.优化日志上报  <br>
+3.添加h5文档显示 具体可以参考demo实现  <br>
+4.修改bug  <br> 
+
 ####sdk更新方法
 删除全部vss相关代码（目前升级后vss的会报错 全部删除即可）
 以后统一h5和flash

@@ -90,13 +90,9 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         tv_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!VhallSDK.isLogin()) {
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                } else {
-                    VhallSDK.logout();
-                    initPage();
-                }
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
         requestPermission();

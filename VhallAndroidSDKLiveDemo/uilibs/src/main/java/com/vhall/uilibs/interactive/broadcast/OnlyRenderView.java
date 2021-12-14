@@ -6,10 +6,6 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.bumptech.glide.request.RequestOptions;
 import com.vhall.business.core.VhallKey;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.interactive.bean.StreamData;
@@ -19,6 +15,7 @@ import com.vhall.uilibs.util.UserManger;
 import com.vhall.uilibs.util.VhallGlideUtils;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.webrtc.SurfaceViewRenderer;
@@ -45,7 +42,11 @@ public class OnlyRenderView extends FrameLayout {
         String attributes = stream.getAttributes();
         String avatar = "";
         String name = "", role = "2";
-        stream.removeAllRenderView();
+        try {
+            stream.removeAllRenderView();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         boolean hasAudio = 1 == streamData.getVoice();
         boolean hasVideo = 1 == streamData.getCamera();
         if (!TextUtils.isEmpty(attributes)) {
@@ -67,7 +68,7 @@ public class OnlyRenderView extends FrameLayout {
         TextView tvName = findViewById(R.id.tv_name1);
         if (TextUtils.equals(mainId, userId)) {
             findViewById(R.id.star1).setVisibility(VISIBLE);
-        }else {
+        } else {
             findViewById(R.id.star1).setVisibility(GONE);
         }
         RenViewUtils.setRole(tvName, role, BaseUtil.getLimitString(name), context);
