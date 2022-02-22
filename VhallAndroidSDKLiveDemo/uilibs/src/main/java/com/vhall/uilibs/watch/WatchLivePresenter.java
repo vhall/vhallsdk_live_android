@@ -314,24 +314,28 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     //无延迟 互动直播 使用
     @Override
-    public void onSwitchCamera(){
+    public void onSwitchCamera() {
 
     }
+
     //无延迟 互动直播 使用
     @Override
-    public void onSwitchVideo(boolean isOpen){
+    public void onSwitchVideo(boolean isOpen) {
 
     }
+
     //无延迟 互动直播 使用
     @Override
-    public  void onSwitchAudio(boolean isOpen){
+    public void onSwitchAudio(boolean isOpen) {
 
     }
+
     //无延迟 互动直播 使用
     @Override
     public void onDownMic(boolean own) {
 
     }
+
     //无延迟 互动直播 使用
     @Override
     public void onUpMic() {
@@ -382,6 +386,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     private RelativeLayout watchLayout;
+
     public WatchLive getWatchLive() {
         if (watchLive == null) {
             watchLayout = liveView.getWatchLayout();
@@ -414,10 +419,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     /**
      * todo 水印和视频画面之间插入图层
+     *
      * @param viewGroup
      */
-    private void insertPic(final ViewGroup viewGroup){
-        if(viewGroup == null){
+    private void insertPic(final ViewGroup viewGroup) {
+        if (viewGroup == null) {
             return;
         }
         viewGroup.post(new Runnable() {
@@ -428,32 +434,32 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 view.setTag("pic");
                 view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
                 Object o = viewGroup.getChildAt(0);
-                if(o instanceof ViewGroup){
+                if (o instanceof ViewGroup) {
                     int count = ((ViewGroup) o).getChildCount();
-                    if(count == 1){
+                    if (count == 1) {
                         ((ViewGroup) o).addView(view);
-                    }else if(count == 2){
-                        ((ViewGroup) o).addView(view,1);
+                    } else if (count == 2) {
+                        ((ViewGroup) o).addView(view, 1);
                     }
                 }
             }
         });
     }
 
-    private void removePic(final ViewGroup viewGroup){
-        if(viewGroup == null){
+    private void removePic(final ViewGroup viewGroup) {
+        if (viewGroup == null) {
             return;
         }
         Object vGroup = viewGroup.getChildAt(0);
-        if(vGroup instanceof ViewGroup){
+        if (vGroup instanceof ViewGroup) {
             int count = ((ViewGroup) vGroup).getChildCount();
-            for (int i = count-1;i>=0;i--){
+            for (int i = count - 1; i >= 0; i--) {
                 View view = ((ViewGroup) vGroup).getChildAt(i);
                 Object o = view.getTag();
-                if(o == null){
+                if (o == null) {
                     continue;
                 }
-                if(TextUtils.equals("pic",o.toString())){
+                if (TextUtils.equals("pic", o.toString())) {
                     ((ViewGroup) vGroup).removeView(view);
                 }
             }
@@ -541,7 +547,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     @Override
     public void onRaiseHand() {
-        if(!canSpeak){
+        if (!canSpeak) {
             ToastUtil.showToast("您已被禁言");
             return;
         }
@@ -822,7 +828,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case MessageServer.EVENT_RESTART:
                     force = true;
                     //onSwitchPixel(WatchLive.DPI_DEFAULT);
-                    watchView.showToast("主持人已开启直播");
+                    watchView.showToast("已开启直播");
                     break;
                 case MessageServer.EVENT_INTERACTIVE_HAND:
                     Log.e(TAG, " status " + messageInfo.status);
@@ -845,6 +851,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_INVITED_MIC://被邀请上麦
                     watchView.showInvited();
+                    break;
+
+                case MessageServer.EVENT_EDIT_WEBINAR_ROLE_NAME:
+                    //角色修改消息 根据自己的逻辑更新对应的UI
+                    watchView.showToast("更新了角色   " + messageInfo.edit_role_type + " 的名字为---" + messageInfo.edit_role_name);
                     break;
                 default:
                     break;
@@ -888,9 +899,9 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     private void operationDocument() {
         if (!getWatchLive().isUseDoc()) {
             documentView.showType(2);//关闭文档
-            watchView.showToast("主持人关闭文档");
+            watchView.showToast("关闭文档");
         } else {
-            watchView.showToast("主持人打开文档");
+            watchView.showToast("打开文档");
             //展示文档
             if (getWatchLive().isUseBoard()) {
                 //当前为白板

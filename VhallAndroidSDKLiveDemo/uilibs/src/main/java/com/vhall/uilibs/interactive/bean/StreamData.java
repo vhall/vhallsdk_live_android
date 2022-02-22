@@ -2,7 +2,9 @@ package com.vhall.uilibs.interactive.bean;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
 import com.vhall.vhallrtc.client.Stream;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -52,6 +54,19 @@ public class StreamData {
     }
 
     public String getName() {
+        String attributes = stream.getAttributes();
+        if (!TextUtils.isEmpty(attributes)) {
+            try {
+                JSONObject a = new JSONObject(attributes);
+                if (a != null) {
+                    if (a.has("nickName")) {
+                        name = a.optString("nickName");
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         return name;
     }
 
@@ -60,6 +75,19 @@ public class StreamData {
     }
 
     public String getRole() {
+        String attributes = stream.getAttributes();
+        if (!TextUtils.isEmpty(attributes)) {
+            try {
+                JSONObject a = new JSONObject(attributes);
+                if (a != null) {
+                    if (a.has("role")) {
+                        role = a.optString("role");
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         return role;
     }
 
@@ -71,8 +99,8 @@ public class StreamData {
         if (voice != -1) {
             return voice;
         }
-        org.json.JSONObject muteStream = stream.muteStream;
-        org.json.JSONObject remoteMuteStream = stream.remoteMuteStream;
+        JSONObject muteStream = stream.muteStream;
+        JSONObject remoteMuteStream = stream.remoteMuteStream;
         if (stream.isLocal) {
             if (muteStream != null) {
                 voice = !muteStream.optBoolean("audio", false) ? 1 : 0;
@@ -93,8 +121,8 @@ public class StreamData {
         if (camera != -1) {
             return camera;
         }
-        org.json.JSONObject muteStream = stream.muteStream;
-        org.json.JSONObject remoteMuteStream = stream.remoteMuteStream;
+        JSONObject muteStream = stream.muteStream;
+        JSONObject remoteMuteStream = stream.remoteMuteStream;
         if (stream.isLocal) {
             if (muteStream != null) {
                 camera = !muteStream.optBoolean("video", false) ? 1 : 0;
@@ -108,9 +136,9 @@ public class StreamData {
     }
 
     public static int getCamera(Stream stream) {
-       int camera=1;
-        org.json.JSONObject muteStream = stream.muteStream;
-        org.json.JSONObject remoteMuteStream = stream.remoteMuteStream;
+        int camera = 1;
+        JSONObject muteStream = stream.muteStream;
+        JSONObject remoteMuteStream = stream.remoteMuteStream;
         if (stream.isLocal) {
             if (muteStream != null) {
                 camera = !muteStream.optBoolean("video", false) ? 1 : 0;
@@ -129,7 +157,7 @@ public class StreamData {
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if(obj instanceof StreamData){
+        if (obj instanceof StreamData) {
             StreamData data = (StreamData) obj;
             if (data == null || data.getStream() == null || this.stream == null) {
                 return false;

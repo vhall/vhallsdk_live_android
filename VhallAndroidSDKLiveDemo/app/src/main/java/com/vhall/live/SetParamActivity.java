@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -21,7 +22,7 @@ import com.vhall.uilibs.Param;
  */
 public class SetParamActivity extends FragmentActivity {
     Param param;
-    EditText et_bro_token,et_bro_name, et_bro_id, et_video_bitrate, et_video_framerate, et_watch_id, et_key, et_buffersecond,et_guest_pwd,et_guest_avatar;
+    EditText et_bro_token, et_bro_name, et_bro_id, et_video_bitrate, et_video_framerate, et_watch_id, et_key, et_buffersecond, et_guest_pwd, et_guest_avatar;
     TextView et_userid, et_usernickname;
     RadioGroup rg_type;
     RadioButton rb_hdpi, rb_xhdpi, radioButtonHD, radioButtonSD, radioButtonUHD;
@@ -73,8 +74,8 @@ public class SetParamActivity extends FragmentActivity {
         et_watch_id.setText(param.watchId);
         et_key.setText(param.key);
         et_buffersecond.setText(String.valueOf(param.bufferSecond));
-
-        et_userid.setText(TextUtils.isEmpty(VhallSDK.getUserName()) ? VHInternalUtils.getDeviceId() : VhallSDK.getUserName());
+        TelephonyManager telephonyMgr = (TelephonyManager) this.getSystemService(TELEPHONY_SERVICE);
+        et_userid.setText(TextUtils.isEmpty(VhallSDK.getUserName()) ? telephonyMgr.getDeviceId() : VhallSDK.getUserName());
         et_usernickname.setText(TextUtils.isEmpty(VhallSDK.getUserNickname()) ? Build.BRAND + getString(R.string.phone_user) : VhallSDK.getUserNickname());
         if (param.pixel_type == VHLivePushFormat.PUSH_MODE_HD) {
             rb_hdpi.setChecked(true);

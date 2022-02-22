@@ -29,9 +29,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.vhall.business.NewH5ImManager;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
+import com.vhall.business.data.RequestDataCallback;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business_interactive.InterActive;
 import com.vhall.net.NetBroadcastReceiver;
@@ -40,7 +40,6 @@ import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.interactive.RtcInternal;
-import com.vhall.uilibs.interactive.bean.StreamData;
 import com.vhall.uilibs.interactive.broadcast.config.RtcConfig;
 import com.vhall.uilibs.interactive.broadcast.present.IBroadcastContract;
 import com.vhall.uilibs.interactive.broadcast.present.RtcH5Present;
@@ -52,16 +51,17 @@ import com.vhall.uilibs.util.BaseUtil;
 import com.vhall.uilibs.util.CommonUtil;
 import com.vhall.uilibs.util.DensityUtils;
 import com.vhall.uilibs.util.ListUtils;
+import com.vhall.uilibs.util.RenViewUtils;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.UserManger;
 import com.vhall.uilibs.util.VhallGlideUtils;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.CallBack;
-import com.vhall.vhss.TokenManger;
+import com.vhall.vhss.data.RoleNameData;
 import com.vhall.vhss.data.WebinarInfoData;
 
-import org.webrtc.SurfaceViewRenderer;
+import org.vhwebrtc.SurfaceViewRenderer;
 
 import static android.support.constraint.ConstraintSet.PARENT_ID;
 
@@ -200,8 +200,19 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
             webinar_type = webinarInfo.getWebinarInfoData().getWebinar().mode;
             webinar_id = webinarInfo.webinar_id;
             webinar_show_type = webinarInfo.getWebinarInfoData().webinar_show_type;
+            //进入房间初始化值
+            roleNameData = webinarInfo.roleNameData;
+            if (broadcastPresent != null && roleNameData != null) {
+                broadcastPresent.updateHostRoleName(roleNameData.host_name);
+            }
+            isRtc = TextUtils.equals("3", webinar_type);
+            if (isRtc) {
+                RenViewUtils.updateRoleName(roleNameData);
+            }
+            if (adapter != null) {
+                adapter.updateRoleName(roleNameData);
+            }
         }
-        isRtc = TextUtils.equals("3", webinar_type);
     }
 
     private void monitorNetWork() {
@@ -210,6 +221,30 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
             public void onChangeListener(int status) {
                 if (RtcInternal.isNetworkConnected(getApplicationContext())) {
                     hideLoadProgress();
+                    //防止网络中断之间 修改昵称
+                    VhallSDK.getRoleName(webinar_id, new RequestDataCallback() {
+                        @Override
+                        public void onSuccess(Object result) {
+                            if (result instanceof RoleNameData) {
+                                roleNameData = (RoleNameData) result;
+                                if (broadcastPresent != null) {
+                                    broadcastPresent.updateHostRoleName(roleNameData.host_name);
+                                }
+                                if (isRtc) {
+                                    if (RenViewUtils.updateRoleName(roleNameData))
+                                        broadcastRtcFragment.updateViewHandler();
+                                }
+                                if (adapter != null) {
+                                    adapter.updateRoleName(roleNameData);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onError(int errorCode, String errorMsg) {
+
+                        }
+                    });
                 } else {
                     baseShowToast("当前网络异常");
                     finish();
@@ -412,6 +447,10 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
     private void initRtc() {
         broadcastPresent = new RtcH5Present(this);
 
+        if (roleNameData != null) {
+            broadcastPresent.updateHostRoleName(roleNameData.host_name);
+        }
+
         broadcastRtcFragment = RtcFragment.getInstance(String.valueOf(webinar_show_type), webinarInfo, broadcastPresent.getMessageCallback(), broadcastPresent.getChatCallback());
         broadcastPresent.setRtcFragmentView(broadcastRtcFragment);
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -604,6 +643,51 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
         if (forbidBroadcast) {
             finish();
         }
+    }
+
+    private RoleNameData roleNameData = new RoleNameData("主持人", "嘉宾", "助理");
+
+    @Override
+    public void notifyRoleName(String type, String name) {
+        if (TextUtils.isEmpty(name)) {
+            return;
+        }
+        switch (type) {
+            //主持人
+            case "1":
+                if (!TextUtils.equals(roleNameData.host_name, name)) {
+                    refreshUserList();
+                    roleNameData.host_name = name;
+                    if (broadcastPresent != null) {
+                        broadcastPresent.updateHostRoleName(roleNameData.host_name);
+                    }
+                    if (isRtc) {
+                        broadcastRtcFragment.updateRoleName(roleNameData);
+                    }
+                }
+                break;
+            //助理
+            case "3":
+                if (!TextUtils.equals(roleNameData.assistant_name, name)) {
+                    refreshUserList();
+                    roleNameData.assistant_name = name;
+                }
+                break;
+            //嘉宾
+            case "4":
+                if (!TextUtils.equals(roleNameData.guest_name, name)) {
+                    refreshUserList();
+                    roleNameData.guest_name = name;
+                    if (isRtc) {
+                        broadcastRtcFragment.updateRoleName(roleNameData);
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+        if (adapter != null)
+            adapter.updateRoleName(roleNameData);
     }
 
     public void userNoSpeaker(String userId) {

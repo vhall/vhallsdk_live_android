@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.CountDownTimer;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,6 +22,7 @@ public class InvitedDialog extends AlertDialog implements View.OnClickListener {
     private ImageView imgClose;
     private TextView tvAgree;
     private TextView tvDisagree;
+    private TextView tvTitle;
     private MyCount count;
     private int countTime = 30;
 
@@ -48,11 +50,12 @@ public class InvitedDialog extends AlertDialog implements View.OnClickListener {
         imgClose = rootView.findViewById(R.id.image_invited_close);
         tvAgree = rootView.findViewById(R.id.tv_invited_agree);
         tvDisagree = rootView.findViewById(R.id.tv_invited_disagree);
+        tvTitle = rootView.findViewById(R.id.content);
         imgClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss();
-                if (refuseInviteListener!=null){
+                if (refuseInviteListener != null) {
                     refuseInviteListener.refuseInvite();
                 }
             }
@@ -81,11 +84,17 @@ public class InvitedDialog extends AlertDialog implements View.OnClickListener {
         });
     }
 
+    public void setTitleText(String roleName) {
+        if (tvTitle != null && !TextUtils.isEmpty(roleName)) {
+            tvTitle.setText(roleName + "邀请您上麦，是否接受？");
+        }
+    }
+
     public void setPositiveOnClickListener(View.OnClickListener onClickListener) {
         tvAgree.setOnClickListener(onClickListener);
     }
 
-    public void setNegativeOnClickListener(View.OnClickListener onClickListener){
+    public void setNegativeOnClickListener(View.OnClickListener onClickListener) {
         tvDisagree.setOnClickListener(onClickListener);
     }
 
@@ -119,13 +128,13 @@ public class InvitedDialog extends AlertDialog implements View.OnClickListener {
             if (isShowing()) {
                 dismiss();
             }
-            if (refuseInviteListener!=null){
+            if (refuseInviteListener != null) {
                 refuseInviteListener.refuseInvite();
             }
         }
     }
 
-   public interface RefuseInviteListener {
+    public interface RefuseInviteListener {
         void refuseInvite();
-   }
+    }
 }

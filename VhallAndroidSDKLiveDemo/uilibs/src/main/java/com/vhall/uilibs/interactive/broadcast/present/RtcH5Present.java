@@ -30,6 +30,7 @@ import java.util.Set;
 
 import static com.vhall.business.MessageServer.EVENT_CHAT_FORBID_ALL;
 import static com.vhall.business.MessageServer.EVENT_DISABLE_CHAT;
+import static com.vhall.business.MessageServer.EVENT_EDIT_WEBINAR_ROLE_NAME;
 import static com.vhall.business.MessageServer.EVENT_INTERACTIVE_DOWN_MIC;
 import static com.vhall.business.MessageServer.EVENT_KICKOUT;
 import static com.vhall.business.MessageServer.EVENT_KICKOUT_RESTORE;
@@ -37,6 +38,7 @@ import static com.vhall.business.MessageServer.EVENT_PERMIT_CHAT;
 import static com.vhall.business.MessageServer.EVENT_VRTC_CONNECT_REFUSED;
 import static com.vhall.business.MessageServer.EVENT_VRTC_CONNECT_SUCCESS;
 import static com.vhall.business.MessageServer.EVENT_VRTC_SPEAKER_SWITCH;
+import static vhall.com.vss2.module.room.MessageTypeData.MESSAGE_EDIT_WEBINAR_ROLE_NAME;
 
 public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
     private static final String TAG = "BroadcastPresent";
@@ -57,6 +59,20 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
      * 嘉宾有没有上麦
      */
     private boolean isPublic = false;
+
+    private String nowHostRoleName = "主持人";
+
+
+    @Override
+    public void updateHostRoleName(String role_name) {
+        if (TextUtils.isEmpty(role_name)) {
+            return;
+        }
+        nowHostRoleName = role_name;
+        if (showInvited != null) {
+            showInvited.setTitleText(nowHostRoleName + "邀请您上麦，是否同意？");
+        }
+    }
 
     public RtcH5Present(IBroadcastContract.IBroadcastView broadcastView) {
         this.broadcastView = broadcastView;
@@ -187,7 +203,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                 case EVENT_VRTC_CONNECT_REFUSED: {
                     userId = msg.user_id;
                     if (TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
-                        broadcastView.showToast("主持人拒绝了您的上麦申请");
+                        broadcastView.showToast(nowHostRoleName+"拒绝了您的上麦申请");
                         broadcastView.setMic(false);
                     }
                 }
@@ -225,7 +241,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                     //被邀请上麦
                     if (showInvited == null) {
                         showInvited = new OutDialogBuilder()
-                                .title("主持人邀请您上麦，是否同意？")
+                                .title(nowHostRoleName+"邀请您上麦，是否同意？")
                                 .tv1("拒绝")
                                 .tv2("同意")
                                 .onCancel(new OutDialog.ClickLister() {
@@ -309,7 +325,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                             }
                             isPublic = false;
                             if (!userId.equals(roomJoinId)) {
-                                broadcastView.showToast("您已被主持人下麦");
+                                broadcastView.showToast("您已被"+nowHostRoleName+"下麦");
                             }
                         } else {
                             broadcastView.showToast(name + "已下麦");
@@ -329,6 +345,10 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                         return;
                     }
                     broadcastView.showToast(BaseUtil.getLimitString(msg.roomJoinId) + "已被设为主讲人");
+                    break;
+
+                case EVENT_EDIT_WEBINAR_ROLE_NAME:
+                    broadcastView.notifyRoleName(msg.edit_role_type,msg.edit_role_name);
                     break;
             }
 

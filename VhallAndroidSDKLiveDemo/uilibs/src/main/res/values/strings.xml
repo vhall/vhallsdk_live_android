@@ -31,7 +31,7 @@
     <string name="vhall_lottery_false">很遗憾您没中</string>
 
     <string name="vhall_hint">提示</string>
-    <string name="vhall_mic_invited">主持人邀请您上麦，是否接受？</string>
+    <string name="vhall_mic_invited">邀请您上麦，是否接受？</string>
     <string name="vhall_agree">同意</string>
     <string name="vhall_disagree">取消</string>
     <string name="vhall_mic_invited_title">上麦邀请</string>

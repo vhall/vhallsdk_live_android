@@ -29,7 +29,7 @@ public class InteractiveContract {
 
     interface InteractiveFraView extends BaseView<InteractiveFraPresenter> {
 
-        void addLocalView( VHRenderView view);
+        void addLocalView(VHRenderView view);
 
         void updateVideoFrame(int status);
 

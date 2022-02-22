@@ -48,7 +48,7 @@ public class LoginActivity extends Activity implements RadioGroup.OnCheckedChang
         head_net_url = this.findViewById(R.id.head_net_url);
         third_id = this.findViewById(R.id.third_id);
         login_type_container = this.findViewById(R.id.login_type_container);
-        mVerTextView.setText(VhallSDK.getVersion());
+        mVerTextView.setText(String.format("V%s", BuildConfig.VERSION_NAME));
 
         login_type_container.setOnCheckedChangeListener(this::onCheckedChanged);
         mWaitingDialog = new ProgressDialog(this);

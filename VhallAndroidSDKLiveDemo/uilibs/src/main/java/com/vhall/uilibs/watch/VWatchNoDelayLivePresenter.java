@@ -36,7 +36,7 @@ import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.SurfaceViewRenderer;
+import org.vhwebrtc.SurfaceViewRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -559,7 +559,7 @@ class VWatchNoDelayLivePresenter implements WatchContract.LivePresenter, ChatCon
                 case MessageServer.EVENT_RESTART:
                     force = true;
                     //onSwitchPixel(WatchLive.DPI_DEFAULT);
-                    watchView.showToast("主持人已开启直播");
+                    watchView.showToast("已开启直播");
                     break;
                 case MessageServer.EVENT_INTERACTIVE_HAND:
                     Log.e(TAG, " status " + messageInfo.status);

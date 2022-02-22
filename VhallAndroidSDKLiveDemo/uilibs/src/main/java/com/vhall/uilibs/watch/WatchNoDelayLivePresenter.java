@@ -32,7 +32,7 @@ import com.vhall.vhss.TokenManger;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONObject;
-import org.webrtc.SurfaceViewRenderer;
+import org.vhwebrtc.SurfaceViewRenderer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -569,7 +569,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                 case MessageServer.EVENT_RESTART:
                     force = true;
                     //onSwitchPixel(WatchLive.DPI_DEFAULT);
-                    watchView.showToast("主持人已开启直播");
+                    watchView.showToast("已开启直播");
                     break;
                 case MessageServer.EVENT_INTERACTIVE_HAND:
                     Log.e(TAG, " status " + messageInfo.status);
@@ -743,9 +743,9 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
     private void operationDocument(int type) {
         if (type == 2) {
             documentView.showType(type);//关闭文档
-            watchView.showToast("主持人关闭文档");
+            watchView.showToast("关闭文档");
         } else {
-            watchView.showToast("主持人打开文档");
+            watchView.showToast("打开文档");
         }
     }
 

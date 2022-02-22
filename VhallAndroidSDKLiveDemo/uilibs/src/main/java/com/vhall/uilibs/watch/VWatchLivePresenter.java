@@ -699,7 +699,7 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
                 case MessageServer.EVENT_RESTART:
                     force = true;
                     //onSwitchPixel(WatchLive.DPI_DEFAULT);
-                    watchView.showToast("主持人已开启直播");
+                    watchView.showToast("已开启直播");
                     break;
                 case MessageServer.EVENT_INTERACTIVE_HAND:
                     Log.e(TAG, " status " + messageInfo.status);
@@ -764,9 +764,9 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
     private void operationDocument() {
         if (!getWatchLive().isUseDoc()) {
             documentView.showType(2);//关闭文档
-            watchView.showToast("主持人关闭文档");
+            watchView.showToast("关闭文档");
         } else {
-            watchView.showToast("主持人打开文档");
+            watchView.showToast("打开文档");
             //展示文档
             if (getWatchLive().isUseBoard()) {
                 //当前为白板

@@ -21,7 +21,7 @@ import com.vhall.push.VHVideoCaptureView;
 import com.vhall.uilibs.R;
 import com.vhall.vhallrtc.client.VHRenderView;
 
-import org.webrtc.SurfaceViewRenderer;
+import org.vhwebrtc.SurfaceViewRenderer;
 
 /**
  * 发无延时的 视频直播 Fragment

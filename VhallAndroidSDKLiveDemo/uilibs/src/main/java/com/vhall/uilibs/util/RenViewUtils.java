@@ -1,31 +1,27 @@
 package com.vhall.uilibs.util;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.bumptech.glide.request.RequestOptions;
 import com.vhall.business.core.VhallKey;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.interactive.bean.StreamData;
 import com.vhall.uilibs.interactive.broadcast.MoreRenderView;
 import com.vhall.uilibs.interactive.broadcast.OnlyRenderView;
-import com.vhall.uilibs.widget.MyImageSpan;
+import com.vhall.uilibs.widget.RadiusBackgroundSpan;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
+import com.vhall.vhss.data.RoleNameData;
 
-import org.eclipse.jetty.util.ajax.JSON;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.SurfaceViewRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +115,7 @@ public class RenViewUtils {
                         TextView tvName = nowView.findViewById(R.id.tv_name1);
                         if (TextUtils.equals(mainId, userId)) {
                             nowView.findViewById(R.id.star1).setVisibility(View.VISIBLE);
-                        }else {
+                        } else {
                             nowView.findViewById(R.id.star1).setVisibility(View.GONE);
                         }
 
@@ -151,7 +147,7 @@ public class RenViewUtils {
                         TextView tvName2 = nowView.findViewById(R.id.tv_name2);
                         if (TextUtils.equals(mainId, userId)) {
                             nowView.findViewById(R.id.star2).setVisibility(View.VISIBLE);
-                        }else {
+                        } else {
                             nowView.findViewById(R.id.star2).setVisibility(View.GONE);
                         }
 
@@ -184,7 +180,7 @@ public class RenViewUtils {
                         TextView tvName3 = nowView.findViewById(R.id.tv_name3);
                         if (TextUtils.equals(mainId, userId)) {
                             nowView.findViewById(R.id.star3).setVisibility(View.VISIBLE);
-                        }else {
+                        } else {
                             nowView.findViewById(R.id.star3).setVisibility(View.GONE);
                         }
                         setRole(tvName3, role, BaseUtil.getLimitString(name), context);
@@ -216,7 +212,7 @@ public class RenViewUtils {
                         nowView.findViewById(R.id.bg4).setVisibility(View.VISIBLE);
                         if (TextUtils.equals(mainId, userId)) {
                             nowView.findViewById(R.id.star4).setVisibility(View.VISIBLE);
-                        }else {
+                        } else {
                             nowView.findViewById(R.id.star4).setVisibility(View.GONE);
                         }
                         setRole(tvName4, role, BaseUtil.getLimitString(name), context);
@@ -245,36 +241,59 @@ public class RenViewUtils {
     }
 
 
+    private static RoleNameData roleNameData = new RoleNameData("主持人", "嘉宾", "助理");
+
+    public static boolean updateRoleName(RoleNameData roleName) {
+        Log.e("vhall_", "RenViewUtils " + roleNameData.host_name);
+        if (roleName == null) {
+            return false;
+        }
+        //助理不上麦 所以不刷新
+        if (TextUtils.equals(roleName.host_name, roleNameData.host_name) &&
+                TextUtils.equals(roleName.guest_name, roleNameData.guest_name)) {
+            return false;
+        }
+        //有改变才更新
+        roleNameData = roleName.copy();
+        return true;
+    }
+
     public static void setRole(TextView tvName, String role, String name, Context context) {
-        MyImageSpan imageSpan;
-        SpannableStringBuilder builder = new SpannableStringBuilder("  " + name);
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        String showRoleText = "主持人";
+        String roleColor = "#FC5659";
         switch (role) {
             case "1":
-                imageSpan = new MyImageSpan(context, R.drawable.icon_chat_main);
-                builder.setSpan(imageSpan, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
                 tvName.setVisibility(View.VISIBLE);
-                tvName.setText(builder);
+                showRoleText = roleNameData.host_name;
+                roleColor = "#FC5659";
                 break;
             case "2":
+                showRoleText = "";
                 tvName.setVisibility(View.VISIBLE);
                 tvName.setText(name);
                 break;
             case "3":
-                imageSpan = new MyImageSpan(context, R.drawable.icon_chat_assistan);
-                builder.setSpan(imageSpan, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
                 tvName.setVisibility(View.VISIBLE);
-                tvName.setText(builder);
+                showRoleText = roleNameData.assistant_name;
+                roleColor = "#BBBBBB";
                 break;
             case "4":
-                imageSpan = new MyImageSpan(context, R.drawable.icon_chat_guest);
-                builder.setSpan(imageSpan, 0, 1, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
                 tvName.setVisibility(View.VISIBLE);
-                tvName.setText(builder);
+                showRoleText = roleNameData.guest_name;
+                roleColor = "#5EA6EC";
                 break;
             default:
                 break;
         }
 
+        if (!TextUtils.isEmpty(showRoleText)) {
+            SpannableStringBuilder ssb = new SpannableStringBuilder(showRoleText);
+            ssb.setSpan(new RadiusBackgroundSpan(Color.parseColor(roleColor), 18), 0, ssb.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+            builder.append(ssb);
+            builder.append(" " + name);
+            tvName.setText(builder);
+        }
     }
 
     public static void destroy() {

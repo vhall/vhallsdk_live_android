@@ -8,7 +8,7 @@ import android.widget.FrameLayout;
 import com.vhall.uilibs.R;
 import com.vhall.vhallrtc.client.VHRenderView;
 
-import org.webrtc.SurfaceViewRenderer;
+import org.vhwebrtc.SurfaceViewRenderer;
 
 
 /**

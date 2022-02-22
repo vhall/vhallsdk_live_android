@@ -36,7 +36,7 @@ import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.data.ScrollInfoData;
 
-import org.webrtc.SurfaceViewRenderer;
+import org.vhwebrtc.SurfaceViewRenderer;
 
 import java.util.HashMap;
 import java.util.Iterator;

@@ -39,6 +39,8 @@ public interface IBroadcastContract {
 
         void forbidBroadcast();
         void userNoSpeaker(String userId);
+
+        void notifyRoleName(String type, String name);
     }
 
     interface RtcFragmentView extends IHostBaseView<IBroadcastPresent>{
@@ -73,13 +75,15 @@ public interface IBroadcastContract {
 
         void onSwitchAudio(boolean isOpen); // 音频开关
 
+        void updateHostRoleName(String role_name);
+
         void onDestroyed();//销毁
 
         MessageServer.Callback getMessageCallback();
 
         ChatServer.Callback getChatCallback();
 
-        void setRtcFragmentView(IBroadcastContract.RtcFragmentView rtcFragmentView);
+        void setRtcFragmentView(RtcFragmentView rtcFragmentView);
     }
 
 

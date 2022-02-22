@@ -15,7 +15,7 @@ import com.vhall.vhallrtc.client.Room;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 
-import org.webrtc.SurfaceViewRenderer;
+import org.vhwebrtc.SurfaceViewRenderer;
 
 
 /**

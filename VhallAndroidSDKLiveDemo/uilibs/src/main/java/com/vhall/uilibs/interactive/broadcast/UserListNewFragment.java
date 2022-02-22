@@ -18,7 +18,9 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
+import com.vhall.business.data.RequestDataCallback;
 import com.vhall.business.data.RequestDataCallbackV2;
 import com.vhall.business.utils.VHInternalUtils;
 import com.vhall.business_interactive.InterActive;
@@ -31,8 +33,11 @@ import com.vhall.uilibs.util.BaseUtil;
 import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.UserManger;
+import com.vhall.vhss.data.RoleNameData;
 import com.vhall.vhss.data.UserStateListData;
 import com.vhall.vhss.data.WebinarInfoData;
+import com.vhall.vhss.network.ActivityNetworkRequest;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -124,11 +129,25 @@ public class UserListNewFragment extends BaseFragment {
         refreshUserList();
         return inflate;
     }
+    private RoleNameData roleNameData = new RoleNameData("主持人", "嘉宾", "助理");
 
     public void refreshUserList() {
         if (!canPostData) {
             return;
         }
+        VhallSDK.getRoleName(roomInfoData.webinar.id, new RequestDataCallback() {
+            @Override
+            public void onSuccess(Object result) {
+                if (result instanceof RoleNameData){
+                    roleNameData= (RoleNameData) result;
+                }
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+
+            }
+        });
         canPostData = false;
         if (TYPE_KICK_OUT.equals(type)) {
 //            if (present == null) {
@@ -376,7 +395,7 @@ public class UserListNewFragment extends BaseFragment {
                         helper.getView(R.id.iv_more).setVisibility(View.VISIBLE);
                     }
                     tvRoleTag.setVisibility(View.VISIBLE);
-                    tvRoleTag.setText("主持人");
+                    tvRoleTag.setText(roleNameData.host_name);
                     tvRoleTag.setBackgroundResource(R.drawable.shape_user_main);
                     tvMic.setVisibility(View.GONE);
                     helper.getView(R.id.iv_banned).setVisibility(View.GONE);
@@ -393,7 +412,7 @@ public class UserListNewFragment extends BaseFragment {
                         helper.getView(R.id.iv_more).setVisibility(View.VISIBLE);
                     }
                     tvRoleTag.setVisibility(View.VISIBLE);
-                    tvRoleTag.setText("助理");
+                    tvRoleTag.setText(roleNameData.assistant_name);
                     tvRoleTag.setBackgroundResource(R.drawable.shape_user_assistant);
                     break;
                 case "4":
@@ -403,7 +422,7 @@ public class UserListNewFragment extends BaseFragment {
                         helper.getView(R.id.iv_more).setVisibility(View.VISIBLE);
                     }
                     tvRoleTag.setVisibility(View.VISIBLE);
-                    tvRoleTag.setText("嘉宾");
+                    tvRoleTag.setText(roleNameData.guest_name);
                     tvRoleTag.setBackgroundResource(R.drawable.shape_user_guest);
                     break;
                 default:

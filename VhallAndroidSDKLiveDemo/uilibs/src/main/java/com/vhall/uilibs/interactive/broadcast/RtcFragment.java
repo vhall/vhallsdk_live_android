@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.UserManager;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
@@ -16,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
@@ -42,11 +42,12 @@ import com.vhall.vhallrtc.client.Room;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.CallBack;
+import com.vhall.vhss.data.RoleNameData;
 import com.vhall.vhss.data.WebinarInfoData;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.SurfaceViewRenderer;
+import org.vhwebrtc.SurfaceViewRenderer;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -485,6 +486,16 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         updatePicImpl(userId, voice, camera);
     }
 
+    public void updateRoleName(RoleNameData roleNameData) {
+        RenViewUtils.updateRoleName(roleNameData);
+        if (ListUtils.isEmpty(views)) {
+            return;
+        }
+        for (int i = 0; i < views.size(); i++) {
+            setViewPic(true, i, 0, 0, "");
+        }
+    }
+
     private void updatePicImpl(String userId, int voice, int camera) {
         for (int i = 0; i < streams.size(); i++) {
             StreamData streamData = streams.get(i);
@@ -525,6 +536,10 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
     }
 
     private void setViewPic(int i, int voice, int camera, String avatar) {
+        setViewPic(false, i, voice, camera, avatar);
+    }
+
+    private void setViewPic(boolean isRole, int i, int voice, int camera, String avatar) {
         if (ListUtils.isEmpty(views)) {
             return;
         }
@@ -543,10 +558,16 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         } else {
             view = views.get(viewNumber);
         }
+        StreamData streamData = streams.get(i);
         switch (viewLocation) {
             case 0:
+                if (isRole) {
+                    TextView viewById = view.findViewById(R.id.tv_name1);
+                    RenViewUtils.setRole(viewById, streamData.getRole(), streamData.getName(), mContext);
+                    return;
+                }
                 if (voice != -1) {
-                    boolean hasAudio = 1 == streams.get(i).getVoice();
+                    boolean hasAudio = 1 == streamData.getVoice();
                     if (hasAudio) {
                         view.findViewById(R.id.iv_audio1).setVisibility(View.GONE);
                     } else {
@@ -554,7 +575,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     }
                 }
                 if (camera != -1) {
-                    boolean hasVideo = 1 == streams.get(i).getCamera();
+                    boolean hasVideo = 1 == streamData.getCamera();
                     if (!hasVideo) {
                         ImageView ivAvatar = view.findViewById(R.id.avatar1);
                         ivAvatar.setVisibility(View.VISIBLE);
@@ -567,8 +588,13 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 }
                 break;
             case 1:
+                if (isRole) {
+                    TextView viewById = view.findViewById(R.id.tv_name2);
+                    RenViewUtils.setRole(viewById, streamData.getRole(), streamData.getName(), mContext);
+                    return;
+                }
                 if (voice != -1) {
-                    boolean hasAudio = 1 == streams.get(i).getVoice();
+                    boolean hasAudio = 1 == streamData.getVoice();
                     if (hasAudio) {
                         view.findViewById(R.id.iv_audio2).setVisibility(View.GONE);
                     } else {
@@ -576,7 +602,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     }
                 }
                 if (camera != -1) {
-                    boolean hasVideo = 1 == streams.get(i).getCamera();
+                    boolean hasVideo = 1 == streamData.getCamera();
                     if (!hasVideo) {
                         ImageView ivAvatar = view.findViewById(R.id.avatar2);
                         ivAvatar.setVisibility(View.VISIBLE);
@@ -589,8 +615,13 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 }
                 break;
             case 2:
+                if (isRole) {
+                    TextView viewById = view.findViewById(R.id.tv_name3);
+                    RenViewUtils.setRole(viewById, streamData.getRole(), streamData.getName(), mContext);
+                    return;
+                }
                 if (voice != -1) {
-                    boolean hasAudio = 1 == streams.get(i).getVoice();
+                    boolean hasAudio = 1 == streamData.getVoice();
                     if (hasAudio) {
                         view.findViewById(R.id.iv_audio3).setVisibility(View.GONE);
                     } else {
@@ -598,7 +629,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     }
                 }
                 if (camera != -1) {
-                    boolean hasVideo = 1 == streams.get(i).getCamera();
+                    boolean hasVideo = 1 == streamData.getCamera();
                     if (!hasVideo) {
                         ImageView ivAvatar = view.findViewById(R.id.avatar3);
                         ivAvatar.setVisibility(View.VISIBLE);
@@ -611,8 +642,13 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 }
                 break;
             case 3:
+                if (isRole) {
+                    TextView viewById = view.findViewById(R.id.tv_name4);
+                    RenViewUtils.setRole(viewById, streamData.getRole(), streamData.getName(), mContext);
+                    return;
+                }
                 if (voice != -1) {
-                    boolean hasAudio = 1 == streams.get(i).getVoice();
+                    boolean hasAudio = 1 == streamData.getVoice();
                     if (hasAudio) {
                         view.findViewById(R.id.iv_audio4).setVisibility(View.GONE);
                     } else {
@@ -620,7 +656,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     }
                 }
                 if (camera != -1) {
-                    boolean hasVideo = 1 == streams.get(i).getCamera();
+                    boolean hasVideo = 1 == streamData.getCamera();
                     if (!hasVideo) {
                         ImageView ivAvatar = view.findViewById(R.id.avatar4);
                         ivAvatar.setVisibility(View.VISIBLE);
@@ -735,6 +771,8 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
     }
 
     private void setChoose(int selectPoint) {
+        if (pointLayout == null)
+           return;
         if (pointLayout.getChildCount() != views.size()) {
             pointLayout.removeAllViews();
             for (int i = 0; i < views.size(); i++) {
@@ -767,7 +805,8 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             }
         views.clear();
         streams.clear();
-        pointLayout.removeAllViews();
+        if (pointLayout != null)
+            pointLayout.removeAllViews();
         selectPoint = 0;
         if (hasShare && shareView != null) {
             views.add(shareView);

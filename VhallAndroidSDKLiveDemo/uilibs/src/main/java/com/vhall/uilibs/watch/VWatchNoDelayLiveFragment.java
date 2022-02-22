@@ -28,7 +28,7 @@ import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.data.ScrollInfoData;
 import com.vhall.vhss.network.ChatNetworkRequest;
 
-import org.webrtc.SurfaceViewRenderer;
+import org.vhwebrtc.SurfaceViewRenderer;
 
 import java.util.HashMap;
 

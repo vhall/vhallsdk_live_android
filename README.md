@@ -21,14 +21,20 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.2.2'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.2.2'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.2.3'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.2.3'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
 ```
 
 二、版本更新信息：
+
+版本：v6.2.3 更新时间 2022.2.21<br>
+1.底层包名修改并且需要修改混淆相关，详情见大版本更新 6.2.3  <br>
+2.支持新功能 -修改主持人、嘉宾、助理的角色名称 <br>
+3.主要更新预告，我们将于半年内升级开发sdk的版本，并转向Androidx <br>
+
 
 版本：v6.2.2 更新时间 2021.12.14 <br>
 1.完善sdk 关键词过滤功能 <br>
