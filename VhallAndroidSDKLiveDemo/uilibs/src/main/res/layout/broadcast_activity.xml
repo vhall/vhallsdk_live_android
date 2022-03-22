@@ -18,6 +18,7 @@
         android:layout_alignParentBottom="true"
         android:layout_marginRight="70dp" />
 
+
     <com.vhall.beautifykit.control.FaceBeautyControlView
         android:id="@+id/faceBeautyControlView"
         android:layout_width="match_parent"
