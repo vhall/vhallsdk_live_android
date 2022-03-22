@@ -205,6 +205,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }
     }
 
+    //是否 开启续播 只有播放中 推到后台才续播
+    boolean restart = false;
+
     @Override
     public void onClick(View view) {
         int i = view.getId();
@@ -366,7 +369,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
     @Override
     public void liveFinished() {
-        if(getActivity() != null && !getActivity().isFinishing()){
+        if (getActivity() != null && !getActivity().isFinishing()) {
             getActivity().finish();
         }
     }
@@ -450,15 +453,16 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         if (marquee_view != null && marquee_view.getVisibility() == View.VISIBLE) {
             marquee_view.stopScroll();
         }
+        if (mPresenter != null && mPresenter.getIsPlaying()) {
+            mPresenter.stopWatch();
+            restart=true;
+        }
     }
 
 
     @Override
     public void onStop() {
         super.onStop();
-        if (mPresenter != null) {
-            mPresenter.stopWatch();
-        }
     }
 
     @Override
@@ -469,6 +473,10 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }
         if (marquee_view != null && marquee_view.getVisibility() == View.VISIBLE) {
             marquee_view.startScroll();
+        }
+        if (mPresenter != null && restart) {
+            mPresenter.startWatch();
+            restart=false;
         }
     }
 

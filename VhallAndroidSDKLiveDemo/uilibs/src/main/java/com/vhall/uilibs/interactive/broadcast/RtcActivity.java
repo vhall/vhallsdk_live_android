@@ -6,12 +6,14 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Group;
 import android.support.v4.app.Fragment;
@@ -20,7 +22,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -29,6 +30,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.vhall.beautify.VHBeautifyKit;
+import com.vhall.beautifykit.control.FaceBeautyControlView;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.RequestDataCallback;
@@ -38,6 +41,7 @@ import com.vhall.net.NetBroadcastReceiver;
 import com.vhall.net.NetUtil;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.beautysource.FaceBeautyDataFactory;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.interactive.RtcInternal;
 import com.vhall.uilibs.interactive.broadcast.config.RtcConfig;
@@ -183,9 +187,12 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
         }
 
         initView();
-        //设置屏幕方向
+        //设置屏幕方向   // 0 竖屏 1横屏
         if (webinar_show_type == 1) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            initBeautifyData(0);
+        } else {
+            initBeautifyData(1);
         }
     }
 
@@ -828,19 +835,28 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
                 broadcastPresent.onSwitchAudio(!isVoice);
             }
         } else if (v.getId() == R.id.iv_beauty) {
-            showBeauty = !showBeauty;
-            if (isRtc) {
-                if (broadcastPresent != null) {
-                    broadcastPresent.showBeauty(showBeauty);
+            //新的美颜形式
+            if (VHBeautifyKit.getInstance().setBeautifyEnable(true)) {
+                changeVisibility();
+            }else {
+                if (beautyDialog == null) {
+                    beautyDialog = new OutDialogBuilder().layout(R.layout.dialog_beauty_no_serve)
+                            .build(getActivity());
                 }
             }
-            if (showBeauty) {
-                ivBeauty.setBackgroundResource(R.mipmap.icon_beauty_open);
-                baseShowToast("已开启美颜");
-            } else {
-                ivBeauty.setBackgroundResource(R.mipmap.icon_beauty_off);
-                baseShowToast("已关闭美颜");
-            }
+//            showBeauty = !showBeauty;
+//            if (isRtc) {
+//                if (broadcastPresent != null) {
+//                    broadcastPresent.showBeauty(showBeauty);
+//                }
+//            }
+//            if (showBeauty) {
+//                ivBeauty.setBackgroundResource(R.mipmap.icon_beauty_open);
+//                baseShowToast("已开启美颜");
+//            } else {
+//                ivBeauty.setBackgroundResource(R.mipmap.icon_beauty_off);
+//                baseShowToast("已关闭美颜");
+//            }
         } else if (v.getId() == R.id.iv_back) {
             docBack();
         } else if (v.getId() == R.id.iv_user_list) {
@@ -1260,5 +1276,31 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
             mTimerHandler.removeCallbacksAndMessages(null);
         }
         super.onDestroy();
+    }
+
+
+    // 高级美颜相关
+    private FaceBeautyControlView mFaceBeautyControlView;
+    private FaceBeautyDataFactory mFaceBeautyDataFactory;
+
+    private void changeVisibility() {
+        //新的美颜
+        if (mFaceBeautyControlView.getVisibility() == View.VISIBLE) {
+            mFaceBeautyControlView.setVisibility(View.GONE);
+        } else {
+            mFaceBeautyControlView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private OutDialog beautyDialog;
+
+    private void initBeautifyData(int orientation) {
+        mFaceBeautyDataFactory = new FaceBeautyDataFactory(getActivity());
+        mFaceBeautyControlView = findViewById(R.id.faceBeautyControlView);
+        mFaceBeautyControlView.setMainTabVisibility(false, true, true, false);
+        mFaceBeautyControlView.setSelectLineVisible();
+        // 0 横屏 1 竖屏
+        mFaceBeautyControlView.changeOrientation(orientation);
+        mFaceBeautyControlView.bindDataFactory(mFaceBeautyDataFactory);
     }
 }

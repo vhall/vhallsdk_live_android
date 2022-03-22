@@ -33,8 +33,6 @@ import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.CallBack;
 
 import org.fourthline.cling.android.AndroidUpnpService;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.vhwebrtc.SurfaceViewRenderer;
 
@@ -364,7 +362,10 @@ class VWatchNoDelayLivePresenter implements WatchContract.LivePresenter, ChatCon
             isPublic = true;
         }
     }
-
+    @Override
+    public boolean getIsPlaying() {
+        return false;
+    }
 
     @Override
     public void initWatch() {

@@ -3,14 +3,19 @@ package com.vhall.uilibs.broadcast;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 
+import com.vhall.beautifykit.control.FaceBeautyControlView;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.beautysource.FaceBeautyDataFactory;
 import com.vhall.uilibs.chat.PushChatFragment;
 import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.util.VhallUtil;
@@ -26,6 +31,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
     PushChatFragment chatFragment;
     private boolean noDelay = false;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,12 +94,19 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
         }else {
             BroadcastFragment mainFragment = (BroadcastFragment) getSupportFragmentManager().findFragmentById(R.id.broadcastFrame);
             if (mainFragment == null) {
-                mainFragment = BroadcastFragment.newInstance();
+                mainFragment = BroadcastFragment.newInstance(param.screenOri);
                 ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                         mainFragment, R.id.broadcastFrame);
             }
             new BroadcastPresenter(param, webinarInfo, this, mainFragment, chatFragment);
+            mainFragment.setIFaceBeautySwitch(new IFaceBeautySwitch() {
+                @Override
+                public void changeVisibility() {
+                   BroadcastActivity.this.changeVisibility();
+                }
+            });
         }
+        initBeautifyData(param.screenOri);
     }
 
 
@@ -144,4 +157,24 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
         super.onUserLeaveHint();
     }
 
+    // 高级美颜相关
+    private FaceBeautyControlView mFaceBeautyControlView;
+    private FaceBeautyDataFactory mFaceBeautyDataFactory;
+
+    private void changeVisibility(){
+        //新的美颜
+        if (mFaceBeautyControlView.getVisibility() == View.VISIBLE) {
+            mFaceBeautyControlView.setVisibility(View.GONE);
+        } else {
+            mFaceBeautyControlView.setVisibility(View.VISIBLE);
+        }
+    }
+    private void initBeautifyData(int orientation) {
+        mFaceBeautyDataFactory = new FaceBeautyDataFactory(getActivity());
+        mFaceBeautyControlView = findViewById(R.id.faceBeautyControlView);
+        mFaceBeautyControlView.setMainTabVisibility(false, true, true, false);
+        mFaceBeautyControlView.setSelectLineVisible();
+        mFaceBeautyControlView.changeOrientation(orientation);
+        mFaceBeautyControlView.bindDataFactory(mFaceBeautyDataFactory);
+    }
 }

@@ -3,10 +3,10 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.vhall.live"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 28
-        versionCode 623
-        versionName "6.2.3"
+        versionCode 630
+        versionName "6.3.0"
 
         multiDexEnabled true
         signingConfig signingConfigs.debug

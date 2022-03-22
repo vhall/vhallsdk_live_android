@@ -225,7 +225,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
     private Broadcast getBroadcast() {
         if (broadcast == null) {
             VHLivePushConfig config = new VHLivePushConfig(param.pixel_type);
-            Log.e("onCreate", "param.screenOri    " + param.screenOri);
+            //不设置 美颜瘦脸没有效果
             config.screenOri = param.screenOri;//横竖屏设置 重要
             //可不设置
             config.videoFrameRate = param.videoFrameRate;//帧率

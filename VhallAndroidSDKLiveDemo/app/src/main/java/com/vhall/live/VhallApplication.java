@@ -1,8 +1,11 @@
 package com.vhall.live;
 
+import static com.vhall.beautify.type.VHBeautifyCode.*;
+
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 import com.vhall.business.ErrorCode;
@@ -43,13 +46,18 @@ public class VhallApplication extends MultiDexApplication {
     /**
      * 要求 必须通过全局变量进行注册   内部类注册可能会被回收并且接收不到重要事件回调
      */
-    private IVHSDKListener mVHListener = (code, tips, args, bundle) -> {
-        if(ErrorCode.ERROR_TOKEN_EXPIRE == code){
-            // TODO: 6/29/21 可以尝试重新登陆SDK
-            ToastUtil.showToast("抱歉token 已过期,请重新登陆");
+    private IVHSDKListener mVHListener = new IVHSDKListener() {
+        @Override
+        public void onAction(int code, String tips, String args, Bundle bundle) {
+            if(ErrorCode.ERROR_TOKEN_EXPIRE == code){
+                ToastUtil.showToast("抱歉token 已过期,请重新登陆");
+            }else if(CODE_INIT_SUCCESS == code){
+                //美颜初始化成功 全局有一次即可确认美颜生效
+            }else if(CODE_INIT_FAILED == code){
+                //失败code码 其他详情参考文档
+            }
         }
     };
-
 
 
     @Override

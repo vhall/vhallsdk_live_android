@@ -1,13 +1,10 @@
 package com.vhall.uilibs.watch;
 
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.constraint.Group;
 import android.support.v4.app.Fragment;
-import android.text.Spannable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,31 +12,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.DensityUtils;
-import com.vhall.uilibs.util.emoji.EmojiUtils;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.data.ScrollInfoData;
-import com.vhall.vhss.network.ChatNetworkRequest;
 
 import org.vhwebrtc.SurfaceViewRenderer;
 
 import java.util.HashMap;
 
-import master.flame.danmaku.controller.IDanmakuView;
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.DanmakuContext;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 /**

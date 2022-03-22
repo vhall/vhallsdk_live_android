@@ -3,6 +3,7 @@ package com.vhall.uilibs.watch;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -94,8 +95,14 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
                 mPresenter.onStopTrackingTouch(seekBar);
             }
         });
-        mPresenter.start();
-
+        //自动播放
+        mPresenter.onPlayClick();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mPresenter.startPlay();
+            }
+        },200);
     }
 
     @Override

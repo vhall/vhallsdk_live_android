@@ -16,10 +16,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vhall.beautify.VHBeautifyKit;
 import com.vhall.push.VHLivePushFormat;
 import com.vhall.push.VHVideoCaptureView;
 import com.vhall.uilibs.R;
-import com.vhall.vhallrtc.client.VHRenderView;
+import com.vhall.uilibs.interactive.dialog.OutDialog;
+import com.vhall.uilibs.interactive.dialog.OutDialogBuilder;
 
 /**
  * 发直播的Fragment
@@ -35,7 +37,12 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
 
     private Activity mActivity;
     private PopupWindow mPopupWindow;
+    private IFaceBeautySwitch iFaceBeautySwitch;
 
+
+    public void setIFaceBeautySwitch(IFaceBeautySwitch iFaceBeautySwitch) {
+        this.iFaceBeautySwitch = iFaceBeautySwitch;
+    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -43,7 +50,10 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         mActivity = activity;
     }
 
-    public static BroadcastFragment newInstance() {
+    private static int orientation;
+
+    public static BroadcastFragment newInstance(int ori) {
+        orientation = ori;
         return new BroadcastFragment();
     }
 
@@ -114,14 +124,27 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         } else if (i == R.id.btn_changeFlash) {
             mPresenter.changeFlash();
         } else if (i == R.id.btn_changeFilter) {
-            showPopupWindow();
+            // showPopupWindow();  之前的美颜只能选等级
+            if (VHBeautifyKit.getInstance().isBeautifyAuthEnable()) {
+                if (iFaceBeautySwitch != null) {
+                    iFaceBeautySwitch.changeVisibility();
+                }
+            } else {
+                if (beautyDialog == null) {
+                    beautyDialog = new OutDialogBuilder().layout(R.layout.dialog_beauty_no_serve)
+                            .build(getActivity());
+                }
+                beautyDialog.show();
+            }
+
         } else if (i == R.id.tv_mode) {
             mPresenter.changeMode();
         } else if (i == R.id.btn_back) {
             getActivity().finish();
-        } else {
         }
     }
+
+    private OutDialog beautyDialog;
 
     @Override
     public VHVideoCaptureView getCameraView() {
@@ -202,12 +225,13 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
 
     @Override
     public void onDestroy() {
+        cameraview.releaseCapture();
         mPresenter.destroyBroadcast();
         super.onDestroy();
     }
 
 
-
+    //之前的美颜 只能选择等级
     private void showPopupWindow() {
         if (mPopupWindow == null) {
             View contentView = LayoutInflater.from(mActivity).inflate(
@@ -260,7 +284,7 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
                         getActivity().finish();
                     }
                 })
-                .setNegativeButton("取消",null)
+                .setNegativeButton("取消", null)
                 .create();
         alertDialog.show();
     }

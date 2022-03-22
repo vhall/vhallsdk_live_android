@@ -39,7 +39,7 @@ public class WatchContract {
         void dismissNotice();
 
         //显示签到框
-        void showSignIn(String signId, String title, int startTime);
+        void showSignIn(String signId ,String title,int startTime);
 
         //隐藏签到框
         void dismissSignIn();
@@ -254,6 +254,9 @@ public class WatchContract {
         void onDownMic(boolean own);
 
         void onUpMic();
+
+        //视频直播使用 返回当前播放状态
+        boolean getIsPlaying();
     }
 
     interface WatchPresenter extends BasePresenter {

@@ -10,18 +10,26 @@
 
     <com.vhall.vhallrtc.client.VHRenderView
         android:id="@+id/render_view"
-        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
-    <Button
-        android:id="@+id/btn_publish"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="5dp"
-        android:background="@drawable/icon_start_bro" />
+    <!--    <Button-->
+    <!--        android:id="@+id/btn_publish"-->
+    <!--        android:layout_width="60dp"-->
+    <!--        android:layout_height="60dp"-->
+    <!--        android:layout_alignParentRight="true"-->
+    <!--        android:layout_alignParentBottom="true"-->
+    <!--        android:layout_margin="5dp"-->
+    <!--        android:background="@drawable/icon_start_bro" />-->
+
+    <!--    <com.vhall.beautifykit.control.FaceBeautyControlView-->
+    <!--        android:id="@+id/faceBeautyControlView"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="@dimen/dimen_80dp"-->
+    <!--        android:layout_alignParentBottom="true"-->
+    <!--        android:layout_marginBottom="@dimen/dimen_60dp"-->
+    <!--        android:visibility="gone" />-->
 
     <LinearLayout
         android:id="@+id/ll_fuc"
@@ -69,10 +77,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:textColor="@color/white"
-            android:padding="5dp"
             android:background="@color/alpha"
-            android:text="FILL"/>
+            android:padding="5dp"
+            android:text="FILL"
+            android:textColor="@color/white" />
 
 
         <Button
@@ -87,7 +95,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_margin="5dp"
-            android:background="@drawable/img_beautify" />
+            android:background="@drawable/rtc_live_beauty_open" />
 
         <Button
             android:id="@+id/btn_changeCamera"
@@ -105,4 +113,12 @@
 
     </LinearLayout>
 
+    <Button
+        android:id="@+id/btn_publish"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="5dp"
+        android:background="@drawable/icon_start_bro" />
 </RelativeLayout>

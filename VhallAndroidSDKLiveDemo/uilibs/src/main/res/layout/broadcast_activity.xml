@@ -13,8 +13,16 @@
         android:id="@+id/chatFrame"
         android:layout_width="match_parent"
         android:layout_height="250dp"
+        android:visibility="visible"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="70dp" />
+
+    <com.vhall.beautifykit.control.FaceBeautyControlView
+        android:id="@+id/faceBeautyControlView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone" />
 
 </RelativeLayout>

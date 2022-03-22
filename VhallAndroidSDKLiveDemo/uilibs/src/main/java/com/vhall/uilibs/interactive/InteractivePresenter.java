@@ -9,8 +9,6 @@ import com.vhall.business.MessageServer;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business_interactive.InterActive;
 import com.vhall.uilibs.Param;
-import com.vhall.uilibs.interactive.broadcast.config.RtcConfig;
-import com.vhall.uilibs.util.UserManger;
 import com.vhall.vhallrtc.client.Room;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;

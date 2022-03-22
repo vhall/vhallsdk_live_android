@@ -725,7 +725,10 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
             isPublic = true;
         }
     }
-
+    @Override
+    public boolean getIsPlaying() {
+        return false;
+    }
     /**
      * 设置本地流
      */

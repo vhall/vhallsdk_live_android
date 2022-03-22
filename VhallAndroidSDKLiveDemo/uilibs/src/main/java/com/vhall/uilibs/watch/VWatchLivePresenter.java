@@ -320,7 +320,10 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
     public void onUpMic() {
 
     }
-
+    @Override
+    public boolean getIsPlaying() {
+        return getWatchLive().isPlaying();
+    }
     @Override
     public void initWatch() {
         if (webinarInfo != null) {

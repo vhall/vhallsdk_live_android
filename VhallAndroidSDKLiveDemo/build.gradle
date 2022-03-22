@@ -18,6 +18,11 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         maven {url 'http://4thline.org/m2'}
+
+        //美颜必须添加
+        maven {
+            url 'http://maven.faceunity.com/repository/maven-public/'
+        }
     }
 
     tasks.withType(Javadoc) {

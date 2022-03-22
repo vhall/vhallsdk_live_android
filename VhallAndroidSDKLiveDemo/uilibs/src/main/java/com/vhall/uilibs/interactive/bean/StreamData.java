@@ -99,8 +99,8 @@ public class StreamData {
         if (voice != -1) {
             return voice;
         }
-        JSONObject muteStream = stream.muteStream;
-        JSONObject remoteMuteStream = stream.remoteMuteStream;
+        org.json.JSONObject muteStream = stream.muteStream;
+        org.json.JSONObject remoteMuteStream = stream.remoteMuteStream;
         if (stream.isLocal) {
             if (muteStream != null) {
                 voice = !muteStream.optBoolean("audio", false) ? 1 : 0;
@@ -121,8 +121,8 @@ public class StreamData {
         if (camera != -1) {
             return camera;
         }
-        JSONObject muteStream = stream.muteStream;
-        JSONObject remoteMuteStream = stream.remoteMuteStream;
+        org.json.JSONObject muteStream = stream.muteStream;
+        org.json.JSONObject remoteMuteStream = stream.remoteMuteStream;
         if (stream.isLocal) {
             if (muteStream != null) {
                 camera = !muteStream.optBoolean("video", false) ? 1 : 0;
@@ -137,8 +137,8 @@ public class StreamData {
 
     public static int getCamera(Stream stream) {
         int camera = 1;
-        JSONObject muteStream = stream.muteStream;
-        JSONObject remoteMuteStream = stream.remoteMuteStream;
+        org.json.JSONObject muteStream = stream.muteStream;
+        org.json.JSONObject remoteMuteStream = stream.remoteMuteStream;
         if (stream.isLocal) {
             if (muteStream != null) {
                 camera = !muteStream.optBoolean("video", false) ? 1 : 0;

@@ -343,6 +343,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     @Override
+    public boolean getIsPlaying() {
+        return getWatchLive().isPlaying();
+    }
+
+    @Override
     public void initWatch() {
         if (webinarInfo != null) {
             getWatchLive().setWebinarInfo(webinarInfo);
@@ -370,6 +375,9 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     @Override
     public void startWatch() {
+        if (webinarInfo == null) {
+            return;
+        }
         getWatchLive().start();
         if (webinarInfo.getWebinarInfoData() != null && webinarInfo.getWebinarInfoData().scrollInfoData != null) {
             liveView.setScrollInfo(webinarInfo.getWebinarInfoData().scrollInfoData);
@@ -948,9 +956,6 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case ChatServer.eventCustomKey:
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
-                    if (chatInfo.onlineData != null) {
-                        watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
-                    }
                     break;
                 case ChatServer.eventOnlineKey:
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));

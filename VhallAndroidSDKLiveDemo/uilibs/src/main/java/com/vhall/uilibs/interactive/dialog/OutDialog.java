@@ -30,7 +30,11 @@ public class OutDialog extends Dialog {
     TextView tvTitle;
 
     public void init() {
-        setContentView(R.layout.dialog_out_login_exit);
+        if (builder.layout != 0) {
+            setContentView(builder.layout);
+        } else {
+            setContentView(R.layout.dialog_out_login_exit);
+        }
         TextView tv1 = findViewById(R.id.tv_1);
         TextView tv2 = findViewById(R.id.tv_2);
         tvTitle = findViewById(R.id.tv_title);

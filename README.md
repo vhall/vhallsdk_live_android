@@ -13,6 +13,9 @@ uilib里面的aar替换为maven依赖
 allprojects {
  maven{
        mavenCentral()
+       
+       //使用高级美颜添加 不用可以不写
+       maven {url 'http://maven.faceunity.com/repository/maven-public/'}
        }
 }
 ``` 
@@ -21,14 +24,23 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.2.3'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.2.3'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.3.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.3.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
 ```
 
 二、版本更新信息：
+
+版本：v6.3.0 更新时间 2022.3.22 <br>
+
+1.支持高级美颜 <br>
+   (1): 美颜功能优化。新增红润、大眼、瘦脸、锐化、白牙、亮眼等美颜功能；<br>
+   (2):   新增滤镜。支持接入自然款、粉嫩款、白亮款等6种滤镜；<br>
+2.修改直播间聊天回复信息格式，统一成和历史聊天记录一致，不再拼接。<br>
+3.优化底层服务  <br>
+4.修复助理文档翻页主持人不同步问题 <br>
 
 版本：v6.2.3 更新时间 2022.2.21<br>
 1.底层包名修改并且需要修改混淆相关，详情见大版本更新 6.2.3  <br>

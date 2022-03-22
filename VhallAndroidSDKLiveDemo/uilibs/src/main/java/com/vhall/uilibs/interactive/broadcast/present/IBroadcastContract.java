@@ -40,7 +40,7 @@ public interface IBroadcastContract {
         void forbidBroadcast();
         void userNoSpeaker(String userId);
 
-        void notifyRoleName(String type, String name);
+        void notifyRoleName(String type,String name);
     }
 
     interface RtcFragmentView extends IHostBaseView<IBroadcastPresent>{
@@ -83,7 +83,7 @@ public interface IBroadcastContract {
 
         ChatServer.Callback getChatCallback();
 
-        void setRtcFragmentView(RtcFragmentView rtcFragmentView);
+        void setRtcFragmentView(IBroadcastContract.RtcFragmentView rtcFragmentView);
     }
 
 
