@@ -1,5 +1,7 @@
 package com.vhall.uilibs.interactive;
 
+import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
+
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.util.Log;
@@ -8,6 +10,7 @@ import android.widget.Toast;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business_interactive.InterActive;
+import com.vhall.business_interactive.internal.VHInteractiveListener;
 import com.vhall.uilibs.Param;
 import com.vhall.vhallrtc.client.Room;
 import com.vhall.vhallrtc.client.Stream;
@@ -64,6 +67,24 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
                 }
                 interactive.setDefinition(definition);
                 setLocalView();
+
+                /**
+                 * since 6.3.1
+                 * 互动特殊事件通知
+                 */
+                interactive.setListener(new VHInteractiveListener() {
+                    @Override
+                    public void onEvent(int code, String msg) {
+                        switch (code) {
+                            case ERROR_LOGIN_MORE://被其他人踢出
+                                interActView.showToast(msg);
+                                interactive.unpublished();
+                                interActView.finish();
+                            default:
+                                break;
+                        }
+                    }
+                });
             }
 
             @Override

@@ -244,7 +244,6 @@ public class RenViewUtils {
     private static RoleNameData roleNameData = new RoleNameData("主持人", "嘉宾", "助理");
 
     public static boolean updateRoleName(RoleNameData roleName) {
-        Log.e("vhall_", "RenViewUtils " + roleNameData.host_name);
         if (roleName == null) {
             return false;
         }

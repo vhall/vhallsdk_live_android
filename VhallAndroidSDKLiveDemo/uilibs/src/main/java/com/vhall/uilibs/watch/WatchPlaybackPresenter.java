@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
 import static com.vhall.business.MessageServer.EVENT_SHOWBOARD;
 import static com.vhall.business.MessageServer.EVENT_SHOWDOC;
 import static com.vhall.business.WatchPlayback.SHOW_DOC_KEY;
@@ -93,7 +94,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                     if (getWatchPlayback().isPlaying()) {
                         playerCurrentPosition = getWatchPlayback().getCurrentPosition();
                         playbackView.setSeekbarCurrentPosition((int) playerCurrentPosition);
-                        Log.e(TAG,""+(int) playerCurrentPosition);
                     }
                     break;
                 default:
@@ -387,6 +387,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 }
             }
         }
+
         @Override
         public void onError(int errorCode, int innerError, String errorMsg) {
             switch (errorCode) {
@@ -434,7 +435,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                     playbackView.setPlayIcon(true);
                     break;
                 case END:
-                    Log.e(TAG, "STATE_END"+(int) playerDuration);
+                    Log.e(TAG, "STATE_END" + (int) playerDuration);
                     playerCurrentPosition = getWatchPlayback().getCurrentPosition();
                     playbackView.setSeekbarCurrentPosition((int) playerCurrentPosition);
                     playbackView.showProgressbar(false);
@@ -460,6 +461,10 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                     break;
                 case Constants.Event.EVENT_DPI_CHANGED:
                     playbackView.setQualityChecked(msg);
+                    break;
+                case ERROR_LOGIN_MORE://被其他人踢出
+                    watchView.showToast(msg);
+                    watchView.getActivity().finish();
                     break;
             }
         }
@@ -518,6 +523,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             }
         });
     }
+
     private class ChatCallback implements ChatServer.Callback {
         @Override
         public void onChatServerConnected() {
@@ -530,7 +536,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
         @Override
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
-            Log.e("ddd","ChatServer.eventMsgKey"+ChatServer.eventMsgKey);
+            Log.e("ddd", "ChatServer.eventMsgKey" + ChatServer.eventMsgKey);
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
@@ -545,6 +551,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
         }
     }
+
     @Override
     public void sendCustom(JSONObject text) {
 

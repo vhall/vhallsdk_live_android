@@ -11,10 +11,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.vhall.beautify.DefaultFaceBeautySource;
 import com.vhall.beautifykit.control.FaceBeautyControlView;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.beautysource.BeautyManager;
 import com.vhall.uilibs.beautysource.FaceBeautyDataFactory;
 import com.vhall.uilibs.chat.PushChatFragment;
 import com.vhall.uilibs.util.ActivityUtils;

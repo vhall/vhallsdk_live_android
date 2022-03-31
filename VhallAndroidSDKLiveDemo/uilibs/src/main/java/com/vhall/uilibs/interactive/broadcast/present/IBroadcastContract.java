@@ -9,9 +9,6 @@ import com.vhall.business.data.WebinarInfo;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhss.CallBack;
-import com.vhall.vhss.data.WebinarInfoData;
-
-import vhall.com.vss2.data.VssMessageChatData;
 
 /**
  * @author hkl

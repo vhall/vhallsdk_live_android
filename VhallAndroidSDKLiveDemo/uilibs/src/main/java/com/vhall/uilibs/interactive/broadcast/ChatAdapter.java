@@ -15,11 +15,8 @@ import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.BaseUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
-import com.vhall.uilibs.widget.MyImageSpan;
 import com.vhall.uilibs.widget.RadiusBackgroundSpan;
 import com.vhall.vhss.data.RoleNameData;
-
-import vhall.com.vss2.data.VssMessageChatData;
 
 
 /**

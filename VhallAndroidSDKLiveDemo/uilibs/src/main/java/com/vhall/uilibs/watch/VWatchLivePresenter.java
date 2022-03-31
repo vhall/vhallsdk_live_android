@@ -1,5 +1,7 @@
 package com.vhall.uilibs.watch;
 
+import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
+
 import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.Log;
@@ -14,7 +16,6 @@ import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
-import com.vhall.business.utils.SurveyInternal;
 import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.player.VHPlayerListener;
@@ -25,7 +26,6 @@ import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.chat.VChatFragment;
 import com.vhall.uilibs.util.emoji.InputUser;
-import com.vhall.vhss.TokenManger;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONArray;
@@ -33,11 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import vhall.com.vss2.VssSdk;
 
 //TODO 投屏相关
 
@@ -565,6 +561,10 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
                     break;
                 case com.vhall.player.Constants.Event.EVENT_STREAM_STOP://发起端停止推流
                     break;
+
+                case ERROR_LOGIN_MORE://被其他人踢出
+                    watchView.showToast(msg);
+                    watchView.getActivity().finish();
                 default:
                     break;
 

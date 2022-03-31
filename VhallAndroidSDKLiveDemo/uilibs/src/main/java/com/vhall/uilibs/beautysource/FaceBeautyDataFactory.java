@@ -5,9 +5,12 @@ import android.content.Context;
 import android.util.Log;
 
 import com.faceunity.core.controller.facebeauty.FaceBeautyParam;
+import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.model.facebeauty.FaceBeauty;
 import com.vhall.beautify.DefaultFaceBeautyDataFactory;
 import com.vhall.beautify.VHBeautifyKit;
+import com.vhall.beautify.type.VHBeautifyFilterConfig;
+import com.vhall.beautify.type.VHBeautifyParamConfig;
 import com.vhall.beautifykit.entity.FaceBeautyBean;
 import com.vhall.beautifykit.entity.FaceBeautyFilterBean;
 import com.vhall.beautifykit.entity.FaceBeautyStyleBean;
@@ -106,7 +109,6 @@ public class FaceBeautyDataFactory extends AbstractFaceBeautyDataFactory {
      */
     @Override
     public int getCurrentFilterIndex() {
-        Log.e("vhall_", "getCurrentFilterIndex = " + BeautyManager.getFilterSelectFromCatch(context));
         return BeautyManager.getFilterSelectFromCatch(context);
     }
 
@@ -176,8 +178,6 @@ public class FaceBeautyDataFactory extends AbstractFaceBeautyDataFactory {
     public double getParamIntensity(String key, double origin) {
 
         double beautyItemNumFromCatch = BeautyManager.getBeautyItemNumFromCatch(context, key, origin);
-        Log.e("vhall_", "getParamIntensity  key= " + key + "    value =  " + beautyItemNumFromCatch);
-
         return beautyItemNumFromCatch;
     }
 
@@ -189,7 +189,6 @@ public class FaceBeautyDataFactory extends AbstractFaceBeautyDataFactory {
      */
     @Override
     public void updateParamIntensity(String key, double value, boolean catchData) {
-        Log.e("vhall_", "updateParamIntensity  key= " + key + "    value =  " + value + "    catchData =  " + catchData);
         VHBeautifyKit.getInstance().updateParamIntensity(key, value);
         if (catchData)
             BeautyManager.setBeautyItemNum(key, String.valueOf(value), context);
@@ -225,9 +224,6 @@ public class FaceBeautyDataFactory extends AbstractFaceBeautyDataFactory {
      */
     @Override
     public void onFilterSelected(String name, double intensity, int position) {
-
-        Log.e("vhall_", "onFilterSelected  name= " + name + "    intensity =  " + intensity);
-
         VHBeautifyKit.getInstance().setFilter(name, intensity);
         BeautyManager.setBeautyItemNum(name, String.valueOf(intensity), context);
         BeautyManager.setFilterSelect(position, context);
@@ -240,10 +236,7 @@ public class FaceBeautyDataFactory extends AbstractFaceBeautyDataFactory {
      */
     @Override
     public void updateFilterIntensity(String name, double intensity) {
-
-        Log.e("vhall_", "updateFilterIntensity  name= " + name + "    intensity =  " + intensity);
-
-        VHBeautifyKit.getInstance().setFilter(name,intensity);
+        VHBeautifyKit.getInstance().setFilter(name, intensity);
         BeautyManager.setBeautyItemNum(name, String.valueOf(intensity), context);
     }
 
@@ -270,7 +263,6 @@ public class FaceBeautyDataFactory extends AbstractFaceBeautyDataFactory {
     @Override
     public void setOpenBeauty(boolean open) {
         BeautyManager.setBeautySwitch(open, context);
-        Log.e("vhall_", "setOpenBeauty = " + open);
     }
 
     @Override

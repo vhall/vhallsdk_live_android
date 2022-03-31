@@ -15,7 +15,6 @@ public class BeautyManager {
     //获取 当前选择的第几个滤镜
     public static int getFilterSelectFromCatch(Context context) {
         if (context == null) {
-            Log.e("vhall_", "getFilterSelectFromCatch  empty context");
             return 1;
         }
         SharedPreferences sp = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -26,7 +25,6 @@ public class BeautyManager {
     //存储 当前选择的第几个滤镜
     public static void setFilterSelect(int filterSelect, Context context) {
         if (context == null) {
-            Log.e("vhall_", "setFilterSelect  empty context");
             return;
         }
         SharedPreferences sp = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -37,7 +35,6 @@ public class BeautyManager {
 
     public static boolean getBeautySwitchFromCatch(Context context) {
         if (context == null) {
-            Log.e("vhall_", "getBeautySwitchFromCatch  empty context");
             return true;
         }
         SharedPreferences sp = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -47,7 +44,6 @@ public class BeautyManager {
 
     public static void setBeautySwitch(boolean beautySwitch, Context context) {
         if (context == null) {
-            Log.e("vhall_", "setBeautySwitch  empty context");
             return;
         }
         SharedPreferences sp = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
@@ -58,7 +54,6 @@ public class BeautyManager {
 
     public static double getBeautyItemNumFromCatch(Context context, String key, double origin) {
         if (context == null) {
-            Log.e("vhall_", "getBeautyItemNumFromCatch  empty context");
             return origin;
         }
         try {
@@ -74,7 +69,6 @@ public class BeautyManager {
     //设置当前进度 瘦脸的大小
     public static void setBeautyItemNum(String key, String value, Context context) {
         if (context == null) {
-            Log.e("vhall_", "setBeautyItemNum  empty context");
             return;
         }
         SharedPreferences sp = context.getSharedPreferences(SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);

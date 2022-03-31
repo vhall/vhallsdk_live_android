@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.constraint.Group;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -327,7 +326,6 @@ public class VWatchNoDelayLiveFragment extends Fragment implements WatchContract
                     VHRenderView vhRenderView = new VHRenderView(getActivity());
                     vhRenderView.init(null, null);
                     stream.addRenderView(vhRenderView);
-                    Log.e("vhall_", vhRenderView.getStream() + "   add ");
                     llRenderView.addView(vhRenderView, renderViewWidth, renderViewHeight);
                 }
             }
@@ -347,7 +345,6 @@ public class VWatchNoDelayLiveFragment extends Fragment implements WatchContract
                         VHRenderView view = (VHRenderView) llRenderView.getChildAt(i);
                         if (view != null && view.getStream() != null && view.getStream().streamId.equals(stream.streamId)) {
                             view.release();
-                            Log.e("vhall_", " remove");
                             llRenderView.removeView(view);
                             stream.removeAllRenderView();
                             return;

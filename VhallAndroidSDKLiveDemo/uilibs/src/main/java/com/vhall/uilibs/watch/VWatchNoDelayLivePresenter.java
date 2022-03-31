@@ -1,25 +1,22 @@
 package com.vhall.uilibs.watch;
 
+import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
+
 import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
-import com.vhall.business.WatchLive;
-import com.vhall.business.common.Constants;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
 import com.vhall.business_interactive.InterActive;
+import com.vhall.business_interactive.internal.VHInteractiveListener;
 import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.business_support.dlna.DeviceDisplay;
-import com.vhall.player.VHPlayerListener;
-import com.vhall.player.stream.play.impl.VHVideoPlayerView;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
@@ -96,6 +93,25 @@ class VWatchNoDelayLivePresenter implements WatchContract.LivePresenter, ChatCon
                 @Override
                 public void onSuccess() {
                     interactive.enterRoom();
+                    /**
+                     * since 6.3.1
+                     * 互动特殊事件通知
+                     */
+                    interactive.setListener(new VHInteractiveListener() {
+                        @Override
+                        public void onEvent(int code, String msg) {
+                            switch (code) {
+                                case ERROR_LOGIN_MORE://被其他人踢出
+                                    watchView.showToast(msg);
+                                    if (isPublic){
+                                        interactive.unpublished();
+                                    }
+                                    watchView.getActivity().finish();
+                                default:
+                                    break;
+                            }
+                        }
+                    });
                 }
 
                 @Override

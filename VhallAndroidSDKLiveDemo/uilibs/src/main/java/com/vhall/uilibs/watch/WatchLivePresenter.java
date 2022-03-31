@@ -2,7 +2,6 @@ package com.vhall.uilibs.watch;
 
 import android.graphics.Color;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -22,7 +21,6 @@ import com.vhall.business.utils.SurveyInternal;
 import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.player.VHPlayerListener;
-import com.vhall.player.stream.play.IVHVideoPlayer;
 import com.vhall.player.stream.play.impl.VHVideoPlayerView;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
@@ -676,7 +674,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case com.vhall.player.Constants.Event.EVENT_STREAM_STOP://发起端停止推流
                     break;
-                case ERROR_LOGIN_MORE://被其他人提出
+                case ERROR_LOGIN_MORE://被其他人踢出
                     watchView.showToast(msg);
                     watchView.getActivity().finish();
                     break;

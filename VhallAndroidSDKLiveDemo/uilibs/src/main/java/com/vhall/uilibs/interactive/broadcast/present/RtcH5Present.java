@@ -38,7 +38,6 @@ import static com.vhall.business.MessageServer.EVENT_PERMIT_CHAT;
 import static com.vhall.business.MessageServer.EVENT_VRTC_CONNECT_REFUSED;
 import static com.vhall.business.MessageServer.EVENT_VRTC_CONNECT_SUCCESS;
 import static com.vhall.business.MessageServer.EVENT_VRTC_SPEAKER_SWITCH;
-import static vhall.com.vss2.module.room.MessageTypeData.MESSAGE_EDIT_WEBINAR_ROLE_NAME;
 
 public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
     private static final String TAG = "BroadcastPresent";
