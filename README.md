@@ -13,7 +13,7 @@ uilib里面的aar替换为maven依赖
 allprojects {
  maven{
        mavenCentral()
-       
+       //since 6.3.0
        //使用高级美颜添加 不用可以不写
        maven {url 'http://maven.faceunity.com/repository/maven-public/'}
        }
@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.3.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.3.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.3.1'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.3.1'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
