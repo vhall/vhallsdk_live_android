@@ -7,9 +7,12 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -32,7 +35,7 @@ public class WebViewActivity extends FragmentActivity {
     WebSettings webSettings;
     RelativeLayout rlContent;
     private Param param;
-    private String baseUrl= "https://e.vhall.com/webinar/inituser/";
+    private String baseUrl = "https://e.vhall.com/webinar/inituser/";
     //https://live.vhall.com/room/embedclient/854954136?
     //<iframe allow="camera *;microphone *;" allowfullscreen="true" border="0" src="https://live.vhall.com/webinar/inituser/263823730" width="800" height="600"></iframe>
     private String roomId = "";
@@ -66,24 +69,26 @@ public class WebViewActivity extends FragmentActivity {
             webSettings.setMediaPlaybackRequiresUserGesture(false);
         }
 
+        String url = getIntent().getStringExtra("url");
+        if (TextUtils.isEmpty(url)) {
+            WebinarInfoRemote.getInstance().getWatchWebinarInfo(roomId, "", "", "", "", "", new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+                @Override
+                public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                    baseUrl = "https://t-webinar.e.vhall.com/v3/lives/watch/";
+                    baseUrl = baseUrl + roomId;
+                    webView.loadUrl(baseUrl);
+                }
 
-        WebinarInfoRemote.getInstance().getWatchWebinarInfo(roomId, "", "", "", "", "", new WebinarInfoDataSource.LoadWebinarInfoCallback() {
-            @Override
-            public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
-                baseUrl = "https://t-webinar.e.vhall.com/v3/lives/watch/";
-                baseUrl = baseUrl + roomId;
-                webView.loadUrl(baseUrl);
-            }
+                @Override
+                public void onError(int errorCode, String errorMsg) {
+                    baseUrl = baseUrl + roomId;
 
-            @Override
-            public void onError(int errorCode, String errorMsg) {
-                baseUrl = baseUrl + roomId;
-
-                webView.loadUrl(baseUrl);
-            }
-        });
-
-
+                    webView.loadUrl(baseUrl);
+                }
+            });
+        } else {
+            webView.loadUrl(url);
+        }
 
 
         webView.setWebViewClient(new WebViewClient() {
@@ -108,17 +113,24 @@ public class WebViewActivity extends FragmentActivity {
             }
         });
 
-        webView.setWebChromeClient(new WebChromeClient(){
+        webView.setWebChromeClient(new WebChromeClient() {
             AlertDialog alertDialog = null;
             private View mCustomView;
             private CustomViewCallback mCustomViewCallback;
 
 
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onPermissionRequest(final PermissionRequest request) {
+                //设置用户麦克风和摄像头权限，没有这个上不了麦
+                request.grant(request.getResources());
+            }
+
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
                 super.onShowCustomView(view, callback);
                 //实现播放器全屏响应
-                if(mCustomView != null){
+                if (mCustomView != null) {
                     callback.onCustomViewHidden();
                     return;
                 }
@@ -135,23 +147,23 @@ public class WebViewActivity extends FragmentActivity {
                 //实现播放器退出全屏响应
                 webView.setVisibility(View.VISIBLE);
                 webView.requestFocus(View.FOCUS_DOWN);
-                if(mCustomView == null){
+                if (mCustomView == null) {
                     return;
                 }
                 mCustomView.setVisibility(View.GONE);
                 rlContent.removeView(mCustomView);
                 mCustomViewCallback.onCustomViewHidden();
-                mCustomView =null;
+                mCustomView = null;
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                 alertDialog = new AlertDialog.Builder(webView.getContext()).create();
                 alertDialog.show();
                 webView.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if(alertDialog != null && alertDialog.isShowing())
+                        if (alertDialog != null && alertDialog.isShowing())
                             alertDialog.cancel();
                     }
-                },50);
+                }, 50);
             }
 
         });

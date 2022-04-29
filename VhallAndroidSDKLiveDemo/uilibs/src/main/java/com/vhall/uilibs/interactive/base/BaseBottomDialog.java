@@ -14,9 +14,10 @@ import com.vhall.uilibs.R;
  * Date: 2020-04-30 15:13
  */
 public abstract class BaseBottomDialog extends Dialog {
-
+    protected Context mContext;
     public BaseBottomDialog(Context context) {
         super(context);
+        mContext=context;
         init();
     }
 

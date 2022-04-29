@@ -306,6 +306,13 @@ public class VWatchNoDelayLiveFragment extends Fragment implements WatchContract
             return;
         }
 
+        /**
+         *  视频轮训 需要过滤不显示
+         */
+        if (stream.getStreamType() == 5) {
+            return;
+        }
+
         if (!del) {
             if (stream.getStreamType() == 3 || stream.getStreamType() == 4) {
                 addShareView(stream);

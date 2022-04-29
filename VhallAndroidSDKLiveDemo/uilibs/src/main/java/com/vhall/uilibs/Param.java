@@ -35,6 +35,7 @@ public class Param implements Serializable {
     public List<String> filters=new ArrayList<>();
     //当前选择的是不是无延迟观看（是无延迟互动 上麦后关闭页面）
     public boolean noDelay=false;
+    public String web_url;
 
     //互动相关
 //    public int interactive_definition = VHILSS.SD;

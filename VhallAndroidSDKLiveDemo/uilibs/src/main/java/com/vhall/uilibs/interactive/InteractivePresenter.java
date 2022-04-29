@@ -269,6 +269,13 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
         @Override
         public void onDidSubscribeStream(Stream stream, final VHRenderView newRenderView) {
             Log.e(TAG, "onDidSubscribeStream");
+
+            /**
+             *  视频轮训 需要过滤不显示
+             */
+            if (stream != null && stream.getStreamType() == 5) {
+                return;
+            }
             new Handler().post(new Runnable() {
                 @Override
                 public void run() {
@@ -302,6 +309,12 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
 
         @Override
         public void onDidRemoveStream(Room room, final Stream stream) {
+            /**
+             *  视频轮训 需要过滤不显示
+             */
+            if (stream != null && stream.getStreamType() == 5) {
+                return;
+            }
             Log.e(TAG, "onDidRemoveStream");
             interFraView.removeStream(stream);
         }

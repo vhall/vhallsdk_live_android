@@ -1,8 +1,8 @@
 package com.vhall.live;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Build;
@@ -10,34 +10,36 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.vhall.business.VhallSDK;
-import com.vhall.business.data.RequestDataCallbackV2;
+import com.vhall.business.data.RequestCallback;
+import com.vhall.business.data.RequestDataCallback;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.WebinarInfoDataSource;
 import com.vhall.live.webWatch.WebViewActivity;
 import com.vhall.live.widget.LiveSelectMenuWidget;
 import com.vhall.logmanager.L;
+import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.broadcast.BroadcastActivity;
 import com.vhall.uilibs.interactive.broadcast.RtcActivity;
 import com.vhall.uilibs.util.HeadsetUtil;
 import com.vhall.uilibs.util.ToastUtil;
-import com.vhall.uilibs.util.UserManger;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.watch.VWatchActivity;
 import com.vhall.uilibs.watch.WatchActivity;
-import com.vhall.vhss.TokenManger;
-import com.vhall.vhss.data.GuestJoinInfoData;
-
-import java.util.UUID;
+import com.vhall.uilibs.widget.AgreementDialog;
+import com.vhall.vhss.CallBack;
+import com.vhall.vhss.data.AgreementData;
+import com.vhall.vhss.network.ActivityNetworkRequest;
 
 
 /**
@@ -46,7 +48,7 @@ import java.util.UUID;
 public class MainActivity extends FragmentActivity implements LiveSelectMenuWidget.OnMenuListener {
     private final static String TAG = MainActivity.class.getSimpleName();
 
-    TextView tv_phone, tv_name, tv_login;
+    TextView tv_phone, tv_name, tv_login, watch_id, broadcast_id;
     ImageView mCircleViewAvatar;
     Param param = null;
 
@@ -65,6 +67,7 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
     private final static String HALF_SCREEN_NO_DELAY_WATCH = "半屏无延迟观看";
     private final static String ALL_SCREEN_NO_DELAY_WATCH = "全屏无延迟观看";
     private final static String ALL_SCREEN_WATCH = "全屏观看";
+    private final static String WATCH_PLAY_BACK = "观看回放";
     private final static String VERTICAL_LIVE = "竖屏直播";
     private final static String VERTICAL_NO_DELAY_LIVE = "竖屏无延迟直播";
     private final static String HORIZONTAL_NO_DELAY_LIVE = "横屏无延迟直播";
@@ -79,6 +82,8 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         HeadsetUtil.init(getApplication());
         tv_phone = this.findViewById(R.id.tv_phone);
         tv_name = this.findViewById(R.id.text_name);
+        watch_id = this.findViewById(R.id.watch_id);
+        broadcast_id = this.findViewById(R.id.broadcast_id);
         mCircleViewAvatar = this.findViewById(R.id.iv_avatar);
         tv_login = this.findViewById(R.id.tv_login);
         select_window = this.findViewById(R.id.select_window);
@@ -112,28 +117,22 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
     public void onClick(String name) {
         switch (name) {
             case HALF_SCREEN_WATCH:
-                onHScreenClick();
-                break;
             case HALF_SCREEN_NO_DELAY_WATCH:
-                onHNoDelayScreenClick();
-                break;
             case ALL_SCREEN_NO_DELAY_WATCH:
-                onNoDelayVScreenClick();
-                break;
             case ALL_SCREEN_WATCH:
-                onVScreenClick();
+                getAgreement(name);
                 break;
             case VERTICAL_LIVE:
-                startBroadcastActivity(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+                startBroadcastActivity(VHLivePushFormat.SCREEN_ORI_PORTRAIT);
                 break;
             case HORIZONTAL_LIVE:
-                startBroadcastActivity(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                startBroadcastActivity(VHLivePushFormat.SCREEN_ORI_LANDSPACE);
                 break;
             case VERTICAL_NO_DELAY_LIVE:
-                startNoDelayBroadcastActivity(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+                startNoDelayBroadcastActivity(VHLivePushFormat.SCREEN_ORI_PORTRAIT);
                 break;
             case HORIZONTAL_NO_DELAY_LIVE:
-                startNoDelayBroadcastActivity(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                startNoDelayBroadcastActivity(VHLivePushFormat.SCREEN_ORI_LANDSPACE);
                 break;
             case HOST_INTERACTIVE:
                 startRtcActivity();
@@ -198,9 +197,9 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
 
             @Override
             public void onError(int errorCode, String errorMsg) {
-                L.e(TAG, errorMsg);
+                L.e(TAG, errorMsg + "");
                 hideLoading();
-                ToastUtil.showToast(MainActivity.this, errorMsg);
+                ToastUtil.showToast(MainActivity.this, errorMsg + "");
             }
         }, true);
     }
@@ -236,6 +235,10 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         } else {
             tv_login.setText(R.string.logoff);
             mCircleViewAvatar.setBackground(getResources().getDrawable(R.drawable.icon_default_avatar));
+        }
+        if (param != null) {
+            watch_id.setText(String.format("观看端id-%s", param.watchId));
+            broadcast_id.setText(String.format("发起端id-%s", param.broId));
         }
     }
 
@@ -311,10 +314,7 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
 
 
     public void onWatchPlayback(View view) {
-        Intent intent = new Intent(this, WatchActivity.class);
-        intent.putExtra("param", param);
-        intent.putExtra("type", VhallUtil.WATCH_PLAYBACK);
-        startActivity(intent);
+        getAgreement(WATCH_PLAY_BACK);
     }
 
     public void onSetParam(View view) {
@@ -364,5 +364,87 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         intent.putExtra("type", VhallUtil.WATCH_LIVE);
         intent.putExtra("no_delay", true);
         startActivity(intent);
+    }
+
+
+    AgreementDialog agreementDialog;
+
+    private void getAgreement(String name) {
+        /**
+         * param.watchId 活动id
+         * AgreementData 观看协议数据类
+         */
+        VhallSDK.getAgreement(param.watchId, new RequestDataCallback() {
+            @Override
+            public void onSuccess(Object result) {
+                AgreementData agreementData = (AgreementData) result;
+                // is_open  声明状态  0:关 1:开
+                // is_agree 当前用户是否同意 0:未同意 1:同意
+                if (agreementData != null && TextUtils.equals("1", agreementData.is_open) && !TextUtils.equals("1", agreementData.is_agree)) {
+                    if (agreementDialog == null) {
+                        agreementDialog = new AgreementDialog(MainActivity.this);
+                        agreementDialog.setOnItemClickLister(new AgreementDialog.OnItemClickLister() {
+                            @Override
+                            public void onItemClick() {
+                                // 调用了这个接口 就不会展示弹窗第二次
+                                VhallSDK.setUserAgreeAgreement(param.watchId, new RequestCallback() {
+                                    @Override
+                                    public void onSuccess() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(int errorCode, String errorMsg) {
+                                        ToastUtil.showToast(errorMsg);
+                                    }
+                                });
+                                jumpWatch(name);
+                            }
+
+                            @Override
+                            public void jumpWeb(String url) {
+                                Intent intent = new Intent(MainActivity.this, WebViewActivity.class);
+                                intent.putExtra("url", url);
+                                startActivity(intent);
+                            }
+                        });
+                    }
+                    agreementDialog.setAgreementData(agreementData);
+                    agreementDialog.show();
+                } else {
+                    jumpWatch(name);
+                }
+            }
+
+            @Override
+            public void onError(int eventCode, String msg) {
+                ToastUtil.showToast(msg);
+                jumpWatch(name);
+            }
+        });
+    }
+
+    private void jumpWatch(String name) {
+        switch (name) {
+            case HALF_SCREEN_WATCH:
+                onHScreenClick();
+                break;
+            case HALF_SCREEN_NO_DELAY_WATCH:
+                onHNoDelayScreenClick();
+                break;
+            case ALL_SCREEN_NO_DELAY_WATCH:
+                onNoDelayVScreenClick();
+                break;
+            case ALL_SCREEN_WATCH:
+                onVScreenClick();
+                break;
+
+            case WATCH_PLAY_BACK:
+                Intent intent = new Intent(this, WatchActivity.class);
+                intent.putExtra("param", param);
+                intent.putExtra("type", VhallUtil.WATCH_PLAYBACK);
+                startActivity(intent);
+                break;
+        }
     }
 }

@@ -134,6 +134,14 @@
                             android:textColor="@color/black"
                             android:textSize="@dimen/common_button_textsize" />
 
+                        <TextView
+                            android:id="@+id/broadcast_id"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/dimen_10dp"
+                            android:gravity="end"
+                            android:text="发起端id" />
+
                     </RelativeLayout>
 
                 </TableRow>
@@ -187,6 +195,14 @@
                             android:text="观看回放"
                             android:textColor="@color/black"
                             android:textSize="@dimen/common_button_textsize" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:id="@+id/watch_id"
+                            android:text="观看端id"
+                            android:layout_margin="@dimen/dimen_10dp"
+                            android:gravity="end"
+                            android:layout_height="wrap_content"/>
 
                     </RelativeLayout>
                 </TableRow>

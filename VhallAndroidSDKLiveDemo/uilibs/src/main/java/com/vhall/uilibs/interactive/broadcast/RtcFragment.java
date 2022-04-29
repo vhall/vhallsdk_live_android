@@ -772,7 +772,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
 
     private void setChoose(int selectPoint) {
         if (pointLayout == null)
-           return;
+            return;
         if (pointLayout.getChildCount() != views.size()) {
             pointLayout.removeAllViews();
             for (int i = 0; i < views.size(); i++) {
@@ -871,8 +871,18 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
          *    VhallStreamTypeOnlyVideo = 1,
          *    VhallStreamTypeAudioAndVideo = 2,
          *    VhallStreamTypeScreen = 3,  // 屏幕共享
-         *    VhallStreamTypeFile = 4 //
+         *    VhallStreamTypeFile = 4 //插播
+         *    VhallStreamTypeVideoPatral = 5 //  视频轮训 需要过滤不显示
          */
+
+
+        /**
+         *  视频轮训 需要过滤不显示
+         */
+        if (stream.getStreamType() == 5) {
+            return;
+        }
+
         /**
          *只要订阅到有人插播视频了，就把麦克风关一下。 解决插播时文件声音混入别人说话的声音。
          */
@@ -907,6 +917,13 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         if (stream == null) {
             return;
         }
+        /**
+         *  视频轮训 需要过滤不显示
+         */
+        if (stream.getStreamType() == 5) {
+            return;
+        }
+
         stream.removeAllRenderView();
         if (stream.getStreamType() == 3 || stream.getStreamType() == 4) {
             removeShareView();

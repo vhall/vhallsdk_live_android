@@ -2,8 +2,6 @@ package com.vhall.uilibs.interactive.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
@@ -14,7 +12,6 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
@@ -26,18 +23,14 @@ import com.chad.library.adapter.base.BaseViewHolder;
 import com.vhall.business.data.RequestDataCallbackV2;
 import com.vhall.business_interactive.InterActive;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.interactive.base.BaseBottomDialog;
 import com.vhall.uilibs.interactive.base.OnNoDoubleClickListener;
-import com.vhall.uilibs.interactive.broadcast.DocChooseActivity;
 import com.vhall.uilibs.interactive.broadcast.config.RtcConfig;
 import com.vhall.uilibs.interactive.doc.EnumDoc;
 import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.vhss.data.DocListInfoData;
-import com.vhall.vhss.data.WebinarInfoData;
 
 import java.text.DecimalFormat;
-import java.util.List;
 
 /**
  * @author hkl

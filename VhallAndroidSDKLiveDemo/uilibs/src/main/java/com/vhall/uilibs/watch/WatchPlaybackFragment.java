@@ -100,7 +100,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             public void run() {
                 mPresenter.startPlay();
             }
-        },200);
+        },500);
     }
 
     @Override
