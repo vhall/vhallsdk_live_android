@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.3.2'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.3.2'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.3.3'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.3.3'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -33,18 +33,27 @@ allprojects {
 
 二、版本更新信息：
 
+版本：v6.3.3 更新时间 2022.5.6
+
+1. 活动详情增加 List<String> permission 嘉宾权限列表  [房间新增字段信息说明](https://saas-doc.vhall.com/docs/show/1217 "房间新增字段信息说明")
+msginfo 增加inviter_account_id 字段[新增消息字段信息说明](https://saas-doc.vhall.com/docs/show/1214 "新增消息字段信息说明")<br>
+
+2. 增加嘉宾作为主讲人上麦 使用步骤[demo中新功能对应使用文档](https://saas-doc.vhall.com/docs/show/1445 "demo中新功能对应使用文档") <br>
+
+3. 优化已知bug <br>
+
 
 版本：v6.3.2 更新时间 2022.4.29
 
-1.增加观看协议-回放和看直播前调用<br>
-2.增加观看协议 使用步骤[demo中新功能对应使用文档](https://saas-doc.vhall.com/docs/show/1445 "demo中新功能对应使用文档") <br>
-3.优化已知bug <br>
+1. 增加观看协议-回放和看直播前调用<br>
+2. 增加观看协议 使用步骤[demo中新功能对应使用文档](https://saas-doc.vhall.com/docs/show/1445 "demo中新功能对应使用文档") <br>
+3. 优化已知bug <br>
 
 
 版本：v6.3.1 更新时间 2022.3.30
 
-1.支持观看回放，无延迟直播，互动时 相同账号踢出功能<br>
-2.优化已知bug <br>
+1. 支持观看回放，无延迟直播，互动时 相同账号踢出功能<br>
+2. 优化已知bug <br>
 
 
 版本：v6.3.0 更新时间 2022.3.22 <br>

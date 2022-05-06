@@ -8,11 +8,13 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
@@ -50,6 +52,7 @@ import java.util.List;
 public class UserListNewFragment extends BaseFragment {
 
     private InterActive mInterActive = RtcConfig.getInterActive();
+
     public static UserListNewFragment getInstance(String type, WebinarInfoData roomInfoData, boolean isGuest, boolean canSpeak, boolean canManger) {
         UserListNewFragment fragment = new UserListNewFragment();
         Bundle bundle = new Bundle();
@@ -69,7 +72,7 @@ public class UserListNewFragment extends BaseFragment {
     private SwipeRefreshLayout refreshLayout;
     private UserListAdapter adapter;
     private int page = 1;
-//    private UserListPresent present;
+    //    private UserListPresent present;
     private View inflate;
     /**
      * 是否加载数据
@@ -91,7 +94,12 @@ public class UserListNewFragment extends BaseFragment {
      * 是不是互动直播
      */
     private boolean canSpeak;
-    
+
+    //嘉宾邀请人上麦权限
+    private boolean guestCanInventPermission = false;
+    //嘉宾邀请人上麦 有权限且是主讲人
+    private boolean guestCanInvent = false;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -100,6 +108,18 @@ public class UserListNewFragment extends BaseFragment {
 
         type = getArguments().getString("type");
         roomInfoData = (WebinarInfoData) getArguments().getSerializable("roomInfoData");
+        if (roomInfoData != null) {
+            List<String> permission = roomInfoData.permission;
+            if (permission != null) {
+                guestCanInventPermission = permission.contains("100037");
+            }
+            //更新当前主讲人 权限
+            if (TextUtils.equals(keynoteSpeakId, roomInfoData.join_info.third_party_user_id) && guestCanInventPermission) {
+                guestCanInvent = true;
+            } else {
+                guestCanInvent = false;
+            }
+        }
         isGuest = getArguments().getBoolean("isGuest", false);
         canSpeak = getArguments().getBoolean("canSpeak", false);
         canManger = getArguments().getBoolean("canManger", true);
@@ -129,6 +149,7 @@ public class UserListNewFragment extends BaseFragment {
         refreshUserList();
         return inflate;
     }
+
     private RoleNameData roleNameData = new RoleNameData("主持人", "嘉宾", "助理");
 
     public void refreshUserList() {
@@ -138,8 +159,8 @@ public class UserListNewFragment extends BaseFragment {
         VhallSDK.getRoleName(roomInfoData.webinar.id, new RequestDataCallback() {
             @Override
             public void onSuccess(Object result) {
-                if (result instanceof RoleNameData){
-                    roleNameData= (RoleNameData) result;
+                if (result instanceof RoleNameData) {
+                    roleNameData = (RoleNameData) result;
                 }
             }
 
@@ -150,9 +171,6 @@ public class UserListNewFragment extends BaseFragment {
         });
         canPostData = false;
         if (TYPE_KICK_OUT.equals(type)) {
-//            if (present == null) {
-//                present = new UserListPresent();
-//            }
             mInterActive.getLimitUserList(page, 10, new RequestDataCallbackV2<UserStateListData>() {
                 @Override
                 public void onSuccess(UserStateListData result) {
@@ -249,49 +267,16 @@ public class UserListNewFragment extends BaseFragment {
         if (TYPE_KICK_OUT.equals(type) || lists.size() < 2) {
             return lists;
         }
-//        for (int i = 0; i < lists.size(); i++) {
-//            UserStateListData.DataBeen mainBeen = lists.get(i);
-//            if ("1".equals(mainBeen.getRole_name())) {
-//                sortList.add(mainBeen);
-//                lists.remove(mainBeen);
-//                break;
-//            }
-//        }
-//        for (int i = 0; i < lists.size(); i++) {
-//            UserStateListData.DataBeen been = lists.get(i);
-//            if (1 == been.getIs_speak()) {
-//                sortList.add(been);
-//                break;
-//            }
-//        }
-//        if (!ListUtils.isEmpty(sortList)) {
-//            lists.removeAll(sortList);
-//        }
-//
-//        for (int i = 0; i < lists.size(); i++) {
-//            UserStateListData.DataBeen been = lists.get(i);
-//            if ("4".equals(been.getRole_name())) {
-//                sortList.add(been);
-//                break;
-//            }
-//        }
-//        if (!ListUtils.isEmpty(sortList)) {
-//            lists.removeAll(sortList);
-//        }
-//        sortList.addAll(lists);
-//        return sortList;
-
-
         Collections.sort(lists, new Comparator<UserStateListData.DataBeen>() {
             @Override
             public int compare(UserStateListData.DataBeen o1, UserStateListData.DataBeen o2) {
                 int order1 = VHInternalUtils.getOrderNum(o1.getRole_name());
                 int order2 = VHInternalUtils.getOrderNum(o2.getRole_name());
-                if(order1 > order2){
+                if (order1 > order2) {
                     return -1;
-                }else if(order1 < order2){
+                } else if (order1 < order2) {
                     return 1;
-                }else {
+                } else {
                     return 0;
                 }
             }
@@ -301,6 +286,19 @@ public class UserListNewFragment extends BaseFragment {
 
     public void setMainId(String mainId) {
         keynoteSpeakId = mainId;
+        // roomInfoData.join_info.third_party_user_id 等同于  WebinarInfo.user_id
+        //更新当前主讲人  主讲人是自己并且有操控上麦的权限
+
+        if (roomInfoData != null) {
+            Log.e("vhall_", "roomInfoData.join_info.third_party_user_id     " + roomInfoData.join_info.third_party_user_id);
+
+
+        }
+        if (roomInfoData != null && TextUtils.equals(keynoteSpeakId, roomInfoData.join_info.third_party_user_id) && guestCanInventPermission) {
+            guestCanInvent = true;
+        } else {
+            guestCanInvent = false;
+        }
         if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
@@ -383,10 +381,10 @@ public class UserListNewFragment extends BaseFragment {
                     tvMic.setVisibility(View.GONE);
                 }
             }
-            if (isGuest) {
+            if (isGuest && !guestCanInvent) {
                 tvMic.setVisibility(View.GONE);
             }
-
+            Log.e("vhall_", "guestCanInvent " + guestCanInvent);
             switch (judgeRole(info.getRole_name())) {
                 case "1":
                     if (isGuest) {
@@ -537,7 +535,7 @@ public class UserListNewFragment extends BaseFragment {
                         default:
                             break;
                     }
-                    if(chooseTypeDialog.isShowing()){
+                    if (chooseTypeDialog.isShowing()) {
                         chooseTypeDialog.cancel();
                     }
                 }
@@ -619,20 +617,20 @@ public class UserListNewFragment extends BaseFragment {
     }
     //1 host-主持人；4 guest-嘉宾；3 assistant-助理
 
-    private String judgeRole(String roleName){
+    private String judgeRole(String roleName) {
         switch (roleName) {
             case "host":
             case "1":
                 return "1";
-                
+
             case "guest":
             case "4":
                 return "4";
-                
+
             case "assistant":
             case "3":
                 return "3";
-                
+
             default:
                 return "2";
         }

@@ -25,6 +25,7 @@ import com.vhall.vhss.data.WebinarInfoData;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,6 +62,10 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
 
     private String nowHostRoleName = "主持人";
 
+    //嘉宾邀请人上麦权限
+    private boolean guestCanInventPermission = false;
+    //嘉宾邀请人上麦 有权限且是主讲人
+    private boolean guestCanInvent = false;
 
     @Override
     public void updateHostRoleName(String role_name) {
@@ -164,12 +169,13 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                 }
                 break;
                 case MessageServer.EVENT_CONNECT_INVITE_REFUSED: {
-                    if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())) {
-                        broadcastView.showToast(String.format("%s拒绝了您的邀请", msg.nick_name));
-                    }
+                    if (TextUtils.equals(msg.inviter_account_id, responseRoomInfo.getJoin_info().third_party_user_id))
+                        if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name()) || guestCanInvent) {
+                            broadcastView.showToast(String.format("%s拒绝了您的邀请", msg.nick_name));
+                        }
                 }
                 break;
-                //互动举手消息
+                //互动举手消息  0取消举手，1举手
                 case MessageServer.EVENT_INTERACTIVE_HAND: {
                     if (msg.status == 1) {
                         try {
@@ -179,7 +185,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                             if (TextUtils.isEmpty(userId)) {
                                 userId = msg.roomJoinId;
                             }
-                            if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name()) && !TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
+                            if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name()) && !TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId) || guestCanInvent) {
                                 showInvitedView(name, userId);
                             }
                         } catch (Exception e) {
@@ -202,7 +208,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                 case EVENT_VRTC_CONNECT_REFUSED: {
                     userId = msg.user_id;
                     if (TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
-                        broadcastView.showToast(nowHostRoleName+"拒绝了您的上麦申请");
+                        broadcastView.showToast(nowHostRoleName + "拒绝了您的上麦申请");
                         broadcastView.setMic(false);
                     }
                 }
@@ -240,7 +246,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                     //被邀请上麦
                     if (showInvited == null) {
                         showInvited = new OutDialogBuilder()
-                                .title(nowHostRoleName+"邀请您上麦，是否同意？")
+                                .title(nowHostRoleName + "邀请您上麦，是否同意？")
                                 .tv1("拒绝")
                                 .tv2("同意")
                                 .onCancel(new OutDialog.ClickLister() {
@@ -313,7 +319,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                         userId = msg.user_id;
                         String name = msg.nick_name;
                         String roomJoinId = msg.roomJoinId;
-                        if (!TextUtils.isEmpty(userId)){
+                        if (!TextUtils.isEmpty(userId)) {
                             broadcastView.userNoSpeaker(userId);
                         }
                         if (!TextUtils.isEmpty(userId) && TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
@@ -324,7 +330,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                             }
                             isPublic = false;
                             if (!userId.equals(roomJoinId)) {
-                                broadcastView.showToast("您已被"+nowHostRoleName+"下麦");
+                                broadcastView.showToast("您已被" + nowHostRoleName + "下麦");
                             }
                         } else {
                             broadcastView.showToast(name + "已下麦");
@@ -336,9 +342,11 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                 case EVENT_VRTC_SPEAKER_SWITCH:
                     //互动设置为主讲人
                     broadcastView.updateMain(msg.roomJoinId);
-//                    if (UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())) {
-//                        mInterActive.setMainSpeaker(responseRoomInfo.interact.room_id, msg.roomJoinId,null);
-//                    }
+                    if (TextUtils.equals(msg.roomJoinId, responseRoomInfo.join_info.third_party_user_id) && guestCanInventPermission) {
+                        guestCanInvent = true;
+                    } else {
+                        guestCanInvent = false;
+                    }
                     if (TextUtils.equals(msg.roomJoinId, responseRoomInfo.getJoin_info().getThird_party_user_id())) {
                         broadcastView.showToast("您已被设为主讲人");
                         return;
@@ -347,7 +355,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                     break;
 
                 case EVENT_EDIT_WEBINAR_ROLE_NAME:
-                    broadcastView.notifyRoleName(msg.edit_role_type,msg.edit_role_name);
+                    broadcastView.notifyRoleName(msg.edit_role_type, msg.edit_role_name);
                     break;
             }
 
@@ -421,6 +429,11 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
         if (mWebinarInfo != null) {
             this.responseRoomInfo = webinarInfo.getWebinarInfoData();
             canSpeak = 0 == mWebinarInfo.getWebinarInfoData().getJoin_info().is_gag;
+
+            List<String> permission = mWebinarInfo.permission;
+            if (permission != null) {
+                guestCanInventPermission = permission.contains("100037");
+            }
         }
     }
 
