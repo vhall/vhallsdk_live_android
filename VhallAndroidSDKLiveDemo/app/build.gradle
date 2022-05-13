@@ -5,8 +5,8 @@ android {
         applicationId "com.vhall.live"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 632
-        versionName "6.3.2"
+        versionCode 634
+        versionName "6.3.4"
 
         multiDexEnabled true
         signingConfig signingConfigs.debug
