@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.pm.ActivityInfo;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
@@ -36,6 +37,7 @@ import static com.vhall.business.MessageServer.EVENT_INTERACTIVE_DOWN_MIC;
 import static com.vhall.business.MessageServer.EVENT_KICKOUT;
 import static com.vhall.business.MessageServer.EVENT_KICKOUT_RESTORE;
 import static com.vhall.business.MessageServer.EVENT_PERMIT_CHAT;
+import static com.vhall.business.MessageServer.EVENT_VRTC_BIG_SCREEN_SET;
 import static com.vhall.business.MessageServer.EVENT_VRTC_CONNECT_REFUSED;
 import static com.vhall.business.MessageServer.EVENT_VRTC_CONNECT_SUCCESS;
 import static com.vhall.business.MessageServer.EVENT_VRTC_SPEAKER_SWITCH;
@@ -114,6 +116,10 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
             }
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
+                    if (chatInfo.msgData!=null&&!TextUtils.isEmpty(chatInfo.msgData.target_id)){
+                        //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
+                        return;
+                    }
                     broadcastView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     break;
                 default:
@@ -140,6 +146,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
             if (msg == null) {
                 return;
             }
+            Log.e("vhall_",msg.mOriginData.toString());
             refreshUserList(msg);
 
             switch (msg.event) {
@@ -357,6 +364,11 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                 case EVENT_EDIT_WEBINAR_ROLE_NAME:
                     broadcastView.notifyRoleName(msg.edit_role_type, msg.edit_role_name);
                     break;
+                case EVENT_VRTC_BIG_SCREEN_SET:
+                    //流消息 互动流设置混流大画面
+                    Log.e("vhall_", "big");
+                    break;
+
             }
 
 

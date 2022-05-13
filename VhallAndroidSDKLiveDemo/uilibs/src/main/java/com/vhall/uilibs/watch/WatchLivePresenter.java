@@ -949,6 +949,17 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
+                    if (chatInfo.msgData != null && !TextUtils.isEmpty(chatInfo.msgData.target_id)) {
+                        //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
+
+                        if (TextUtils.equals(chatInfo.msgData.target_id, webinarInfo.user_id)) {
+                            //自己的私聊展示
+                            chatInfo.msgData.text = "私聊消息---" + chatInfo.msgData.text;
+                        } else {
+                            return;
+                        }
+                    }
+
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     liveView.addDanmu(chatInfo.msgData.text);
                     break;

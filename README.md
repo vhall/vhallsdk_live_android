@@ -24,14 +24,23 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.3.3'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.3.3'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.3.4'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.3.4'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
 ```
 
 二、版本更新信息：
+
+版本：v6.3.4  更新时间 2022.5.13
+
+1. 开放动态过滤私聊 使用步骤 [demo中新功能对应使用文档](https://saas-doc.vhall.com/docs/show/1445 "demo中新功能对应使用文档")<br>
+
+2. 增加新的消息类型 互动流设置混流大画面 EVENT_VRTC_BIG_SCREEN_SET ，开放其他没使用的消息 <br>
+
+3. 优化已知bug <br>
+
 
 版本：v6.3.3 更新时间 2022.5.6
 

@@ -3,6 +3,7 @@ package com.vhall.uilibs.watch;
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
@@ -536,9 +537,12 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
         @Override
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
-            Log.e("ddd", "ChatServer.eventMsgKey" + ChatServer.eventMsgKey);
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
+                    if (chatInfo.msgData!=null&&!TextUtils.isEmpty(chatInfo.msgData.target_id)){
+                        //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
+                        return;
+                    }
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     break;
                 default:

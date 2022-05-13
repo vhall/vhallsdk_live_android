@@ -29,6 +29,7 @@ public class MessageChatData implements Serializable {
     private String roleName = "2";
     private String role = "user";
     public ChatServer.ChatInfo.OnlineData onlineData;
+    public String target_id;//需要被过滤的消息 用于私聊判断
 
     public static final String eventOnlineKey = "online";// 上线
     public static final String eventOfflineKey = "offline";// 下线
@@ -198,6 +199,7 @@ public class MessageChatData implements Serializable {
             }
             data.setImage_url(chatInfo.msgData.resourceUrl);
             data.setImage_urls(chatInfo.msgData.imageUrls);
+            data.target_id=chatInfo.msgData.target_id;
         }
         data.setMy(false);
         if (!TextUtils.isEmpty(VhallSDK.getUserId())) {

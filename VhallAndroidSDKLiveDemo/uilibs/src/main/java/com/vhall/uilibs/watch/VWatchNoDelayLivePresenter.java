@@ -685,6 +685,10 @@ class VWatchNoDelayLivePresenter implements WatchContract.LivePresenter, ChatCon
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
+                    if (chatInfo.msgData!=null&&!TextUtils.isEmpty(chatInfo.msgData.target_id)){
+                        //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
+                        return;
+                    }
                     chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
                     liveView.addDanmu(chatInfo.msgData.text);
                     break;
