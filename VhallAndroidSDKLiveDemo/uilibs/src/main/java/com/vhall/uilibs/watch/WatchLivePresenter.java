@@ -1,5 +1,7 @@
 package com.vhall.uilibs.watch;
 
+import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
+
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
@@ -14,6 +16,7 @@ import com.vhall.business.VhallSDK;
 import com.vhall.business.WatchLive;
 import com.vhall.business.common.Constants;
 import com.vhall.business.data.RequestCallback;
+import com.vhall.business.data.RequestDataCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
@@ -27,9 +30,12 @@ import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.chat.PushChatFragment;
+import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.uilibs.widget.SurveyListDialog;
 import com.vhall.vhss.TokenManger;
+import com.vhall.vhss.data.SurveyInfoData;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONArray;
@@ -42,8 +48,6 @@ import java.util.List;
 import java.util.Map;
 
 import vhall.com.vss2.VssSdk;
-
-import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
 
 //TODO 投屏相关
 
@@ -75,7 +79,14 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     CountDownTimer onHandDownTimer;
     private int durationSec = 30; // 举手上麦倒计时
+    //是否可以聊天
     private boolean canSpeak = true;
+    //全体禁言
+    private boolean chatALLForbid = true;
+    //私人禁言
+    private boolean chatOwnForbid = true;
+    //是否可以 发问答
+    private boolean canSpeakQa = true;
 
 
     public WatchLivePresenter(WatchContract.LiveView liveView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, ChatContract.ChatView questionView, WatchContract.WatchView watchView, Param param, WebinarInfo webinarInfo) {
@@ -90,6 +101,23 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         this.liveView.setPresenter(this);
         this.chatView.setPresenter(this);
         this.questionView.setPresenter(this);
+
+        /**
+         * since 6.4.0
+         */
+        if (webinarInfo != null) {
+            chatALLForbid = webinarInfo.chatAllForbid;
+            chatOwnForbid = webinarInfo.chatOwnForbid;
+            if (!webinarInfo.chatAllForbid) {
+                //取消全员禁言
+                canSpeak = !webinarInfo.chatOwnForbid;
+                canSpeakQa = true;
+            } else {
+                //全员禁言
+                canSpeak = false;
+                canSpeakQa = !TextUtils.equals("1", webinarInfo.qa_status);
+            }
+        }
     }
 
 
@@ -104,7 +132,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 //            public void run() {
 //                getWatchLive().start();
 //            }
-//        },200);
+//        },500);
     }
 
     @Override
@@ -153,11 +181,11 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             watchView.showToast(R.string.vhall_login_first);
             return;
         }
-        //禁言与自定义消息无关
-/*        if (!canSpeak) {
+        //禁言与自定义消息无关 根据自己的需求 判断
+        if (!canSpeak) {
             watchView.showToast("你被禁言了");
             return;
-        }*/
+        }
         getWatchLive().sendCustom(text, new RequestCallback() {
             @Override
             public void onSuccess() {
@@ -174,6 +202,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     public void sendQuestion(String content) {
         if (!VhallSDK.isLogin()) {
             watchView.showToast(R.string.vhall_login_first);
+            return;
+        }
+        if (!canSpeakQa) {
+            watchView.showToast("你被禁言了");
             return;
         }
         getWatchLive().sendQuestion(content, new RequestCallback() {
@@ -232,9 +264,6 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         }
         force = false;
         getWatchLive().setPCSwitchDefinition();
-        if (watchView.getActivity().isFinishing()) {
-            return;
-        }
     }
 
     @Override
@@ -354,7 +383,46 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             chatView.clearChatData();
             getChatHistory();
             getAnswerList();
+            getSurveyList();
         }
+    }
+
+    /**
+     * 6.3.5
+     */
+    private void getSurveyList() {
+        VhallSDK.getHistorySurveyList(webinarInfo.switch_id, webinarInfo.vss_room_id, webinarInfo.webinar_id, new RequestDataCallback() {
+            @Override
+            public void onSuccess(Object o) {
+                liveView.updateSurveyList((ArrayList<SurveyInfoData>) o);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                ToastUtil.showToast(errorMsg);
+            }
+        });
+    }
+
+    @Override
+    public void showSurveyListDialog(List<SurveyInfoData> dataList, boolean show) {
+        if (chatView == null || webinarInfo == null || ListUtils.isEmpty(dataList)) {
+            ToastUtil.showToast("error data");
+            return;
+        }
+        if (surveyListDialog == null) {
+            surveyListDialog = new SurveyListDialog(chatView.getContext(), dataList);
+            surveyListDialog.setOnItemClickLister(new SurveyListDialog.OnItemClickLister() {
+                @Override
+                public void jump(SurveyInfoData info) {
+                    watchView.showSurvey(SurveyInternal.createSurveyUrl(webinarInfo, info), "");
+                }
+            });
+        } else {
+            surveyListDialog.setDataList(dataList);
+        }
+        if (show)
+            surveyListDialog.show();
     }
 
     private void getAnswerList() {
@@ -610,6 +678,17 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         getWatchLive().stop();
     }
 
+    SurveyListDialog surveyListDialog;
+
+    @Override
+    public void showSurvey(SurveyInfoData info) {
+        if (info == null || webinarInfo == null) {
+            ToastUtil.showToast("error data");
+            return;
+        }
+        watchView.showSurvey(SurveyInternal.createSurveyUrl(webinarInfo, info), "");
+    }
+
     @Override
     public void dismissDevices() {
         watchView.dismissDevices();
@@ -701,6 +780,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         }
     }
 
+    String question_name = "问答";//默认显示 可以自己按照需求设置
+
     /**
      * 观看过程消息监听
      */
@@ -709,27 +790,36 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         public void onEvent(MessageServer.MsgInfo messageInfo) {
             Log.e(TAG, "messageInfo " + messageInfo.event);
             switch (messageInfo.event) {
-                case MessageServer.EVENT_DISABLE_CHAT://禁言
-                    watchView.showToast("您已被禁言");
-                    canSpeak = false;
-                    break;
                 case MessageServer.EVENT_KICKOUT://踢出
                     watchView.showToast("您已被踢出");
                     watchView.getActivity().finish();
                     break;
+
+                case MessageServer.EVENT_DISABLE_CHAT://禁言
+                    watchView.showToast("您已被禁言");
+                    canSpeak = false;
+                    chatOwnForbid = true;
+                    break;
                 case MessageServer.EVENT_PERMIT_CHAT://解除禁言
                     watchView.showToast("您已被解除禁言");
-                    canSpeak = true;
+                    chatOwnForbid = false;
+                    canSpeak = !chatALLForbid;
                     break;
                 case MessageServer.EVENT_CHAT_FORBID_ALL://全员禁言
+                    //问答状态 根据全体禁言判断 如果开启禁言则根据 qa_status判断 1开启 0关闭  如果关闭全体禁言 则直接开启问答
+                    //聊天 如果开启 则不可以聊 如果关闭则根据当前的 个人禁言情况
                     if (messageInfo.status == 0) {
                         //取消全员禁言
                         watchView.showToast("解除全员禁言");
-                        canSpeak = true;
+                        canSpeak = !chatOwnForbid;
+                        chatALLForbid = false;
+                        canSpeakQa = true;
                     } else {
                         //全员禁言
                         watchView.showToast("全员禁言");
+                        chatALLForbid = true;
                         canSpeak = false;
+                        canSpeakQa = !TextUtils.equals("1", messageInfo.qa_status);
                     }
                     break;
                 case MessageServer.EVENT_OVER://直播结束
@@ -759,21 +849,28 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                         watchView.showSignIn(messageInfo.id, messageInfo.signTitle, parseTime(messageInfo.sign_show_time, 30));
                     }
                     break;
+                case MessageServer.EVENT_QUESTION_ANSWER_SET: // 修改问答昵称设置
+
+                    if (!TextUtils.isEmpty(messageInfo.question_name)) {
+                        question_name = messageInfo.question_name;
+                    }
+                    watchView.showQAndA(question_name);
+                    break;
                 case MessageServer.EVENT_QUESTION: // 问答开关
-                    watchView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
+                    if (!TextUtils.isEmpty(messageInfo.question_name)) {
+                        question_name = messageInfo.question_name;
+                    }
+                    watchView.showToast(question_name + "功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
                     if (messageInfo.status == 1) {
-                        watchView.showQAndA();
+                        watchView.showQAndA(question_name);
                     } else {
                         watchView.dismissQAndA();
                     }
                     break;
                 case MessageServer.EVENT_SURVEY://问卷
-
-
                     /**
                      * 获取msg内容
                      */
-
                     MessageChatData surveyData = new MessageChatData();
                     surveyData.event = MessageChatData.eventSurveyKey;
                     Map<String, String> params = new HashMap<>();
@@ -789,7 +886,15 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     params.put(SurveyInternal.KEY_INTERACT_TOKEN, TokenManger.getInteractToken());
                     surveyData.setUrl(SurveyInternal.createSurveyUrl(params));
                     surveyData.setId(messageInfo.id);
+                    surveyData.survey_name = messageInfo.survey_name;
                     chatView.notifyDataChangedChat(surveyData);
+                    getSurveyList();
+                    break;
+
+                //有人提交问卷  messageInfo.user_id 提交人的id
+                case MessageServer.EVENT_SURVEY_PUSH:
+                    if (TextUtils.equals(messageInfo.user_id, webinarInfo.user_id))
+                        getSurveyList();
                     break;
                 case MessageServer.EVENT_SHOWDOC://文档开关指令 1 使用文档 0 关闭文档
                     Log.e(TAG, "onEvent:show_docType:watchType= " + messageInfo.watchType);

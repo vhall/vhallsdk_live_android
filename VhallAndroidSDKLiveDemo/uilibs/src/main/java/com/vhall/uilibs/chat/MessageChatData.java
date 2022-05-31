@@ -30,6 +30,7 @@ public class MessageChatData implements Serializable {
     private String role = "user";
     public ChatServer.ChatInfo.OnlineData onlineData;
     public String target_id;//需要被过滤的消息 用于私聊判断
+    public String survey_name;//问卷的昵称  用户自定义的显示
 
     public static final String eventOnlineKey = "online";// 上线
     public static final String eventOfflineKey = "offline";// 下线

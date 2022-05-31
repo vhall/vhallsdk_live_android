@@ -58,7 +58,8 @@ public class OutDialog extends Dialog {
         tv1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dismiss();
+                if (builder.dismiss1)
+                    dismiss();
                 if (builder.mCancelListener != null) {
                     builder.mCancelListener.click();
                 }
@@ -67,7 +68,8 @@ public class OutDialog extends Dialog {
         tv2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dismiss();
+                if (builder.dismiss2)
+                    dismiss();
                 if (builder.mConfirmListener != null) {
                     builder.mConfirmListener.click();
                 }

@@ -30,6 +30,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <View
+        android:id="@+id/ll"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_8dp"
         android:background="@color/color_F5"
@@ -42,11 +43,10 @@
         android:gravity="center"
         android:padding="@dimen/dimen_16dp"
         android:text="密码"
-        android:layout_marginBottom="@dimen/dimen_8dp"
         android:textColor="@color/color_22"
         android:textSize="@dimen/dimen_16dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/tv_cancel"
+        app:layout_constraintBottom_toTopOf="@id/ll"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -58,7 +58,7 @@
 
     <TextView
         android:id="@+id/tv_2"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:padding="@dimen/dimen_16dp"

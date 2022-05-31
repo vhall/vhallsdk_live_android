@@ -268,6 +268,9 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
 
         @Override
         public void onDidSubscribeStream(Stream stream, final VHRenderView newRenderView) {
+            if (stream!=null&& stream.getStreamType()==5){
+                return;
+            }
             Log.e(TAG, "onDidSubscribeStream");
 
             /**
@@ -294,6 +297,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
                     interActView.finish();
                     break;
                 case VHRoomStatusError:
+                    interActView.finish();
                     Log.e(TAG, "VHRoomStatusError");
                     break;
                 case VHRoomStatusReady:

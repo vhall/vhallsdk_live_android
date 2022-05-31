@@ -48,6 +48,8 @@ public interface IBroadcastContract {
         void sendMsg(String msg, String type, final CallBack callBack);
 
         boolean isPublish();
+
+        void initLocalStream();
     }
 
     interface IBroadcastPresent{

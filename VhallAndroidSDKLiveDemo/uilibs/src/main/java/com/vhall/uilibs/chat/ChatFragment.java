@@ -327,9 +327,15 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                         convertView = View.inflate(getActivity(), R.layout.chat_item_survey, null);
                         surveyHolder = new ChatSurveyHolder();
                         surveyHolder.tv_join = (TextView) convertView.findViewById(R.id.tv_join);
+                        surveyHolder.tv_title = (TextView) convertView.findViewById(R.id.tv_title);
                         convertView.setTag(surveyHolder);
                     } else {
                         surveyHolder = (ChatSurveyHolder) convertView.getTag();
+                    }
+                    if (!TextUtils.isEmpty(data.survey_name)){
+                        surveyHolder.tv_title.setText(String.format("组织者发布 %s 调查，", data.survey_name));
+                    }else {
+                        surveyHolder.tv_title.setText(String.format("组织者发布 %s 调查，", "问卷"));
                     }
                     surveyHolder.tv_join.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -420,6 +426,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
 
     static class ChatSurveyHolder {
         TextView tv_join;
+        TextView tv_title;
     }
 
     static class Holder {

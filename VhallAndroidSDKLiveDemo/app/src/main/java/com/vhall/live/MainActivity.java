@@ -1,16 +1,17 @@
 package com.vhall.live;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,16 +31,22 @@ import com.vhall.logmanager.L;
 import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.broadcast.BroadcastActivity;
+import com.vhall.uilibs.broadcast.DirectorPushActivity;
+import com.vhall.uilibs.interactive.RtcInternal;
 import com.vhall.uilibs.interactive.broadcast.RtcActivity;
+import com.vhall.uilibs.interactive.dialog.ChooseTypeDialog;
+import com.vhall.uilibs.interactive.dialog.ScrollChooseTypeDialog;
 import com.vhall.uilibs.util.HeadsetUtil;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.watch.VWatchActivity;
 import com.vhall.uilibs.watch.WatchActivity;
 import com.vhall.uilibs.widget.AgreementDialog;
-import com.vhall.vhss.CallBack;
 import com.vhall.vhss.data.AgreementData;
-import com.vhall.vhss.network.ActivityNetworkRequest;
+import com.vhall.vhss.data.DirectorSeatListData;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -53,12 +60,11 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
     Param param = null;
 
     private ProgressDialog mLoading;
+    private Context mContext;
 
     private LiveSelectMenuWidget select_window;
     private static final int REQUEST_PERMISSIONS = 1;
     public String[] permissions = new String[]{
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO,
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
@@ -72,6 +78,7 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
     private final static String VERTICAL_NO_DELAY_LIVE = "竖屏无延迟直播";
     private final static String HORIZONTAL_NO_DELAY_LIVE = "横屏无延迟直播";
     private final static String HORIZONTAL_LIVE = "横屏直播";
+    private final static String CLOUD_DIRECTOR = "云导播活动";
     private final static String HOST_INTERACTIVE = "主持人互动";
     private final static String GUEST_INTERACTIVE = "嘉宾互动";
 
@@ -79,6 +86,7 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+        mContext = this;
         HeadsetUtil.init(getApplication());
         tv_phone = this.findViewById(R.id.tv_phone);
         tv_name = this.findViewById(R.id.text_name);
@@ -91,7 +99,7 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         mLoading = new ProgressDialog(this);
         mLoading.setTitle("提示");
         mLoading.setMessage("加载中...");
-
+        requestPermission();
         tv_login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,8 +108,13 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
                 finish();
             }
         });
-        requestPermission();
+    }
 
+    public void requestPermission() {
+        if (Build.VERSION.SDK_INT < 23) {
+            return;
+        }
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_PERMISSIONS);
     }
 
 
@@ -123,19 +136,28 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
                 getAgreement(name);
                 break;
             case VERTICAL_LIVE:
-                startBroadcastActivity(VHLivePushFormat.SCREEN_ORI_PORTRAIT);
+                if (RtcInternal.isGrantedPermissionRtc(MainActivity.this, REQUEST_PUSH))
+                    startBroadcastActivity(VHLivePushFormat.SCREEN_ORI_PORTRAIT);
                 break;
             case HORIZONTAL_LIVE:
-                startBroadcastActivity(VHLivePushFormat.SCREEN_ORI_LANDSPACE);
+                if (RtcInternal.isGrantedPermissionRtc(MainActivity.this, REQUEST_PUSH))
+                    startBroadcastActivity(VHLivePushFormat.SCREEN_ORI_LANDSPACE);
+                break;
+            case CLOUD_DIRECTOR:
+                if (RtcInternal.isGrantedPermissionRtc(MainActivity.this, REQUEST_PUSH))
+                    startDirectorActivity();
                 break;
             case VERTICAL_NO_DELAY_LIVE:
-                startNoDelayBroadcastActivity(VHLivePushFormat.SCREEN_ORI_PORTRAIT);
+                if (RtcInternal.isGrantedPermissionRtc(MainActivity.this, REQUEST_PUSH))
+                    startNoDelayBroadcastActivity(VHLivePushFormat.SCREEN_ORI_PORTRAIT);
                 break;
             case HORIZONTAL_NO_DELAY_LIVE:
-                startNoDelayBroadcastActivity(VHLivePushFormat.SCREEN_ORI_LANDSPACE);
+                if (RtcInternal.isGrantedPermissionRtc(MainActivity.this, REQUEST_PUSH))
+                    startNoDelayBroadcastActivity(VHLivePushFormat.SCREEN_ORI_LANDSPACE);
                 break;
             case HOST_INTERACTIVE:
-                startRtcActivity();
+                if (RtcInternal.isGrantedPermissionRtc(MainActivity.this, REQUEST_PUSH))
+                    startRtcActivity();
                 break;
             case GUEST_INTERACTIVE:
                 guestJoinMeeting();
@@ -210,13 +232,6 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         RtcActivity.startActivity(MainActivity.this, webinarInfo, param);
     }
 
-    public void requestPermission() {
-        if (Build.VERSION.SDK_INT < 23) {
-            return;
-        }
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_PERMISSIONS);
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -248,11 +263,171 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
     }
 
     public void onBroadcastLandspace(View view) {
-        select_window.showMenus(VERTICAL_NO_DELAY_LIVE, HORIZONTAL_NO_DELAY_LIVE, VERTICAL_LIVE, HORIZONTAL_LIVE);
+        select_window.showMenus(VERTICAL_NO_DELAY_LIVE, HORIZONTAL_NO_DELAY_LIVE, VERTICAL_LIVE, HORIZONTAL_LIVE, CLOUD_DIRECTOR);
     }
 
     public void onBroadcastPortrait(View view) {
         select_window.showMenus(HOST_INTERACTIVE, GUEST_INTERACTIVE);
+    }
+
+    private List<String> stringDirector = new ArrayList<>();
+    private ChooseTypeDialog director;
+
+    private void initDirector() {
+        if (director == null) {
+            stringDirector.clear();
+            stringDirector.add("以主持人身份发起直播");
+            stringDirector.add("以视频推流形式推流到云导播");
+            director = new ChooseTypeDialog(mContext, stringDirector);
+            director.setOnItemClickLister(new ChooseTypeDialog.onItemClickLister() {
+                @Override
+                public void onItemClick(int option) {
+                    switch (option) {
+                        case 1:
+                            startDirectorBroadcastActivity();
+                            break;
+                        case 2:
+                            initCameraStan();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+        }
+        director.show();
+    }
+
+    //选择云导播推流机位
+    private void initCameraStan() {
+        List<String> strings = new ArrayList<>();
+        List<Boolean> booleans = new ArrayList<>();
+        //获取机位列表
+        VhallSDK.getDirectorSeatList(param.broId, new RequestDataCallback() {
+            @Override
+            public void onSuccess(Object result) {
+                DirectorSeatListData directorData = (DirectorSeatListData) result;
+                if (directorData == null || directorData.list == null || directorData.list.size() <= 0) {
+                    ToastUtil.showToast("errorData");
+                    return;
+                }
+                for (int i = 0; i < directorData.list.size(); i++) {
+                    DirectorSeatListData.ListBean directorSeatListData = directorData.list.get(i);
+                    strings.add(directorSeatListData.name + ((TextUtils.equals(directorSeatListData.status, "0") ? "" : "：已占用")));
+                    booleans.add(TextUtils.equals(directorSeatListData.status, "0"));
+                }
+                ScrollChooseTypeDialog scrollDirectorDialog = new ScrollChooseTypeDialog(MainActivity.this, strings, booleans);
+                scrollDirectorDialog.setOnItemClickLister((option, content) -> {
+                    DirectorSeatListData.ListBean directorSeatListData = directorData.list.get(option);
+                    selectSeat(directorSeatListData);
+                });
+                scrollDirectorDialog.show();
+            }
+
+            @Override
+            public void onError(int eventCode, String msg) {
+                ToastUtil.showToast(msg);
+            }
+        });
+
+    }
+
+    //云导播机位占用-成功到机位推流页面
+    private void selectSeat(DirectorSeatListData.ListBean directorSeatListData) {
+        VhallSDK.directorSelectSeat(param.broId, directorSeatListData.seat_id, new RequestCallback() {
+            @Override
+            public void onSuccess() {
+                param.seatId = directorSeatListData.seat_id;
+                Intent intent = new Intent(MainActivity.this, DirectorPushActivity.class);
+                intent.putExtra("param", param);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(int eventCode, String msg) {
+                ToastUtil.showToast(msg);
+            }
+        });
+    }
+
+    private void startDirectorActivity() {
+        VhallSDK.getBaseWebinarInfo(param.broId, new RequestDataCallback() {
+            @Override
+            public void onSuccess(Object result) {
+                WebinarInfo webinarInfo = (WebinarInfo) result;
+                if (webinarInfo.is_director != 1) {
+                    Toast.makeText(MainActivity.this, "当前直播不是云导播活动请退出", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                param.webinar_id = webinarInfo.webinar_id;
+                param.noDelay = false;
+                param.isDirector = true;
+                //横竖屏 0 竖屏 1横屏
+                if (0 == webinarInfo.webinar_show_type) {
+                    param.screenOri = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+                } else {
+                    param.screenOri = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+                }
+                VhallSDK.getDirectorStatus(param.broId, new RequestDataCallback() {
+                    @Override
+                    public void onSuccess(Object director_status) {
+                        // 云导播台状态， 0： 未开启， 1：已开启
+                        initDirector();
+                        //云导播活动有开启云导播
+                        if (TextUtils.equals((String) director_status, "0"))
+                            director.setViewUnClickable();
+                        else
+                            director.setViewClickable();
+                    }
+
+                    @Override
+                    public void onError(int eventCode, String errorMsg) {
+                        ToastUtil.showToast(errorMsg);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                ToastUtil.showToast(errorMsg);
+            }
+        });
+    }
+
+
+    //主持人依然调用之前的接口
+    private void startDirectorBroadcastActivity() {
+        Intent intent = new Intent(this, BroadcastActivity.class);
+        VhallSDK.initBroadcast(param.broId, param.broToken, param.broName, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+            @Override
+            public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                if (webinarInfo.is_director != 1) {
+                    Toast.makeText(MainActivity.this, "当前直播不是云导播活动请退出", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                param.vssToken = webinarInfo.vss_token;
+                param.vssRoomId = webinarInfo.vss_room_id;
+                param.join_id = webinarInfo.join_id;
+                param.webinar_id = webinarInfo.webinar_id;
+                param.inav_num = webinarInfo.inav_num;
+                param.noDelay = false;
+                param.isDirector = true;
+                //横竖屏 0 竖屏 1横屏
+                if (0 == webinarInfo.webinar_show_type) {
+                    param.screenOri = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+                } else {
+                    param.screenOri = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+                }
+                intent.putExtra("param", param);
+                intent.putExtra("webinarInfo", webinarInfo);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                Toast.makeText(MainActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void startBroadcastActivity(int orientation) {
@@ -260,6 +435,10 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
         VhallSDK.initBroadcast(param.broId, param.broToken, param.broName, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
+                if (webinarInfo.is_director == 1) {
+                    Toast.makeText(MainActivity.this, "当前直播是云导播活动请退出", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 param.vssToken = webinarInfo.vss_token;
                 param.vssRoomId = webinarInfo.vss_room_id;
                 param.join_id = webinarInfo.join_id;
@@ -288,6 +467,10 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
                     Toast.makeText(MainActivity.this, "当前直播是常规直播", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if (webinarInfo.is_director == 1) {
+                    Toast.makeText(MainActivity.this, "当前直播是云导播活动请退出", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 param.vssToken = webinarInfo.vss_token;
                 param.vssRoomId = webinarInfo.vss_room_id;
                 param.join_id = webinarInfo.join_id;
@@ -308,7 +491,6 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
     }
 
     public void onWatchLive(View view) {
-//        findViewById(R.id.select_window).setVisibility(View.VISIBLE);
         select_window.showMenus(HALF_SCREEN_NO_DELAY_WATCH, ALL_SCREEN_NO_DELAY_WATCH, HALF_SCREEN_WATCH, ALL_SCREEN_WATCH);
     }
 
@@ -445,6 +627,19 @@ public class MainActivity extends FragmentActivity implements LiveSelectMenuWidg
                 intent.putExtra("type", VhallUtil.WATCH_PLAYBACK);
                 startActivity(intent);
                 break;
+        }
+    }
+    public static final int REQUEST_PUSH = 0;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PUSH) {
+            if (grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+            } else {
+                ToastUtil.showToast("未获取到音视频设备权限，请前往获取权限");
+            }
         }
     }
 }

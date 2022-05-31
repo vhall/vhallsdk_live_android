@@ -1,6 +1,9 @@
 package com.vhall.uilibs.watch;
 
+import android.annotation.SuppressLint;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,9 +19,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
 import com.vhall.vhss.data.ScrollInfoData;
 
+import java.io.InputStream;
 import java.util.HashMap;
 
 import master.flame.danmaku.controller.IDanmakuView;
@@ -37,7 +42,7 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 public class VWatchLiveFragment extends Fragment implements WatchContract.LiveView, View.OnClickListener {
 
     private WatchContract.LivePresenter mPresenter;
-    private TextView fragmentDownloadSpeed;
+    private TextView fragmentDownloadSpeed, tv_color, tv_image;
     private RelativeLayout mContainerLayout;
     private ProgressBar progressbar;
     private IDanmakuView mDanmakuView;
@@ -66,9 +71,13 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
     private void initView(View root) {
         mContainerLayout = root.findViewById(R.id.rl_container);
         fragmentDownloadSpeed = root.findViewById(R.id.fragment_download_speed);
+        tv_color = root.findViewById(R.id.tv_color);
+        tv_image = root.findViewById(R.id.tv_image);
         progressbar = root.findViewById(R.id.progressbar);
         btn_change_scaletype = (ImageView) root.findViewById(R.id.btn_change_scaletype);
         btn_change_scaletype.setOnClickListener(this);
+        tv_color.setOnClickListener(this);
+        tv_image.setOnClickListener(this);
         root.findViewById(R.id.image_action_back).setOnClickListener(this);
         // 设置最大显示行数
         HashMap<Integer, Integer> maxLinesPair = new HashMap<>();
@@ -151,13 +160,43 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
             progressbar.setVisibility(View.GONE);
     }
 
+    int color = 0;
+
     @Override
     public void onClick(View view) {
         int i = view.getId();
         if (i == R.id.image_action_back) {
             getActivity().onBackPressed();
-        }else if (i == R.id.btn_change_scaletype) {
+        } else if (i == R.id.btn_change_scaletype) {
             mPresenter.setScaleType();
+        } else if (i == R.id.tv_color) {
+            int setColor = Color.parseColor("#000000");
+            if (color == 0) {
+                color = 1;
+                setColor = Color.parseColor("#999999");
+            } else if (color == 1) {
+                color = 2;
+                setColor = Color.parseColor("#ffffff");
+            } else if (color == 2) {
+                color = 3;
+                setColor = Color.parseColor("#F09A37");
+            } else if (color == 3) {
+                color = 0;
+                setColor = Color.parseColor("#000000");
+            }
+            if (!mPresenter.setVideoBackgroundColor(setColor)) {
+                ToastUtil.showToast("设置失败");
+            } else {
+                ToastUtil.showToast("设置成功");
+            }
+        } else if (i == R.id.tv_image) {
+            @SuppressLint("ResourceType") InputStream is = getResources().openRawResource(R.drawable.splash_bg);
+            Bitmap mBitmap = BitmapFactory.decodeStream(is);
+            if (!mPresenter.setVideoBackgroundImage(mBitmap)) {
+                ToastUtil.showToast("设置失败");
+            } else {
+                ToastUtil.showToast("设置成功");
+            }
         }
     }
 
@@ -219,7 +258,7 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
 
     @Override
     public void liveFinished() {
-        if(getActivity() != null && !getActivity().isFinishing()){
+        if (getActivity() != null && !getActivity().isFinishing()) {
             getActivity().finish();
         }
     }

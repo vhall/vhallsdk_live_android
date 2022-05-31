@@ -121,6 +121,7 @@ public class DocFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (documentPublicView!=null)
         documentPublicView.destroy();
     }
 

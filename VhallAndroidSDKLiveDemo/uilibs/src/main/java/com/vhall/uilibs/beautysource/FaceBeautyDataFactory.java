@@ -2,15 +2,11 @@ package com.vhall.uilibs.beautysource;
 
 
 import android.content.Context;
-import android.util.Log;
 
 import com.faceunity.core.controller.facebeauty.FaceBeautyParam;
-import com.faceunity.core.faceunity.FURenderKit;
 import com.faceunity.core.model.facebeauty.FaceBeauty;
 import com.vhall.beautify.DefaultFaceBeautyDataFactory;
 import com.vhall.beautify.VHBeautifyKit;
-import com.vhall.beautify.type.VHBeautifyFilterConfig;
-import com.vhall.beautify.type.VHBeautifyParamConfig;
 import com.vhall.beautifykit.entity.FaceBeautyBean;
 import com.vhall.beautifykit.entity.FaceBeautyFilterBean;
 import com.vhall.beautifykit.entity.FaceBeautyStyleBean;

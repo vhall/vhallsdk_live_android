@@ -64,6 +64,5 @@ public class SurveyPopuVss extends PopupWindow {
     public void loadView(String url, String title) {
         tv_title.setText(title);
         wvSurvey.loadUrl(url);
-        Log.e("hkl",url);
     }
 }

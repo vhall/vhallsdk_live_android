@@ -68,6 +68,7 @@ import com.vhall.vhss.data.WebinarInfoData;
 import org.vhwebrtc.SurfaceViewRenderer;
 
 import static android.support.constraint.ConstraintSet.PARENT_ID;
+import static com.vhall.uilibs.interactive.RtcInternal.REQUEST_PUSH;
 
 /**
  * 互动界面  仿制 微吼直播
@@ -354,10 +355,11 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
         docFragment = DocFragment.getInstance(webinar_type, String.valueOf(webinar_show_type));
         if (isGuest) {
             processGuest();
+        }else {
+            RtcInternal.isGrantedPermissionRtc(this, REQUEST_PUSH);
         }
         //活动显示类型  0 竖屏 1横屏
         broadcastPresent.initInputView();
-        RtcInternal.isGrantedPermissionRtc(this, REQUEST_PUSH);
 
         showFragment(R.id.fragment_doc, docFragment);
 
@@ -513,7 +515,6 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
         return RtcActivity.this;
     }
 
-    private static final int REQUEST_PUSH = 0;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,

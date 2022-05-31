@@ -2,6 +2,7 @@ package com.vhall.uilibs.watch;
 
 import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
 
+import android.graphics.Bitmap;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
 import android.util.Log;
@@ -245,6 +246,18 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
         getWatchLive().destroy();
     }
 
+
+    @Override
+    public boolean setVideoBackgroundColor(int color) {
+        return getWatchLive().setVideoBackgroundColor(color);
+    }
+
+
+    @Override
+    public boolean setVideoBackgroundImage(Bitmap bitmap) {
+        return getWatchLive().setVideoBackgroundImage(bitmap);
+    }
+
     @Override
     public void submitLotteryInfo(String id, String lottery_id, String nickname, String phone) {
         if (!TextUtils.isEmpty(id) && !TextUtils.isEmpty(lottery_id)) {
@@ -293,33 +306,39 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
 
     //无延迟 互动直播 使用
     @Override
-    public void onSwitchCamera(){
+    public void onSwitchCamera() {
 
     }
+
     //无延迟 互动直播 使用
     @Override
-    public void onSwitchVideo(boolean isOpen){
+    public void onSwitchVideo(boolean isOpen) {
 
     }
+
     //无延迟 互动直播 使用
     @Override
-    public  void onSwitchAudio(boolean isOpen){
+    public void onSwitchAudio(boolean isOpen) {
 
     }
+
     //无延迟 互动直播 使用
     @Override
     public void onDownMic(boolean own) {
 
     }
+
     //无延迟 互动直播 使用
     @Override
     public void onUpMic() {
 
     }
+
     @Override
     public boolean getIsPlaying() {
         return getWatchLive().isPlaying();
     }
+
     @Override
     public void initWatch() {
         if (webinarInfo != null) {
@@ -811,7 +830,7 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
-                    if (chatInfo.msgData!=null&&!TextUtils.isEmpty(chatInfo.msgData.target_id)){
+                    if (chatInfo.msgData != null && !TextUtils.isEmpty(chatInfo.msgData.target_id)) {
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }

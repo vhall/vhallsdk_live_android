@@ -1,6 +1,5 @@
 package com.vhall.uilibs.watch;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
@@ -8,12 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -37,6 +38,7 @@ import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.WebinarInfoDataSource;
 import com.vhall.uilibs.interactive.InteractiveActivity;
+import com.vhall.uilibs.interactive.RtcInternal;
 import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
@@ -48,6 +50,7 @@ import com.vhall.uilibs.util.SignInDialog;
 import com.vhall.uilibs.util.SurveyPopu;
 import com.vhall.uilibs.util.SurveyPopuVss;
 import com.vhall.uilibs.util.SurveyView;
+import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.ExtendTextView;
@@ -57,6 +60,7 @@ import com.vhall.uilibs.util.emoji.KeyBoardManager;
 import com.vhall.uilibs.util.handler.WeakHandler;
 
 
+import static com.vhall.uilibs.interactive.RtcInternal.REQUEST_PUSH;
 import static com.vhall.uilibs.util.SurveyView.EVENT_JS_BACK;
 import static com.vhall.uilibs.util.SurveyView.EVENT_PAGE_LOADED;
 
@@ -192,7 +196,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         VhallSDK.initWatch(params.watchId, "", "", params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
-                if (getActivity().isFinishing()){
+                if (getActivity().isFinishing()) {
                     return;
                 }
                 if (webinarInfo.status == WebinarInfo.BESPEAK)//预告状态
@@ -201,9 +205,17 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     finish();
                     return;
                 }
-                status.setText(String.format("进入房间初始化值 举手开关=  %s  问答=  %d  禁言=  %s   自己的禁言=  %s  全体禁言=  %s", webinarInfo.hands_up, webinarInfo.question_status, webinarInfo.chatforbid, webinarInfo.chatOwnForbid, webinarInfo.chatAllForbid));
+                status.setText(String.format("进入房间初始化值 举手开关=%s、问答开关=%d、禁言=%s、自己的禁言=%s、全体禁言=%s、" +
+                                "问答禁言状态=%s、公聊禁言状态=%s、",
+                        webinarInfo.hands_up, webinarInfo.question_status, webinarInfo.chatforbid,
+                        webinarInfo.chatOwnForbid, webinarInfo.chatAllForbid,webinarInfo.qa_status,webinarInfo.chat_status));
+
                 param.webinar_id = webinarInfo.webinar_id;
                 questionBtn.setVisibility((webinarInfo.question_status == 1) ? View.VISIBLE : View.GONE);
+                //当前房间问答两个字的 别名
+                if (!TextUtils.isEmpty(webinarInfo.question_name)) {
+                    questionBtn.setText(webinarInfo.question_name);
+                }
                 //敏感词过滤信息，发送聊天、评论通用
                 if (webinarInfo.filters != null && webinarInfo.filters.size() > 0) {
                     param.filters.clear();
@@ -323,9 +335,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         mHand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //点击上麦, 再次点击下麦
-                if (mPresenter != null) {
-                    mPresenter.onRaiseHand();
+                //观众上麦进入互动直播间，必须要有麦克风摄像头权限
+                if (RtcInternal.isGrantedPermissionRtc(WatchActivity.this, REQUEST_PUSH)) {
+                    //点击上麦, 再次点击下麦
+                    if (mPresenter != null) {
+                        mPresenter.onRaiseHand();
+                    }
                 }
             }
         });
@@ -480,8 +495,10 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     //显示问答
     @Override
-    public void showQAndA() {
+    public void showQAndA(String name) {
         questionBtn.setVisibility(View.VISIBLE);
+        if (!TextUtils.isEmpty(name))
+            questionBtn.setText(name);
     }
 
     //隐藏问答
@@ -552,15 +569,17 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             invitedDialog.setPositiveOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //同意上麦
-                    mPresenter.replyInvite(1);
-                    if (param.noDelay) {
-                        noDelayLiveFragment.enterInteractive(true);
-                    } else {
-                        enterInteractive();
+                    if (RtcInternal.isGrantedPermissionRtc(WatchActivity.this, REQUEST_PUSH)) {
+                        //同意上麦
+                        mPresenter.replyInvite(1);
+                        if (param.noDelay) {
+                            noDelayLiveFragment.enterInteractive(true);
+                        } else {
+                            enterInteractive();
+                        }
+                        invitedDialog.dismiss();
+                        //发送同意上麦信息
                     }
-                    invitedDialog.dismiss();
-                    //发送同意上麦信息
                 }
             });
             invitedDialog.setNegativeOnClickListener(new View.OnClickListener() {
@@ -799,8 +818,21 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         }
     }
 
-    public String[] permissions = new String[]{
-            Manifest.permission.CAMERA,
-            Manifest.permission.RECORD_AUDIO
-    };
+
+    private void baseShowToast(final String txt) {
+        ToastUtil.showToast(txt);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PUSH) {
+            if (grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+            } else {
+                baseShowToast("未获取到音视频设备权限，请前往获取权限");
+            }
+        }
+    }
 }

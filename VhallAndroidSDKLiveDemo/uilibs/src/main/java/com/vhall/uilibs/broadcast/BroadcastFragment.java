@@ -124,7 +124,7 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         } else if (i == R.id.btn_changeFlash) {
             mPresenter.changeFlash();
         } else if (i == R.id.btn_changeFilter) {
-            // showPopupWindow();  之前的美颜只能选等级
+            //  showPopupWindow();  //之前的美颜只能选等级
             if (VHBeautifyKit.getInstance().isBeautifyAuthEnable()) {
                 if (iFaceBeautySwitch != null) {
                     iFaceBeautySwitch.changeVisibility();

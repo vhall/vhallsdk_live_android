@@ -75,7 +75,12 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
 
     CountDownTimer onHandDownTimer;
     private int durationSec = 30; // 举手上麦倒计时
+    //是否可以聊天
     private boolean canSpeak = true;
+    private boolean chatALLForbid = true;
+    private boolean chatOwnForbid = true;
+    //是否可以 发问答
+    private boolean canSpeakQa = true;
     private InterActive interactive;
 
     public WatchNoDelayLivePresenter(WatchContract.LiveView liveView, WatchContract.LiveNoDelayView liveNoDelayView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, ChatContract.ChatView questionView, WatchContract.WatchView watchView, Param param, WebinarInfo webinarInfo) {
@@ -93,6 +98,22 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
         this.chatView.setPresenter(this);
         this.questionView.setPresenter(this);
         initInteractive();
+        /**
+         * since 6.4.0
+         */
+        if (webinarInfo != null) {
+            chatALLForbid = webinarInfo.chatAllForbid;
+            chatOwnForbid = webinarInfo.chatOwnForbid;
+            if (!webinarInfo.chatAllForbid) {
+                //取消全员禁言
+                canSpeak = !webinarInfo.chatOwnForbid;
+                canSpeakQa = true;
+            } else {
+                //全员禁言
+                canSpeak = false;
+                canSpeakQa = !TextUtils.equals("1", webinarInfo.qa_status);
+            }
+        }
     }
 
     public void initInteractive() {
@@ -211,6 +232,10 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
     public void sendQuestion(String content) {
         if (!VhallSDK.isLogin()) {
             watchView.showToast(R.string.vhall_login_first);
+            return;
+        }
+        if (!canSpeakQa) {
+            watchView.showToast("你被禁言了");
             return;
         }
         interactive.sendQuestion(content, new RequestCallback() {
@@ -489,6 +514,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
         watchView.dismissDevices();
     }
 
+    String question_name = "问答";
     /**
      * 观看过程消息监听
      */
@@ -499,10 +525,11 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
             switch (messageInfo.event) {
                 case MessageServer.EVENT_DISABLE_CHAT://禁言
                     watchView.showToast("您已被禁言");
+                    canSpeak = false;
+                    chatOwnForbid = true;
                     if (liveNoDelayView != null) {
                         liveNoDelayView.enterInteractive(false);
                     }
-                    canSpeak = false;
                     break;
                 case MessageServer.EVENT_KICKOUT://踢出
                     watchView.showToast("您已被踢出");
@@ -510,16 +537,22 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                     break;
                 case MessageServer.EVENT_PERMIT_CHAT://解除禁言
                     watchView.showToast("您已被解除禁言");
-                    canSpeak = true;
+                    chatOwnForbid = false;
+                    canSpeak = !chatALLForbid;
                     break;
                 case MessageServer.EVENT_CHAT_FORBID_ALL://全员禁言
+                    //问答状态 根据全体禁言判断 如果开启禁言择不可以发送问答  如果关闭择根据 qa_status判断 1开启禁言 0关闭
                     if (messageInfo.status == 0) {
                         //取消全员禁言
                         watchView.showToast("解除全员禁言");
-                        canSpeak = true;
+                        canSpeak = !chatOwnForbid;
+                        chatALLForbid = false;
+                        canSpeakQa = true;
                     } else {
                         //全员禁言
                         watchView.showToast("全员禁言");
+                        chatALLForbid = true;
+                        canSpeakQa = !TextUtils.equals("1", messageInfo.qa_status);
                         canSpeak = false;
                     }
                     break;
@@ -542,10 +575,20 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                         watchView.showSignIn(messageInfo.id, messageInfo.signTitle, parseTime(messageInfo.sign_show_time, 30));
                     }
                     break;
+                case MessageServer.EVENT_QUESTION_ANSWER_SET: // 修改问答昵称设置
+
+                    if (!TextUtils.isEmpty(messageInfo.question_name)) {
+                        question_name = messageInfo.question_name;
+                    }
+                    watchView.showQAndA(question_name);
+                    break;
                 case MessageServer.EVENT_QUESTION: // 问答开关
-                    watchView.showToast("问答功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
+                    if (!TextUtils.isEmpty(messageInfo.question_name)) {
+                        question_name = messageInfo.question_name;
+                    }
+                    watchView.showToast(question_name + "功能已" + (messageInfo.status == 0 ? "关闭" : "开启"));
                     if (messageInfo.status == 1) {
-                        watchView.showQAndA();
+                        watchView.showQAndA(question_name);
                     } else {
                         watchView.dismissQAndA();
                     }
@@ -569,6 +612,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                     params.put(SurveyInternal.KEY_INTERACT_TOKEN, TokenManger.getInteractToken());
                     surveyData.setUrl(SurveyInternal.createSurveyUrl(params));
                     surveyData.setId(messageInfo.id);
+                    surveyData.survey_name = messageInfo.survey_name;
                     chatView.notifyDataChangedChat(surveyData);
                     break;
                 case MessageServer.EVENT_SHOWDOC://文档开关指令 1 使用文档 0 关闭文档
@@ -808,7 +852,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
-                    if (chatInfo.msgData!=null&&!TextUtils.isEmpty(chatInfo.msgData.target_id)){
+                    if (chatInfo.msgData != null && !TextUtils.isEmpty(chatInfo.msgData.target_id)) {
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }
@@ -913,10 +957,11 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
         public void onDidRoomStatus(Room room, Room.VHRoomStatus vhRoomStatus) {
             Log.e(TAG, "onDidRoomStatus  " + vhRoomStatus);
             switch (vhRoomStatus) {
-                case VHRoomStatusDisconnected:// 异常退出
+                case VHRoomStatusDisconnected:
                     watchView.getActivity().finish();
                     break;
                 case VHRoomStatusError:
+                    watchView.getActivity().finish();
                     Log.e(TAG, "VHRoomStatusError");
                     break;
                 case VHRoomStatusReady:

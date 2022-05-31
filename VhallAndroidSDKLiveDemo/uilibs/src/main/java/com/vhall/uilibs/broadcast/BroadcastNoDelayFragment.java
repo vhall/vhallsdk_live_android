@@ -15,8 +15,11 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.vhall.beautify.VHBeautifyKit;
 import com.vhall.push.VHVideoCaptureView;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.interactive.dialog.OutDialog;
+import com.vhall.uilibs.interactive.dialog.OutDialogBuilder;
 import com.vhall.vhallrtc.client.VHRenderView;
 
 import org.vhwebrtc.SurfaceViewRenderer;
@@ -37,7 +40,19 @@ public class BroadcastNoDelayFragment extends Fragment implements BroadcastContr
     private PopupWindow mPopupWindow;
     private VHRenderView renderView;
 
+    private IFaceBeautySwitch iFaceBeautySwitch;
 
+    private static int orientation;
+    public void setIFaceBeautySwitch(IFaceBeautySwitch iFaceBeautySwitch) {
+        this.iFaceBeautySwitch = iFaceBeautySwitch;
+    }
+
+    public static BroadcastNoDelayFragment newInstance(int ori) {
+        orientation = ori;
+        return new BroadcastNoDelayFragment();
+    }
+
+    private OutDialog beautyDialog;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -107,7 +122,18 @@ public class BroadcastNoDelayFragment extends Fragment implements BroadcastContr
         } else if (i == R.id.btn_changeFlash) {
             mPresenter.changeFlash();
         } else if (i == R.id.btn_changeFilter) {
-            showPopupWindow();
+//            showPopupWindow();
+            if (VHBeautifyKit.getInstance().isBeautifyAuthEnable()) {
+                if (iFaceBeautySwitch != null) {
+                    iFaceBeautySwitch.changeVisibility();
+                }
+            } else {
+                if (beautyDialog == null) {
+                    beautyDialog = new OutDialogBuilder().layout(R.layout.dialog_beauty_no_serve)
+                            .build(getActivity());
+                }
+                beautyDialog.show();
+            }
         } else if (i == R.id.tv_mode) {
             mPresenter.changeMode();
         } else if (i == R.id.btn_back) {

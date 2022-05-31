@@ -1,6 +1,7 @@
 package com.vhall.uilibs.watch;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
@@ -16,9 +17,11 @@ import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.data.ScrollInfoData;
+import com.vhall.vhss.data.SurveyInfoData;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,7 +42,7 @@ public class WatchContract {
         void dismissNotice();
 
         //显示签到框
-        void showSignIn(String signId ,String title,int startTime);
+        void showSignIn(String signId, String title, int startTime);
 
         //隐藏签到框
         void dismissSignIn();
@@ -53,7 +56,7 @@ public class WatchContract {
         void dismissSurvey();
 
         //显示问答
-        void showQAndA();
+        void showQAndA(String name);
 
         //隐藏问答
         void dismissQAndA();
@@ -142,11 +145,16 @@ public class WatchContract {
 
         void liveFinished();//直播结束
 
+        default void updateSurveyList(ArrayList<SurveyInfoData> result) {
+
+        }
+
     }
 
     interface LiveNoDelayView extends BaseView<LivePresenter> {
 
         void updateMain(String mainId);
+
         //无延迟直播专用
         void updateStream(boolean del, Stream stream, VHRenderView newRenderView);//直播结束
 
@@ -233,6 +241,14 @@ public class WatchContract {
 
         int changeOriention();
 
+        default boolean setVideoBackgroundColor(int color) {
+            return false;
+        }
+
+        default boolean setVideoBackgroundImage(Bitmap bitmap) {
+            return false;
+        }
+
         void onDestroy();
 
         void submitLotteryInfo(String id, String lottery_id, String nickname, String phone);
@@ -244,10 +260,13 @@ public class WatchContract {
         void setHeadTracker(); // 设置陀螺仪
 
         boolean isHeadTracker();  // 当前的陀螺仪
+
         //无延迟 互动直播 使用
         void onSwitchCamera(); // 切换摄像头
+
         //无延迟 互动直播 使用
         void onSwitchVideo(boolean isOpen); // 视频开关
+
         //无延迟 互动直播 使用
         void onSwitchAudio(boolean isOpen); // 音频开关
 
@@ -274,6 +293,14 @@ public class WatchContract {
         DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
 
         void showDevices();
+
+        default void showSurveyListDialog(List<SurveyInfoData> dataList ,boolean show) {
+
+        }
+
+        default void showSurvey(SurveyInfoData data) {
+
+        }
 
         void dismissDevices();
     }

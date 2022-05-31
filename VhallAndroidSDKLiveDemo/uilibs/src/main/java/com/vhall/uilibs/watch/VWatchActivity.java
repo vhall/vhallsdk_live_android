@@ -3,11 +3,13 @@ package com.vhall.uilibs.watch;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -32,6 +34,7 @@ import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.VChatFragment;
 import com.vhall.uilibs.interactive.InteractiveActivity;
+import com.vhall.uilibs.interactive.RtcInternal;
 import com.vhall.uilibs.util.ActivityUtils;
 import com.vhall.uilibs.util.CircleView;
 import com.vhall.uilibs.util.DevicePopu;
@@ -42,6 +45,7 @@ import com.vhall.uilibs.util.SignInDialog;
 import com.vhall.uilibs.util.SurveyPopu;
 import com.vhall.uilibs.util.SurveyPopuVss;
 import com.vhall.uilibs.util.SurveyView;
+import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
@@ -55,6 +59,7 @@ import org.fourthline.cling.model.meta.RemoteDevice;
 import org.fourthline.cling.registry.DefaultRegistryListener;
 import org.fourthline.cling.registry.Registry;
 
+import static com.vhall.uilibs.interactive.RtcInternal.REQUEST_PUSH;
 import static com.vhall.uilibs.util.SurveyView.EVENT_JS_BACK;
 import static com.vhall.uilibs.util.SurveyView.EVENT_PAGE_LOADED;
 
@@ -234,9 +239,11 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
         mHand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //点击上麦, 再次点击下麦
-                if (mPresenter != null) {
-                    mPresenter.onRaiseHand();
+                if (RtcInternal.isGrantedPermissionRtc(VWatchActivity.this, REQUEST_PUSH)) {
+                    //点击上麦, 再次点击下麦
+                    if (mPresenter != null) {
+                        mPresenter.onRaiseHand();
+                    }
                 }
             }
         });
@@ -351,7 +358,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
 
     //显示问答
     @Override
-    public void showQAndA() {
+    public void showQAndA(String name) {
     }
 
     //隐藏问答
@@ -416,16 +423,19 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
             invitedDialog.setPositiveOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //同意上麦
-                    mPresenter.replyInvite(1);
-                    //无延迟在当前房间上麦 非无延迟 进入互动房间
-                    if (param.noDelay) {
-                        noDelayLiveFragment.enterInteractive(true);
-                    } else {
-                        enterInteractive();
+                    //有互动权限才可以上麦
+                    if (RtcInternal.isGrantedPermissionRtc(VWatchActivity.this, REQUEST_PUSH)) {
+                        //同意上麦
+                        mPresenter.replyInvite(1);
+                        //无延迟在当前房间上麦 非无延迟 进入互动房间
+                        if (param.noDelay) {
+                            noDelayLiveFragment.enterInteractive(true);
+                        } else {
+                            enterInteractive();
+                        }
+                        invitedDialog.dismiss();
+                        //发送同意上麦信息
                     }
-                    invitedDialog.dismiss();
-                    //发送同意上麦信息
                 }
             });
             invitedDialog.setNegativeOnClickListener(new View.OnClickListener() {
@@ -599,5 +609,22 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
     public void dismissDevices() {
         if (devicePopu != null)
             devicePopu.dismiss();
+    }
+
+    private void baseShowToast(final String txt) {
+        ToastUtil.showToast(txt);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PUSH) {
+            if (grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+
+            } else {
+                baseShowToast("未获取到音视频设备权限，请前往获取权限");
+            }
+        }
     }
 }

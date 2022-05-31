@@ -24,14 +24,37 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.3.4'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.3.4'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.4.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.4.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
+    
+    
+    //美颜相关 使用高级美颜添加 不用可以不写
+   api 'com.github.vhall.android.base:vhall-beautify-faceunity:1.1.3'
+
+    //美颜demoUI 建议自己按照自己需求实现 使用高级美颜添加 不用可以不写
+    api 'com.github.vhall.android.library:vhall-beautify-kit-support:1.1.0'
+
     
 ```
 
 二、版本更新信息：
+
+ 版本：v6.4.0  更新时间 2022.5.31
+ 
+1. 新增支持云导播活动的发起和推流 [使用指南](https://saas-doc.vhall.com/docs/show/1507 "使用指南")<br>
+
+2. 问卷&问答支持修改显示名称、批量删除等功能 [使用指南](https://saas-doc.vhall.com/docs/show/1507 "使用指南")<br>
+
+3. 支持设置图片或颜色为播放器背景 [使用指南](https://saas-doc.vhall.com/docs/show/1507 "使用指南") <br>
+
+4. 修改嘉宾和观众的设备检验流程
+
+5. SDK不再采集IMEI、IMSI、设备序列号、安卓ID等安全信息
+
+6. 修改已知SDK提示问题
+
 
 版本：v6.3.4  更新时间 2022.5.13
 

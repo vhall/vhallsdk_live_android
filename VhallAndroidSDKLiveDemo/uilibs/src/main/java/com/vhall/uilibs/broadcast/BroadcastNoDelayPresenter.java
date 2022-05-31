@@ -334,7 +334,7 @@ public class BroadcastNoDelayPresenter implements BroadcastContract.Presenter, C
 
         @Override
         public void onDidConnect() {//进入房间
-            Log.e(TAG, "onDidConnect");
+            Log.e("vhall_", "onDidConnect");
             if (interactive != null) {
                 interactive.publish();
             }
@@ -377,7 +377,7 @@ public class BroadcastNoDelayPresenter implements BroadcastContract.Presenter, C
 
         @Override
         public void onDidPublishStream() {// 上麦
-            Log.e(TAG, "onDidPublishStream");
+            Log.e("vhall_", "onDidPublishStream");
         }
 
         @Override
@@ -395,10 +395,10 @@ public class BroadcastNoDelayPresenter implements BroadcastContract.Presenter, C
         public void onDidRoomStatus(Room room, Room.VHRoomStatus vhRoomStatus) {
             Log.e(TAG, "onDidRoomStatus  " + vhRoomStatus);
             switch (vhRoomStatus) {
-                case VHRoomStatusDisconnected:// 异常退出
-                    mBraodcastView.getActivity().finish();
+                case VHRoomStatusDisconnected:
                     break;
                 case VHRoomStatusError:
+                    mBraodcastView.getActivity().finish();
                     Log.e(TAG, "VHRoomStatusError");
                     break;
                 case VHRoomStatusReady:

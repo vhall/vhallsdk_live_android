@@ -784,10 +784,11 @@ class VWatchNoDelayLivePresenter implements WatchContract.LivePresenter, ChatCon
         public void onDidRoomStatus(Room room, Room.VHRoomStatus vhRoomStatus) {
             Log.e(TAG, "onDidRoomStatus  " + vhRoomStatus);
             switch (vhRoomStatus) {
-                case VHRoomStatusDisconnected:// 异常退出
+                case VHRoomStatusDisconnected:
                     watchView.getActivity().finish();
                     break;
                 case VHRoomStatusError:
+                    watchView.getActivity().finish();
                     Log.e(TAG, "VHRoomStatusError");
                     break;
                 case VHRoomStatusReady:

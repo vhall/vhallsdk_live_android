@@ -148,6 +148,8 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     private void initWatch() {
         if (webinarInfo != null) {
             getWatchPlayback().setWebinarInfo(webinarInfo);
+            //修改默认type
+            getWatchPlayback().setScaleType(1);
             handlePosition();
             pos = 1;
             initCommentData(pos);

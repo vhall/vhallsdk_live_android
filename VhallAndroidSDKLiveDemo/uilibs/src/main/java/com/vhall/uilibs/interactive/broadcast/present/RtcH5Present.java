@@ -11,6 +11,7 @@ import com.vhall.business.MessageServer;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.uilibs.chat.MessageChatData;
+import com.vhall.uilibs.interactive.RtcInternal;
 import com.vhall.uilibs.interactive.broadcast.config.RtcConfig;
 import com.vhall.uilibs.interactive.dialog.OutDialog;
 import com.vhall.uilibs.interactive.dialog.OutDialogBuilder;
@@ -41,6 +42,7 @@ import static com.vhall.business.MessageServer.EVENT_VRTC_BIG_SCREEN_SET;
 import static com.vhall.business.MessageServer.EVENT_VRTC_CONNECT_REFUSED;
 import static com.vhall.business.MessageServer.EVENT_VRTC_CONNECT_SUCCESS;
 import static com.vhall.business.MessageServer.EVENT_VRTC_SPEAKER_SWITCH;
+import static com.vhall.uilibs.interactive.RtcInternal.REQUEST_PUSH;
 
 public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
     private static final String TAG = "BroadcastPresent";
@@ -116,7 +118,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
             }
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
-                    if (chatInfo.msgData!=null&&!TextUtils.isEmpty(chatInfo.msgData.target_id)){
+                    if (chatInfo.msgData != null && !TextUtils.isEmpty(chatInfo.msgData.target_id)) {
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }
@@ -146,7 +148,6 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
             if (msg == null) {
                 return;
             }
-            Log.e("vhall_",msg.mOriginData.toString());
             refreshUserList(msg);
 
             switch (msg.event) {
@@ -256,6 +257,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                                 .title(nowHostRoleName + "邀请您上麦，是否同意？")
                                 .tv1("拒绝")
                                 .tv2("同意")
+                                .dismiss2(false)
                                 .onCancel(new OutDialog.ClickLister() {
                                     @Override
                                     public void click() {
@@ -265,17 +267,23 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                                 .onConfirm(new OutDialog.ClickLister() {
                                     @Override
                                     public void click() {
-                                        RtcConfig.getInterActive().agreeInvite(new RequestCallback() {
-                                            @Override
-                                            public void onSuccess() {
-                                                RtcConfig.getInterActive().publish();
-                                            }
+                                        //有权限才可以上麦
+                                        if (RtcInternal.isGrantedPermissionRtc(activity, REQUEST_PUSH)) {
+                                            RtcConfig.getInterActive().agreeInvite(new RequestCallback() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    mRtcFragmentView.initLocalStream();
+                                                    RtcConfig.getInterActive().publish();
+                                                    showInvited.dismiss();
+                                                }
 
-                                            @Override
-                                            public void onError(int eventCode, String msg) {
-                                                broadcastView.showToast(msg);
-                                            }
-                                        });
+                                                @Override
+                                                public void onError(int eventCode, String msg) {
+                                                    broadcastView.showToast(msg);
+                                                    showInvited.dismiss();
+                                                }
+                                            });
+                                        }
                                     }
                                 })
                                 .build(activity);
@@ -303,6 +311,8 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                     break;
                 case MessageServer.EVENT_INTERACTIVE_ALLOW_MIC:
                     //接收上麦消息
+                    //嘉宾需要先设置本地流
+                    mRtcFragmentView.initLocalStream();
                     RtcConfig.getInterActive().publish();
                     break;
                 case MessageServer.EVENT_VRTC_CONNECT_SUCCESS:

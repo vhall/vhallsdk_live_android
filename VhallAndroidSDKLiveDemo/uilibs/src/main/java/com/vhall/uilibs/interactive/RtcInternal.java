@@ -15,8 +15,10 @@ import com.vhall.httpclient.utils.OKHttpUtils;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 import okhttp3.Call;
@@ -29,12 +31,14 @@ import static android.Manifest.permission.RECORD_AUDIO;
 
 public class RtcInternal {
 
+    public static final int REQUEST_PUSH = 0;
     public static String reportUrl = "https://dc.e.vhall.com";
-    public static void report(String userId, String webinar_id,Context context) {
+
+    public static void report(String userId, String webinar_id, Context context) {
         if (TextUtils.isEmpty(userId) || TextUtils.isEmpty(webinar_id) || TextUtils.isEmpty(reportUrl)) {
             return;
         }
-        String reportHost = String.format("%s/login?k=%s&id=%s&s=%s&token=%s", reportUrl, "606001", "Android" + System.currentTimeMillis(), UUID.randomUUID().toString(), getToken(userId, webinar_id,context));
+        String reportHost = String.format("%s/login?k=%s&id=%s&s=%s&token=%s", reportUrl, "606001", "Android" + System.currentTimeMillis(), UUID.randomUUID().toString(), getToken(userId, webinar_id, context));
         Request request = (new Request.Builder()).url(reportHost).get().build();
 
         OKHttpUtils.createOkClient().newCall(request).enqueue(new Callback() {
@@ -51,9 +55,7 @@ public class RtcInternal {
     }
 
 
-
-
-    private static String getToken(String userId, String webinar_id,Context context) {
+    private static String getToken(String userId, String webinar_id, Context context) {
         JSONObject collectionParam = new JSONObject();
         try {
             collectionParam.put("user_id", userId);
@@ -73,6 +75,7 @@ public class RtcInternal {
     }
 
     public static final String TIME_PATTERN3 = "yyyy-MM-dd HH:mm:ss";
+
     public static String dateToString() {
         SimpleDateFormat format = new SimpleDateFormat(TIME_PATTERN3);
         try {
@@ -84,9 +87,21 @@ public class RtcInternal {
         return "";
     }
 
+    public static String dateToString2(String date) {
+        SimpleDateFormat format = new SimpleDateFormat(TIME_PATTERN3);
+        try {
+            Date d2 = format.parse(date);
+            int minutes = d2.getMinutes();
+            return d2.getHours() + ":" + (minutes <= 9 ? "0" + minutes : minutes);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return date;
+    }
 
     /**
      * 判断是否有网络链接
+     *
      * @param context
      * @return
      */
@@ -103,9 +118,7 @@ public class RtcInternal {
     }
 
 
-
-
-    public static boolean isGrantedPermissionRtc(Activity activity,int requestCode) {
+    public static boolean isGrantedPermissionRtc(Activity activity, int requestCode) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
         }
@@ -115,7 +128,6 @@ public class RtcInternal {
         activity.requestPermissions(new String[]{CAMERA, RECORD_AUDIO}, requestCode);
         return false;
     }
-
 
 
 }

@@ -16,6 +16,8 @@ public class OutDialogBuilder {
     public int color1;
     public int color2;
     public int layout=0;
+    public boolean dismiss2 = true;
+    public boolean dismiss1 = true;
 
     public OutDialogBuilder title(String title) {
         this.title = title;
@@ -31,6 +33,15 @@ public class OutDialogBuilder {
         return this;
     }
 
+    public OutDialogBuilder dismiss2(boolean dismiss2) {
+        this.dismiss2 = dismiss2;
+        return this;
+    }
+
+    public OutDialogBuilder dismiss1(boolean dismiss1) {
+        this.dismiss1 = dismiss1;
+        return this;
+    }
     public OutDialogBuilder tv1(String tv1) {
         this.tv1 = tv1;
         return this;

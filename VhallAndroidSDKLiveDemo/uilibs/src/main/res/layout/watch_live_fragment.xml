@@ -9,9 +9,9 @@
         android:id="@+id/rl_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/dimen_45dp"
         android:background="@color/black"
-        android:gravity="center"
-        android:layout_marginBottom="@dimen/dimen_45dp" />
+        android:gravity="center" />
 
     <com.vhall.vhallrtc.client.VHRenderView
         android:id="@+id/share_render_view"
@@ -30,6 +30,32 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/fl_survey"
+        android:layout_width="@dimen/dimen_32dp"
+        android:layout_height="@dimen/dimen_32dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/dimen_15dp"
+        android:layout_marginBottom="@dimen/dimen_60dp"
+        android:visibility="visible">
+
+        <ImageView
+            android:layout_width="@dimen/dimen_32dp"
+            android:layout_height="@dimen/dimen_32dp"
+            android:src="@drawable/icon_survey"
+            android:visibility="visible" />
+
+        <View
+            android:id="@+id/red_point"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/dimen_1dp"
+            android:background="@drawable/shape_red_point"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"

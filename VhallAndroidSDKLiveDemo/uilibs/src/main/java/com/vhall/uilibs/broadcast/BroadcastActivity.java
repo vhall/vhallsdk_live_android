@@ -11,12 +11,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.vhall.beautify.DefaultFaceBeautySource;
 import com.vhall.beautifykit.control.FaceBeautyControlView;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
-import com.vhall.uilibs.beautysource.BeautyManager;
 import com.vhall.uilibs.beautysource.FaceBeautyDataFactory;
 import com.vhall.uilibs.chat.PushChatFragment;
 import com.vhall.uilibs.util.ActivityUtils;
@@ -32,6 +30,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
     InputView inputView;
     PushChatFragment chatFragment;
     private boolean noDelay = false;
+    private boolean isDirector = false;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -49,6 +48,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
         noDelay = param.noDelay;
+        isDirector = param.isDirector;
         setContentView(R.layout.broadcast_activity);
 
         if (inputView == null) {
@@ -85,15 +85,29 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     chatFragment, R.id.chatFrame);
         }
-        if (noDelay) {
-            BroadcastNoDelayFragment mainFragment = (BroadcastNoDelayFragment) getSupportFragmentManager().findFragmentById(R.id.broadcastFrame);
+        if (isDirector) {
+            DirectorFragment mainFragment = (DirectorFragment) getSupportFragmentManager().findFragmentById(R.id.broadcastFrame);
             if (mainFragment == null) {
-                mainFragment = BroadcastNoDelayFragment.newInstance();
+                mainFragment = DirectorFragment.newInstance();
                 ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                         mainFragment, R.id.broadcastFrame);
             }
+            new DirectorPresenter(param, webinarInfo, this,mainFragment, chatFragment);
+        } else if (noDelay) {
+            BroadcastNoDelayFragment mainFragment = (BroadcastNoDelayFragment) getSupportFragmentManager().findFragmentById(R.id.broadcastFrame);
+            if (mainFragment == null) {
+                mainFragment = BroadcastNoDelayFragment.newInstance(param.screenOri);
+                ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                        mainFragment, R.id.broadcastFrame);
+            }
+            mainFragment.setIFaceBeautySwitch(new IFaceBeautySwitch() {
+                @Override
+                public void changeVisibility() {
+                    BroadcastActivity.this.changeVisibility();
+                }
+            });
             new BroadcastNoDelayPresenter(param, webinarInfo, this, mainFragment, chatFragment);
-        }else {
+        } else {
             BroadcastFragment mainFragment = (BroadcastFragment) getSupportFragmentManager().findFragmentById(R.id.broadcastFrame);
             if (mainFragment == null) {
                 mainFragment = BroadcastFragment.newInstance(param.screenOri);
@@ -104,7 +118,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             mainFragment.setIFaceBeautySwitch(new IFaceBeautySwitch() {
                 @Override
                 public void changeVisibility() {
-                   BroadcastActivity.this.changeVisibility();
+                    BroadcastActivity.this.changeVisibility();
                 }
             });
         }
@@ -163,7 +177,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
     private FaceBeautyControlView mFaceBeautyControlView;
     private FaceBeautyDataFactory mFaceBeautyDataFactory;
 
-    private void changeVisibility(){
+    private void changeVisibility() {
         //新的美颜
         if (mFaceBeautyControlView.getVisibility() == View.VISIBLE) {
             mFaceBeautyControlView.setVisibility(View.GONE);
@@ -171,6 +185,7 @@ public class BroadcastActivity extends FragmentActivity implements BroadcastCont
             mFaceBeautyControlView.setVisibility(View.VISIBLE);
         }
     }
+
     private void initBeautifyData(int orientation) {
         mFaceBeautyDataFactory = new FaceBeautyDataFactory(getActivity());
         mFaceBeautyControlView = findViewById(R.id.faceBeautyControlView);

@@ -1,6 +1,7 @@
 package com.vhall.uilibs.broadcast;
 
 import android.app.Activity;
+import android.widget.RelativeLayout;
 
 import com.vhall.push.VHVideoCaptureView;
 import com.vhall.uilibs.BasePresenter;
@@ -15,6 +16,7 @@ public class BroadcastContract {
 
     interface BroadcastView extends BaseView<Presenter> {
         void showChatView(boolean emoji, InputUser user, int limit);
+
         //获取当前activity实例
         Activity getActivity();
     }
@@ -39,7 +41,9 @@ public class BroadcastContract {
         void showMsg(String msg);
 
         void setSpeedText(String text);
+
         void setModeText(String mode);
+
         //是否结束直播弹窗
         void showEndLiveDialog();
     }
@@ -73,5 +77,30 @@ public class BroadcastContract {
 
         void onPause();
 
+    }
+
+    interface IDirectorPresenter extends BasePresenter {
+        void onstartBtnClick();
+
+        void onDestroy();
+
+        //获取当前直播状态：有没有开播
+        boolean getWebinarStatus();
+
+        void onResume();
+
+        void onPause();
+
+        void init();
+    }
+
+    interface DirectorView extends BaseView<IDirectorPresenter> {
+        RelativeLayout getWatchLayout();
+
+        Activity getActivity();
+
+        void setDirectorError(String type);
+
+        void setStartBtnImage(boolean start);
     }
 }

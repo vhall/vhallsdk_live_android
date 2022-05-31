@@ -8,11 +8,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -21,13 +23,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.vhall.business.utils.LogManager;
-import com.vhall.business.widget.ContainerLayout;
 import com.vhall.player.Constants;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.MarqueeView;
+import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
+import com.vhall.uilibs.widget.SurveyListDialog;
 import com.vhall.vhss.data.ScrollInfoData;
+import com.vhall.vhss.data.SurveyInfoData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -67,6 +73,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     private Activity context;
 
     private ImageView iv_dlna;
+    private FrameLayout fl_survey;
+    private View redPoint;
 
     public static WatchLiveFragment newInstance() {
         return new WatchLiveFragment();
@@ -103,7 +111,10 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         clickStart = (ImageView) root.findViewById(R.id.click_rtmp_watch);
         clickStart.setOnClickListener(this);
         clickOrientation = (ImageView) root.findViewById(R.id.click_rtmp_orientation);
+        fl_survey = root.findViewById(R.id.fl_survey);
+        redPoint = root.findViewById(R.id.red_point);
         clickOrientation.setOnClickListener(this);
+        fl_survey.setOnClickListener(this);
         radioChoose = (RadioGroup) root.findViewById(R.id.radio_choose);
         radioChoose.setOnCheckedChangeListener(checkListener);
         radioButtonShowDEFAULT = (RadioButton) root.findViewById(R.id.radio_btn_default);
@@ -245,6 +256,15 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         } else if (i == R.id.iv_dlna) {
             // TODO 投屏相关
             mPresenter.showDevices();
+        } else if (i == R.id.fl_survey) {
+            judgeRed();
+            if (status == 0) {
+                ToastUtil.showToast("已提交成功感谢参与");
+            } else if (status == 1) {
+                mPresenter.showSurvey(surveyInfoData);
+            } else {
+                mPresenter.showSurveyListDialog(resultSurvey,true);
+            }
         }
     }
 
@@ -374,6 +394,45 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }
     }
 
+    private ArrayList<SurveyInfoData> resultSurvey = new ArrayList<>();
+
+    @Override
+    public void updateSurveyList(ArrayList<SurveyInfoData> result) {
+        resultSurvey.clear();
+        if (!ListUtils.isEmpty(result)) {
+            resultSurvey.addAll(result);
+            mPresenter.showSurveyListDialog(result,false);
+        }
+        judgeRed();
+    }
+
+    // 1 只有一个没有填写 2+多个没有填写 0 全部填写
+    private int status;
+    private SurveyInfoData surveyInfoData;//如果只有一个没有填写记录信息
+
+    /**
+     * 判读显示不显示红点
+     * 判断按钮的跳转
+     */
+    private void judgeRed() {
+        status = 0;
+        if (ListUtils.isEmpty(resultSurvey)) {
+            redPoint.setVisibility(View.GONE);
+        } else {
+            for (int i = 0; i < resultSurvey.size(); i++) {
+                if (TextUtils.equals("0", resultSurvey.get(i).is_answered)) {
+                    status++;
+                    surveyInfoData = resultSurvey.get(i);
+                }
+            }
+            if (status > 0) {
+                redPoint.setVisibility(View.VISIBLE);
+            } else {
+                redPoint.setVisibility(View.GONE);
+            }
+        }
+    }
+
     private ScrollInfoData scrollInfoData;
 
     @Override
@@ -455,7 +514,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }
         if (mPresenter != null && mPresenter.getIsPlaying()) {
             mPresenter.stopWatch();
-            restart=true;
+            restart = true;
         }
     }
 
@@ -476,7 +535,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }
         if (mPresenter != null && restart) {
             mPresenter.startWatch();
-            restart=false;
+            restart = false;
         }
     }
 

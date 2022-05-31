@@ -125,8 +125,25 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
      */
     private boolean finish = false;
 
+
+    @Override
     public Stream getLocalStream() {
+        if (localStream==null){
+            initLocalStream();
+        }
         return localStream;
+    }
+
+    @Override
+    public void initLocalStream() {
+        if (!UserManger.isHost(roomInfo.getJoin_info().role_name) && localStream == null) {
+            VHRenderView tempRenderView = new VHRenderView(mContext);
+            if (mainLocalView == null) {
+                mainLocalView = tempRenderView;
+            }
+            mInteractive.setLocalView(mainLocalView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo, null);
+            localStream = mInteractive.getLocalStream();
+        }
     }
 
     public void setFinish(boolean finish) {
@@ -264,8 +281,11 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         setRoomInfo(context, null, callBack);
     }
 
+    private VHRenderView mainLocalView;
+
     public void setRoomInfo(Context context, VHRenderView renderView, final CallBack callBack) {
         if (roomInfo != null) {
+            mainLocalView = renderView;
             this.roomInfo = mWebinarInfo.getWebinarInfoData();
             if (roomInfo.roomToolsStatusData != null && !TextUtils.isEmpty(roomInfo.roomToolsStatusData.doc_permission)) {
                 mainId = roomInfo.roomToolsStatusData.doc_permission;
@@ -303,13 +323,16 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     }
                 }
             });
-            VHRenderView tempRenderView = new VHRenderView(context);
-            if (renderView == null) {
-                renderView = tempRenderView;
-            }
             mInteractive.setDefinition(definition);
-            mInteractive.setLocalView(renderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo, null);
-            localStream = mInteractive.getLocalStream();
+            //支持人直接创建本流 嘉宾上麦之后创建
+            if (UserManger.isHost(roomInfo.getJoin_info().role_name)) {
+                VHRenderView tempRenderView = new VHRenderView(context);
+                if (renderView == null) {
+                    renderView = tempRenderView;
+                }
+                mInteractive.setLocalView(renderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo, null);
+                localStream = mInteractive.getLocalStream();
+            }
             RtcConfig.setInteractive(mInteractive);
         }
     }
@@ -388,8 +411,8 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         @Override
         public void onDidChangeStatus(Room room, Room.VHRoomStatus vhRoomStatus) {
             switch (vhRoomStatus) {
-                case VHRoomStatusDisconnected:// 异常退出
-                    //TODO 销毁页面
+                case VHRoomStatusDisconnected:
+
                     break;
                 case VHRoomStatusError:
                     Log.e("rtc", "VHRoomStatusError");
@@ -812,6 +835,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             views.add(shareView);
             setChoose(selectPoint);
         }
+        if (adapter!=null)
         adapter.notifyDataSetChanged();
     }
 

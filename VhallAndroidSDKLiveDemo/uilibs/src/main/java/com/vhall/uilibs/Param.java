@@ -14,6 +14,8 @@ public class Param implements Serializable {
 
     //发直播相关
     public String broId = "";
+    //云导播的机位id
+    public String seatId = "";
     public String broName = "";
     public String broToken = "5d56d034e933e1826c7c896859019e33";
     public String guestPwd = "123456";//嘉宾口令
@@ -36,6 +38,8 @@ public class Param implements Serializable {
     //当前选择的是不是无延迟观看（是无延迟互动 上麦后关闭页面）
     public boolean noDelay=false;
     public String web_url;
+    //当前活动是不是云导播活动
+    public boolean isDirector=false;
 
     //互动相关
 //    public int interactive_definition = VHILSS.SD;
