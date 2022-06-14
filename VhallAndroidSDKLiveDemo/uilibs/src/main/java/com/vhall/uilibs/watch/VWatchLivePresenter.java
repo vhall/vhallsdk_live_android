@@ -379,6 +379,7 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
         }
     }
 
+
     public WatchLive getWatchLive() {
         if (watchLive == null) {
             RelativeLayout watchLayout = liveView.getWatchLayout();

@@ -77,6 +77,7 @@
         android:text="改变背景图"
         android:textColor="#ff0000" />
 
+
     <ProgressBar
         android:id="@+id/progressbar"
         android:layout_width="wrap_content"

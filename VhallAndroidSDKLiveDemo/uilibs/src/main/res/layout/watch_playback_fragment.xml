@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/splash_bg">
+    android:background="@color/color_22"
+    android:layout_height="match_parent">
 
     <com.vhall.player.vod.VodPlayerView
         android:id="@+id/surface_view"
@@ -56,8 +56,8 @@
                 android:id="@+id/tv_current_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
                 android:layout_below="@id/seekbar"
+                android:layout_alignParentLeft="true"
                 android:text="00:00:00"
                 android:textColor="@android:color/white"
                 android:textSize="10dp" />
@@ -66,8 +66,8 @@
                 android:id="@+id/tv_end_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
                 android:layout_below="@id/seekbar"
+                android:layout_alignParentRight="true"
                 android:text="00:00:00"
                 android:textColor="@android:color/white"
                 android:textSize="10dp" />
@@ -100,7 +100,6 @@
             android:layout_marginRight="5dp"
             android:src="@drawable/push_tv" />
 
-
         <ImageView
             android:id="@+id/btn_change_scale_type"
             android:layout_width="25dp"
@@ -109,16 +108,28 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
             android:background="@drawable/fit_default" />
+
         <TextView
             android:id="@+id/tv_play_speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@id/btn_change_scale_type"
             android:padding="10dp"
             android:text="1.00"
-            android:textColor="#ffffff"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="5dp"
-            android:layout_toLeftOf="@id/btn_change_scale_type"/>
+            android:textColor="#ffffff" />
+
+        <ImageView
+            android:id="@+id/btn_mute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:layout_toLeftOf="@id/tv_play_speed"
+            android:src="@drawable/btn_unmute"
+            android:visibility="gone" />
+
     </RelativeLayout>
 
     <RadioGroup

@@ -41,7 +41,14 @@ allprojects {
 
 二、版本更新信息：
 
- 版本：v6.4.0  更新时间 2022.5.31
+ 版本：v6.4.1  更新时间 2022.6.14 <br>
+ 
+1. 抽奖增加中奖列表，领奖开关    使用步骤 [demo中新功能对应使用文档](https://saas-doc.vhall.com/docs/show/1489 "demo中新功能对应使用文档")
+[消息说明](https://saas-doc.vhall.com/docs/show/1214 "消息说明")<br>
+
+
+
+版本：v6.4.0  更新时间 2022.5.31 <br>
  
 1. 新增支持云导播活动的发起和推流 [使用指南](https://saas-doc.vhall.com/docs/show/1507 "使用指南")<br>
 

@@ -6,14 +6,12 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Group;
 import android.support.v4.app.Fragment;
@@ -992,9 +990,9 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
         clOver.setVisibility(View.VISIBLE);
         // 活动类型  1为音频，2视频 3 互动直播
         if (!"2".equals(webinar_type)) {
-            findViewById(R.id.image).setVisibility(View.VISIBLE);
+            findViewById(R.id.tv_top).setVisibility(View.VISIBLE);
         } else if (1 == webinarInfo.getWebinarInfoData().getWebinar_show_type()) {
-            findViewById(R.id.image).setVisibility(View.VISIBLE);
+            findViewById(R.id.tv_top).setVisibility(View.VISIBLE);
         }
 
         TextView time = findViewById(R.id.tv_over_time);

@@ -53,9 +53,10 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
         return articleFragment;
     }
 
+    // 中奖者列表   提交中奖信息列表
     private RecyclerView lotteryWinnerRecyclerView, commitRecyclerView;
     private ImageView ivCover, ivEnd, ivClose;
-    private TextView tvCommit, tvLotteryIng, tvLotterName, tvEndHint, tvEndBtn, tvJoin;
+    private TextView tvCommit, tvLotteryIng, tvLotterName, tvEndHint, tvEndBtn, tvJoin,tv_title_name;
     private View rootView;
     private LinearLayout llIng, llEnd, llCommit, llResult, llOldCommit;
     private String lotteryId;
@@ -83,6 +84,7 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
         ivClose = rootView.findViewById(R.id.iv_close);
         llIng = rootView.findViewById(R.id.ll_lottery_ing);
         llEnd = rootView.findViewById(R.id.ll_lottery_end);
+        tv_title_name = rootView.findViewById(R.id.tv_title_name);
         llCommit = rootView.findViewById(R.id.ll_lottery_commit);
         llResult = rootView.findViewById(R.id.ll_lottery_result);
         llOldCommit = rootView.findViewById(R.id.commit_ll);
@@ -113,29 +115,8 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
             public void onClick(View v) {
                 llEnd.setVisibility(View.GONE);
                 if (endBtnGoLook) {
-                    if (lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.award != null && !TextUtils.isEmpty(lotteryData.lotteryInfo.award.image_url)) {
-                        RequestOptions requestOptions = RequestOptions.bitmapTransform(new CircleCrop()).placeholder(R.drawable.icon_default_avatar);
-                        Glide.with(getActivity()).load(lotteryData.lotteryInfo.award.image_url).apply(requestOptions).into(ivResult);
-                    }
-                    /**
-                     * 去查看获奖名单 if (lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.is_new == 1) 这个时候列表通过接口获取
-                     */
-                    if (lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.is_new == 1) {
-                        VhallSDK.getLotteryWinner(lotteryData.lotteryInfo.room_id, lotteryData.lotteryInfo.lottery_id, new RequestDataCallback() {
-                            @Override
-                            public void onSuccess(Object o) {
-                                LotteryWinnerData result = (LotteryWinnerData) o;
-                                lotteryWinnerAdapter.setData(result.list);
-                                llEnd.setVisibility(View.GONE);
-                                llResult.setVisibility(View.VISIBLE);
-                            }
-
-                            @Override
-                            public void onError(int errorCode, String errorMsg) {
-                                Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    //查看中奖用户列表
+                    goToLook();
                 } else {
                     if (lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.is_new == 1) {
                         commitRecyclerView.setVisibility(View.VISIBLE);
@@ -165,6 +146,7 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                 }
             }
         });
+        //提交中奖信息
         tvCommit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -228,6 +210,32 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
         });
     }
 
+    private void goToLook() {
+        if (lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.award != null && !TextUtils.isEmpty(lotteryData.lotteryInfo.award.image_url)) {
+            RequestOptions requestOptions = RequestOptions.bitmapTransform(new CircleCrop()).placeholder(R.drawable.icon_default_avatar);
+            Glide.with(getActivity()).load(lotteryData.lotteryInfo.award.image_url).apply(requestOptions).into(ivResult);
+        }
+        /**
+         * 去查看获奖名单 if (lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.is_new == 1) 这个时候列表通过接口获取
+         */
+        if (lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.is_new == 1) {
+            VhallSDK.getLotteryWinner(lotteryData.lotteryInfo.room_id, lotteryData.lotteryInfo.lottery_id, new RequestDataCallback() {
+                @Override
+                public void onSuccess(Object o) {
+                    LotteryWinnerData result = (LotteryWinnerData) o;
+                    lotteryWinnerAdapter.setData(result.list);
+                    llEnd.setVisibility(View.GONE);
+                    llResult.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onError(int errorCode, String errorMsg) {
+                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
     @Override
     public void setPresenter(BasePresenter presenter) {
     }
@@ -250,7 +258,14 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                 final MessageServer.LotteryInfo lotteryInfo = lotteryData.lotteryInfo;
                 if (lotteryInfo != null) {
                     tvLotteryIng.setText(lotteryInfo.remark);
+                    if (!TextUtils.isEmpty(lotteryInfo.title)){
+                        tv_title_name.setText(lotteryInfo.title);
+                        tv_title_name.setVisibility(View.VISIBLE);
+                    }else {
+                        tv_title_name.setVisibility(View.GONE);
+                    }
                 }
+
                 if (lotteryInfo != null && lotteryInfo.lottery_type.equals("8")) {
                     image = lotteryInfo.icon;
                     String text = "发送口令\"" + lotteryInfo.command + "\"参与抽奖吧！";
@@ -265,14 +280,14 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                             VhallSDK.joinCodeLottery(lotteryInfo.room_id, lotteryInfo.lottery_id, lotteryInfo.command, new RequestCallback() {
                                 @Override
                                 public void onSuccess() {
-                                    Toast.makeText(getContext(), "send success", Toast.LENGTH_SHORT).show();
-                                    tvJoin.setEnabled(false);
+                                    Toast.makeText(getContext(), "发送成功", Toast.LENGTH_SHORT).show();
+                                    tvJoin.setVisibility(View.GONE);
                                 }
 
                                 @Override
                                 public void onError(int errorCode, String errorMsg) {
                                     Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
-                                    tvJoin.setEnabled(true);
+                                    tvJoin.setClickable(true);
                                 }
                             });
                         }
@@ -289,6 +304,7 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                 Glide.with(getActivity()).load(image).apply(options).into(ivCover);
                 break;
             case MessageServer.EVENT_END_LOTTERY:
+                // lotteries中奖信息
                 if (lotteryData.lotteries != null && lotteryData.lotteries.size() > 0) {
                     lotteryWinnerAdapter.setData(lotteryData.lotteries);
                     List<MessageServer.Lottery> lottery_winners = lotteryData.lotteries;
@@ -302,23 +318,44 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                     }
                 }
                 String award_name = getString(R.string.lottery);
+                String award_image = getString(R.string.lottery);
                 if (lotteryData.lotteryInfo != null) {
                     lotteryId = lotteryData.lotteryInfo.lottery_id;
+                    if (!TextUtils.isEmpty(lotteryData.lotteryInfo.title)){
+                        tv_title_name.setText(lotteryData.lotteryInfo.title);
+                        tv_title_name.setVisibility(View.VISIBLE);
+                    }else {
+                        tv_title_name.setVisibility(View.GONE);
+                    }
                 }
                 if (lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.award != null && !TextUtils.isEmpty(lotteryData.lotteryInfo.award.award_name)) {
                     award_name = lotteryData.lotteryInfo.award.award_name;
+                    award_image = lotteryData.lotteryInfo.award.image_url;
                 }
                 tvLotterName.setText(award_name);
                 if (lotteryData.winnerLottery) {
                     //自己中奖
                     llIng.setVisibility(View.GONE);
                     llEnd.setVisibility(View.VISIBLE);
-                    tvEndBtn.setText(getString(R.string.accept_the_prize));
-                    tvEndBtn.setVisibility(View.VISIBLE);
-                    endBtnGoLook = false;
+                    //need_take_award 是否需要领奖 0-否 1-是
+                    if (lotteryData.lotteryInfo.need_take_award == 1) {
+                        tvEndBtn.setText(getString(R.string.accept_the_prize));
+                        tvEndBtn.setVisibility(View.VISIBLE);
+                        endBtnGoLook = false;
+                    } else {
+                        if (lotteryData != null && lotteryData.lotteryInfo != null && lotteryData.lotteryInfo.publish_winner == 0) {
+                            tvEndBtn.setVisibility(View.GONE);
+                        } else {
+                            endBtnGoLook = true;
+                            tvEndBtn.setText(getString(R.string.lottery_look_winner));
+                            tvEndBtn.setVisibility(View.VISIBLE);
+                        }
+                    }
                     tvEndHint.setTextColor(ContextCompat.getColor(getContext(), R.color.color_FC5659));
                     tvEndHint.setText(String.format(getString(R.string.lottery_win), award_name));
-                    ivEnd.setBackgroundResource(R.drawable.icon_win_prize);
+
+                    RequestOptions requestOptions = RequestOptions.bitmapTransform(new CircleCrop()).placeholder(R.drawable.icon_win_prize);
+                    Glide.with(this).load(award_image).apply(requestOptions).into(ivEnd);
                 } else {
                     //自己没中奖
                     llIng.setVisibility(View.GONE);
@@ -338,6 +375,7 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
         }
     }
 
+    //查看中奖名单
     private boolean endBtnGoLook = false;
 
     private String markToString(List<LotteryPrizeListInfo> data) {

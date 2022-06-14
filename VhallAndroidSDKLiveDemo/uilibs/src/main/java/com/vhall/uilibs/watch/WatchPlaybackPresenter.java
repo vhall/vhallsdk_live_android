@@ -324,6 +324,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         watchView.dismissDevices();
     }
 
+
     /**
      * 根据文档状态选择展示
      */

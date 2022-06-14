@@ -402,6 +402,7 @@ class VWatchNoDelayLivePresenter implements WatchContract.LivePresenter, ChatCon
         //不支持
     }
 
+
     //签到
     @Override
     public void signIn(String signId) {

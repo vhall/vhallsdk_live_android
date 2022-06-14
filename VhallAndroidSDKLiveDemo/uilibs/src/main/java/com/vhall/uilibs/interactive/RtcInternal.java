@@ -99,6 +99,17 @@ public class RtcInternal {
         return date;
     }
 
+    public static String dateToString3(String date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        try {
+            return format.format(Calendar.getInstance());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
     /**
      * 判断是否有网络链接
      *

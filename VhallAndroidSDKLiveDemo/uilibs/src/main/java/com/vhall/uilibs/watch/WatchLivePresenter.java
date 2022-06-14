@@ -2,6 +2,9 @@ package com.vhall.uilibs.watch;
 
 import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
 
+import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.text.TextUtils;
@@ -33,15 +36,20 @@ import com.vhall.uilibs.chat.PushChatFragment;
 import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.uilibs.widget.LotteryListDialog;
 import com.vhall.uilibs.widget.SurveyListDialog;
+import com.vhall.vhss.CallBack;
 import com.vhall.vhss.TokenManger;
+import com.vhall.vhss.data.LotteryCheckData;
 import com.vhall.vhss.data.SurveyInfoData;
+import com.vhall.vhss.network.InteractToolsNetworkRequest;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -384,6 +392,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             getChatHistory();
             getAnswerList();
             getSurveyList();
+            updateLotteryList();
         }
     }
 
@@ -400,6 +409,69 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             @Override
             public void onError(int errorCode, String errorMsg) {
                 ToastUtil.showToast(errorMsg);
+            }
+        });
+    }
+
+    private LotteryListDialog lotteryListDialog;
+
+    //show 不需不需要展示弹窗 false 只更新数据
+    @Override
+    public void showLotteryListDialog(List<LotteryCheckData> dataList, boolean show) {
+        if (chatView == null || webinarInfo == null) {
+            ToastUtil.showToast("error data");
+            return;
+        }
+        if (ListUtils.isEmpty(dataList)) {
+            ToastUtil.showToast("当前没有中奖");
+            return;
+        }
+        if (dataList.size() == 1) {
+            // public int take_award;//是否已领奖 0-否 1-是
+            //  public int need_take_award;//是否需要领奖 0-否 1-是
+            LotteryCheckData lotteryCheckData = dataList.get(0);
+            if (lotteryCheckData.need_take_award == 0) {
+                if (show)
+                    ToastUtil.showToast("当前奖品不需要领奖");
+                return;
+            }
+            if (lotteryCheckData.take_award == 1) {
+                if (show)
+                    ToastUtil.showToast("当前奖品已经领过奖");
+                return;
+            }
+        }
+        if (lotteryListDialog == null) {
+            lotteryListDialog = new LotteryListDialog(chatView.getContext(), dataList, webinarInfo.webinar_id);
+            lotteryListDialog.setOnItemClickLister(new LotteryListDialog.OnItemClickLister() {
+                @Override
+                public void update() {
+                    updateLotteryList();
+                }
+            });
+        } else {
+            lotteryListDialog.setDataList(dataList);
+        }
+        if (show) {
+            lotteryListDialog.show();
+            //更新数据
+            updateLotteryList();
+        }
+    }
+
+    /**
+     * 6.4.1
+     */
+    private void updateLotteryList() {
+        VhallSDK.getHistoryLotteryList("2", new RequestDataCallback() {
+            @Override
+            public void onSuccess(Object result) {
+                liveView.updateLotteryList((ArrayList<LotteryCheckData>) result);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+
             }
         });
     }
@@ -458,6 +530,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             liveView.setPlayPicture(isWatching);
         }
     }
+
 
     private RelativeLayout watchLayout;
 
@@ -697,6 +770,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     /**
      * 观看过程中事件监听
      */
+    private boolean setBg = false;
+
     private class WatchCallback implements VHPlayerListener {
         @Override
         public void onStateChanged(com.vhall.player.Constants.State state) {
@@ -705,11 +780,17 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     isWatching = true;
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
-//                    if(TextUtils.equals(com.vhall.player.Constants.Rate.DPI_AUDIO,getWatchLive().getDefinition())){
-//                        insertPic(watchLayout);
-//                    }else{
-//                        removePic(watchLayout);
-//                    }
+                    if (!setBg) {
+                        //只设置一次
+                        @SuppressLint("ResourceType") InputStream is = watchView.getActivity().getResources().openRawResource(R.drawable.splash_bg);
+                        Bitmap mBitmap = BitmapFactory.decodeStream(is);
+                        if (!watchLive.setVideoBackgroundImage(mBitmap)) {
+                            ToastUtil.showToast("设置失败");
+                        } else {
+                            ToastUtil.showToast("设置成功");
+                        }
+                        setBg=true;
+                    }
                     break;
                 case BUFFER:
                     if (isWatching) {
@@ -788,7 +869,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     private class MessageEventCallback implements MessageServer.Callback {
         @Override
         public void onEvent(MessageServer.MsgInfo messageInfo) {
-            Log.e(TAG, "messageInfo " + messageInfo.event);
+            Log.e(TAG, "messageInfo " + messageInfo.event + ((null != messageInfo.responseImMessageInfo) ? messageInfo.responseImMessageInfo.getData() : "nulllll"));
             switch (messageInfo.event) {
                 case MessageServer.EVENT_KICKOUT://踢出
                     watchView.showToast("您已被踢出");
@@ -836,10 +917,13 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 //                    }
                     break;
                 case MessageServer.EVENT_START_LOTTERY://抽奖开始
+                    //watchView.showToast(messageInfo.lotteryInfo.title);
                     watchView.showLottery(messageInfo);
                     break;
                 case MessageServer.EVENT_END_LOTTERY://抽奖结束
+                    // watchView.showToast(messageInfo.lotteryInfo.title);
                     watchView.showLottery(messageInfo);
+                    updateLotteryList();
                     break;
                 case MessageServer.EVENT_NOTICE:
                     watchView.showNotice(messageInfo.content);
@@ -967,6 +1051,9 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case MessageServer.EVENT_EDIT_WEBINAR_ROLE_NAME:
                     //角色修改消息 根据自己的逻辑更新对应的UI
                     watchView.showToast("更新了角色   " + messageInfo.edit_role_type + " 的名字为---" + messageInfo.edit_role_name);
+                    break;
+                case MessageServer.EVENT_VRTC_BIG_SCREEN_SET:
+                    watchView.showToast("流消息 互动流设置混流大画面 " + messageInfo.user_id);
                     break;
                 default:
                     break;

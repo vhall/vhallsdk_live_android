@@ -32,7 +32,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     SeekBar seekbar;
     TextView tv_current_time, tv_end_time, tv_play_speed;
     ProgressBar pb;
-    ImageView iv_dlna_playback;
+    ImageView iv_dlna_playback,btn_mute;
     RadioGroup rg_quality;
     Context mContext;
 
@@ -64,9 +64,11 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
         surface_view = getView().findViewById(R.id.surface_view);
         btn_changescaletype = getView().findViewById(R.id.btn_change_scale_type);
         iv_dlna_playback = getView().findViewById(R.id.iv_dlna_playback);
+        btn_mute = getView().findViewById(R.id.btn_mute);
         rg_quality = getView().findViewById(R.id.rg_quality);
         btn_changescaletype.setOnClickListener(this);
         iv_dlna_playback.setOnClickListener(this);
+        btn_mute.setOnClickListener(this);
         pb = (ProgressBar) getView().findViewById(R.id.pb);
         iv_play = (ImageView) getView().findViewById(R.id.iv_play);
         iv_play.setOnClickListener(this);
@@ -255,5 +257,7 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
         }
     }
 
+    // 静音 默认关闭
+    private boolean mute = false;
 
 }

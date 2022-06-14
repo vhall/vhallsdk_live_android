@@ -49,7 +49,7 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
     private DanmakuContext mDanmuContext;
     private BaseDanmakuParser mParser;
 
-    private ImageView btn_change_scaletype;
+    private ImageView btn_change_scaletype, mBtnMute, mBtnUnMute;
 
     public static VWatchLiveFragment newInstance() {
         return new VWatchLiveFragment();
@@ -74,10 +74,11 @@ public class VWatchLiveFragment extends Fragment implements WatchContract.LiveVi
         tv_color = root.findViewById(R.id.tv_color);
         tv_image = root.findViewById(R.id.tv_image);
         progressbar = root.findViewById(R.id.progressbar);
-        btn_change_scaletype = (ImageView) root.findViewById(R.id.btn_change_scaletype);
+        btn_change_scaletype = root.findViewById(R.id.btn_change_scaletype);
         btn_change_scaletype.setOnClickListener(this);
         tv_color.setOnClickListener(this);
         tv_image.setOnClickListener(this);
+
         root.findViewById(R.id.image_action_back).setOnClickListener(this);
         // 设置最大显示行数
         HashMap<Integer, Integer> maxLinesPair = new HashMap<>();

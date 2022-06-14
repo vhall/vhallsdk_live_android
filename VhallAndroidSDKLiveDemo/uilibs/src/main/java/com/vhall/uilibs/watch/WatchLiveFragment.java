@@ -29,9 +29,11 @@ import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.MarqueeView;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
-import com.vhall.uilibs.widget.SurveyListDialog;
+import com.vhall.vhss.CallBack;
+import com.vhall.vhss.data.LotteryCheckData;
 import com.vhall.vhss.data.ScrollInfoData;
 import com.vhall.vhss.data.SurveyInfoData;
+import com.vhall.vhss.network.InteractToolsNetworkRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +57,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
     private WatchContract.LivePresenter mPresenter;
 
-    private ImageView clickOrientation, clickStart, mVrButton;
+    private ImageView clickOrientation, clickStart, mVrButton, btn_mute;
     private RadioButton radioButtonShowDEFAULT, radioButtonShowSD, radioButtonShowHD, radioButtonShowUHD, radioButtonShowA;
 
     private RadioGroup radioChoose;
@@ -74,7 +76,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
     private ImageView iv_dlna;
     private FrameLayout fl_survey;
-    private View redPoint;
+    private View surveyRedPoint;
+    private FrameLayout fl_lottery;
+    private View lotteryRedPoint;
 
     public static WatchLiveFragment newInstance() {
         return new WatchLiveFragment();
@@ -106,15 +110,20 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     }
 
     private void initView(View root) {
+        root.findViewById(R.id.btn_mute).setOnClickListener(this);
+        btn_mute = root.findViewById(R.id.btn_mute);
         iv_dlna = (ImageView) root.findViewById(R.id.iv_dlna);
         iv_dlna.setOnClickListener(this);
         clickStart = (ImageView) root.findViewById(R.id.click_rtmp_watch);
         clickStart.setOnClickListener(this);
         clickOrientation = (ImageView) root.findViewById(R.id.click_rtmp_orientation);
         fl_survey = root.findViewById(R.id.fl_survey);
-        redPoint = root.findViewById(R.id.red_point);
+        fl_lottery = root.findViewById(R.id.fl_lottery);
+        surveyRedPoint = root.findViewById(R.id.survey_red_point);
+        lotteryRedPoint = root.findViewById(R.id.lottery_red_point);
         clickOrientation.setOnClickListener(this);
         fl_survey.setOnClickListener(this);
+        fl_lottery.setOnClickListener(this);
         radioChoose = (RadioGroup) root.findViewById(R.id.radio_choose);
         radioChoose.setOnCheckedChangeListener(checkListener);
         radioButtonShowDEFAULT = (RadioButton) root.findViewById(R.id.radio_btn_default);
@@ -254,19 +263,23 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             }
 
         } else if (i == R.id.iv_dlna) {
-            // TODO 投屏相关
             mPresenter.showDevices();
         } else if (i == R.id.fl_survey) {
-            judgeRed();
-            if (status == 0) {
+            judgeSurveyRed();
+            if (surveyStatus == 0) {
                 ToastUtil.showToast("已提交成功感谢参与");
-            } else if (status == 1) {
+            } else if (surveyStatus == 1) {
                 mPresenter.showSurvey(surveyInfoData);
             } else {
-                mPresenter.showSurveyListDialog(resultSurvey,true);
+                mPresenter.showSurveyListDialog(resultSurvey, true);
             }
+        } else if (i == R.id.fl_lottery) {
+            mPresenter.showLotteryListDialog(lotteryCheckData, true);
         }
     }
+
+    // 静音 默认关闭
+    private boolean mute = false;
 
     /**
      * 切换分辨率
@@ -395,40 +408,83 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     }
 
     private ArrayList<SurveyInfoData> resultSurvey = new ArrayList<>();
+    private ArrayList<LotteryCheckData> lotteryCheckData = new ArrayList<>();
+
+    @Override
+    public void updateLotteryList(ArrayList<LotteryCheckData> result) {
+        judgeLotteryRed(result);
+        lotteryCheckData.clear();
+        if (!ListUtils.isEmpty(result)) {
+            lotteryCheckData.addAll(result);
+            mPresenter.showLotteryListDialog(result, false);
+        }
+    }
 
     @Override
     public void updateSurveyList(ArrayList<SurveyInfoData> result) {
         resultSurvey.clear();
         if (!ListUtils.isEmpty(result)) {
             resultSurvey.addAll(result);
-            mPresenter.showSurveyListDialog(result,false);
+            mPresenter.showSurveyListDialog(result, false);
         }
-        judgeRed();
+        judgeSurveyRed();
     }
 
+
     // 1 只有一个没有填写 2+多个没有填写 0 全部填写
-    private int status;
+    private int surveyStatus;
     private SurveyInfoData surveyInfoData;//如果只有一个没有填写记录信息
 
     /**
      * 判读显示不显示红点
      * 判断按钮的跳转
+     * 问卷
      */
-    private void judgeRed() {
-        status = 0;
+    private void judgeSurveyRed() {
+        surveyStatus = 0;
         if (ListUtils.isEmpty(resultSurvey)) {
-            redPoint.setVisibility(View.GONE);
+            surveyRedPoint.setVisibility(View.GONE);
         } else {
             for (int i = 0; i < resultSurvey.size(); i++) {
                 if (TextUtils.equals("0", resultSurvey.get(i).is_answered)) {
-                    status++;
+                    surveyStatus++;
                     surveyInfoData = resultSurvey.get(i);
                 }
             }
-            if (status > 0) {
-                redPoint.setVisibility(View.VISIBLE);
+            if (surveyStatus > 0) {
+                surveyRedPoint.setVisibility(View.VISIBLE);
             } else {
-                redPoint.setVisibility(View.GONE);
+                surveyRedPoint.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    // 1 只有一个没有填写 2+多个没有填写 0 全部填写
+    private int lotteryStatus;
+    //如果只有一个没有填写记录信息
+
+    /**
+     * 判读显示不显示红点
+     * 判断按钮的跳转
+     * 抽奖
+     * <p>
+     * public int take_award;//是否已领奖 0-否 1-是
+     * public int need_take_award;//是否需要领奖 0-否 1-是
+     */
+    private void judgeLotteryRed(ArrayList<LotteryCheckData> result) {
+        lotteryStatus = 0;
+        if (ListUtils.isEmpty(result)) {
+            lotteryRedPoint.setVisibility(View.GONE);
+        } else {
+            for (int i = 0; i < result.size(); i++) {
+                if (1 == result.get(i).need_take_award && 0 == result.get(i).take_award) {
+                    lotteryStatus++;
+                }
+            }
+            if (lotteryStatus > 0) {
+                lotteryRedPoint.setVisibility(View.VISIBLE);
+            } else {
+                lotteryRedPoint.setVisibility(View.GONE);
             }
         }
     }

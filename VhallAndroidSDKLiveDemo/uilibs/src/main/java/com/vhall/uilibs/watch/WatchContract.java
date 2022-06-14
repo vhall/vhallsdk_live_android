@@ -16,6 +16,7 @@ import com.vhall.uilibs.BaseView;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
+import com.vhall.vhss.data.LotteryCheckData;
 import com.vhall.vhss.data.ScrollInfoData;
 import com.vhall.vhss.data.SurveyInfoData;
 
@@ -149,6 +150,10 @@ public class WatchContract {
 
         }
 
+        //更新抽奖
+        default void updateLotteryList(ArrayList<LotteryCheckData> lotteryCheckData) {
+
+        }
     }
 
     interface LiveNoDelayView extends BaseView<LivePresenter> {
@@ -294,7 +299,11 @@ public class WatchContract {
 
         void showDevices();
 
-        default void showSurveyListDialog(List<SurveyInfoData> dataList ,boolean show) {
+        default void showSurveyListDialog(List<SurveyInfoData> dataList, boolean show) {
+
+        }
+
+        default void showLotteryListDialog(List<LotteryCheckData> dataList, boolean show) {
 
         }
 
@@ -303,5 +312,6 @@ public class WatchContract {
         }
 
         void dismissDevices();
+
     }
 }

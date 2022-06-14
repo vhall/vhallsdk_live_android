@@ -21,7 +21,7 @@ import java.util.List;
  * @author hkl
  * Date: 2020/12/23 2:38 PM
  */
-class LotteryCommitAdapter extends RecyclerView.Adapter<LotteryCommitAdapter.RecyclerHolder> {
+public class LotteryCommitAdapter extends RecyclerView.Adapter<LotteryCommitAdapter.RecyclerHolder> {
     private Context mContext;
     private List<LotteryPrizeListInfo> dataList = new ArrayList<>();
     private RecyclerHolder recyclerHolder;
@@ -66,7 +66,11 @@ class LotteryCommitAdapter extends RecyclerView.Adapter<LotteryCommitAdapter.Rec
 
             @Override
             public void afterTextChanged(Editable s) {
-                dataList.get(p).field_value = s.toString();
+                try {
+                    dataList.get(p).field_value = s.toString();
+                }catch (Exception e){
+
+                }
             }
         });
     }

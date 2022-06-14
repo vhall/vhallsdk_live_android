@@ -48,7 +48,33 @@
             android:visibility="visible" />
 
         <View
-            android:id="@+id/red_point"
+            android:id="@+id/survey_red_point"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/dimen_1dp"
+            android:background="@drawable/shape_red_point"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_lottery"
+        android:layout_width="@dimen/dimen_32dp"
+        android:layout_height="@dimen/dimen_32dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/dimen_55dp"
+        android:layout_marginBottom="@dimen/dimen_60dp"
+        android:visibility="visible">
+
+        <ImageView
+            android:layout_width="@dimen/dimen_32dp"
+            android:layout_height="@dimen/dimen_32dp"
+            android:src="@drawable/icon_lottery"
+            android:visibility="visible" />
+
+        <View
+            android:id="@+id/lottery_red_point"
             android:layout_width="8dp"
             android:layout_height="8dp"
             android:layout_gravity="end"
@@ -103,11 +129,21 @@
             android:orientation="horizontal">
 
             <ImageView
+                android:id="@+id/btn_mute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="5dp"
+  		android:visibility="gone"
+                android:src="@drawable/btn_unmute" />
+
+            <ImageView
                 android:id="@+id/btn_headtracker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="5dp"
+                android:visibility="gone"
                 android:src="@drawable/vhall_icon_headtracker_checked" />
 
             <ImageView
@@ -142,8 +178,6 @@
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:background="@drawable/icon_round_fullscreen" />
-
-
         </LinearLayout>
 
         <LinearLayout

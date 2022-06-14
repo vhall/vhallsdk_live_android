@@ -52,6 +52,8 @@
 
     <color name="color_5EA6EC">#5EA6EC</color>
     <color name="color_66">#666666</color>
+    <color name="color_FC9600">#FC9600</color>
+    <color name="color_8c">#8c8c8c</color>
     <color name="color_EFF6FE">#EFF6FE</color>
     <color name="color_F4FBFF">#F4FBFF</color>
 </resources>
