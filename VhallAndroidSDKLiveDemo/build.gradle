@@ -18,9 +18,6 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
         maven {url 'http://4thline.org/m2'}
-        maven {url 'https://s01.oss.sonatype.org/content/repositories/releases/'}
-        maven {url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'}
-
 
         //美颜必须添加
         maven {
