@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.4.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.4.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.4.1'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.4.1'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -44,7 +44,8 @@ allprojects {
  版本：v6.4.1  更新时间 2022.6.14 <br>
  
 1. 抽奖增加中奖列表，领奖开关    使用步骤 [demo中新功能对应使用文档](https://saas-doc.vhall.com/docs/show/1489 "demo中新功能对应使用文档")
-[消息说明](https://saas-doc.vhall.com/docs/show/1214 "消息说明")<br>
+[消息说明](https://saas-doc.vhall.com/docs/show/1214 "消息说明") <br>
+
 
 
 
