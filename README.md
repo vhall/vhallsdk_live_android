@@ -24,14 +24,14 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.4.1'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.4.1'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.5.1'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.5.1'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
     
     //美颜相关 使用高级美颜添加 不用可以不写
-   api 'com.github.vhall.android.base:vhall-beautify-faceunity:1.1.3'
+   api 'com.github.vhall.android.base:vhall-beautify-faceunity:1.1.6'
 
     //美颜demoUI 建议自己按照自己需求实现 使用高级美颜添加 不用可以不写
     api 'com.github.vhall.android.library:vhall-beautify-kit-support:1.1.0'
@@ -41,7 +41,14 @@ allprojects {
 
 二、版本更新信息：
 
- 版本：v6.4.1  更新时间 2022.6.14 <br>
+ 版本：v6.5.1  更新时间 2022.7.8 <br>
+ 
+1. 增加观众参与视频轮巡 <br>
+2. 优化播放器自动播放   [播放器自动播放](https://saas-doc.vhall.com/docs/show/1210 "播放器自动播放")<br>
+3. 互动增加清晰度根据互动人数自动变化 <br>
+4. demo增加文档横竖屏切换<br>
+
+版本：v6.4.1  更新时间 2022.6.14 <br>
  
 1. 抽奖增加中奖列表，领奖开关    使用步骤 [demo中新功能对应使用文档](https://saas-doc.vhall.com/docs/show/1489 "demo中新功能对应使用文档")
 [消息说明](https://saas-doc.vhall.com/docs/show/1214 "消息说明") <br>
