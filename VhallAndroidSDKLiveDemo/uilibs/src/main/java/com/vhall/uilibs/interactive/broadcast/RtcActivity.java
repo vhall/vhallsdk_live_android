@@ -631,6 +631,7 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
     public void notifyDataChangedChat(MessageChatData data) {
         if (adapter != null) {
             adapter.addData(data);
+            if (adapter.getItemCount()>0)
             recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
         }
     }

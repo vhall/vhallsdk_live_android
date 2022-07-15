@@ -17,9 +17,9 @@
             android:id="@+id/text_chat_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_centerVertical="true"
             android:layout_margin="@dimen/common_margin_size_5"
+            android:layout_weight="1"
             android:background="@drawable/bg_common_rounded_white_border_gray"
             android:padding="10dp"
             android:text="我来说两句"
@@ -30,20 +30,26 @@
             android:id="@+id/test_send_custom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/common_margin_size_10"
             android:layout_marginRight="@dimen/common_margin_size_5"
-            android:textColor="@color/white"
             android:background="@drawable/bg_common_rounded_red"
-            android:textSize="15dp"
-            android:text="自定义消息"/>
+            android:padding="@dimen/common_margin_size_10"
+            android:text="自定义消息"
+            android:textColor="@color/white"
+            android:textSize="15dp" />
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/lv_chat"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/chat_view"
-        android:transcriptMode="alwaysScroll"></ListView>
+        android:layout_above="@+id/chat_view">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycle_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/chat_view" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

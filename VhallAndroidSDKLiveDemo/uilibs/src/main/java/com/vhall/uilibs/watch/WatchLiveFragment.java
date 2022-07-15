@@ -571,6 +571,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         if (mPresenter != null && mPresenter.getIsPlaying()) {
             mPresenter.stopWatch();
             restart = true;
+            mPresenter.onPause();
         }
     }
 
@@ -592,6 +593,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         if (mPresenter != null && restart) {
             mPresenter.startWatch();
             restart = false;
+            mPresenter.onResume();
         }
     }
 

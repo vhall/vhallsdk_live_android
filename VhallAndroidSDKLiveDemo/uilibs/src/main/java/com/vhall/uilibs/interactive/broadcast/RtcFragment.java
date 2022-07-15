@@ -136,7 +136,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
 
     @Override
     public void initLocalStream() {
-        if (!UserManger.isHost(roomInfo.getJoin_info().role_name) && localStream == null) {
+        if (!UserManger.isHost(roomInfo.getJoin_info().role_name)) {
             VHRenderView tempRenderView = new VHRenderView(mContext);
             if (mainLocalView == null) {
                 mainLocalView = tempRenderView;
@@ -295,19 +295,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             if (mInteractive == null) {
                 mInteractive = new InterActive(context, mRoomCallback, mChatCallback, mMessageCallback);
             }
-            /**
-             * 主持人 建议 5 嘉宾建议根据上麦人数调整
-             *  definition 设置上麦分辨率
-             */
-            int definition = 3;
-            if (mWebinarInfo.inav_num > 5 && 10 >= mWebinarInfo.inav_num) {
-                definition = 2;
-            } else if (mWebinarInfo.inav_num > 10) {
-                definition = 1;
-            }
-            if (UserManger.isHost(roomInfo.getJoin_info().role_name)) {
-                definition = 5;
-            }
             mInteractive.init(mWebinarInfo, new RequestCallback() {
                 @Override
                 public void onSuccess() {
@@ -323,8 +310,20 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     }
                 }
             });
-            mInteractive.setDefinition(definition);
-            //支持人直接创建本流 嘉宾上麦之后创建
+            /**
+             * 主动设置后，sdk内部根据连麦人数自动切换分辨率的逻辑失效
+             */
+//            int definition = 3;
+//            if (mWebinarInfo.inav_num > 5 && 10 >= mWebinarInfo.inav_num) {
+//                definition = 2;
+//            } else if (mWebinarInfo.inav_num > 10) {
+//                definition = 1;
+//            }
+//            if (UserManger.isHost(roomInfo.getJoin_info().role_name)) {
+//                definition = 5;
+//            }
+//            mInteractive.setDefinition(definition);
+            //主持人直接创建本流 嘉宾上麦之后创建
             if (UserManger.isHost(roomInfo.getJoin_info().role_name)) {
                 VHRenderView tempRenderView = new VHRenderView(context);
                 if (renderView == null) {
@@ -896,12 +895,12 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
          *    VhallStreamTypeAudioAndVideo = 2,
          *    VhallStreamTypeScreen = 3,  // 屏幕共享
          *    VhallStreamTypeFile = 4 //插播
-         *    VhallStreamTypeVideoPatral = 5 //  视频轮训 需要过滤不显示
+         *    VhallStreamTypeVideoPatral = 5 //  视频轮巡 需要过滤不显示
          */
 
 
         /**
-         *  视频轮训 需要过滤不显示
+         *  视频轮巡 需要过滤不显示
          */
         if (stream.getStreamType() == 5) {
             return;
@@ -942,7 +941,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             return;
         }
         /**
-         *  视频轮训 需要过滤不显示
+         *  视频轮巡 需要过滤不显示
          */
         if (stream.getStreamType() == 5) {
             return;

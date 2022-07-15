@@ -82,7 +82,7 @@ public interface IBroadcastContract {
 
         ChatServer.Callback getChatCallback();
 
-        void setRtcFragmentView(IBroadcastContract.RtcFragmentView rtcFragmentView);
+        void setRtcFragmentView(RtcFragmentView rtcFragmentView);
     }
 
 

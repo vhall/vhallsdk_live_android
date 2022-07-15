@@ -274,7 +274,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
             Log.e(TAG, "onDidSubscribeStream");
 
             /**
-             *  视频轮训 需要过滤不显示
+             *  视频轮巡 需要过滤不显示
              */
             if (stream != null && stream.getStreamType() == 5) {
                 return;
@@ -314,7 +314,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
         @Override
         public void onDidRemoveStream(Room room, final Stream stream) {
             /**
-             *  视频轮训 需要过滤不显示
+             *  视频轮巡 需要过滤不显示
              */
             if (stream != null && stream.getStreamType() == 5) {
                 return;

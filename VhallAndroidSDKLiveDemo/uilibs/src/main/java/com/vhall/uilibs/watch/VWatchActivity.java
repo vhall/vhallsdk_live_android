@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
+import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.WebinarInfoDataSource;
@@ -426,22 +427,31 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
                     //有互动权限才可以上麦
                     if (RtcInternal.isGrantedPermissionRtc(VWatchActivity.this, REQUEST_PUSH)) {
                         //同意上麦
-                        mPresenter.replyInvite(1);
-                        //无延迟在当前房间上麦 非无延迟 进入互动房间
-                        if (param.noDelay) {
-                            noDelayLiveFragment.enterInteractive(true);
-                        } else {
-                            enterInteractive();
-                        }
-                        invitedDialog.dismiss();
-                        //发送同意上麦信息
+                        mPresenter.replyInvite(1, new RequestCallback() {
+                            @Override
+                            public void onSuccess() {
+                                //无延迟在当前房间上麦 非无延迟 进入互动房间
+                                if (param.noDelay) {
+                                    noDelayLiveFragment.enterInteractive(true);
+                                } else {
+                                    enterInteractive();
+                                }
+                                invitedDialog.dismiss();
+                                //发送同意上麦信息
+                            }
+
+                            @Override
+                            public void onError(int errorCode, String errorMsg) {
+                                showToast(errorMsg);
+                            }
+                        });
                     }
                 }
             });
             invitedDialog.setNegativeOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mPresenter.replyInvite(2);
+                    mPresenter.replyInvite(2, null);
                     invitedDialog.dismiss();
                     //发送拒绝上麦信息
                 }
@@ -450,7 +460,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
         invitedDialog.setRefuseInviteListener(new InvitedDialog.RefuseInviteListener() {
             @Override
             public void refuseInvite() {
-                mPresenter.replyInvite(2);
+                mPresenter.replyInvite(2, null);
             }
         });
         invitedDialog.show();

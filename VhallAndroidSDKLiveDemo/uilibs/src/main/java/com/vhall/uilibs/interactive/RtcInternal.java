@@ -31,7 +31,8 @@ import static android.Manifest.permission.RECORD_AUDIO;
 
 public class RtcInternal {
 
-    public static final int REQUEST_PUSH = 0;
+    public static final int REQUEST_PUSH = 100;
+    public static final int REQUEST_ROUND = 101;
     public static String reportUrl = "https://dc.e.vhall.com";
 
     public static void report(String userId, String webinar_id, Context context) {
@@ -139,6 +140,18 @@ public class RtcInternal {
         activity.requestPermissions(new String[]{CAMERA, RECORD_AUDIO}, requestCode);
         return false;
     }
+
+
+    public static boolean isCheckPermissionRtc(Activity activity) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        if (activity.checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        return false;
+    }
+
 
 
 }

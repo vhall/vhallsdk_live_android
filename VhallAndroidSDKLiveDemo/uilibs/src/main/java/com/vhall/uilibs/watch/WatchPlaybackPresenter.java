@@ -1,5 +1,17 @@
 package com.vhall.uilibs.watch;
 
+import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
+import static com.vhall.business.MessageServer.EVENT_SHOWBOARD;
+import static com.vhall.business.MessageServer.EVENT_SHOWDOC;
+import static com.vhall.business.WatchPlayback.SHOW_DOC_KEY;
+import static com.vhall.ops.VHOPS.ERROR_CONNECT;
+import static com.vhall.ops.VHOPS.ERROR_DOC_INFO;
+import static com.vhall.ops.VHOPS.ERROR_SEND;
+import static com.vhall.ops.VHOPS.KEY_OPERATE;
+import static com.vhall.ops.VHOPS.TYPE_ACTIVE;
+import static com.vhall.ops.VHOPS.TYPE_SWITCHOFF;
+import static com.vhall.ops.VHOPS.TYPE_SWITCHON;
+
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
@@ -23,8 +35,7 @@ import com.vhall.player.VHPlayerListener;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
-import com.vhall.uilibs.chat.PushChatFragment;
-import com.vhall.uilibs.chat.MessageChatData;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 
@@ -33,22 +44,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
-import static com.vhall.business.MessageServer.EVENT_SHOWBOARD;
-import static com.vhall.business.MessageServer.EVENT_SHOWDOC;
-import static com.vhall.business.WatchPlayback.SHOW_DOC_KEY;
-import static com.vhall.ops.VHOPS.ERROR_CONNECT;
-import static com.vhall.ops.VHOPS.ERROR_DOC_INFO;
-import static com.vhall.ops.VHOPS.ERROR_SEND;
-import static com.vhall.ops.VHOPS.KEY_OPERATE;
-import static com.vhall.ops.VHOPS.TYPE_ACTIVE;
-import static com.vhall.ops.VHOPS.TYPE_SWITCHOFF;
-import static com.vhall.ops.VHOPS.TYPE_SWITCHON;
 
 //TODO  投屏相关
 
@@ -113,6 +111,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         this.playbackView.setPresenter(this);
         this.chatView.setPresenter(this);
         this.watchView.setPresenter(this);
+        this.documentView.setPresenter(this);
     }
 
     @Override
@@ -130,11 +129,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
                 chatView.clearChatData();
                 loadingComment = false;
-                List<MessageChatData> list1 = new ArrayList<>();
-                for (ChatServer.ChatInfo chatInfo : list) {
-                    list1.add(MessageChatData.getChatData(chatInfo));
-                }
-                chatView.notifyDataChangedChat(PushChatFragment.CHAT_EVENT_CHAT, list1);
+                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,list);
             }
 
             @Override
@@ -175,7 +170,6 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         }
         playbackView.setPlayIcon(false);
         getWatchPlayback().start();
-
     }
 
     @Override
@@ -302,8 +296,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     }
 
     @Override
-    public void replyInvite(int type) {
-
+    public void replyInvite(int type, RequestCallback callback) {
     }
 
     //TODO 投屏相关
@@ -324,6 +317,34 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         watchView.dismissDevices();
     }
 
+
+    @Override
+    public void showDocFullScreen(int state) {
+        if (null != watchView) {
+            watchView.showDocFullScreen(state);
+        }
+    }
+
+    @Override
+    public void changeDocOrientation() {
+        if (null != watchView) {
+            watchView.changeDocOrientation();
+        }
+    }
+
+    @Override
+    public void triggerDocOrientation() {
+        if (null != documentView) {
+            documentView.triggerDocOrientation();
+        }
+    }
+
+    @Override
+    public void clickDocFullBack() {
+        if (null != documentView) {
+            documentView.clickDocFullBack();
+        }
+    }
 
     /**
      * 根据文档状态选择展示
@@ -459,6 +480,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                     //支持的分辨率 msg
                     try {
                         JSONArray array = new JSONArray(msg);
+                        Log.e("vhall_", msg);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -469,6 +491,9 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                 case ERROR_LOGIN_MORE://被其他人踢出
                     watchView.showToast(msg);
                     watchView.getActivity().finish();
+                    break;
+                case com.vhall.business.Watch.EVENT_INIT_PLAYER_SUCCESS://
+                    startPlay();
                     break;
             }
         }
@@ -542,11 +567,11 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
-                    if (chatInfo.msgData!=null&&!TextUtils.isEmpty(chatInfo.msgData.target_id)){
+                    if (chatInfo.msgData != null && !TextUtils.isEmpty(chatInfo.msgData.target_id)) {
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 default:
                     break;

@@ -95,14 +95,6 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
                 mPresenter.onStopTrackingTouch(seekBar);
             }
         });
-        //自动播放
-        mPresenter.onPlayClick();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mPresenter.startPlay();
-            }
-        },500);
     }
 
     @Override

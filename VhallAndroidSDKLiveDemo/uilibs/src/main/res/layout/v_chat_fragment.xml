@@ -23,13 +23,10 @@
         android:textColor="@android:color/background_light"
         android:textSize="15dp" />
 
-    <ListView
-        android:id="@+id/lv_chat"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/text_chat_content"
-        android:divider="@null"
-        android:scrollbars="none"
-        android:transcriptMode="alwaysScroll" />
+        android:layout_above="@+id/text_chat_content" />
 
 </RelativeLayout>

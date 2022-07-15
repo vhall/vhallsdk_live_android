@@ -19,15 +19,10 @@ import java.util.List;
 public class ChatContract {
 
     public interface ChatView extends BaseView<ChatPresenter> {
-        void notifyDataChangedChat(MessageChatData data);
+        void notifyDataChanged(int type, ChatServer.ChatInfo data);
+        void notifyDataChanged(int type, List<ChatServer.ChatInfo> list);
 
-        void notifyDataChangedQe(ChatServer.ChatInfo data);
 
-        //TODO type 类型作用说明补充
-        void notifyDataChangedChat(int type, List<MessageChatData> list);
-
-        //TODO type 类型作用说明补充
-        void notifyDataChangedQe(int type, List<ChatServer.ChatInfo> list);
 
         void showToast(String content);
 

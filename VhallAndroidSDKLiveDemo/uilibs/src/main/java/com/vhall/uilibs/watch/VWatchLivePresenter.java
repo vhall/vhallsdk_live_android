@@ -24,6 +24,7 @@ import com.vhall.player.stream.play.impl.VHVideoPlayerView;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.chat.VChatFragment;
 import com.vhall.uilibs.util.emoji.InputUser;
@@ -489,19 +490,8 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
         });
     }
 
-    @Override
-    public void replyInvite(int type) {
-        getWatchLive().replyInvitation(params.watchId, type, new RequestCallback() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onError(int errorCode, String errorMsg) {
-                watchView.showToast("上麦状态反馈异常，errorMsg:" + errorMsg);
-            }
-        });
+    public void replyInvite(int type, RequestCallback callback) {
+        getWatchLive().replyInvitation(params.watchId, type, callback);
     }
 
 
@@ -835,23 +825,23 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     liveView.addDanmu(chatInfo.msgData.text);
                     break;
                 case ChatServer.eventCustomKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     if (chatInfo.onlineData != null) {
                         watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
                     }
                     break;
                 case ChatServer.eventOnlineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     if (chatInfo.onlineData != null) {
                         watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
                     }
                     break;
                 case ChatServer.eventOfflineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 case ChatServer.eventQuestion:
                     break;
@@ -869,11 +859,7 @@ class VWatchLivePresenter implements WatchContract.LivePresenter, ChatContract.C
         getWatchLive().acquireChatRecord(true, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                List<MessageChatData> list1 = new ArrayList<>();
-                for (ChatServer.ChatInfo chatInfo : list) {
-                    list1.add(MessageChatData.getChatData(chatInfo));
-                }
-                chatView.notifyDataChangedChat(VChatFragment.CHAT_EVENT_CHAT, list1);
+                chatView.notifyDataChanged(VChatFragment.CHAT_EVENT_CHAT, list);
             }
 
             @Override

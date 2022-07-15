@@ -11,6 +11,7 @@ import com.vhall.business_interactive.InterActive;
 import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.vhallrtc.client.Room;
@@ -103,7 +104,7 @@ public class BroadcastNoDelayPresenter implements BroadcastContract.Presenter, C
             localStream = interactive.getLocalStream();
             if (isMute) {
                 localStream.muteAudio(null);
-            }else {
+            } else {
                 localStream.unmuteAudio(null);
             }
             if (isStart) {
@@ -203,7 +204,7 @@ public class BroadcastNoDelayPresenter implements BroadcastContract.Presenter, C
             isMute = !isMute;
             if (isMute) {
                 localStream.muteAudio(null);
-            }else {
+            } else {
                 localStream.unmuteAudio(null);
             }
             mView.setAudioBtnImage(!isMute);
@@ -304,20 +305,20 @@ public class BroadcastNoDelayPresenter implements BroadcastContract.Presenter, C
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
-                    if (chatInfo.msgData!=null&&!TextUtils.isEmpty(chatInfo.msgData.target_id)){
+                    if (chatInfo.msgData != null && !TextUtils.isEmpty(chatInfo.msgData.target_id)) {
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 case ChatServer.eventCustomKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 case ChatServer.eventOnlineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 case ChatServer.eventOfflineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 default:
                     break;

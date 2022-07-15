@@ -7,7 +7,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +25,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.chad.library.adapter.base.BaseQuickAdapter;
+import com.chad.library.adapter.base.BaseViewHolder;
 import com.vhall.business.ChatServer;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.VhallUtil;
@@ -42,11 +47,8 @@ public class PushChatFragment extends Fragment implements ChatContract.ChatView 
     public static final int CHAT_SURVEY = 0x01;
     private ChatContract.ChatPresenter mPresenter;
     public final int RequestLogin = 0;
-    ListView lv_chat;
-    List<ChatServer.ChatInfo> questionData = new ArrayList<ChatServer.ChatInfo>();
-    List<MessageChatData> chatInfoList = new ArrayList<>();
+    RecyclerView lv_chat;
     ChatAdapter chatAdapter = new ChatAdapter();
-    QuestionAdapter questionAdapter = new QuestionAdapter();
     boolean isquestion = false;
     int status = -1;
     private Activity mActivity;
@@ -92,7 +94,8 @@ public class PushChatFragment extends Fragment implements ChatContract.ChatView 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        lv_chat = getView().findViewById(R.id.lv_chat);
+        lv_chat = getView().findViewById(R.id.recycle_view);
+        lv_chat.setLayoutManager(new LinearLayoutManager(mActivity));
         getView().findViewById(R.id.text_chat_content).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -103,11 +106,9 @@ public class PushChatFragment extends Fragment implements ChatContract.ChatView 
         });
         isquestion = getArguments().getBoolean("question");
         status = getArguments().getInt("state");
-        if (isquestion) {
-            lv_chat.setAdapter(questionAdapter);
-        } else {
-            lv_chat.setAdapter(chatAdapter);
-        }
+
+        lv_chat.setAdapter(chatAdapter);
+
         init();
     }
 
@@ -116,36 +117,21 @@ public class PushChatFragment extends Fragment implements ChatContract.ChatView 
 
 
     @Override
-    public void notifyDataChangedChat(MessageChatData data) {
-        if (chatInfoList.size() > 10) {
-            chatInfoList.remove(0);
+    public void notifyDataChanged(int type, List<ChatServer.ChatInfo> list) {
+        if (type == CHAT_EVENT_CHAT) {
+            chatAdapter.addData(list);
+            if (chatAdapter.getItemCount()>0)
+            lv_chat.smoothScrollToPosition(chatAdapter.getItemCount() - 1);
         }
-        chatInfoList.add(data);
-        chatAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void notifyDataChangedQe(ChatServer.ChatInfo data) {
-        if (questionData.size() > 10) {
-            questionData.remove(0);
+    public void notifyDataChanged(int type, ChatServer.ChatInfo list) {
+        if (type == CHAT_EVENT_CHAT) {
+            chatAdapter.addData(list);
+            if (chatAdapter.getItemCount()>0)
+            lv_chat.smoothScrollToPosition(chatAdapter.getItemCount() - 1);
         }
-        questionData.add(data);
-        questionAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void notifyDataChangedChat(int type, List<MessageChatData> list) {
-        chatInfoList.addAll(list);
-        chatAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void notifyDataChangedQe(int type, List<ChatServer.ChatInfo> list) {
-        if (questionData.size() > 10) {
-            questionData.remove(0);
-        }
-        questionData.addAll(list);
-        questionAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -157,12 +143,7 @@ public class PushChatFragment extends Fragment implements ChatContract.ChatView 
 
     @Override
     public void clearChatData() {
-        if (questionData != null) {
-            questionData.clear();
-        }
-        if (chatInfoList != null) {
-            chatInfoList.clear();
-        }
+        chatAdapter.setNewData(null);
     }
 
     @Override
@@ -207,215 +188,78 @@ public class PushChatFragment extends Fragment implements ChatContract.ChatView 
         mPresenter = presenter;
     }
 
-    class ChatAdapter extends BaseAdapter {
+    class ChatAdapter extends BaseQuickAdapter<ChatServer.ChatInfo, BaseViewHolder> {
+        public ChatAdapter() {
+            super(R.layout.push_chat_item);
+        }
 
         @Override
-        public int getItemViewType(int position) {
-            if ("survey".equals(chatInfoList.get(position).event)) {
-                return CHAT_SURVEY;
-            } else {
-                return CHAT_NORMAL;
+        protected void convert(@NonNull BaseViewHolder viewHolder, ChatServer.ChatInfo chatInfo) {
+            TextView tv_chat_content = viewHolder.getView(R.id.tv_chat_content);
+            TextView tv_chat_time = viewHolder.getView(R.id.tv_chat_time);
+            String avatar = chatInfo.avatar;
+            if (!TextUtils.isEmpty(avatar) && !avatar.startsWith("http")) {
+                avatar = String.format("https:%s", avatar);
             }
-        }
+            ImageView iv_chat_avatar = viewHolder.getView(R.id.iv_chat_avatar);
+            RequestOptions options = new RequestOptions().placeholder(R.drawable.icon_vhall).transform(new CircleCrop());
+            Glide.with(getActivity()).load(avatar).apply(options).into(iv_chat_avatar);
+            tv_chat_time.setText(chatInfo.time);
+            //处理回复消息
+            String textContent = "";
+            if (chatInfo.replyMsg != null) {
+                textContent = chatInfo.replyMsg.user_name + ": " + chatInfo.replyMsg.content.textContent + "\n" + "回复：";
+            }
+            if (chatInfo.msgData != null) {
+                textContent = textContent + chatInfo.msgData.text;
+            }
+            messageCount++;
+            int textColor = messageCount % 3 == 0 ? Color.rgb(130, 180, 150) :
+                    messageCount % 3 == 1 ? Color.rgb(120, 170, 230) : Color.rgb(190, 170, 80);
 
-        @Override
-        public int getViewTypeCount() {
-            return 2;
-        }
-
-        @Override
-        public int getCount() {
-            return chatInfoList.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return chatInfoList.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(final int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
-            ChatSurveyHolder surveyHolder;
-            final MessageChatData data = chatInfoList.get(position);
-            switch (getItemViewType(position)) {
-                case CHAT_NORMAL:
-                    if (convertView == null) {
-                        convertView = View.inflate(getActivity(), R.layout.push_chat_item, null);
-                        viewHolder = new ViewHolder();
-                        viewHolder.iv_chat_avatar = (ImageView) convertView.findViewById(R.id.iv_chat_avatar);
-                        viewHolder.tv_chat_content = (TextView) convertView.findViewById(R.id.tv_chat_content);
-                        viewHolder.tv_chat_name = (TextView) convertView.findViewById(R.id.tv_chat_name);
-                        viewHolder.tv_chat_time = (TextView) convertView.findViewById(R.id.tv_chat_time);
-                        convertView.setTag(viewHolder);
-                    } else {
-                        viewHolder = (ViewHolder) convertView.getTag();
-                    }
-
-                    String avatar = data.getAvatar();
-                    if (!TextUtils.isEmpty(avatar)) {
-                        RequestOptions options = new RequestOptions().placeholder(R.drawable.chat_default_image).transform(new CircleCrop());
-                        Glide.with(getActivity()).load(avatar).apply(options).into(viewHolder.iv_chat_avatar);
-                    }
-                    messageCount ++;
-                    int textColor = messageCount % 3 == 0 ? Color.rgb(130, 180, 150) :
-                            messageCount % 3 == 1 ? Color.rgb(120, 170, 230) : Color.rgb(190, 170, 80);
-                    switch (data.event) {
-                        case MessageChatData.eventMsgKey:
-                            if (data.getType().equals("image")) {
-                                StringBuilder builder = new StringBuilder();
-                                MessageChatData info = data;
-                                builder.append("收到图片");
-                                if (info.getImage_urls() != null && info.getImage_urls().size() > 0) {
-                                    for (String u : info.getImage_urls()) {
-                                        builder.append(String.format("%s;\n", u));
-                                    }
-                                } else if (!TextUtils.isEmpty(info.getImage_url())) {
-                                    builder.append(info.getImage_url());
+            switch (chatInfo.event) {
+                case ChatServer.eventMsgKey:
+                    if (chatInfo.msgData != null)
+                        if (chatInfo.msgData.type.equals("image")) {
+                            StringBuilder builder = new StringBuilder();
+                            builder.append("收到图片");
+                            List<String> image_urls = chatInfo.msgData.imageUrls;
+                            if (image_urls != null && image_urls.size() > 0) {
+                                for (String u : image_urls) {
+                                    builder.append(String.format("%s;\n", u));
                                 }
-                                viewHolder.tv_chat_content.setText(builder.toString());
-                            } else {
-                                viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.getText_content()), TextView.BufferType.SPANNABLE);
+                            } else if (!TextUtils.isEmpty(chatInfo.msgData.resourceUrl)) {
+                                builder.append(chatInfo.msgData.resourceUrl);
                             }
-                            viewHolder.tv_chat_name.setText(data.getNickname());
-                            break;
-                        case MessageChatData.eventCustomKey:
-                            viewHolder.tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, data.getText_content()), TextView.BufferType.SPANNABLE);
-                            viewHolder.tv_chat_name.setText(data.getNickname()+"【自定义消息】");
-                            break;
-                        case MessageChatData.eventOnlineKey:
-                            viewHolder.tv_chat_name.setText(data.getNickname());
-                            viewHolder.tv_chat_content.setText(String.format("[%s]进入房间:%s 在线%s 参会:%s", data.getRoleName(),data.getUserId(), data.onlineData.concurrent_user,data.onlineData.attend_count));
-                            break;
-                        case MessageChatData.eventOfflineKey:
-                            viewHolder.tv_chat_name.setText(data.getNickname());
-                            viewHolder.tv_chat_content.setText(String.format("[%s]离开房间:%s 在线%s 参会:%s", data.getRoleName(),data.getUserId(), data.onlineData.concurrent_user,data.onlineData.attend_count));
-                            break;
-                        default:
-                            messageCount --;
-                            break;
-                    }
-                    viewHolder.tv_chat_content.setTextColor(textColor);
-                    viewHolder.tv_chat_time.setTextColor(textColor);
-                    viewHolder.tv_chat_time.setText(data.getTime());
-                    break;
-                case CHAT_SURVEY:
-                    if (convertView == null) {
-                        convertView = View.inflate(getActivity(), R.layout.chat_item_survey, null);
-                        surveyHolder = new ChatSurveyHolder();
-                        surveyHolder.tv_join = (TextView) convertView.findViewById(R.id.tv_join);
-                        convertView.setTag(surveyHolder);
-                    } else {
-                        surveyHolder = (ChatSurveyHolder) convertView.getTag();
-                    }
-                    surveyHolder.tv_join.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (TextUtils.isEmpty(data.getUrl())) {
-                                mPresenter.showSurvey(data.getId());
-                            } else {
-                                mPresenter.showSurvey(data.getUrl(), "");
-                            }
+                            viewHolder.setText(R.id.tv_chat_content, builder.toString());
+                        } else {
+                            viewHolder.setText(R.id.tv_chat_content, EmojiUtils.getEmojiText(mActivity, textContent));
                         }
-                    });
+                    tv_chat_content.setVisibility(View.VISIBLE);
+                    viewHolder.setText(R.id.tv_chat_name, chatInfo.user_name + "角色：" + chatInfo.roleName + "(" + chatInfo.role + ")" + " 用户ID：" + chatInfo.account_id);
+                    break;
+                case ChatServer.eventCustomKey:
+                    tv_chat_content.setVisibility(View.VISIBLE);
+                    tv_chat_content.setText(EmojiUtils.getEmojiText(mActivity, textContent), TextView.BufferType.SPANNABLE);
+                    viewHolder.setText(R.id.tv_chat_name, chatInfo.user_name + "【自定义消息】");
+                    break;
+                case ChatServer.eventOnlineKey:
+                    viewHolder.setText(R.id.tv_chat_name, String.format("%s上线了！角色：%s(%s)", chatInfo.user_name, chatInfo.roleName, chatInfo.role));
+                    tv_chat_content.setVisibility(View.INVISIBLE);
+                    break;
+                case ChatServer.eventOfflineKey:
+                    viewHolder.setText(R.id.tv_chat_name, String.format("%s下线了！角色：%s(%s)", chatInfo.user_name, chatInfo.roleName, chatInfo.role));
+                    tv_chat_content.setVisibility(View.INVISIBLE);
                     break;
                 default:
+                    messageCount--;
                     break;
             }
-            return convertView;
+            tv_chat_content.setTextColor(textColor);
+            tv_chat_time.setTextColor(textColor);
         }
     }
 
-    class QuestionAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            return questionData.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return questionData.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            Holder viewHolder;
-            if (convertView == null) {
-                convertView = View.inflate(getActivity(), R.layout.chat_question_item, null);
-                viewHolder = new Holder();
-                viewHolder.iv_question_avatar = convertView.findViewById(R.id.iv_question_avatar);
-                viewHolder.tv_question_content = convertView.findViewById(R.id.tv_question_content);
-                viewHolder.tv_question_name = (TextView) convertView.findViewById(R.id.tv_question_name);
-                viewHolder.tv_question_time = (TextView) convertView.findViewById(R.id.tv_question_time);
-
-                viewHolder.ll_answer = (LinearLayout) convertView.findViewById(R.id.ll_answer);
-                viewHolder.iv_answer_avatar = (ImageView) convertView.findViewById(R.id.iv_answer_avatar);
-                viewHolder.tv_answer_content = (TextView) convertView.findViewById(R.id.tv_answer_content);
-                viewHolder.tv_answer_name = (TextView) convertView.findViewById(R.id.tv_answer_name);
-                viewHolder.tv_answer_time = (TextView) convertView.findViewById(R.id.tv_answer_time);
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (Holder) convertView.getTag();
-            }
-            ChatServer.ChatInfo data = questionData.get(position);
-            ChatServer.ChatInfo.QuestionData questionData = data.questionData;
-            RequestOptions options = new RequestOptions().placeholder(R.drawable.icon_vhall);
-            if (questionData != null && !TextUtils.isEmpty(questionData.avatar)) {
-                Glide.with(getActivity()).load(questionData.avatar).apply(options).into(viewHolder.iv_question_avatar);
-            }
-            //TODO 头像设置
-            viewHolder.tv_question_name.setText(questionData.nick_name);
-            viewHolder.tv_question_time.setText(questionData.created_time);
-            viewHolder.tv_question_content.setText(EmojiUtils.getEmojiText(mActivity, questionData.content), TextView.BufferType.SPANNABLE);
-            if (questionData.answer != null) {
-                viewHolder.ll_answer.setVisibility(View.VISIBLE);
-                viewHolder.tv_answer_content.setText(EmojiUtils.getEmojiText(mActivity, questionData.answer.content), TextView.BufferType.SPANNABLE);
-                viewHolder.tv_answer_name.setText(questionData.answer.nick_name);
-                viewHolder.tv_answer_time.setText(questionData.answer.created_time);
-                Glide.with(getActivity()).load(questionData.answer.avatar).apply(options).into(viewHolder.iv_answer_avatar);
-                Glide.with(getActivity()).load(questionData.avatar).apply(options).into(viewHolder.iv_question_avatar);
-            } else {
-                Glide.with(getActivity()).load(data.avatar).apply(options).into(viewHolder.iv_question_avatar);
-                viewHolder.ll_answer.setVisibility(View.GONE);
-            }
-            return convertView;
-        }
-    }
-
-    static class ViewHolder {
-        ImageView iv_chat_avatar;
-        TextView tv_chat_content;
-        TextView tv_chat_name;
-        TextView tv_chat_time;
-    }
-
-    static class ChatSurveyHolder {
-        TextView tv_join;
-    }
-
-    static class Holder {
-        ImageView iv_question_avatar;
-        TextView tv_question_content;
-        TextView tv_question_time;
-        TextView tv_question_name;
-
-        LinearLayout ll_answer;
-        ImageView iv_answer_avatar;
-        TextView tv_answer_content;
-        TextView tv_answer_time;
-        TextView tv_answer_name;
-    }
 
     @Override
     public void onStop() {

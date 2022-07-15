@@ -7,6 +7,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import com.vhall.business.MessageServer;
+import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.business_support.dlna.DeviceDisplay;
@@ -93,6 +94,17 @@ public class WatchContract {
 
         void setPvNum(int pvNum, int pvVirtual);
 
+        /**
+         * 文档全屏
+         */
+        default void showDocFullScreen(int state) {
+        }
+
+        /**
+         * 改变文档方向
+         */
+        default void changeDocOrientation() {
+        }
     }
 
     interface DocumentView extends BaseView<BasePresenter> {
@@ -109,6 +121,11 @@ public class WatchContract {
 
         void paintH5DocView(View docView);
 
+        default void clickDocFullBack() {
+        }
+
+        default void triggerDocOrientation() {
+        }
     }
 
     interface DocumentViewVss extends BaseView<BasePresenter> {
@@ -254,6 +271,16 @@ public class WatchContract {
             return false;
         }
 
+
+        default void onResume() {
+
+        }
+
+        default void onPause() {
+
+        }
+
+
         void onDestroy();
 
         void submitLotteryInfo(String id, String lottery_id, String nickname, String phone);
@@ -293,7 +320,19 @@ public class WatchContract {
 
         void onRaiseHand(); // 举手
 
-        void replyInvite(int type);
+        default void beautyOpen() {
+
+        }
+
+        ; // 举手
+
+        void replyInvite(int type, RequestCallback callback);
+
+
+        //返回是否已经参加轮训
+        default boolean getIsRound() {
+            return false;
+        }
 
         DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
 
@@ -313,5 +352,31 @@ public class WatchContract {
 
         void dismissDevices();
 
+        /**
+         * 文档全屏显示
+         *
+         * @param state
+         * @see DocFragState
+         */
+        default void showDocFullScreen(int state) {
+        }
+
+        /**
+         * 触发doc切换横竖屏方向
+         */
+        default void changeDocOrientation() {
+        }
+
+        /**
+         * 改变文档方向：事件从activity到fragment
+         */
+        default void triggerDocOrientation() {
+        }
+
+        /**
+         * 文档全屏回退
+         */
+        default void clickDocFullBack() {
+        }
     }
 }

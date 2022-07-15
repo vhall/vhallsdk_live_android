@@ -12,6 +12,7 @@
         android:allowBackup="true"
         android:icon="@drawable/logo"
         tools:overrideLibrary="com.vhall.core"
+        tools:replace="android:allowBackup"
         android:hardwareAccelerated="true"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"

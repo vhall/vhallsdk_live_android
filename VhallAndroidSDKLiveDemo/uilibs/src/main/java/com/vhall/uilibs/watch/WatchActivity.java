@@ -10,12 +10,14 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.PixelFormat;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -26,17 +28,21 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
+import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.WebinarInfoDataSource;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.interactive.InteractiveActivity;
 import com.vhall.uilibs.interactive.RtcInternal;
 import com.vhall.uilibs.util.ActivityUtils;
@@ -52,7 +58,6 @@ import com.vhall.uilibs.util.SurveyPopuVss;
 import com.vhall.uilibs.util.SurveyView;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.VhallUtil;
-import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.ExtendTextView;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.util.emoji.InputView;
@@ -65,6 +70,8 @@ import static com.vhall.uilibs.util.SurveyView.EVENT_JS_BACK;
 import static com.vhall.uilibs.util.SurveyView.EVENT_PAGE_LOADED;
 
 //TODO 投屏相关
+import static java.lang.Math.abs;
+
 import com.vhall.uilibs.util.DevicePopu;
 import com.vhall.business_support.dlna.DeviceDisplay;
 
@@ -78,6 +85,7 @@ import org.fourthline.cling.model.types.DeviceType;
 import org.fourthline.cling.model.types.UDADeviceType;
 import org.fourthline.cling.registry.DefaultRegistryListener;
 import org.fourthline.cling.registry.Registry;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -88,12 +96,15 @@ import java.util.Collection;
 public class WatchActivity extends FragmentActivity implements WatchContract.WatchView {
 
     private FrameLayout contentDoc, contentDetail, contentChat, contentQuestion, contentLottery;
+    private RelativeLayout contentDocFull;
     private RadioGroup radio_tabs;
     private RadioButton questionBtn, chatBtn, lotteryBtn;
     private LinearLayout ll_detail;
     private CircleView mHand;
     ExtendTextView tv_notice;
     private TextView tvOnlineNum, tvPvNum;
+    private View doc_action_back;
+
     private Param param;
     private int type;
     private WatchContract.WatchView watchView;
@@ -105,7 +116,6 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     public LotteryFragment lotteryFragment;
     public ChatFragment questionFragment;
     private int onlineVirtual = 0, pvVirtual = 0;
-
 
     InputView inputView;
     public int chatEvent = ChatFragment.CHAT_EVENT_CHAT;
@@ -120,6 +130,14 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     private TextView status;
     //当前观看的是不是无延迟直播
     private boolean noDelay = false;
+    private ImageView beauty;
+
+    /**
+     * 陀螺仪
+     */
+    private SensorManager mSensorManager = null;
+    private Sensor mSensor = null;
+    private int mCurrentOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 
     private static final String TAG = "WatchActivity";
 
@@ -132,10 +150,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         setContentView(R.layout.watch_activity);
         fragmentManager = getSupportFragmentManager();
         status = findViewById(R.id.status);
+        beauty = findViewById(R.id.beauty);
         param = (Param) getIntent().getSerializableExtra("param");
         type = getIntent().getIntExtra("type", VhallUtil.WATCH_LIVE);
         noDelay = getIntent().getBooleanExtra("no_delay", false);
         docFragment = fragmentManager.findFragmentById(R.id.contentDoc);
+        contentDocFull = findViewById(R.id.contentDocFull);
         chatFragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.contentChat);
         DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentById(R.id.contentDetail);
         lotteryFragment = (LotteryFragment) getSupportFragmentManager().findFragmentById(R.id.contentLottery);
@@ -179,8 +199,66 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                 Context.BIND_AUTO_CREATE
         );
 
+//        initSensor();
     }
 
+    /**
+     * 初始化陀螺仪
+     */
+    private void initSensor() {
+        try {
+            getSensorManager().registerListener(mSensorEventListener, getSensor(), SensorManager.SENSOR_DELAY_NORMAL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private SensorManager getSensorManager() {
+        if (null == mSensorManager) {
+            mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        }
+        return mSensorManager;
+    }
+
+    private Sensor getSensor() {
+        if (null == mSensor) {
+            mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        }
+        return mSensor;
+    }
+
+    private final SensorEventListener mSensorEventListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                float x = event.values[0];
+                float y = event.values[1];
+                if (abs(x) > 3 || abs(y) > 3) {
+                    if (abs(x) > abs(y)) {
+                        if (ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE != mCurrentOrientation) {
+                            mCurrentOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+                            mPresenter.triggerDocOrientation();
+                        }
+                        Log.d("Jooper", "sensor: " + (x > 0 ? 0 : 180));
+                    } else {
+                        if (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT != mCurrentOrientation) {
+                            mCurrentOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+                            mPresenter.triggerDocOrientation();
+                        }
+                        Log.d("Jooper", "sensor: " + (y > 0 ? 90 : 270));
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
+
+
+    private String roomId="";
 
     public void initWatch(Param params) {
         //可以不设置这两个参数
@@ -208,7 +286,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                 status.setText(String.format("进入房间初始化值 举手开关=%s、问答开关=%d、禁言=%s、自己的禁言=%s、全体禁言=%s、" +
                                 "问答禁言状态=%s、公聊禁言状态=%s、",
                         webinarInfo.hands_up, webinarInfo.question_status, webinarInfo.chatforbid,
-                        webinarInfo.chatOwnForbid, webinarInfo.chatAllForbid,webinarInfo.qa_status,webinarInfo.chat_status));
+                        webinarInfo.chatOwnForbid, webinarInfo.chatAllForbid, webinarInfo.qa_status, webinarInfo.chat_status));
 
                 param.webinar_id = webinarInfo.webinar_id;
                 questionBtn.setVisibility((webinarInfo.question_status == 1) ? View.VISIBLE : View.GONE);
@@ -290,6 +368,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 
     private void initView() {
         tvOnlineNum = findViewById(R.id.tv_online_num);
+        doc_action_back = findViewById(R.id.doc_action_back);
+        doc_action_back.setOnClickListener(v -> {
+            if (null != mPresenter) {
+                mPresenter.clickDocFullBack();
+            }
+        });
 
         tvPvNum = findViewById(R.id.tv_pv_num);
 
@@ -322,7 +406,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             }
         });
         ll_detail = (LinearLayout) this.findViewById(R.id.ll_detail);
-        contentDoc = (FrameLayout) findViewById(R.id.contentDoc);
+        contentDoc = findViewById(R.id.contentDoc);
         contentDetail = (FrameLayout) findViewById(R.id.contentDetail);
         contentChat = (FrameLayout) findViewById(R.id.contentChat);
         contentQuestion = (FrameLayout) findViewById(R.id.contentQuestion);
@@ -345,6 +429,14 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             }
         });
 
+        beauty.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mPresenter != null) {
+                    mPresenter.beautyOpen();
+                }
+            }
+        });
         tv_notice = this.findViewById(R.id.tv_notice);
         tv_notice.setDrawableClickListener(new ExtendTextView.DrawableClickListener() {
             @Override
@@ -521,6 +613,45 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
+    public void showDocFullScreen(int state) {
+        if (DocFragState.isStateHorizontal(state)) {
+            //ver half
+            doc_action_back.setVisibility(View.VISIBLE);
+        } else {
+            if (DocFragState.isFullScreen(state)) {
+                doc_action_back.setVisibility(View.VISIBLE);
+                if (null != contentDoc) {
+                    RelativeLayout parent = findViewById(R.id.parent_frags);
+                    parent.removeView(contentDoc);
+                    contentDocFull.setVisibility(View.VISIBLE);
+                    RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT);
+                    params.addRule(RelativeLayout.CENTER_IN_PARENT);
+                    contentDocFull.addView(contentDoc, params);
+                }
+            } else {
+                doc_action_back.setVisibility(View.GONE);
+                if (null != contentDocFull) {
+                    contentDocFull.removeView(contentDoc);
+                    contentDocFull.setVisibility(View.GONE);
+                    RelativeLayout parentDoc = findViewById(R.id.parent_frags);
+                    parentDoc.addView(contentDoc);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void changeDocOrientation() {
+        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            mCurrentOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else {
+            mCurrentOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+    }
+
+    @Override
     public void showToast(String toast) {
         Toast.makeText(this, toast, Toast.LENGTH_SHORT).show();
     }
@@ -571,21 +702,30 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                 public void onClick(View v) {
                     if (RtcInternal.isGrantedPermissionRtc(WatchActivity.this, REQUEST_PUSH)) {
                         //同意上麦
-                        mPresenter.replyInvite(1);
-                        if (param.noDelay) {
-                            noDelayLiveFragment.enterInteractive(true);
-                        } else {
-                            enterInteractive();
-                        }
-                        invitedDialog.dismiss();
-                        //发送同意上麦信息
+                        mPresenter.replyInvite(1, new RequestCallback() {
+                            @Override
+                            public void onSuccess() {
+                                if (param.noDelay) {
+                                    noDelayLiveFragment.enterInteractive(true);
+                                } else {
+                                    enterInteractive();
+                                }
+                                invitedDialog.dismiss();
+                                //发送同意上麦信息
+                            }
+
+                            @Override
+                            public void onError(int errorCode, String errorMsg) {
+                                showToast(errorMsg);
+                            }
+                        });
                     }
                 }
             });
             invitedDialog.setNegativeOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mPresenter.replyInvite(2);
+                    mPresenter.replyInvite(2,null);
                     invitedDialog.dismiss();
                     //发送拒绝上麦信息
                 }
@@ -595,7 +735,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             @Override
             public void refuseInvite() {
                 //超时
-                mPresenter.replyInvite(3);
+                mPresenter.replyInvite(3,null);
             }
         });
         invitedDialog.show();
@@ -660,6 +800,10 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             inputView.destroyed();
         }
         this.unbindService(serviceConnection);
+
+        if (null != mSensorManager) {
+            mSensorManager.unregisterListener(mSensorEventListener);
+        }
     }
 
     @Override
@@ -824,8 +968,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode,  String[] permissions,
+                                           int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PUSH) {
             if (grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {

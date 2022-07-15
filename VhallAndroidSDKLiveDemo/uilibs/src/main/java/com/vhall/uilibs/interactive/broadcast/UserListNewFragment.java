@@ -384,7 +384,6 @@ public class UserListNewFragment extends BaseFragment {
             if (isGuest && !guestCanInvent) {
                 tvMic.setVisibility(View.GONE);
             }
-            Log.e("vhall_", "guestCanInvent " + guestCanInvent);
             switch (judgeRole(info.getRole_name())) {
                 case "1":
                     if (isGuest) {

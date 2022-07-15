@@ -325,6 +325,11 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                         if (!TextUtils.isEmpty(userId) && TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
                             isPublic = true;
                             broadcastView.setMic(true);
+                            Stream localStream =  RtcConfig.getInterActive().getLocalStream();
+                            if (localStream != null) {
+                                localStream.setEnableBeautify(true);
+                                localStream.setEnableCaptureCallback(true);
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -342,6 +347,11 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                         if (!TextUtils.isEmpty(userId) && TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
                             //主播下麦用户/嘉宾
                             RtcConfig.getInterActive().unpublished();
+                            if (RtcConfig.getInterActive().getLocalStream()!=null){
+                                RtcConfig.getInterActive().getLocalStream().removeAllRenderView();
+                                RtcConfig.getInterActive().getLocalStream().stopStats();
+                                RtcConfig.getInterActive().getLocalStream().dispose();
+                            }
                             if (!UserManger.isHost(responseRoomInfo.getJoin_info().getRole_name())) {
                                 broadcastView.setMic(false);
                             }

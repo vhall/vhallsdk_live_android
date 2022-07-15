@@ -16,6 +16,7 @@ import com.vhall.push.VHLivePushConfig;
 import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.vhallrtc.client.VHRenderView;
@@ -426,16 +427,16 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 case ChatServer.eventCustomKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 case ChatServer.eventOnlineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 case ChatServer.eventOfflineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 default:
                     break;

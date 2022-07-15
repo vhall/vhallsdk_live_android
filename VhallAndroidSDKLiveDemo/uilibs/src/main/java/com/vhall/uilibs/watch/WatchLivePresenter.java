@@ -1,18 +1,21 @@
 package com.vhall.uilibs.watch;
 
 import static com.vhall.business.ErrorCode.ERROR_LOGIN_MORE;
+import static com.vhall.business.Watch.EVENT_INIT_PLAYER_SUCCESS;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.vhall.beautify.VHBeautifyKit;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
@@ -24,25 +27,32 @@ import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
 import com.vhall.business.utils.SurveyInternal;
+import com.vhall.business_interactive.InterActive;
 import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.business_support.dlna.DeviceDisplay;
+import com.vhall.net.NetBroadcastReceiver;
+import com.vhall.net.NetUtil;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.player.stream.play.impl.VHVideoPlayerView;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.MessageChatData;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.chat.PushChatFragment;
+import com.vhall.uilibs.interactive.RtcInternal;
 import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.widget.LotteryListDialog;
 import com.vhall.uilibs.widget.SurveyListDialog;
-import com.vhall.vhss.CallBack;
+import com.vhall.vhallrtc.client.Room;
+import com.vhall.vhallrtc.client.Stream;
+import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.TokenManger;
 import com.vhall.vhss.data.LotteryCheckData;
+import com.vhall.vhss.data.RoundUserListData;
 import com.vhall.vhss.data.SurveyInfoData;
-import com.vhall.vhss.network.InteractToolsNetworkRequest;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONArray;
@@ -64,7 +74,7 @@ import vhall.com.vss2.VssSdk;
  * 观看直播的Presenter
  */
 public class WatchLivePresenter implements WatchContract.LivePresenter, ChatContract.ChatPresenter {
-    private static final String TAG = "WatchLivePresenter";
+    private static final String TAG = "vhallWatchLivePresenter";
     private Param params;
     private WebinarInfo webinarInfo;
     private WatchContract.LiveView liveView;
@@ -109,6 +119,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         this.liveView.setPresenter(this);
         this.chatView.setPresenter(this);
         this.questionView.setPresenter(this);
+        this.documentView.setPresenter(this);
 
         /**
          * since 6.4.0
@@ -134,13 +145,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         getWatchLive().setVRHeadTracker(true);
         initWatch();
         getWatchLive().setScaleType(Constants.DrawMode.kVHallDrawModeAspectFit.getValue());
-        //自动播放
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                getWatchLive().start();
-//            }
-//        },500);
+
     }
 
     @Override
@@ -299,7 +304,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
     @Override
     public void onDestroy() {
+        releaseRound();
         getWatchLive().destroy();
+        if (netUtil != null)
+            netUtil.release();
     }
 
     @Override
@@ -393,6 +401,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             getAnswerList();
             getSurveyList();
             updateLotteryList();
+            monitorNetWork();
         }
     }
 
@@ -501,7 +510,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         VhallSDK.getAnswerList(params.watchId, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                questionView.notifyDataChangedQe(PushChatFragment.CHAT_EVENT_QUESTION, list);
+                questionView.notifyDataChanged(PushChatFragment.CHAT_EVENT_QUESTION, list);
             }
 
             @Override
@@ -531,6 +540,34 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         }
     }
 
+
+    @Override
+    public void showDocFullScreen(int state) {
+        if (null != watchView) {
+            watchView.showDocFullScreen(state);
+        }
+    }
+
+    @Override
+    public void changeDocOrientation() {
+        if (null != watchView) {
+            watchView.changeDocOrientation();
+        }
+    }
+
+    @Override
+    public void triggerDocOrientation() {
+        if (null != documentView) {
+            documentView.triggerDocOrientation();
+        }
+    }
+
+    @Override
+    public void clickDocFullBack() {
+        if (null != documentView) {
+            documentView.clickDocFullBack();
+        }
+    }
 
     private RelativeLayout watchLayout;
 
@@ -693,6 +730,16 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     @Override
+    public void beautyOpen() {
+        if (VHBeautifyKit.getInstance().isBeautifyEnable()) {
+            ToastUtil.showToast("美颜关闭");
+        } else {
+            ToastUtil.showToast("美颜开启");
+        }
+        VHBeautifyKit.getInstance().setBeautifyEnable(!VHBeautifyKit.getInstance().isBeautifyEnable());
+    }
+
+    @Override
     public void onRaiseHand() {
         if (!canSpeak) {
             ToastUtil.showToast("您已被禁言");
@@ -722,18 +769,8 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     }
 
     @Override
-    public void replyInvite(int type) {
-        getWatchLive().replyInvitation(params.watchId, type, new RequestCallback() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onError(int errorCode, String errorMsg) {
-                watchView.showToast("上麦状态反馈异常，errorMsg:" + errorMsg);
-            }
-        });
+    public void replyInvite(int type, RequestCallback callback) {
+        getWatchLive().replyInvitation(params.watchId, type, callback);
     }
 
 
@@ -789,7 +826,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                         } else {
                             ToastUtil.showToast("设置成功");
                         }
-                        setBg=true;
+                        setBg = true;
                     }
                     break;
                 case BUFFER:
@@ -837,6 +874,20 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case ERROR_LOGIN_MORE://被其他人踢出
                     watchView.showToast(msg);
                     watchView.getActivity().finish();
+                    break;
+                case EVENT_INIT_PLAYER_SUCCESS://
+                    if (!setBg) {
+                        //只设置一次 设置背景 没有需求的可以不加
+                        @SuppressLint("ResourceType") InputStream is = watchView.getActivity().getResources().openRawResource(R.drawable.splash_bg);
+                        Bitmap mBitmap = BitmapFactory.decodeStream(is);
+                        if (!watchLive.setVideoBackgroundImage(mBitmap)) {
+                            ToastUtil.showToast("设置失败");
+                        } else {
+                            ToastUtil.showToast("设置成功");
+                        }
+                        setBg = true;
+                    }
+                    startWatch();
                     break;
                 default:
                     break;
@@ -955,7 +1006,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     /**
                      * 获取msg内容
                      */
-                    MessageChatData surveyData = new MessageChatData();
+                    ChatServer.ChatInfo surveyData = new ChatServer.ChatInfo();
                     surveyData.event = MessageChatData.eventSurveyKey;
                     Map<String, String> params = new HashMap<>();
                     params.put(SurveyInternal.KEY_SURVEY_ID, messageInfo.id);
@@ -968,10 +1019,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     params.put(SurveyInternal.KEY_USER_ID, webinarInfo.user_id);
                     params.put(SurveyInternal.KEY_TOKEN, TokenManger.getToken());
                     params.put(SurveyInternal.KEY_INTERACT_TOKEN, TokenManger.getInteractToken());
-                    surveyData.setUrl(SurveyInternal.createSurveyUrl(params));
-                    surveyData.setId(messageInfo.id);
-                    surveyData.survey_name = messageInfo.survey_name;
-                    chatView.notifyDataChangedChat(surveyData);
+                    surveyData.url = (SurveyInternal.createSurveyUrl(params));
+                    surveyData.id = (messageInfo.id);
+                    surveyData.name = messageInfo.survey_name;
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, surveyData);
                     getSurveyList();
                     break;
 
@@ -1031,8 +1082,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_INTERACTIVE_ALLOW_MIC:
                     //主持人 同意上麦
-//                    getWatchLive().disconnectMsgServer(); // 关闭watchLive中的消息
-//                    replyInvite(1);
+                    if (isRound) {
+                        watchView.showToast("已经参加了轮巡");
+                        return;
+                    }
                     watchView.enterInteractive();
                     if (onHandDownTimer != null) {
                         isHand = false; //重置是否举手标识
@@ -1045,6 +1098,10 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
 
                     break;
                 case MessageServer.EVENT_INVITED_MIC://被邀请上麦
+                    if (isRound) {
+                        watchView.showToast("已经参加了轮巡");
+                        return;
+                    }
                     watchView.showInvited();
                     break;
 
@@ -1054,6 +1111,19 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     break;
                 case MessageServer.EVENT_VRTC_BIG_SCREEN_SET:
                     watchView.showToast("流消息 互动流设置混流大画面 " + messageInfo.user_id);
+                    break;
+
+                case MessageServer.EVENT_VIDEO_ROUND_START:
+                    //轮巡开启
+                    watchView.showToast("主办方开启了视频轮巡功能，在主持人端将会看到您的视频画面，请保持视频设备一切正常");
+                    break;
+                case MessageServer.EVENT_VIDEO_ROUND_END:
+                    //轮巡结束
+                    releaseRound();
+                    break;
+                case MessageServer.EVENT_VIDEO_ROUND_USERS:
+                    //轮巡用户 再次之前必需要有麦克风、摄像头权限 uids次轮参与用户id
+                    dealRound(messageInfo.uids, false);
                     break;
                 default:
                     break;
@@ -1088,6 +1158,187 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         @Override
         public void onMsgServerClosed() {
 
+        }
+    }
+
+    private NetUtil netUtil;
+
+    @Override
+    public boolean getIsRound() {
+        return isRound;
+    }
+
+    private void getRoundUsers(boolean isPublic) {
+        if (webinarInfo != null && !TextUtils.isEmpty(webinarInfo.vss_room_id))
+            VhallSDK.getRoundUsers(webinarInfo.vss_room_id, "0", new RequestDataCallback() {
+                @Override
+                public void onSuccess(Object o) {
+                    RoundUserListData roundUserListData = (RoundUserListData) o;
+                    List<String> uids = new ArrayList<>();
+                    if (roundUserListData != null && !ListUtils.isEmpty(roundUserListData.list))
+                        for (int i = 0; i < roundUserListData.list.size(); i++) {
+                            uids.add(roundUserListData.list.get(i).account_id);
+                        }
+                    dealRound(uids, isPublic);
+                }
+
+                @Override
+                public void onError(int errorCode, String errorMsg) {
+                    if (errorCode == 513343) {
+                        //视频轮巡未开启 根据自己需求是否提示
+                        return;
+                    }
+                    ToastUtil.showToast(errorMsg);
+                }
+            });
+    }
+
+    private void monitorNetWork() {
+        netUtil = new NetUtil(watchView.getActivity(), new NetBroadcastReceiver.NetChangeListener() {
+            @Override
+            public void onChangeListener(int status) {
+                if (RtcInternal.isNetworkConnected(watchView.getActivity())) {
+                    //互动没有初始化需要在这里获取，已经初始化了走互动自己的重连
+                    if (interactive == null)
+                        getRoundUsers(false);
+                } else {
+                    ToastUtil.showToast("当前网络异常");
+                }
+            }
+        });
+    }
+
+    private InterActive interactive;
+    // 是否参与轮巡
+    private boolean isRound = false;
+
+    /**
+     * @param uids     包含自己判断是否需要轮巡 如果没有 已经参与轮巡的需要下麦
+     * @param isPublic 是否强制推流  如果断网重连 则需要在 onDidConnect 消息里面强制推流
+     */
+    public void dealRound(List uids, boolean isPublic) {
+        if (!ListUtils.isEmpty(uids) && uids.contains(webinarInfo.user_id)) {
+            //已经参加的不需要进入
+            if (!isRound || isPublic) {
+                if (interactive == null) {
+                    interactive = new InterActive(watchView.getActivity(), new RoomCallback(), null);
+                    interactive.init(true, webinarInfo, new RequestCallback() {
+                        @Override
+                        public void onSuccess() {
+                            setLocalView();
+                            interactive.enterRoom();
+                            isRound = true;
+                        }
+
+                        @Override
+                        public void onError(int errorCode, String errorMsg) {
+                            watchView.showToast(errorMsg);
+                        }
+                    });
+                } else {
+                    //此时互动没有被释放可以接着使用、适用于断网重联
+                    setLocalView();
+                    interactive.publish();
+                    isRound = true;
+                }
+            }
+            //轮训开启美颜
+//            VHBeautifyKit.getInstance().setBeautifyEnable(true);
+        } else {
+            releaseRound();
+        }
+    }
+
+    private void releaseRound() {
+        //没有自己停止轮巡，必需离开互动房间
+        isRound = false;
+        if (interactive != null) {
+            interactive.unpublished();
+            interactive.leaveRoom();
+            interactive.onDestroy();
+            interactive = null;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        if (webinarInfo != null && !TextUtils.isEmpty(webinarInfo.vss_room_id))
+            getRoundUsers(false);
+    }
+
+    @Override
+    public void onPause() {
+        releaseRound();
+    }
+
+    /**
+     * 设置本地流
+     */
+    private void setLocalView() {
+        if (interactive != null) {
+            interactive.setLocalView(null, Stream.VhallStreamType.VhallStreamTypeVideoPatrol, null);
+        }
+    }
+
+    class RoomCallback implements InterActive.RoomCallback {
+        @Override
+        public void onDidConnect() {
+            Log.e(TAG, "onDidConnect");
+            //进入房间
+            //断网重联也会触发 需要记录上麦状态
+            if (interactive != null) {
+                getRoundUsers(true);
+            }
+        }
+
+        @Override
+        public void onDidError() {//进入房间失败
+
+        }
+
+        @Override
+        public void onDidPublishStream() {// 上麦
+            Log.e(TAG, "onDidPublishStream");
+        }
+
+        @Override
+        public void onDidUnPublishStream() {//下麦
+            Log.e(TAG, "onDidUnPublishStream");
+        }
+
+        @Override
+        public void onDidSubscribeStream(Stream stream, final VHRenderView newRenderView) {
+
+        }
+
+        @Override
+        public void onDidRoomStatus(Room room, Room.VHRoomStatus vhRoomStatus) {
+            Log.e(TAG, "onDidRoomStatus  " + vhRoomStatus);
+            switch (vhRoomStatus) {
+                case VHRoomStatusDisconnected:// 异常退出
+                    break;
+                case VHRoomStatusError:
+                    Log.e(TAG, "VHRoomStatusError");
+                    if (interactive != null) {
+                        interactive.leaveRoom();
+                        interactive.onDestroy();
+                        interactive = null;
+                        isRound = false;
+                    }
+                    break;
+                case VHRoomStatusReady:
+                    Log.e(TAG, "VHRoomStatusReady");
+                    break;
+                case VHRoomStatusConnected: // 重连进房间
+                    Log.e(TAG, "VHRoomStatusConnected");
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void onDidRemoveStream(Room room, final Stream stream) {
         }
     }
 
@@ -1152,20 +1403,20 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                         }
                     }
 
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     liveView.addDanmu(chatInfo.msgData.text);
                     break;
                 case ChatServer.eventCustomKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 case ChatServer.eventOnlineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     if (chatInfo.onlineData != null) {
                         watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
                     }
                     break;
                 case ChatServer.eventOfflineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 case ChatServer.eventQuestion:
                     if (chatInfo.questionData != null && chatInfo.questionData.answer != null) {
@@ -1173,7 +1424,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                             return;
                         }
                     }
-                    questionView.notifyDataChangedQe(chatInfo);
+                    questionView.notifyDataChanged(ChatFragment.CHAT_EVENT_QUESTION, chatInfo);
                     break;
                 default:
                     break;
@@ -1189,11 +1440,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         getWatchLive().acquireChatRecord(true, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                List<MessageChatData> list1 = new ArrayList<>();
-                for (ChatServer.ChatInfo chatInfo : list) {
-                    list1.add(MessageChatData.getChatData(chatInfo));
-                }
-                chatView.notifyDataChangedChat(PushChatFragment.CHAT_EVENT_CHAT, list1);
+                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, list);
             }
 
             @Override

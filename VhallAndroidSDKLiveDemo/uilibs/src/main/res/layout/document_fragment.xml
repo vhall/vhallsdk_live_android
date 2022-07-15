@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <com.vhall.business.widget.PPTView
         android:id="@+id/iv_doc"
@@ -19,6 +20,45 @@
         android:id="@+id/fl_h5_doc"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:visibility="visible" />
 
+    <ImageView
+        android:id="@+id/doc_action_resume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/dimen_30dp"
+        android:layout_marginBottom="@dimen/dimen_30dp"
+        android:background="@drawable/doc_action_resume"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/doc_type_full"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/dimen_30dp"
+        android:layout_marginBottom="@dimen/dimen_30dp"
+        android:layout_toLeftOf="@+id/doc_action_resume"
+        android:background="@drawable/doc_type_full"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/doc_ori_land"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="@dimen/dimen_30dp"
+        android:layout_marginRight="@dimen/dimen_50dp"
+        android:layout_marginBottom="@dimen/dimen_30dp"
+        android:layout_toLeftOf="@+id/doc_type_full"
+        android:background="@drawable/doc_ori_ver2hor"
+        android:visibility="gone"
+        tools:visibility="visible" />
 </RelativeLayout>

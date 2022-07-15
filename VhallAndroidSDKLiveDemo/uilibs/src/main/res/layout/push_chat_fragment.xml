@@ -27,12 +27,10 @@
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/lv_chat"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/chat_view"
-        android:divider="@null"
-        android:transcriptMode="alwaysScroll"></ListView>
+        android:layout_above="@+id/chat_view" />
 
 </RelativeLayout>

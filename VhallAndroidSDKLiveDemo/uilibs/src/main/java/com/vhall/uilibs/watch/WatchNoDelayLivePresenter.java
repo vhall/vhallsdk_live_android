@@ -7,10 +7,12 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RelativeLayout;
 
+import com.vhall.beautify.VHBeautifyKit;
 import com.vhall.business.ChatServer;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
+import com.vhall.business.data.RequestDataCallback;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
@@ -23,8 +25,9 @@ import com.vhall.uilibs.Param;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.MessageChatData;
-import com.vhall.uilibs.chat.PushChatFragment;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.BaseUtil;
+import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.vhallrtc.client.Room;
@@ -32,6 +35,7 @@ import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.CallBack;
 import com.vhall.vhss.TokenManger;
+import com.vhall.vhss.data.RoundUserListData;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONObject;
@@ -97,6 +101,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
         this.liveNoDelayView.setPresenter(this);
         this.chatView.setPresenter(this);
         this.questionView.setPresenter(this);
+        this.documentView.setPresenter(this);
         initInteractive();
         /**
          * since 6.4.0
@@ -393,6 +398,34 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
         //不支持
     }
 
+    @Override
+    public void showDocFullScreen(int state) {
+        if(null != watchView){
+            watchView.showDocFullScreen(state);
+        }
+    }
+
+    @Override
+    public void changeDocOrientation() {
+        if (null != watchView) {
+            watchView.changeDocOrientation();
+        }
+    }
+
+    @Override
+    public void triggerDocOrientation() {
+        if (null != documentView) {
+            documentView.triggerDocOrientation();
+        }
+    }
+
+    @Override
+    public void clickDocFullBack() {
+        if (null != documentView) {
+            documentView.clickDocFullBack();
+        }
+    }
+
     private RelativeLayout watchLayout;
 
     //签到
@@ -481,18 +514,8 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
     }
 
     @Override
-    public void replyInvite(int type) {
-        interactive.replyInvitation(params.watchId, type, new RequestCallback() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onError(int errorCode, String errorMsg) {
-                watchView.showToast("上麦状态反馈异常，errorMsg:" + errorMsg);
-            }
-        });
+    public void replyInvite(int type, RequestCallback callback) {
+        interactive.replyInvitation(params.watchId, type, callback);
     }
 
 
@@ -562,8 +585,6 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                     stopWatch();
                     break;
                 case MessageServer.EVENT_START_LOTTERY://抽奖开始
-                    watchView.showLottery(messageInfo);
-                    break;
                 case MessageServer.EVENT_END_LOTTERY://抽奖结束
                     watchView.showLottery(messageInfo);
                     break;
@@ -597,7 +618,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                     /**
                      * 获取msg内容
                      */
-                    MessageChatData surveyData = new MessageChatData();
+                    ChatServer.ChatInfo surveyData = new ChatServer.ChatInfo();
                     surveyData.event = MessageChatData.eventSurveyKey;
                     Map<String, String> params = new HashMap<>();
                     params.put(SurveyInternal.KEY_SURVEY_ID, messageInfo.id);
@@ -610,10 +631,10 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                     params.put(SurveyInternal.KEY_USER_ID, webinarInfo.user_id);
                     params.put(SurveyInternal.KEY_TOKEN, TokenManger.getToken());
                     params.put(SurveyInternal.KEY_INTERACT_TOKEN, TokenManger.getInteractToken());
-                    surveyData.setUrl(SurveyInternal.createSurveyUrl(params));
-                    surveyData.setId(messageInfo.id);
-                    surveyData.survey_name = messageInfo.survey_name;
-                    chatView.notifyDataChangedChat(surveyData);
+                    surveyData.url = (SurveyInternal.createSurveyUrl(params));
+                    surveyData.id = (messageInfo.id);
+                    surveyData.name = messageInfo.survey_name;
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,surveyData);
                     break;
                 case MessageServer.EVENT_SHOWDOC://文档开关指令 1 使用文档 0 关闭文档
                     Log.e(TAG, "onEvent:show_docType:watchType= " + messageInfo.watchType);
@@ -682,6 +703,17 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                         liveNoDelayView.updateVideoFrame(messageInfo.status);
                     }
                     break;
+
+                case MessageServer.EVENT_VIDEO_ROUND_START:
+                    watchView.showToast("主办方开启了视频轮巡功能，在主持人端将会看到您的视频画面，请保持视频设备一切正常");
+                    break;
+                case MessageServer.EVENT_VIDEO_ROUND_END:
+                    //是轮巡调用下麦
+                    releaseRound();
+                    break;
+                case MessageServer.EVENT_VIDEO_ROUND_USERS:
+                    dealRound(messageInfo.uids, false);
+                    break;
                 default:
                     break;
             }
@@ -715,6 +747,76 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
         @Override
         public void onMsgServerClosed() {
 
+        }
+    }
+
+
+    @Override
+    public void onResume() {
+        if (webinarInfo != null && !TextUtils.isEmpty(webinarInfo.vss_room_id))
+            getRoundUsers(false);
+    }
+
+    @Override
+    public void onPause() {
+        releaseRound();
+    }
+
+    @Override
+    public boolean getIsRound() {
+        return isRound;
+    }
+
+    //断网或者 推到后台回来 需要判断自己是否需要继续参加轮巡
+    // isPublic 是否强制推流  如果断网重连 则需要在 onDidConnect 消息里面强制推流
+    private void getRoundUsers(boolean isPublic) {
+        if (webinarInfo != null && !TextUtils.isEmpty(webinarInfo.vss_room_id))
+            VhallSDK.getRoundUsers(webinarInfo.vss_room_id, "0", new RequestDataCallback() {
+                @Override
+                public void onSuccess(Object o) {
+                    RoundUserListData roundUserListData = (RoundUserListData) o;
+                    List<String> uids = new ArrayList<>();
+                    if (roundUserListData != null && !ListUtils.isEmpty(roundUserListData.list))
+                        for (int i = 0; i < roundUserListData.list.size(); i++) {
+                            uids.add(roundUserListData.list.get(i).account_id);
+                        }
+                    dealRound(uids, isPublic);
+                }
+
+                @Override
+                public void onError(int errorCode, String errorMsg) {
+                    ToastUtil.showToast(errorMsg);
+                }
+            });
+    }
+
+
+    // 是否参与轮巡
+    private boolean isRound = false;
+
+    /**
+     * @param uids     包含自己判断是否需要轮巡 如果没有 已经参与轮巡的需要下麦
+     * @param isPublic 是否强制推流  如果断网重连 则需要在 onDidConnect 消息里面强制推流
+     */
+    public void dealRound(List uids, boolean isPublic) {
+        if (!ListUtils.isEmpty(uids) && uids.contains(webinarInfo.user_id)) {
+            //已经参加的不需要进入
+            if (!isRound || isPublic) {
+                //断网重连之后
+                setLocalView(Stream.VhallStreamType.VhallStreamTypeVideoPatrol);
+                interactive.publish();
+                isRound = true;
+            }
+        } else {
+            releaseRound();
+        }
+    }
+
+    private void releaseRound() {
+        //没有自己停止轮巡
+        isRound = false;
+        if (interactive != null && interactive.getLocalStream() != null && interactive.getLocalStream().getStreamType() == 5) {
+            interactive.unpublished();
         }
     }
 
@@ -786,8 +888,12 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
 
     @Override
     public void onUpMic() {
+        if (isRound){
+            watchView.showToast("已经参加了轮巡");
+            return;
+        }
         if (interactive != null) {
-            setLocalView();
+            setLocalView(Stream.VhallStreamType.VhallStreamTypeAudioAndVideo);
             interactive.publish();
             isPublic = true;
         }
@@ -800,13 +906,24 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
 
     /**
      * 设置本地流
+     * 参数类型 VHStreamTypeParams
      */
-    private void setLocalView() {
+    private void setLocalView(Stream.VhallStreamType streamType) {
         VHRenderView vhRenderView;
         vhRenderView = new VHRenderView(watchView.getActivity());
         vhRenderView.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFit);
         vhRenderView.init(null, null);
-        interactive.setLocalView(vhRenderView, Stream.VhallStreamType.VhallStreamTypeAudioAndVideo, null);
+        interactive.setLocalView(vhRenderView, streamType, null);
+    }
+
+    @Override
+    public void beautyOpen() {
+        if (VHBeautifyKit.getInstance().isBeautifyEnable()) {
+            ToastUtil.showToast("美颜关闭");
+        } else {
+            ToastUtil.showToast("美颜开启");
+        }
+        VHBeautifyKit.getInstance().setBeautifyEnable(!VHBeautifyKit.getInstance().isBeautifyEnable());
     }
 
     /**
@@ -856,23 +973,20 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                   chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     liveView.addDanmu(chatInfo.msgData.text);
                     break;
                 case ChatServer.eventCustomKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
-                    if (chatInfo.onlineData != null) {
-                        watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
-                    }
+                   chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 case ChatServer.eventOnlineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                   chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     if (chatInfo.onlineData != null) {
                         watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
                     }
                     break;
                 case ChatServer.eventOfflineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                   chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 case ChatServer.eventQuestion:
                     if (chatInfo.questionData != null && chatInfo.questionData.answer != null) {
@@ -880,7 +994,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                             return;
                         }
                     }
-                    questionView.notifyDataChangedQe(chatInfo);
+                    questionView.notifyDataChanged(ChatFragment.CHAT_EVENT_QUESTION,chatInfo);
                     break;
                 default:
                     break;
@@ -899,11 +1013,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
         interactive.acquireChatRecord(true, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                List<MessageChatData> list1 = new ArrayList<>();
-                for (ChatServer.ChatInfo chatInfo : list) {
-                    list1.add(MessageChatData.getChatData(chatInfo));
-                }
-                chatView.notifyDataChangedChat(PushChatFragment.CHAT_EVENT_CHAT, list1);
+                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,list);
             }
 
             @Override
@@ -918,6 +1028,9 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
         @Override
         public void onDidConnect() {//进入房间
             Log.e(TAG, "onDidConnect");
+            if (interactive != null) {
+                getRoundUsers(true);
+            }
         }
 
         @Override
@@ -961,6 +1074,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                     watchView.getActivity().finish();
                     break;
                 case VHRoomStatusError:
+                    watchView.showToast("互动房间链接失败");
                     watchView.getActivity().finish();
                     Log.e(TAG, "VHRoomStatusError");
                     break;

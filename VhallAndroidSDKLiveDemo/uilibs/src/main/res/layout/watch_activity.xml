@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -138,6 +138,7 @@
 
 
             <RelativeLayout
+                android:id="@+id/parent_frags"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
@@ -145,19 +146,19 @@
                     android:id="@+id/contentChat"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone"></FrameLayout>
+                    android:visibility="gone"/>
 
                 <FrameLayout
                     android:id="@+id/contentDoc"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone"></FrameLayout>
+                    android:visibility="gone"/>
 
                 <FrameLayout
                     android:id="@+id/contentQuestion"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone"></FrameLayout>
+                    android:visibility="gone"/>
 
                 <FrameLayout
                     android:id="@+id/contentLottery"
@@ -169,14 +170,13 @@
                     android:id="@+id/contentDetail"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone"></FrameLayout>
-
+                    android:visibility="gone"/>
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
+                    android:layout_marginTop="@dimen/dimen_20dp"
                     android:layout_marginRight="@dimen/common_margin_size_10">
 
                     <com.vhall.uilibs.util.CircleView
@@ -184,11 +184,22 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/icon_upper" />
-
                 </RelativeLayout>
 
-            </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="@dimen/dimen_70dp"
+                    android:layout_marginRight="@dimen/common_margin_size_10">
 
+                    <ImageView
+                        android:id="@+id/beauty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/rtc_live_beauty_open" />
+                </RelativeLayout>
+            </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
 
@@ -207,4 +218,20 @@
         android:layout_toEndOf="@id/tv_online_num"
         android:text="  pv:0"
         android:textColor="@color/red_main" />
+
+    <RelativeLayout
+        android:id="@+id/contentDocFull"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/doc_action_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="7dp"
+        android:src="@drawable/icon_round_back"
+        android:visibility="gone"
+        tools:visibility="visible" />
 </RelativeLayout>

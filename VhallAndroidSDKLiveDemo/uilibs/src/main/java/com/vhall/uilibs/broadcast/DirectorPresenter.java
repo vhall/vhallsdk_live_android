@@ -14,6 +14,7 @@ import com.vhall.business.data.WebinarInfo;
 import com.vhall.player.VHPlayerListener;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
+import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.emoji.InputUser;
 
@@ -259,16 +260,16 @@ public class DirectorPresenter implements ChatContract.ChatPresenter, BroadcastC
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 case ChatServer.eventCustomKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 case ChatServer.eventOnlineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 case ChatServer.eventOfflineKey:
-                    chatView.notifyDataChangedChat(MessageChatData.getChatData(chatInfo));
+                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
                     break;
                 default:
                     break;
