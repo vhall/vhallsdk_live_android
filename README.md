@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.5.1'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.5.1'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.6.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.6.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -40,6 +40,12 @@ allprojects {
 ```
 
 二、版本更新信息：
+
+ 版本：v6.6.0 更新时间 2022.8.9 <br>
+
+1. 【新增】公告列表 公告 <br>
+2. 【新增】观看直播增加k_id验证 新增方法 <br>
+3. 【新增】聊天记录增加分页消息锚点 ，防止重复数据 新增方法 <br>
 
  版本：v6.5.1  更新时间 2022.7.8 <br>
  
