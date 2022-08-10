@@ -35,6 +35,7 @@ import vhall.com.vss2.VssSdk;
 
 /**
  * @author hkl
+ * 问卷列表
  */
 
 public class SurveyListDialog extends BaseBottomDialog implements View.OnClickListener {

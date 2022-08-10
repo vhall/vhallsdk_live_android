@@ -27,6 +27,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.vhall.business.ChatServer;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
 
@@ -57,6 +58,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
     private Handler handler = new Handler(Looper.getMainLooper());
 
     private boolean flag = false;
+    private int page = 1;
 
 
     @Override
@@ -135,6 +137,24 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if (mPresenter != null) {
+                    mPresenter.acquireChatRecord(page, new ChatServer.ChatRecordCallback() {
+                        @Override
+                        public void onDataLoaded(List<ChatServer.ChatInfo> list) {
+                            if (ListUtils.isEmpty(list)) {
+                                showToast("没有更多数据");
+                                return;
+                            }
+                            chatAdapter.addData(0, list);
+                            page++;
+                        }
+
+                        @Override
+                        public void onFailed(int errorcode, String messaage) {
+                            showToast(messaage);
+                        }
+                    });
+                }
                 if (refreshLayout != null) {
                     refreshLayout.setRefreshing(false);
                 }
@@ -276,7 +296,7 @@ public class ChatFragment extends Fragment implements ChatContract.ChatView {
                 switch (chatInfo.event) {
                     case ChatServer.eventMsgKey:
                         if (chatInfo.msgData != null)
-                            if (chatInfo.msgData.type.equals("image")) {
+                            if (!ListUtils.isEmpty(chatInfo.msgData.imageUrls) || !TextUtils.isEmpty(chatInfo.msgData.resourceUrl)) {
                                 StringBuilder builder = new StringBuilder();
                                 builder.append("收到图片");
                                 List<String> image_urls = chatInfo.msgData.imageUrls;

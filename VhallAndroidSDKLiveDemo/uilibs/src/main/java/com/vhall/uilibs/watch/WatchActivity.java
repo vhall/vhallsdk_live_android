@@ -271,7 +271,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         } else {
             watchType = WebinarInfo.VIDEO;
         }
-        VhallSDK.initWatch(params.watchId, "", "", params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.initWatch(params.watchId, "", "", params.key, watchType,params.k_id, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                 if (getActivity().isFinishing()) {
@@ -629,6 +629,9 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     contentDocFull.addView(contentDoc, params);
                 }
             } else {
+                if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE && null != mPresenter) {
+                    mPresenter.triggerDocOrientation();
+                }
                 doc_action_back.setVisibility(View.GONE);
                 if (null != contentDocFull) {
                     contentDocFull.removeView(contentDoc);
@@ -677,8 +680,16 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
 //                WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 //        lotteryDialog.show();
 
-        lotteryBtn.setChecked(true);
+        if (isDocFullScreen()) {
+            baseShowToast(getString(R.string.lottery_incoming_msg));
+        } else {
+            lotteryBtn.setChecked(true);
+        }
         lotteryFragment.setLotteryData(lotteryData);
+    }
+
+    private boolean isDocFullScreen() {
+        return null != contentDocFull && View.VISIBLE == contentDocFull.getVisibility();
     }
 
     @Override

@@ -33,17 +33,17 @@
 
     <FrameLayout
         android:id="@+id/fl_survey"
-        android:layout_width="@dimen/dimen_32dp"
-        android:layout_height="@dimen/dimen_32dp"
+        android:layout_width="@dimen/dimen_30dp"
+        android:layout_height="@dimen/dimen_30dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="@dimen/dimen_15dp"
+        android:layout_marginRight="@dimen/dimen_10dp"
         android:layout_marginBottom="@dimen/dimen_60dp"
         android:visibility="visible">
 
         <ImageView
-            android:layout_width="@dimen/dimen_32dp"
-            android:layout_height="@dimen/dimen_32dp"
+            android:layout_width="@dimen/dimen_30dp"
+            android:layout_height="@dimen/dimen_30dp"
             android:src="@drawable/icon_survey"
             android:visibility="visible" />
 
@@ -57,24 +57,51 @@
             android:visibility="gone" />
     </FrameLayout>
 
+
     <FrameLayout
         android:id="@+id/fl_lottery"
-        android:layout_width="@dimen/dimen_32dp"
-        android:layout_height="@dimen/dimen_32dp"
+        android:layout_width="@dimen/dimen_30dp"
+        android:layout_height="@dimen/dimen_30dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="@dimen/dimen_55dp"
+        android:layout_marginRight="@dimen/dimen_50dp"
         android:layout_marginBottom="@dimen/dimen_60dp"
         android:visibility="visible">
 
         <ImageView
-            android:layout_width="@dimen/dimen_32dp"
-            android:layout_height="@dimen/dimen_32dp"
+            android:layout_width="@dimen/dimen_30dp"
+            android:layout_height="@dimen/dimen_30dp"
             android:src="@drawable/icon_lottery"
             android:visibility="visible" />
 
         <View
             android:id="@+id/lottery_red_point"
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/dimen_1dp"
+            android:background="@drawable/shape_red_point"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/fl_notice"
+        android:layout_width="@dimen/dimen_30dp"
+        android:layout_height="@dimen/dimen_30dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="@dimen/dimen_90dp"
+        android:layout_marginBottom="@dimen/dimen_60dp"
+        android:visibility="visible">
+
+        <ImageView
+            android:layout_width="@dimen/dimen_30dp"
+            android:layout_height="@dimen/dimen_30dp"
+            android:src="@drawable/icon_notice"
+            android:visibility="visible" />
+
+        <View
+            android:id="@+id/notice_red_point"
             android:layout_width="8dp"
             android:layout_height="8dp"
             android:layout_gravity="end"

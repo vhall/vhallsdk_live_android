@@ -50,6 +50,10 @@ public class ChatContract {
 
         void showSurvey(String surveyid);
 
+        default void acquireChatRecord(int page,ChatServer.ChatRecordCallback callback){
+
+        }
+
     }
 
 }

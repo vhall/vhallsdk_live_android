@@ -127,7 +127,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
         } else {
             watchType = WebinarInfo.VIDEO;
         }
-        VhallSDK.initWatch(params.watchId, "", "", params.key, watchType, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.initWatch(params.watchId, "", "", params.key, watchType,params.k_id, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                 if (getActivity().isFinishing()) {

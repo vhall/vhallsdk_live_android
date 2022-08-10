@@ -45,6 +45,7 @@ import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.uilibs.widget.LotteryListDialog;
+import com.vhall.uilibs.widget.NoticeListDialog;
 import com.vhall.uilibs.widget.SurveyListDialog;
 import com.vhall.vhallrtc.client.Room;
 import com.vhall.vhallrtc.client.Stream;
@@ -61,6 +62,7 @@ import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,7 +138,12 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 canSpeak = false;
                 canSpeakQa = !TextUtils.equals("1", webinarInfo.qa_status);
             }
+
+            if (webinarInfo.notice != null && !TextUtils.isEmpty(webinarInfo.notice.content)) {
+                hasNotice = true;
+            }
         }
+
     }
 
 
@@ -397,7 +404,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             // operationDocument();
             liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
             chatView.clearChatData();
-            getChatHistory();
+//            getChatHistory();
             getAnswerList();
             getSurveyList();
             updateLotteryList();
@@ -420,6 +427,20 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 ToastUtil.showToast(errorMsg);
             }
         });
+    }
+
+    private NoticeListDialog noticeListDialog;
+
+    private boolean hasNotice = false;
+
+    @Override
+    public void showNoticeDialog() {
+        if (hasNotice) {
+            noticeListDialog = new NoticeListDialog(chatView.getContext(), webinarInfo.vss_room_id);
+            noticeListDialog.show();
+        } else {
+            ToastUtil.showToast("当前主持人没有发布公告");
+        }
     }
 
     private LotteryListDialog lotteryListDialog;
@@ -977,7 +998,13 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     updateLotteryList();
                     break;
                 case MessageServer.EVENT_NOTICE:
+                    hasNotice = true;
                     watchView.showNotice(messageInfo.content);
+                    if (noticeListDialog != null && noticeListDialog.isShowing()) {
+                        noticeListDialog.onRefreshData();
+                    } else {
+                        liveView.showNoticeRed();
+                    }
                     break;
                 case MessageServer.EVENT_SIGNIN: //签到消息
                     if (!TextUtils.isEmpty(messageInfo.id) && !TextUtils.isEmpty(messageInfo.sign_show_time)) {
@@ -1376,6 +1403,48 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         }.start();
     }
 
+    //当前消息的标示，如果进来就拉历史新消息，取最后一个
+    //如果进来不拉取历史消息，则取时时消息最早的一个，如果不穿默认根据页数拉取,page 从1开始
+    private String msgId = "";
+
+    @Override
+    public void acquireChatRecord(int page, final ChatServer.ChatRecordCallback callback) {
+        if (webinarInfo == null) {
+            ToastUtil.showToast("error data");
+            return;
+        }
+        /**
+         * 获取当前房间聊天列表
+         *
+         * @param page        获取条目节点，默认为1
+         * @param limit       获取条目数量，最大100
+         * @param msg_id      获取条目数量，聊天记录 锚点消息id,此参数存在时anchor_path 参数必须存在
+         * @param anchor_path 锚点方向，up 向上查找，down 向下查找,此参数存在时 msg_id 参数必须存在
+         * @param is_role     0：不筛选主办方 1：筛选主办方 默认是0
+         */
+        Log.e("vhall_", "msgId   " + msgId);
+        getWatchLive().acquireChatRecord(page, 10, msgId, "down", "0", new ChatServer.ChatRecordCallback() {
+            @Override
+            public void onDataLoaded(List<ChatServer.ChatInfo> list) {
+                if (!ListUtils.isEmpty(list)) {
+                    msgId = list.get(list.size() - 1).msg_id;
+                }
+                Log.e("vhall_", "msgId   " + msgId);
+                Collections.reverse(list);
+                if (callback != null) {
+                    callback.onDataLoaded(list);
+                }
+            }
+
+            @Override
+            public void onFailed(int errorcode, String messaage) {
+                if (callback != null) {
+                    callback.onFailed(errorcode, messaage);
+                }
+            }
+        });
+    }
+
     private class ChatCallback implements ChatServer.Callback {
 
         @Override
@@ -1394,15 +1463,18 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case ChatServer.eventMsgKey:
                     if (chatInfo.msgData != null && !TextUtils.isEmpty(chatInfo.msgData.target_id)) {
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
-
                         if (TextUtils.equals(chatInfo.msgData.target_id, webinarInfo.user_id)) {
                             //自己的私聊展示
                             chatInfo.msgData.text = "私聊消息---" + chatInfo.msgData.text;
                         } else {
                             return;
                         }
+                    } else {
+                        //为空代表没有拉去历史聊天记录 锚点id设置为 进入房间的第一天数据 私聊消息除外
+                        if (TextUtils.isEmpty(msgId)) {
+                            msgId = chatInfo.msg_id;
+                        }
                     }
-
                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     liveView.addDanmu(chatInfo.msgData.text);
                     break;

@@ -52,7 +52,7 @@ public class InteractivePresenter implements InteractiveContract.InteractiveFraP
     @Override
     public void initInteractive() {
         interactive = new InterActive(interActView.getContext(), new RoomCallback(), new MessageEventCallback());
-        interactive.init(mParam.watchId, "", "", mParam.key, new RequestCallback() {
+        interactive.init(mParam.watchId, "", "", mParam.key,mParam.k_id, new RequestCallback() {
             @Override
             public void onSuccess() {
                 /**

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
+
 import com.vhall.document.DocumentView;
 import com.vhall.document.IDocument;
 import com.vhall.ops.VHOPS;
@@ -19,8 +20,10 @@ import com.vhall.uilibs.interactive.dialog.OutDialogBuilder;
 import com.vhall.uilibs.util.DensityUtils;
 import com.vhall.uilibs.util.DocTouchListener;
 import com.vhall.uilibs.util.emoji.KeyBoardManager;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import static com.vhall.document.DocumentView.DOC_DOCUMENT;
 import static com.vhall.ops.VHOPS.KEY_OPERATE;
 import static com.vhall.ops.VHOPS.TYPE_ACTIVE;
@@ -40,10 +43,13 @@ public class DocumentPublicView extends RelativeLayout {
     private IDocViewLister docViewLister;
     private int size = 20;
     private String color = "#3478F6";
+    //翻页
     private boolean canEnable = false;
     private DocumentEditPopup editPopup, colorPopup, shapePopup, linePopup;
     private String mainId;
     private String ownerId;
+    //不设置 和之前一样
+    private boolean isHost = false;
     private String orientation;
 
     private RelativeLayout rlDocView;
@@ -56,11 +62,19 @@ public class DocumentPublicView extends RelativeLayout {
     public void setMainId(String mainId) {
         this.mainId = mainId;
         if (!TextUtils.equals(ownerId, mainId)) {
-            //观看端
-            if (vhops != null) {
-                vhops.setEditable(false);
-            }
             hintPop();
+//            //主持人不是主讲人也可以翻页
+            if (isHost) {
+                if (vhops != null) {
+                    vhops.setEditable(true);
+                    canEnable = false;
+                }
+            } else {
+                //观看端
+                if (vhops != null) {
+                    vhops.setEditable(false);
+                }
+            }
         } else {
             if (vhops != null) {
                 vhops.setEditable(true);
@@ -69,8 +83,14 @@ public class DocumentPublicView extends RelativeLayout {
         }
     }
 
+    //设置自己的id
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
+    }
+
+    //是否是主持人
+    public void isHost(boolean isHost) {
+        this.isHost = isHost;
     }
 
     public void setOrientation(String orientation) {
@@ -154,13 +174,13 @@ public class DocumentPublicView extends RelativeLayout {
                                         .tv1("取消")
                                         .tv2("确定")
                                         .onConfirm(new OutDialog.ClickLister() {
-                                                          @Override
-                                                          public void click() {
-                                                              if (documentView != null) {
-                                                                  documentView.clear();
-                                                              }
-                                                          }
-                                                      }
+                                                       @Override
+                                                       public void click() {
+                                                           if (documentView != null) {
+                                                               documentView.clear();
+                                                           }
+                                                       }
+                                                   }
                                         )
                                         .build(context);
                             }
@@ -235,7 +255,9 @@ public class DocumentPublicView extends RelativeLayout {
             }
         }
         editPopup.showAtLocation(view, Gravity.BOTTOM | Gravity.END, x, height);
-        if (documentView != null) {
+
+        //主讲人才可以画画操作
+        if (documentView != null && TextUtils.equals(ownerId, mainId)) {
             documentView.setDrawType(mType);
             documentView.setDrawOption(color, size);
             documentView.setAction(mAction);
@@ -249,7 +271,7 @@ public class DocumentPublicView extends RelativeLayout {
         if (shapePopup != null) {
             shapePopup.dismiss();
         }
-        if (documentView != null) {
+        if (documentView != null && TextUtils.equals(ownerId, mainId)) {
             mAction = IDocument.DrawAction.ADD;
             documentView.setDrawType(mType);
             documentView.setDrawOption(color, size);
@@ -279,7 +301,7 @@ public class DocumentPublicView extends RelativeLayout {
                         default:
                             break;
                     }
-                    if (documentView != null) {
+                    if (documentView != null && TextUtils.equals(ownerId, mainId)) {
                         mAction = IDocument.DrawAction.ADD;
                         documentView.setDrawType(mType);
                         documentView.setDrawOption(color, size);
@@ -312,7 +334,7 @@ public class DocumentPublicView extends RelativeLayout {
         if (shapePopup != null) {
             shapePopup.dismiss();
         }
-        if (documentView != null) {
+        if (documentView != null && TextUtils.equals(ownerId, mainId)) {
             mAction = IDocument.DrawAction.ADD;
             documentView.setDrawType(mType);
             documentView.setDrawOption(color, size);
@@ -342,7 +364,7 @@ public class DocumentPublicView extends RelativeLayout {
                         default:
                             break;
                     }
-                    if (documentView != null) {
+                    if (documentView != null && TextUtils.equals(ownerId, mainId)) {
                         mAction = IDocument.DrawAction.ADD;
                         documentView.setDrawType(mType);
                         documentView.setDrawOption(color, size);
@@ -376,7 +398,7 @@ public class DocumentPublicView extends RelativeLayout {
         if (colorPopup != null) {
             colorPopup.dismiss();
         }
-        if (documentView != null) {
+        if (documentView != null && TextUtils.equals(ownerId, mainId)) {
             mAction = IDocument.DrawAction.ADD;
             documentView.setDrawType(mType);
             documentView.setDrawOption(color, size);
@@ -406,7 +428,7 @@ public class DocumentPublicView extends RelativeLayout {
                         default:
                             break;
                     }
-                    if (documentView != null) {
+                    if (documentView != null && TextUtils.equals(ownerId, mainId)) {
                         documentView.setDrawType(mType);
                         documentView.setDrawOption(color, size);
                         documentView.setAction(mAction);
@@ -532,7 +554,7 @@ public class DocumentPublicView extends RelativeLayout {
                 if (type.equals(TYPE_ACTIVE)) {
                     documentView = vhops.getActiveView();
                     if (documentView != null) {
-                        if (TextUtils.equals(ownerId, mainId) && vhops.isEditAble()) {
+                        if ((TextUtils.equals(ownerId, mainId)||isHost) && vhops.isEditAble()) {
                             documentView.addListener(eventListener);
                             onTouchListener = new DocTouchListener();
                             documentView.setOnTouchListener(onTouchListener);
@@ -548,7 +570,7 @@ public class DocumentPublicView extends RelativeLayout {
                             post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if(getParent() != null){
+                                    if (getParent() != null) {
                                         View view = (View) getParent();
                                         view.setVisibility(GONE);
                                         view.setVisibility(VISIBLE);

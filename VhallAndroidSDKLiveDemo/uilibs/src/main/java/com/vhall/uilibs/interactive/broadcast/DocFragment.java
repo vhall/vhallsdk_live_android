@@ -13,6 +13,7 @@ import com.vhall.uilibs.R;
 import com.vhall.uilibs.interactive.base.BaseFragment;
 import com.vhall.uilibs.interactive.doc.DocumentPublicView;
 import com.vhall.uilibs.interactive.doc.IDocViewLister;
+import com.vhall.uilibs.util.UserManger;
 import com.vhall.vhss.data.WebinarInfoData;
 
 
@@ -70,6 +71,7 @@ public class DocFragment extends BaseFragment {
         }
         if (!TextUtils.isEmpty(webinarInfoData.join_info.third_party_user_id)) {
             documentPublicView.setOwnerId(webinarInfoData.join_info.third_party_user_id);
+            documentPublicView.isHost(UserManger.isHost(webinarInfoData.join_info.role_name));
             if ( webinarInfoData.roomToolsStatusData!=null&&!TextUtils.isEmpty(webinarInfoData.roomToolsStatusData.doc_permission)) {
                 setMainId(webinarInfoData.roomToolsStatusData.doc_permission, webinarInfoData.join_info.third_party_user_id);
             } else {

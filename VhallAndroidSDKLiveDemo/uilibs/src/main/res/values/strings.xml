@@ -39,6 +39,7 @@
     <string name="lottery_commit_success">信息提交成功</string>
     <string name="lottery_commit_failed">信息提交失败</string>
     <string name="lottery">礼品</string>
+    <string name="lottery_incoming_msg">收到一条抽奖消息</string>
     <string name="accept_the_prize">立即领奖</string>
     <string name="lottery_lose">很遗憾，\n您与大奖擦肩而过，感谢您的参与！</string>
     <string name="lottery_win">中奖啦，\n恭喜您获得" %s "</string>

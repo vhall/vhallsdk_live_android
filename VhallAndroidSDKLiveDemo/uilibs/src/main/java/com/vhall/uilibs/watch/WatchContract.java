@@ -171,6 +171,9 @@ public class WatchContract {
         default void updateLotteryList(ArrayList<LotteryCheckData> lotteryCheckData) {
 
         }
+
+        //显示公告 红点
+        default void showNoticeRed(){};
     }
 
     interface LiveNoDelayView extends BaseView<LivePresenter> {
@@ -343,6 +346,10 @@ public class WatchContract {
         }
 
         default void showLotteryListDialog(List<LotteryCheckData> dataList, boolean show) {
+
+        }
+
+        default void showNoticeDialog() {
 
         }
 

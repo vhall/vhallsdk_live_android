@@ -29,11 +29,9 @@ import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.MarqueeView;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
-import com.vhall.vhss.CallBack;
 import com.vhall.vhss.data.LotteryCheckData;
 import com.vhall.vhss.data.ScrollInfoData;
 import com.vhall.vhss.data.SurveyInfoData;
-import com.vhall.vhss.network.InteractToolsNetworkRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,6 +77,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     private View surveyRedPoint;
     private FrameLayout fl_lottery;
     private View lotteryRedPoint;
+    private FrameLayout fl_notice;
+    private View noticeRedPoint;
 
     public static WatchLiveFragment newInstance() {
         return new WatchLiveFragment();
@@ -119,11 +119,14 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         clickOrientation = (ImageView) root.findViewById(R.id.click_rtmp_orientation);
         fl_survey = root.findViewById(R.id.fl_survey);
         fl_lottery = root.findViewById(R.id.fl_lottery);
+        fl_notice = root.findViewById(R.id.fl_notice);
         surveyRedPoint = root.findViewById(R.id.survey_red_point);
         lotteryRedPoint = root.findViewById(R.id.lottery_red_point);
+        noticeRedPoint = root.findViewById(R.id.notice_red_point);
         clickOrientation.setOnClickListener(this);
         fl_survey.setOnClickListener(this);
         fl_lottery.setOnClickListener(this);
+        fl_notice.setOnClickListener(this);
         radioChoose = (RadioGroup) root.findViewById(R.id.radio_choose);
         radioChoose.setOnCheckedChangeListener(checkListener);
         radioButtonShowDEFAULT = (RadioButton) root.findViewById(R.id.radio_btn_default);
@@ -275,6 +278,9 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             }
         } else if (i == R.id.fl_lottery) {
             mPresenter.showLotteryListDialog(lotteryCheckData, true);
+        }else if (i == R.id.fl_notice) {
+            noticeRedPoint.setVisibility(View.GONE);
+            mPresenter.showNoticeDialog();
         }
     }
 
@@ -411,6 +417,11 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
     private ArrayList<LotteryCheckData> lotteryCheckData = new ArrayList<>();
 
     @Override
+    public void showNoticeRed() {
+        noticeRedPoint.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void updateLotteryList(ArrayList<LotteryCheckData> result) {
         judgeLotteryRed(result);
         lotteryCheckData.clear();
@@ -488,6 +499,34 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
             }
         }
     }
+
+
+    /**
+     * 判读显示不显示红点
+     * 公告
+     * 每次进入直播间公告不为空 则显示红点，点击消失 弹窗关闭之后 收到公告则恢复红点显示
+     * <p>
+     * public int take_award;//是否已领奖 0-否 1-是
+     * public int need_take_award;//是否需要领奖 0-否 1-是
+     */
+    private void judgeNoticeRed(ArrayList<LotteryCheckData> result) {
+        lotteryStatus = 0;
+        if (ListUtils.isEmpty(result)) {
+            lotteryRedPoint.setVisibility(View.GONE);
+        } else {
+            for (int i = 0; i < result.size(); i++) {
+                if (1 == result.get(i).need_take_award && 0 == result.get(i).take_award) {
+                    lotteryStatus++;
+                }
+            }
+            if (lotteryStatus > 0) {
+                lotteryRedPoint.setVisibility(View.VISIBLE);
+            } else {
+                lotteryRedPoint.setVisibility(View.GONE);
+            }
+        }
+    }
+
 
     private ScrollInfoData scrollInfoData;
 
