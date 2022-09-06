@@ -24,6 +24,7 @@ import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.utils.VHInternalUtils;
 import com.vhall.business_interactive.InterActive;
 import com.vhall.business_interactive.SimpleRoomCallbackV2;
+import com.vhall.ilss.VHInteractive;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.interactive.base.BaseFragment;
 import com.vhall.uilibs.interactive.bean.InteractiveUser;
@@ -45,7 +46,6 @@ import com.vhall.vhss.CallBack;
 import com.vhall.vhss.data.RoleNameData;
 import com.vhall.vhss.data.WebinarInfoData;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.vhwebrtc.SurfaceViewRenderer;
 
@@ -124,11 +124,25 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
      * 直播结束
      */
     private boolean finish = false;
+    private boolean isDress = false;
 
+    /**
+     * 布局layout：
+     * 1，主次悬浮 - CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE
+     * 2，主次平铺 - CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
+     * 3，均匀排列 - CANVAS_ADAPTIVE_LAYOUT_GRID_MODE
+     */
+
+    private int layout = VHInteractive.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE;
+
+
+    public void setDress(boolean dress) {
+        isDress = dress;
+    }
 
     @Override
     public Stream getLocalStream() {
-        if (localStream==null){
+        if (localStream == null) {
             initLocalStream();
         }
         return localStream;
@@ -292,6 +306,22 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             } else {
                 mainId = String.valueOf(roomInfo.getWebinar().userinfo.user_id);
             }
+
+            if (!TextUtils.isEmpty(mWebinarInfo.inter_active_type)) {
+                /**
+                 * 布局layout：
+                 * 1，主次悬浮 - CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE
+                 * 2，主次平铺 - CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
+                 * 3，均匀排列 - CANVAS_ADAPTIVE_LAYOUT_GRID_MODE
+                 */
+                if (TextUtils.equals("CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE", mWebinarInfo.inter_active_type)) {
+                    layout = VHInteractive.CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE;
+                } else if (TextUtils.equals("CANVAS_ADAPTIVE_LAYOUT_TILED_MODE", mWebinarInfo.inter_active_type)) {
+                    layout = VHInteractive.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE;
+                } else if (TextUtils.equals("CANVAS_ADAPTIVE_LAYOUT_GRID_MODE", mWebinarInfo.inter_active_type)) {
+                    layout = VHInteractive.CANVAS_ADAPTIVE_LAYOUT_GRID_MODE;
+                }
+            }
             if (mInteractive == null) {
                 mInteractive = new InterActive(context, mRoomCallback, mChatCallback, mMessageCallback);
             }
@@ -442,16 +472,8 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         @Override
         public void onStreamMixed(JSONObject jsonObject) {
             if (!isPush) {
-                JSONObject config = new JSONObject();
-                try {
-                    /**
-                     * adaptiveLayoutMode
-                     * 支持 16人画面
-                     */
-                    config.put("profile", Room.getProfile(Room.BROADCAST_VIDEO_PROFILE_1080P_1));
-                    config.put("adaptiveLayoutMode", 2);
-                    config.put("precast_pic_exist", false);
-                    broadCast(config, new CallBack() {
+                if (UserManger.isHost(roomInfo.join_info.role_name)) {
+                    mInteractive.broadCastRoom(1, layout, isDress, new CallBack() {
                         @Override
                         public void onSuccess(Object result) {
                             isPush = true;
@@ -466,8 +488,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                             getActivity().finish();
                         }
                     });
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
             }
         }
@@ -550,7 +570,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             }
             //1主播
             if (UserManger.isHost(roomInfo.getJoin_info().getRole_name())) {
-                mInteractive.broadCastRoom(2, 0, null);
+                mInteractive.broadCastRoom(2, 0, isDress, null);
             } else {
                 mInteractive.setUserNoSpeak(null);
             }
@@ -757,7 +777,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                         updateMainStreamLister.updateMainStream(mainStream);
                     }
                     if (!hasShare && isPush) {
-                        setLayout(mainStream, CANVAS_LAYOUT_PATTERN_TILED_6_1T5D);
+                        setMixLayoutMainScreen(mainStream);
                     }
                 }
             }
@@ -776,7 +796,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         setChoose(selectPoint);
     }
 
-    private void setLayout(Stream mainStream, int layout) {
+    private void setMixLayoutMainScreen(Stream mainStream) {
         if (mInteractive != null && roomInfo != null) {
             if (!UserManger.isHost(roomInfo.getJoin_info().getRole_name())) {
                 return;
@@ -785,8 +805,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 //旁路主讲人设置未大画面
                 mainStream.setMixLayoutMainScreen("", null);
             }
-            mInteractive.broadCastRoom(1, layout, null);
-
         } else {
             Log.e("BroadcastRtcFragment", "基本信息为空");
         }
@@ -834,8 +852,8 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             views.add(shareView);
             setChoose(selectPoint);
         }
-        if (adapter!=null)
-        adapter.notifyDataSetChanged();
+        if (adapter != null)
+            adapter.notifyDataSetChanged();
     }
 
     /**
@@ -849,7 +867,10 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         stream.addRenderView(shareView);
         views.add(0, shareView);
         adapter.notifyDataSetChanged();
-        setLayout(stream, CANVAS_LAYOUT_PATTERN_GRID_1);
+        setMixLayoutMainScreen(stream);
+
+        //设置共享桌面、插播 大画面
+        mInteractive.setMixLayoutMode(CANVAS_LAYOUT_PATTERN_GRID_1, null);
         setChoose(selectPoint);
     }
 
@@ -870,10 +891,9 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             adapter.notifyDataSetChanged();
         }
         if (mainStream != null) {
-            setLayout(mainStream, CANVAS_LAYOUT_PATTERN_TILED_6_1T5D);
-        } else {
-            setLayout(null, CANVAS_LAYOUT_PATTERN_TILED_6_1T5D);
+            setMixLayoutMainScreen(mainStream);
         }
+        mInteractive.setMixLayoutMode(layout, null);
     }
 
     public Stream getMainStream() {
@@ -990,32 +1010,6 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         }
     }
 
-    /**
-     * 轻享逻辑
-     * 上麦后默认推旁路直播
-     * SaaS 无需处理
-     *
-     * @param jsonObject
-     */
-    public void broadCast(JSONObject jsonObject, final CallBack callback) {
-        if (UserManger.isHost(roomInfo.join_info.role_name)) {
-            mInteractive.broadCastRoom(1, jsonObject, callback);
-        }
-    }
-
-    /**
-     * 轻享逻辑
-     * 上麦后默认推旁路直播
-     * SaaS 无需处理
-     *
-     * @param type
-     */
-    public void broadCast(int type, final CallBack callback) {
-        if (UserManger.isHost(roomInfo.join_info.role_name)) {
-
-            mInteractive.broadCastRoom(1, type, callback);
-        }
-    }
 
     @Override
     public void onResume() {

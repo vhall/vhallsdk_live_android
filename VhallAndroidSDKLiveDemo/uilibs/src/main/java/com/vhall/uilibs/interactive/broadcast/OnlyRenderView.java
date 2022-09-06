@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.vhall.business.core.VhallKey;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.interactive.bean.StreamData;
@@ -26,18 +27,24 @@ import org.vhwebrtc.SurfaceViewRenderer;
  */
 public class OnlyRenderView extends FrameLayout {
     private Context mContext;
+    private Stream stream;
 
     private VHRenderView renderView1;
 
-    public OnlyRenderView(Context context, StreamData stream, String mainId) {
+    public OnlyRenderView(Context context, StreamData streamData, String mainId) {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.item_rtc_only_view, this);
-        initView(context, stream, mainId);
+        stream = streamData.getStream();
+        initView(context, streamData, mainId);
+    }
+
+    public Stream getStream() {
+        return stream;
     }
 
     private void initView(Context context, StreamData streamData, String mainId) {
         mContext = context;
-        Stream stream = streamData.getStream();
+        stream = streamData.getStream();
         String userId = stream.userId;
         String attributes = stream.getAttributes();
         String avatar = "";
@@ -63,7 +70,7 @@ public class OnlyRenderView extends FrameLayout {
         }
         renderView1 = findViewById(R.id.image1);
         renderView1.init(null, null);
-        renderView1.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFill);
+        renderView1.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFit);
         stream.addRenderView(renderView1);
         TextView tvName = findViewById(R.id.tv_name1);
         if (TextUtils.equals(mainId, userId)) {

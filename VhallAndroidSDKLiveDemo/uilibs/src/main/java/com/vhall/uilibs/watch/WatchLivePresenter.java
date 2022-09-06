@@ -838,17 +838,6 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     isWatching = true;
                     liveView.showLoading(false);
                     liveView.setPlayPicture(isWatching);
-                    if (!setBg) {
-                        //只设置一次
-                        @SuppressLint("ResourceType") InputStream is = watchView.getActivity().getResources().openRawResource(R.drawable.splash_bg);
-                        Bitmap mBitmap = BitmapFactory.decodeStream(is);
-                        if (!watchLive.setVideoBackgroundImage(mBitmap)) {
-                            ToastUtil.showToast("设置失败");
-                        } else {
-                            ToastUtil.showToast("设置成功");
-                        }
-                        setBg = true;
-                    }
                     break;
                 case BUFFER:
                     if (isWatching) {
@@ -897,17 +886,17 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     watchView.getActivity().finish();
                     break;
                 case EVENT_INIT_PLAYER_SUCCESS://
-                    if (!setBg) {
-                        //只设置一次 设置背景 没有需求的可以不加
-                        @SuppressLint("ResourceType") InputStream is = watchView.getActivity().getResources().openRawResource(R.drawable.splash_bg);
-                        Bitmap mBitmap = BitmapFactory.decodeStream(is);
-                        if (!watchLive.setVideoBackgroundImage(mBitmap)) {
-                            ToastUtil.showToast("设置失败");
-                        } else {
-                            ToastUtil.showToast("设置成功");
-                        }
-                        setBg = true;
-                    }
+//                    if (!setBg) {
+//                        //只设置一次 设置背景 没有需求的可以不加
+//                        @SuppressLint("ResourceType") InputStream is = watchView.getActivity().getResources().openRawResource(R.drawable.splash_bg);
+//                        Bitmap mBitmap = BitmapFactory.decodeStream(is);
+//                        if (!watchLive.setVideoBackgroundImage(mBitmap)) {
+//                            ToastUtil.showToast("设置失败");
+//                        } else {
+//                            ToastUtil.showToast("设置成功");
+//                        }
+//                        setBg = true;
+//                    }
                     startWatch();
                     break;
                 default:
@@ -1422,14 +1411,12 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
          * @param anchor_path 锚点方向，up 向上查找，down 向下查找,此参数存在时 msg_id 参数必须存在
          * @param is_role     0：不筛选主办方 1：筛选主办方 默认是0
          */
-        Log.e("vhall_", "msgId   " + msgId);
         getWatchLive().acquireChatRecord(page, 10, msgId, "down", "0", new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
                 if (!ListUtils.isEmpty(list)) {
                     msgId = list.get(list.size() - 1).msg_id;
                 }
-                Log.e("vhall_", "msgId   " + msgId);
                 Collections.reverse(list);
                 if (callback != null) {
                     callback.onDataLoaded(list);

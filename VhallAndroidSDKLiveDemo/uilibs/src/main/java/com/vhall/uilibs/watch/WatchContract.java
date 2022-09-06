@@ -173,7 +173,9 @@ public class WatchContract {
         }
 
         //显示公告 红点
-        default void showNoticeRed(){};
+        default void showNoticeRed() {
+        }
+
     }
 
     interface LiveNoDelayView extends BaseView<LivePresenter> {
@@ -188,6 +190,14 @@ public class WatchContract {
         void updateAudioFrame(int status);
 
         void enterInteractive(boolean isEnter);
+
+        //显示计时器
+        default void showTimeView(MessageServer.TimerData timerData) {
+        }
+
+        //显示计时器
+        default void showTimeView(boolean pause) {
+        }
 
     }
 
@@ -216,6 +226,10 @@ public class WatchContract {
         void setQualityChecked(String dpi);
 
         void setPlaySpeedText(String text);
+
+
+
+        void setScrollInfo(final ScrollInfoData scrollInfo);
     }
 
     interface PlaybackPresenter extends WatchPresenter {
@@ -315,19 +329,23 @@ public class WatchContract {
 
     interface WatchPresenter extends BasePresenter {
 
-        void signIn(String signId);
+        default void signIn(String signId) {
 
-        void submitSurvey(String result);
+        }
 
-        void submitSurvey(Survey survey, String result);
+        default void submitSurvey(String result) {
+
+        }
+
+        default void submitSurvey(Survey survey, String result) {
+
+        }
 
         void onRaiseHand(); // 举手
 
         default void beautyOpen() {
 
         }
-
-        ; // 举手
 
         void replyInvite(int type, RequestCallback callback);
 
@@ -337,9 +355,13 @@ public class WatchContract {
             return false;
         }
 
-        DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service);
+        default DMCControl dlnaPost(DeviceDisplay deviceDisplay, AndroidUpnpService service) {
+            return null;
+        }
 
-        void showDevices();
+        default void showDevices() {
+
+        }
 
         default void showSurveyListDialog(List<SurveyInfoData> dataList, boolean show) {
 
@@ -357,7 +379,9 @@ public class WatchContract {
 
         }
 
-        void dismissDevices();
+        default void dismissDevices() {
+
+        }
 
         /**
          * 文档全屏显示

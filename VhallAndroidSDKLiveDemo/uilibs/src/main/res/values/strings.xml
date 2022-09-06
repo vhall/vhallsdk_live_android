@@ -45,7 +45,9 @@
     <string name="lottery_win">中奖啦，\n恭喜您获得" %s "</string>
 
     <string name="start_broadcast">开始直播</string>
+    <string name="start_dress_rehearsal">开始彩排</string>
     <string name="live_send_msg_hint">说点什么吧…</string>
+    <string name="send_msg_hint">参与聊天</string>
     <string name="sure">确定</string>
     <string name="vhall_no_member">暂时没有成员列表</string>
     <string name="vhall_forbit_member">暂时没有禁言或踢出成员</string>
@@ -54,5 +56,7 @@
 
     <string name="live_director">以视频推流形式推流到云导播</string>
     <string name="live_host">以主持人身份发起直播</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

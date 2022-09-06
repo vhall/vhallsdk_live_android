@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="RtlCompat">
+
+    <com.vhall.vhallrtc.client.VHRenderView
+        android:id="@+id/image1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/tv_name1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_6dp"
+        android:layout_marginBottom="@dimen/dimen_6dp"
+        android:textColor="@color/color_CC"
+        android:textSize="@dimen/dimen_9dp"
+        app:layout_constraintBottom_toBottomOf="@id/image1"
+        app:layout_constraintStart_toStartOf="@id/image1" />
+
+</android.support.constraint.ConstraintLayout>

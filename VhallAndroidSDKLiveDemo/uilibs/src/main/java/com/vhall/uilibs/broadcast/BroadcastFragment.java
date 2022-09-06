@@ -30,8 +30,8 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
 
     private BroadcastContract.Presenter mPresenter;
     private VHVideoCaptureView cameraview;
-    private TextView mSpeed;
-    private Button mPublish, mChangeCamera, mChangeFlash, mChangeAudio, mChangeFilter, mBackBtn;
+    private TextView mSpeed, tv_dress_rehearsal, tv_start, tv_dress;
+    private Button mChangeCamera, mChangeFlash, mChangeAudio, mChangeFilter, mBackBtn;
     private TextView tvMode;
     private SeekBar seekBar;
 
@@ -74,8 +74,11 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         cameraview = (VHVideoCaptureView) getView().findViewById(R.id.cameraview);
         cameraview.setCameraDrawMode(VHLivePushFormat.DRAW_MODE_ASPECTFILL);
         mSpeed = (TextView) getView().findViewById(R.id.tv_upload_speed);
-        mPublish = (Button) getView().findViewById(R.id.btn_publish);
-        mPublish.setOnClickListener(this);
+        tv_dress = getView().findViewById(R.id.tv_dress);
+        tv_dress_rehearsal = getView().findViewById(R.id.tv_dress_rehearsal);
+        tv_dress_rehearsal.setOnClickListener(this);
+        tv_start = getView().findViewById(R.id.tv_start);
+        tv_start.setOnClickListener(this);
         mChangeCamera = (Button) getView().findViewById(R.id.btn_changeCamera);
         mChangeCamera.setOnClickListener(this);
         mChangeFlash = (Button) getView().findViewById(R.id.btn_changeFlash);
@@ -108,12 +111,23 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         });
     }
 
+    //是否点击了彩排按钮
+    private boolean isDressRehearsal = false;
+
     @Override
     public void onClick(View v) {
         int i = v.getId();
-        if (i == R.id.btn_publish) {
+        if (i == R.id.tv_start) {
             if (cameraAvailable) {
-                mPresenter.onstartBtnClick();
+                isDressRehearsal = false;
+                mPresenter.onstartBtnClick(false);
+            } else {
+                Toast.makeText(mActivity, "camera is not available...", Toast.LENGTH_SHORT).show();
+            }
+        } else if (i == R.id.tv_dress_rehearsal) {
+            if (cameraAvailable) {
+                isDressRehearsal = true;
+                mPresenter.onstartBtnClick(true);
             } else {
                 Toast.makeText(mActivity, "camera is not available...", Toast.LENGTH_SHORT).show();
             }
@@ -153,11 +167,7 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
 
     @Override
     public void setStartBtnImage(boolean start) {
-        if (start) {
-            mPublish.setBackgroundResource(R.drawable.icon_start_bro);
-        } else {
-            mPublish.setBackgroundResource(R.drawable.icon_pause_bro);
-        }
+
     }
 
     @Override
@@ -188,10 +198,35 @@ public class BroadcastFragment extends Fragment implements BroadcastContract.Vie
         mChangeCamera.setVisibility(enable ? View.VISIBLE : View.GONE);
     }
 
+
     @Override
     public void showMsg(String msg) {
         if (this.isAdded()) {
             Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void startBroadcastSuccess(boolean success) {
+        if (success) {
+            tv_dress_rehearsal.setVisibility(View.GONE);
+            tv_start.setVisibility(View.GONE);
+            if (isDressRehearsal) {
+                tv_dress.setVisibility(View.VISIBLE);
+            }
+        } else {
+            tv_dress_rehearsal.setVisibility(View.VISIBLE);
+            tv_start.setVisibility(View.VISIBLE);
+            tv_dress.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void liveRehearsal(boolean success) {
+        if (success) {
+            tv_dress.setVisibility(View.VISIBLE);
+        } else {
+            tv_dress.setVisibility(View.GONE);
         }
     }
 

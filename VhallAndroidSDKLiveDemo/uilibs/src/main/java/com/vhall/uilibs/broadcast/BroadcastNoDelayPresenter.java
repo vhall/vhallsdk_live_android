@@ -59,14 +59,14 @@ public class BroadcastNoDelayPresenter implements BroadcastContract.Presenter, C
 
     @Override
     public void start() {
-        initBroadcast();
+        initBroadcast(false);
     }
 
 
     private boolean isStart = false;
 
     @Override
-    public void onstartBtnClick() {
+    public void onstartBtnClick(boolean rehearsal) {
         if (!isStart) {
             //直接开始
             startBroadcast();
@@ -124,7 +124,7 @@ public class BroadcastNoDelayPresenter implements BroadcastContract.Presenter, C
     }
 
     @Override
-    public void initBroadcast() {
+    public void initBroadcast(boolean rehearsal) {
         if (interactive == null) {
             interactive = new InterActive(mBraodcastView.getActivity(), new RoomCallback(), new ChatCallback(), null);
             interactive.init(webinarInfo, new RequestCallback() {

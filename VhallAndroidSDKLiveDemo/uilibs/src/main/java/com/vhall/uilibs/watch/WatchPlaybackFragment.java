@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import com.vhall.player.vod.VodPlayerView;
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.MarqueeView;
+import com.vhall.vhss.data.ScrollInfoData;
 
 import java.util.List;
 
@@ -35,6 +37,8 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     ImageView iv_dlna_playback,btn_mute;
     RadioGroup rg_quality;
     Context mContext;
+
+    private MarqueeView marquee_view;
 
     public static WatchPlaybackFragment newInstance() {
         WatchPlaybackFragment articleFragment = new WatchPlaybackFragment();
@@ -68,6 +72,8 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
         rg_quality = getView().findViewById(R.id.rg_quality);
         btn_changescaletype.setOnClickListener(this);
         iv_dlna_playback.setOnClickListener(this);
+
+        marquee_view = getView().findViewById(R.id.marquee_view);
         btn_mute.setOnClickListener(this);
         pb = (ProgressBar) getView().findViewById(R.id.pb);
         iv_play = (ImageView) getView().findViewById(R.id.iv_play);
@@ -110,7 +116,21 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
             iv_play.setImageResource(R.drawable.vhall_icon_live_pause);
         }
     }
+    private ScrollInfoData scrollInfoData;
 
+    @Override
+    public void setScrollInfo(final ScrollInfoData scrollInfo) {
+        if (scrollInfoData != null || scrollInfo == null) {
+            //设置一次就好了
+            return;
+        }
+        scrollInfoData = scrollInfo;
+        if (marquee_view != null) {
+            marquee_view.setVisibility(View.VISIBLE);
+            //height        随机显示时 控件显示的的高度范围  默认 100 -500 可以自己根据需求改
+            marquee_view.setScrollingInfo(scrollInfoData, 450);
+        }
+    }
     @Override
     public void setProgressLabel(String currentTime, String max) {
         tv_current_time.setText(currentTime);
@@ -209,18 +229,27 @@ public class WatchPlaybackFragment extends Fragment implements WatchContract.Pla
     public void onDestroy() {
         super.onDestroy();
         mPresenter.onFragmentDestory();
+        if (marquee_view != null) {
+            marquee_view.onDestroy();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         mPresenter.onResume();
+        if (marquee_view != null && marquee_view.getVisibility() == View.VISIBLE) {
+            marquee_view.startScroll();
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mPresenter.onPause();
+        if (marquee_view != null && marquee_view.getVisibility() == View.VISIBLE) {
+            marquee_view.stopScroll();
+        }
     }
 
     @Override

@@ -31,84 +31,105 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-    <FrameLayout
-        android:id="@+id/fl_survey"
-        android:layout_width="@dimen/dimen_30dp"
-        android:layout_height="@dimen/dimen_30dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginRight="@dimen/dimen_10dp"
-        android:layout_marginBottom="@dimen/dimen_60dp"
-        android:visibility="visible">
+        android:layout_marginBottom="@dimen/dimen_60dp">
 
-        <ImageView
+        <FrameLayout
+            android:id="@+id/fl_timer"
             android:layout_width="@dimen/dimen_30dp"
             android:layout_height="@dimen/dimen_30dp"
-            android:src="@drawable/icon_survey"
-            android:visibility="visible" />
+            android:layout_marginRight="@dimen/dimen_10dp"
+            android:visibility="gone">
 
-        <View
-            android:id="@+id/survey_red_point"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_gravity="end"
-            android:layout_margin="@dimen/dimen_1dp"
-            android:background="@drawable/shape_red_point"
-            android:visibility="gone" />
-    </FrameLayout>
+            <ImageView
+                android:layout_width="@dimen/dimen_30dp"
+                android:layout_height="@dimen/dimen_30dp"
+                android:src="@drawable/icon_timer"
+                android:visibility="visible" />
 
+            <View
+                android:id="@+id/timer_red_point"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="end"
+                android:layout_margin="@dimen/dimen_1dp"
+                android:background="@drawable/shape_red_point"
+                android:visibility="gone" />
+        </FrameLayout>
 
-    <FrameLayout
-        android:id="@+id/fl_lottery"
-        android:layout_width="@dimen/dimen_30dp"
-        android:layout_height="@dimen/dimen_30dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="@dimen/dimen_50dp"
-        android:layout_marginBottom="@dimen/dimen_60dp"
-        android:visibility="visible">
-
-        <ImageView
+        <FrameLayout
+            android:id="@+id/fl_survey"
             android:layout_width="@dimen/dimen_30dp"
             android:layout_height="@dimen/dimen_30dp"
-            android:src="@drawable/icon_lottery"
-            android:visibility="visible" />
+            android:layout_marginRight="@dimen/dimen_10dp"
+            android:visibility="visible">
 
-        <View
-            android:id="@+id/lottery_red_point"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_gravity="end"
-            android:layout_margin="@dimen/dimen_1dp"
-            android:background="@drawable/shape_red_point"
-            android:visibility="gone" />
-    </FrameLayout>
+            <ImageView
+                android:layout_width="@dimen/dimen_30dp"
+                android:layout_height="@dimen/dimen_30dp"
+                android:src="@drawable/icon_survey"
+                android:visibility="visible" />
 
-    <FrameLayout
-        android:id="@+id/fl_notice"
-        android:layout_width="@dimen/dimen_30dp"
-        android:layout_height="@dimen/dimen_30dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="@dimen/dimen_90dp"
-        android:layout_marginBottom="@dimen/dimen_60dp"
-        android:visibility="visible">
+            <View
+                android:id="@+id/survey_red_point"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="end"
+                android:layout_margin="@dimen/dimen_1dp"
+                android:background="@drawable/shape_red_point"
+                android:visibility="gone" />
+        </FrameLayout>
 
-        <ImageView
+        <FrameLayout
+            android:id="@+id/fl_lottery"
             android:layout_width="@dimen/dimen_30dp"
             android:layout_height="@dimen/dimen_30dp"
-            android:src="@drawable/icon_notice"
-            android:visibility="visible" />
+            android:layout_marginRight="@dimen/dimen_10dp"
+            android:visibility="visible">
 
-        <View
-            android:id="@+id/notice_red_point"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_gravity="end"
-            android:layout_margin="@dimen/dimen_1dp"
-            android:background="@drawable/shape_red_point"
-            android:visibility="gone" />
-    </FrameLayout>
+            <ImageView
+                android:layout_width="@dimen/dimen_30dp"
+                android:layout_height="@dimen/dimen_30dp"
+                android:src="@drawable/icon_lottery"
+                android:visibility="visible" />
+
+            <View
+                android:id="@+id/lottery_red_point"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="end"
+                android:layout_margin="@dimen/dimen_1dp"
+                android:background="@drawable/shape_red_point"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fl_notice"
+            android:layout_width="@dimen/dimen_30dp"
+            android:layout_height="@dimen/dimen_30dp"
+            android:layout_marginRight="@dimen/dimen_10dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:layout_width="@dimen/dimen_30dp"
+                android:layout_height="@dimen/dimen_30dp"
+                android:src="@drawable/icon_notice"
+                android:visibility="visible" />
+
+            <View
+                android:id="@+id/notice_red_point"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="end"
+                android:layout_margin="@dimen/dimen_1dp"
+                android:background="@drawable/shape_red_point"
+                android:visibility="gone" />
+        </FrameLayout>
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -161,8 +182,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="5dp"
-  		android:visibility="gone"
-                android:src="@drawable/btn_unmute" />
+                android:src="@drawable/btn_unmute"
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/btn_headtracker"
@@ -170,8 +191,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="5dp"
-                android:visibility="gone"
-                android:src="@drawable/vhall_icon_headtracker_checked" />
+                android:src="@drawable/vhall_icon_headtracker_checked"
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/btn_danmaku"
@@ -299,6 +320,14 @@
 
 
     </RelativeLayout>
+
+    <com.vhall.uilibs.widget.TimerView
+        android:id="@+id/time_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/dp_40"
+        android:visibility="gone" />
 
     <ProgressBar
         android:id="@+id/progressbar"

@@ -293,6 +293,24 @@
         app:layout_constraintEnd_toStartOf="@id/iv_doc"
          />
 
+    <TextView
+        android:id="@+id/tv_dress"
+        android:layout_width="61dp"
+        android:layout_height="24dp"
+        android:paddingStart="8dp"
+        android:text="彩排中"
+        android:background="@drawable/bg_black_30_shape"
+        android:textColor="@color/white"
+        android:textSize="12dp"
+        android:visibility="gone"
+        android:drawablePadding="3dp"
+        android:drawableStart="@drawable/shape_white_circle"
+        android:gravity="center_vertical"
+        android:layout_marginStart="@dimen/dimen_15dp"
+        android:layout_marginTop="@dimen/dimen_60dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycle_view"
         android:layout_width="300dp"

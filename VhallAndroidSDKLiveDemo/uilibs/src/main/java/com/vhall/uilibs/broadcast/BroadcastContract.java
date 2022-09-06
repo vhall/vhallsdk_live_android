@@ -40,6 +40,14 @@ public class BroadcastContract {
 
         void showMsg(String msg);
 
+        default void startBroadcastSuccess(boolean success) {
+
+        }
+
+        default void liveRehearsal(boolean success) {
+
+        }
+
         void setSpeedText(String text);
 
         void setModeText(String mode);
@@ -49,9 +57,11 @@ public class BroadcastContract {
     }
 
     interface Presenter extends BasePresenter {
-        void onstartBtnClick();
 
-        void initBroadcast();
+        // rehearsal是否是彩排
+        void onstartBtnClick(boolean rehearsal);
+
+        void initBroadcast(boolean rehearsal);
 
         void startBroadcast();
 

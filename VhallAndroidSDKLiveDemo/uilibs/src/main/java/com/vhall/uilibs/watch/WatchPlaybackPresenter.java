@@ -129,7 +129,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
                 chatView.clearChatData();
                 loadingComment = false;
-                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,list);
+                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, list);
             }
 
             @Override
@@ -151,6 +151,9 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             watchView.showNotice(getWatchPlayback().getNotice()); //显示公告
             playbackView.setQuality(getWatchPlayback().getQualities());
             operationDocument();
+            if (webinarInfo.getWebinarInfoData() != null && webinarInfo.getWebinarInfoData().scrollInfoData != null) {
+                playbackView.setScrollInfo(webinarInfo.getWebinarInfoData().scrollInfoData);
+            }
         }
     }
 
@@ -265,10 +268,15 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             WatchPlayback.Builder builder = new WatchPlayback.Builder()
                     .context(watchView.getActivity())
                     .vodPlayView(playbackView.getVideoView())
-//                    .surfaceView(playbackView.getVideoView())
                     .callback(new WatchCallback())
                     .chatCallback(new ChatCallback())
-                    .docCallback(new DocCallback());
+                    .messageCallback(new MessageEventCallback())
+                    .docCallback(new DocCallback())
+                    //设置MessageEventCallback之后可以显示 h5的文档 就不用设置docCallback flash则还需要设置docCallback
+                    //文档处理二选一 不要同时存在
+                    ;
+
+
             watchPlayback = builder.build();
         }
         return watchPlayback;
@@ -553,6 +561,43 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         });
     }
 
+    private class MessageEventCallback implements MessageServer.Callback {
+        @Override
+        public void onEvent(MessageServer.MsgInfo messageInfo) {
+            switch (messageInfo.event) {
+                //h5文档处理 和 DocCallback二选一 文档开关指令 1 使用文档 0 关闭文档
+                case MessageServer.EVENT_SHOWH5DOC:
+                    if (documentView != null)
+                        if (messageInfo.watchType == 1)
+                            documentView.showType(3);
+                        else
+                            documentView.showType(2);
+                    break;
+                case MessageServer.EVENT_PAINTH5DOC:
+                    if (documentView != null)
+                        documentView.paintH5DocView(messageInfo.h5DocView);
+                    break;
+
+            }
+        }
+
+        @Override
+        public void onMsgServerConnected() {
+
+        }
+
+        @Override
+        public void onConnectFailed() {
+            Log.e(TAG, "MessageServer CONNECT FAILED");
+//            getWatchLive().connectMsgServer();
+        }
+
+        @Override
+        public void onMsgServerClosed() {
+
+        }
+    }
+
     private class ChatCallback implements ChatServer.Callback {
         @Override
         public void onChatServerConnected() {
@@ -571,7 +616,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }
-                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 default:
                     break;

@@ -13,6 +13,7 @@ import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.RequestDataCallback;
+import com.vhall.business.data.RequestDataCallbackV2;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
@@ -36,6 +37,8 @@ import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.CallBack;
 import com.vhall.vhss.TokenManger;
 import com.vhall.vhss.data.RoundUserListData;
+import com.vhall.vhss.data.TimerInfoData;
+import com.vhall.vhss.network.InteractToolsNetworkRequest;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONObject;
@@ -161,6 +164,24 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                 }
             });
         }
+
+        VhallSDK.getTimerInfo(new RequestDataCallbackV2<TimerInfoData>() {
+            @Override
+            public void onSuccess(TimerInfoData result) {
+                MessageServer.TimerData timerData = new MessageServer.TimerData();
+                timerData.is_all_show = result.is_all_show;
+                timerData.remain_time = result.remain_time;
+                timerData.is_timeout = result.is_timeout;
+                timerData.duration = result.duration;
+                liveNoDelayView.showTimeView(result.status.equals("4"));
+                liveNoDelayView.showTimeView(timerData);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+
+            }
+        });
     }
 
     @Override
@@ -400,7 +421,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
 
     @Override
     public void showDocFullScreen(int state) {
-        if(null != watchView){
+        if (null != watchView) {
             watchView.showDocFullScreen(state);
         }
     }
@@ -538,6 +559,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
     }
 
     String question_name = "问答";
+
     /**
      * 观看过程消息监听
      */
@@ -634,7 +656,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                     surveyData.url = (SurveyInternal.createSurveyUrl(params));
                     surveyData.id = (messageInfo.id);
                     surveyData.name = messageInfo.survey_name;
-                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,surveyData);
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, surveyData);
                     break;
                 case MessageServer.EVENT_SHOWDOC://文档开关指令 1 使用文档 0 关闭文档
                     Log.e(TAG, "onEvent:show_docType:watchType= " + messageInfo.watchType);
@@ -713,6 +735,23 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                     break;
                 case MessageServer.EVENT_VIDEO_ROUND_USERS:
                     dealRound(messageInfo.uids, false);
+                    break;
+
+                case MessageServer.EVENT_TIMER_START:
+                    liveNoDelayView.showTimeView(messageInfo.timerData);
+                    break;
+                case MessageServer.EVENT_TIMER_END:
+                case MessageServer.EVENT_TIMER_RESET:
+                    liveNoDelayView.showTimeView(null);
+                    break;
+
+                case MessageServer.EVENT_TIMER_RESUME:
+                    liveNoDelayView.showTimeView(false);
+                    watchView.showToast("计时器继续");
+                    break;
+                case MessageServer.EVENT_TIMER_PAUSE:
+                    liveNoDelayView.showTimeView(true);
+                    watchView.showToast("计时器暂停");
                     break;
                 default:
                     break;
@@ -888,7 +927,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
 
     @Override
     public void onUpMic() {
-        if (isRound){
+        if (isRound) {
             watchView.showToast("已经参加了轮巡");
             return;
         }
@@ -973,20 +1012,20 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }
-                   chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     liveView.addDanmu(chatInfo.msgData.text);
                     break;
                 case ChatServer.eventCustomKey:
-                   chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 case ChatServer.eventOnlineKey:
-                   chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     if (chatInfo.onlineData != null) {
                         watchView.setOnlineNum(chatInfo.onlineData.concurrent_user, 0);
                     }
                     break;
                 case ChatServer.eventOfflineKey:
-                   chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 case ChatServer.eventQuestion:
                     if (chatInfo.questionData != null && chatInfo.questionData.answer != null) {
@@ -994,7 +1033,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                             return;
                         }
                     }
-                    questionView.notifyDataChanged(ChatFragment.CHAT_EVENT_QUESTION,chatInfo);
+                    questionView.notifyDataChanged(ChatFragment.CHAT_EVENT_QUESTION, chatInfo);
                     break;
                 default:
                     break;
@@ -1013,7 +1052,7 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
         interactive.acquireChatRecord(true, new ChatServer.ChatRecordCallback() {
             @Override
             public void onDataLoaded(List<ChatServer.ChatInfo> list) {
-                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,list);
+                chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, list);
             }
 
             @Override

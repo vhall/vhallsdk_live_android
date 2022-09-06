@@ -18,6 +18,16 @@ public class RadiusBackgroundSpan extends ReplacementSpan {
      * @param color  背景颜色
      * @param radius 圆角半径
      */
+    public RadiusBackgroundSpan(int color, int radius,int textColor) {
+        mColor = color;
+        mRadius = radius;
+        this.textColor = textColor;
+    }
+
+    /**
+     * @param color  背景颜色
+     * @param radius 圆角半径
+     */
     public RadiusBackgroundSpan(int color, int radius) {
         mColor = color;
         mRadius = radius;

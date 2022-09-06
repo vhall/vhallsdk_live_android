@@ -71,7 +71,7 @@ public class BroadcastNoDelayFragment extends Fragment implements BroadcastContr
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.broadcast_fragment, container, false);
+        return inflater.inflate(R.layout.broadcast_nodelay_fragment, container, false);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class BroadcastNoDelayFragment extends Fragment implements BroadcastContr
         int i = v.getId();
         if (i == R.id.btn_publish) {
             if (cameraAvailable) {
-                mPresenter.onstartBtnClick();
+                mPresenter.onstartBtnClick(false);
             } else {
                 Toast.makeText(mActivity, "camera is not available...", Toast.LENGTH_SHORT).show();
             }

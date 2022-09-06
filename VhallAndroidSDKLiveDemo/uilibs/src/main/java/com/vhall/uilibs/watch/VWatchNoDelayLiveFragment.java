@@ -274,6 +274,9 @@ public class VWatchNoDelayLiveFragment extends Fragment implements WatchContract
         if (beforeMainStream != null) {
             beforeMainStream.removeAllRenderView();
         }
+        if (llRenderView == null) {
+            return;
+        }
         for (int i = 0; i < llRenderView.getChildCount(); i++) {
             VHRenderView vhRenderView = (VHRenderView) llRenderView.getChildAt(i);
             if (vhRenderView != null && vhRenderView.getStream() != null && vhRenderView.getStream().userId.equals(mainUserId)) {
@@ -333,6 +336,9 @@ public class VWatchNoDelayLiveFragment extends Fragment implements WatchContract
                     VHRenderView vhRenderView = new VHRenderView(getActivity());
                     vhRenderView.init(null, null);
                     stream.addRenderView(vhRenderView);
+                    if (llRenderView == null) {
+                        return;
+                    }
                     llRenderView.addView(vhRenderView, renderViewWidth, renderViewHeight);
                 }
             }
@@ -347,6 +353,9 @@ public class VWatchNoDelayLiveFragment extends Fragment implements WatchContract
                 if (stream.userId.equals(mainUserId)) {
                     stream.removeAllRenderView();
                 } else {
+                    if (llRenderView == null) {
+                        return;
+                    }
                     int childCount = llRenderView.getChildCount();
                     for (int i = 0; i < childCount; i++) {
                         VHRenderView view = (VHRenderView) llRenderView.getChildAt(i);
@@ -369,16 +378,20 @@ public class VWatchNoDelayLiveFragment extends Fragment implements WatchContract
 
     private void addShareView(Stream stream) {
         shareRenderView.setVisibility(View.VISIBLE);
-        llRenderView.setVisibility(View.GONE);
-        noDelayCl.setVisibility(View.GONE);
+        if (llRenderView != null)
+            llRenderView.setVisibility(View.GONE);
+        if (noDelayCl != null)
+            noDelayCl.setVisibility(View.GONE);
         stream.removeAllRenderView();
         stream.addRenderView(shareRenderView);
     }
 
     private void removeShareView(Stream stream) {
         shareRenderView.setVisibility(View.GONE);
-        llRenderView.setVisibility(View.VISIBLE);
-        noDelayCl.setVisibility(View.VISIBLE);
+        if (llRenderView != null)
+            llRenderView.setVisibility(View.VISIBLE);
+        if (noDelayCl != null)
+            noDelayCl.setVisibility(View.VISIBLE);
         stream.removeAllRenderView();
     }
 }

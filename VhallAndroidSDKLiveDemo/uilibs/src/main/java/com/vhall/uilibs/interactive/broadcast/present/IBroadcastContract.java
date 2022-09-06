@@ -38,6 +38,8 @@ public interface IBroadcastContract {
         void userNoSpeaker(String userId);
 
         void notifyRoleName(String type,String name);
+
+        void liveRehearsal(boolean start);
     }
 
     interface RtcFragmentView extends IHostBaseView<IBroadcastPresent>{

@@ -31,17 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.vhall.business.MessageServer.EVENT_CHAT_FORBID_ALL;
-import static com.vhall.business.MessageServer.EVENT_DISABLE_CHAT;
-import static com.vhall.business.MessageServer.EVENT_EDIT_WEBINAR_ROLE_NAME;
-import static com.vhall.business.MessageServer.EVENT_INTERACTIVE_DOWN_MIC;
-import static com.vhall.business.MessageServer.EVENT_KICKOUT;
-import static com.vhall.business.MessageServer.EVENT_KICKOUT_RESTORE;
-import static com.vhall.business.MessageServer.EVENT_PERMIT_CHAT;
-import static com.vhall.business.MessageServer.EVENT_VRTC_BIG_SCREEN_SET;
-import static com.vhall.business.MessageServer.EVENT_VRTC_CONNECT_REFUSED;
-import static com.vhall.business.MessageServer.EVENT_VRTC_CONNECT_SUCCESS;
-import static com.vhall.business.MessageServer.EVENT_VRTC_SPEAKER_SWITCH;
+import static com.vhall.business.MessageServer.*;
 import static com.vhall.uilibs.interactive.RtcInternal.REQUEST_PUSH;
 
 public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
@@ -325,7 +315,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                         if (!TextUtils.isEmpty(userId) && TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
                             isPublic = true;
                             broadcastView.setMic(true);
-                            Stream localStream =  RtcConfig.getInterActive().getLocalStream();
+                            Stream localStream = RtcConfig.getInterActive().getLocalStream();
                             if (localStream != null) {
                                 localStream.setEnableBeautify(true);
                                 localStream.setEnableCaptureCallback(true);
@@ -347,7 +337,7 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                         if (!TextUtils.isEmpty(userId) && TextUtils.equals(responseRoomInfo.getJoin_info().getThird_party_user_id(), userId)) {
                             //主播下麦用户/嘉宾
                             RtcConfig.getInterActive().unpublished();
-                            if (RtcConfig.getInterActive().getLocalStream()!=null){
+                            if (RtcConfig.getInterActive().getLocalStream() != null) {
                                 RtcConfig.getInterActive().getLocalStream().removeAllRenderView();
                                 RtcConfig.getInterActive().getLocalStream().stopStats();
                                 RtcConfig.getInterActive().getLocalStream().dispose();
@@ -387,6 +377,15 @@ public class RtcH5Present implements IBroadcastContract.IBroadcastPresent {
                 case EVENT_VRTC_BIG_SCREEN_SET:
                     //流消息 互动流设置混流大画面
                     Log.e("vhall_", "big");
+                    break;
+
+                case EVENT_LIVE_START_REHEARSAL:
+                    //彩排开始
+                    broadcastView.liveRehearsal(true);
+                    break;
+                case EVENT_LIVE_OVER_REHEARSAL:
+                    //彩排结束
+                    broadcastView.liveRehearsal(false);
                     break;
 
             }

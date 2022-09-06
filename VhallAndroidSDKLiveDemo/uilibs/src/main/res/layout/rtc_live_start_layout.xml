@@ -35,18 +35,41 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="295dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <TextView
-        android:id="@+id/tv_start"
-        android:layout_width="@dimen/dimen_280dp"
+        android:id="@+id/tv_dress_rehearsal"
+        android:layout_width="@dimen/dimen_140dp"
         android:layout_height="@dimen/dimen_45dp"
         android:layout_marginTop="@dimen/dimen_30dp"
         android:layout_marginBottom="@dimen/dimen_50dp"
-        android:background="@drawable/rtc_shape_start_btn"
+        android:background="@drawable/shape_draw_btn"
+        android:gravity="center"
+        android:text="@string/start_dress_rehearsal"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_17dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/view" />
+
+    <TextView
+        android:id="@+id/tv_start"
+        android:layout_width="@dimen/dimen_140dp"
+        android:layout_height="@dimen/dimen_45dp"
+        android:layout_marginTop="@dimen/dimen_30dp"
+        android:layout_marginBottom="@dimen/dimen_50dp"
+        android:background="@drawable/shape_star_btn"
         android:gravity="center"
         android:text="@string/start_broadcast"
         android:textColor="@color/white"
         android:textSize="@dimen/dimen_17dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@id/view" />
+
 </android.support.constraint.ConstraintLayout>

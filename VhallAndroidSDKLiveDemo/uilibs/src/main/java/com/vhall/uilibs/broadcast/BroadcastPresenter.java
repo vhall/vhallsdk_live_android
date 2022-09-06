@@ -1,5 +1,8 @@
 package com.vhall.uilibs.broadcast;
 
+import static com.vhall.business.MessageServer.EVENT_LIVE_OVER_REHEARSAL;
+import static com.vhall.business.MessageServer.EVENT_LIVE_START_REHEARSAL;
+
 import android.hardware.Camera;
 import android.text.TextUtils;
 import android.util.Log;
@@ -7,6 +10,7 @@ import android.view.View;
 
 import com.vhall.business.Broadcast;
 import com.vhall.business.ChatServer;
+import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.WebinarInfo;
@@ -17,7 +21,6 @@ import com.vhall.push.VHLivePushFormat;
 import com.vhall.uilibs.Param;
 import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.ChatFragment;
-import com.vhall.uilibs.chat.MessageChatData;
 import com.vhall.uilibs.util.emoji.InputUser;
 import com.vhall.vhallrtc.client.VHRenderView;
 
@@ -61,7 +64,9 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
          *
          */
         getBroadcast();
-
+        if (webinarInfo != null && "2".equals(webinarInfo.live_type)) {
+            mView.liveRehearsal(true);
+        }
     }
 
 //    @Override
@@ -72,25 +77,25 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 //    }
 
 
+    // 是否是彩排
+    boolean rehearsal = false;
+
     @Override
-    public void onstartBtnClick() {
-        if (isPublishing) {
-//            finishBroadcast();
-            mView.showEndLiveDialog();
+    public void onstartBtnClick(boolean rehearsal) {
+        this.rehearsal = rehearsal;
+        if (getBroadcast().isAvaliable() && !isFinish) {
+            startBroadcast();
         } else {
-            if(getBroadcast().isAvaliable() && !isFinish){
-                getBroadcast().start();
-            }else{
-                initBroadcast();
-            }
+            initBroadcast(rehearsal);
         }
     }
 
     @Override
-    public void initBroadcast() {
+    public void initBroadcast(boolean rehearsal) {
+        this.rehearsal = rehearsal;
         if (webinarInfo != null && !getBroadcast().isAvaliable()) {
             getBroadcast().setWebinarInfo(webinarInfo);
-            getBroadcast().start();
+            startBroadcast();
             getBroadcast().acquireChatRecord(true, new ChatServer.ChatRecordCallback() {
                 @Override
                 public void onDataLoaded(List<ChatServer.ChatInfo> list) {
@@ -103,11 +108,11 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
                 }
             });
         } else {
-            VhallSDK.initBroadcast(param.broId, param.broToken,param.broName, getBroadcast(), new RequestCallback() {
+            VhallSDK.initBroadcast(param.broId, param.broToken, param.broName, getBroadcast(), new RequestCallback() {
                 @Override
                 public void onSuccess() {
                     isFinish = false;
-                    getBroadcast().start();
+                    startBroadcast();
                 }
 
                 @Override
@@ -120,7 +125,18 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
     @Override
     public void startBroadcast() {//发起直播
-        getBroadcast().start();
+        getBroadcast().start(rehearsal, new RequestCallback() {
+            @Override
+            public void onSuccess() {
+                mView.startBroadcastSuccess(true);
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+                mView.startBroadcastSuccess(false);
+                mView.showMsg("initBroadcastFailed：" + errorMsg);
+            }
+        });
     }
 
     @Override
@@ -141,7 +157,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
             broId = param.broId;
             broToken = param.broToken;
         }
-        VhallSDK.finishBroadcast(broId, broToken, getBroadcast(), new RequestCallback() {
+        VhallSDK.finishBroadcast(broId, broToken, getBroadcast(), rehearsal, new RequestCallback() {
             @Override
             public void onSuccess() {
                 isFinish = true;
@@ -232,7 +248,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
             config.videoFrameRate = param.videoFrameRate;//帧率
             config.videoBitrate = param.videoBitrate;//码率
             //2 音频直播
-            if (webinarInfo.layout == 2||webinarInfo.layout == 4) {
+            if (webinarInfo.layout == 2 || webinarInfo.layout == 4) {
                 config.streamType = VHLivePushFormat.STREAM_TYPE_A;
                 mView.getCameraView().setVisibility(View.GONE);
             } else {
@@ -241,9 +257,10 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
             Broadcast.Builder builder = new Broadcast.Builder()
                     .cameraView(mView.getCameraView())
                     .config(config)
-                    .callback(listener)
                     .callback(new BroadcastEventCallback())
+                    .messageCallback(new MessageEventCallback())
                     .chatCallback(new ChatCallback());
+
             //狄拍
 //            LiveParam.PushParam param = new LiveParam.PushParam();
 //            param.video_width = 1280;
@@ -258,22 +275,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
 
         return broadcast;
     }
-    private VHPlayerListener listener = new VHPlayerListener() {
-        @Override
-        public void onStateChanged(Constants.State state) {
 
-        }
-
-        @Override
-        public void onEvent(int event, String msg) {
-
-        }
-
-        @Override
-        public void onError(int errorCode, int innerErrorCode, String msg) {
-            chatView.showToast(msg);
-        }
-    };
     @Override
     public void showChatView(boolean emoji, InputUser user, int limit) {
         mBraodcastView.showChatView(emoji, user, limit);
@@ -407,7 +409,38 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         }
     }
 
+    private class MessageEventCallback implements MessageServer.Callback {
+        @Override
+        public void onEvent(MessageServer.MsgInfo messageInfo) {
+            switch (messageInfo.event) {
+                case EVENT_LIVE_START_REHEARSAL:
+                    //彩排开始
+                    mView.liveRehearsal(true);
+                    break;
+                case EVENT_LIVE_OVER_REHEARSAL:
+                    //彩排结束
+                    mView.liveRehearsal(false);
+                default:
+                    break;
+            }
+        }
 
+        @Override
+        public void onMsgServerConnected() {
+
+        }
+
+        @Override
+        public void onConnectFailed() {
+            Log.e(TAG, "MessageServer CONNECT FAILED");
+//            getWatchLive().connectMsgServer();
+        }
+
+        @Override
+        public void onMsgServerClosed() {
+
+        }
+    }
     private class ChatCallback implements ChatServer.Callback {
         @Override
         public void onChatServerConnected() {
@@ -423,20 +456,20 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
         public void onChatMessageReceived(ChatServer.ChatInfo chatInfo) {
             switch (chatInfo.event) {
                 case ChatServer.eventMsgKey:
-                    if (chatInfo.msgData!=null&&!TextUtils.isEmpty(chatInfo.msgData.target_id)){
+                    if (chatInfo.msgData != null && !TextUtils.isEmpty(chatInfo.msgData.target_id)) {
                         //根据target_id 不为空标记当前是不是问答私聊 是的话直接过滤
                         return;
                     }
-                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 case ChatServer.eventCustomKey:
-                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 case ChatServer.eventOnlineKey:
-                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 case ChatServer.eventOfflineKey:
-                     chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT,chatInfo);
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_CHAT, chatInfo);
                     break;
                 default:
                     break;

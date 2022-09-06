@@ -106,7 +106,8 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
     }
 
     private CountDownTimer mCount;
-    private TextView tvTimeNum, tvStart, tvMic, tvTime, tvLookNum, tvErrorName;
+    private TextView tvTimeNum, tvStart, tvMic, tvTime, tvLookNum, tvErrorName, tv_dress_rehearsal, tv_dress;
+    ;
     private ImageView ivDoc;
     private ProgressBar progressBar;
     private FrameLayout flBroadcast, flDoc;
@@ -276,7 +277,9 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
 
         group_a = findViewById(R.id.group_a);
         group_v = findViewById(R.id.group_v);
-
+        tv_dress_rehearsal = findViewById(R.id.tv_dress_rehearsal);
+        tv_dress = findViewById(R.id.tv_dress);
+        tv_dress_rehearsal.setOnClickListener(this);
         mainLocalView = findViewById(R.id.render_main_view);
         mainLocalView.init(null, null);
         mainLocalView.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFill);
@@ -330,7 +333,7 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
                 webinar_show_type = webinarInfo.getWebinarInfoData().webinar_show_type;
                 RtcInternal.report(webinarInfo.getWebinarInfoData().join_info.third_party_user_id, webinar_id, getApplicationContext());
             }
-
+            tv_dress_rehearsal.setVisibility(View.GONE);
             tvStart.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             tvTimeNum.setVisibility(View.GONE);
@@ -348,12 +351,17 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
             VhallGlideUtils.loadImage(RtcActivity.this, url, R.mipmap.ic_avatar, R.mipmap.ic_avatar, ivOverAvatar);
         }
 
+        if (webinarInfo != null && "2".equals(webinarInfo.live_type)) {
+            showDress = true;
+            tv_dress.setVisibility(View.VISIBLE);
+        }
+
         initRtc();
 
         docFragment = DocFragment.getInstance(webinar_type, String.valueOf(webinar_show_type));
         if (isGuest) {
             processGuest();
-        }else {
+        } else {
             RtcInternal.isGrantedPermissionRtc(this, REQUEST_PUSH);
         }
         //活动显示类型  0 竖屏 1横屏
@@ -394,7 +402,7 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
             if (webinarInfo.getWebinarInfoData() != null && webinarInfo.getWebinarInfoData().roomToolsStatusData != null && webinarInfo.getWebinarInfoData().roomToolsStatusData.speaker_list != null) {
                 for (int i = 0; i < webinarInfo.getWebinarInfoData().roomToolsStatusData.speaker_list.size(); i++) {
                     if (webinarInfo.getWebinarInfoData().join_info.third_party_user_id.endsWith(webinarInfo.getWebinarInfoData().roomToolsStatusData.speaker_list.get(i).account_id)) {
-                        mInterActive.setUserNoSpeak(null);
+                        mInterActive.unpublish(null);
                     }
                 }
             }
@@ -459,6 +467,7 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
         }
 
         broadcastRtcFragment = RtcFragment.getInstance(String.valueOf(webinar_show_type), webinarInfo, broadcastPresent.getMessageCallback(), broadcastPresent.getChatCallback());
+        broadcastRtcFragment.setDress(isDress);
         broadcastPresent.setRtcFragmentView(broadcastRtcFragment);
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         am.setMode(AudioManager.MODE_IN_CALL);
@@ -631,8 +640,8 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
     public void notifyDataChangedChat(MessageChatData data) {
         if (adapter != null) {
             adapter.addData(data);
-            if (adapter.getItemCount()>0)
-            recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+            if (adapter.getItemCount() > 0)
+                recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
         }
     }
 
@@ -653,6 +662,20 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
     }
 
     private RoleNameData roleNameData = new RoleNameData("主持人", "嘉宾", "助理");
+
+    /**
+     * 显示彩排中
+     */
+    boolean showDress = false;
+
+    @Override
+    public void liveRehearsal(boolean start) {
+        showDress = start;
+        if (start)
+            tv_dress.setVisibility(View.VISIBLE);
+        else
+            tv_dress.setVisibility(View.GONE);
+    }
 
     @Override
     public void notifyRoleName(String type, String name) {
@@ -754,9 +777,18 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
 
     }
 
+    boolean isDress = false;
+
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.tv_start) {
+
+        if (v.getId() == R.id.tv_dress_rehearsal) {
+            isDress = true;
+            if (broadcastRtcFragment != null) {
+                broadcastRtcFragment.setDress(isDress);
+            }
+            startLive();
+        } else if (v.getId() == R.id.tv_start) {
             startLive();
         } else if (v.getId() == R.id.tv_chat) {
             broadcastPresent.showInputView();
@@ -838,7 +870,7 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
             //新的美颜形式
             if (VHBeautifyKit.getInstance().setBeautifyEnable(true)) {
                 changeVisibility();
-            }else {
+            } else {
                 if (beautyDialog == null) {
                     beautyDialog = new OutDialogBuilder().layout(R.layout.dialog_beauty_no_serve)
                             .build(getActivity());
@@ -919,6 +951,7 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
     private void startLive() {
         if (RtcInternal.isGrantedPermissionRtc(this, REQUEST_PUSH)) {
             tvStart.setVisibility(View.GONE);
+            tv_dress_rehearsal.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
             tvTimeNum.setVisibility(View.VISIBLE);
             startCountDown();
@@ -930,15 +963,23 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
      * 退出弹窗
      */
     private void initOutDialog() {
-
-        OutDialogBuilder.DialogTexts texts = new OutDialogBuilder.DialogTexts("确认结束当前直播?", "继续直播", "结束直播");
+        String title = "确认结束当前直播?";
+        String tv1 = "继续直播";
+        String tv2 = "结束直播";
+        if (isDress) {
+            title = "确认结束当前彩排?";
+            tv1 = "继续彩排";
+            tv2 = "结束彩排";
+        }
         if (isGuest) {
-            texts = new OutDialogBuilder.DialogTexts("确定退出直播?", "取消", "确认");
+            title = "确定退出直播?";
+            tv1 = "取消";
+            tv2 = "确认";
         }
         outDialog = new OutDialogBuilder()
-                .title(texts.title)
-                .tv1(texts.cancel)
-                .tv2(texts.conform)
+                .title(title)
+                .tv1(tv1)
+                .tv2(tv2)
                 .onConfirm(new OutDialog.ClickLister() {
                     @Override
                     public void click() {
@@ -1148,6 +1189,7 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
             flBroadcast.setVisibility(View.VISIBLE);
             flBroadcast.setLayoutParams(playerViewLayoutParams);
         }
+        tv_dress.setVisibility(View.GONE);
     }
 
     public void hideDoc() {
@@ -1189,6 +1231,9 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
         playerViewLayoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         playerViewLayoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT;
         flBroadcast.setLayoutParams(playerViewLayoutParams);
+        if (showDress) {
+            tv_dress.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showUI() {
@@ -1207,6 +1252,7 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
                 @Override
                 public void onTick(long millisUntilFinished) {
                     tvStart.setVisibility(View.GONE);
+                    tv_dress_rehearsal.setVisibility(View.GONE);
                     String text = String.valueOf(millisUntilFinished / 1000);
                     if ("0".equals(text)) {
                         text = "GO";
@@ -1218,6 +1264,11 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
                 public void onFinish() {
                     if (!isFinishing()) {
                         startLiveImpl();
+                        if (isDress) {
+                            tv_dress.setVisibility(View.VISIBLE);
+                        } else {
+                            tv_dress.setVisibility(View.GONE);
+                        }
                     }
                 }
             };
@@ -1261,7 +1312,7 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
     @Override
     protected void onDestroy() {
         //结束互动直播
-        VhallSDK.finishBroadcast(webinarInfo.getWebinarInfoData().webinar.id, "", null, null);
+        VhallSDK.finishBroadcast(webinarInfo.getWebinarInfoData().webinar.id, "", null, isDress, null);
         if (broadcastRtcFragment != null) {
             broadcastRtcFragment.finish();
         }

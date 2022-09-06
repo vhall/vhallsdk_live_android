@@ -7,18 +7,22 @@ import android.os.Bundle;
 import android.support.constraint.Group;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.vhall.business.MessageServer;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.uilibs.R;
 import com.vhall.uilibs.util.DensityUtils;
+import com.vhall.uilibs.widget.TimerView;
 import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.data.ScrollInfoData;
@@ -60,6 +64,10 @@ public class WatchNoDelayLiveFragment extends Fragment implements WatchContract.
 
     boolean hasVideoOpen = false;
     boolean hasAudioOpen = false;
+
+    private TimerView timerView;
+    private FrameLayout fl_timer;
+    private View timer_red_point;
 
 
     public static WatchNoDelayLiveFragment newInstance(WebinarInfo webinarInfoData) {
@@ -109,7 +117,28 @@ public class WatchNoDelayLiveFragment extends Fragment implements WatchContract.
         clickOrientation.setVisibility(View.GONE);
         btn_change_scaletype.setVisibility(View.GONE);
         progressbar = (ProgressBar) root.findViewById(R.id.progressbar);
+        timerView = root.findViewById(R.id.time_view);
+        fl_timer = root.findViewById(R.id.fl_timer);
+        timer_red_point = root.findViewById(R.id.timer_red_point);
+        timerView.setOnItemClickLister(new TimerView.OnItemClickLister() {
+            @Override
+            public void cancel() {
+                timer_red_point.setVisibility(View.VISIBLE);
+            }
 
+            @Override
+            public void dismiss() {
+                timer_red_point.setVisibility(View.GONE);
+                fl_timer.setVisibility(View.GONE);
+            }
+        });
+        fl_timer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timerView.setVisibility(View.VISIBLE);
+                timer_red_point.setVisibility(View.GONE);
+            }
+        });
         shareRenderView = root.findViewById(R.id.share_render_view);
         shareRenderView.init(null, null);
         shareRenderView.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFill);
@@ -216,12 +245,34 @@ public class WatchNoDelayLiveFragment extends Fragment implements WatchContract.
     }
 
     @Override
+    public void showTimeView(boolean pause) {
+        Log.e("vhall_", pause + "");
+        timerView.setPause(pause);
+    }
+
+    @Override
+    public void showTimeView(MessageServer.TimerData timerData) {
+        if (timerData == null) {
+            timerView.setVisibility(View.GONE);
+            fl_timer.setVisibility(View.GONE);
+            timerView.dismiss();
+        } else {
+            timerView.setData(timerData);
+            if ("1".equals(timerData.is_all_show))
+                fl_timer.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
     public void updateMain(String mainId) {
         mainUserId = mainId;
         Stream beforeMainStream = mainRenderView.getStream();
         Stream nowMainStream = null;
         if (beforeMainStream != null) {
             beforeMainStream.removeAllRenderView();
+        }
+        if (llRenderView == null) {
+            return;
         }
         for (int i = 0; i < llRenderView.getChildCount(); i++) {
             VHRenderView vhRenderView = (VHRenderView) llRenderView.getChildAt(i);
@@ -281,6 +332,9 @@ public class WatchNoDelayLiveFragment extends Fragment implements WatchContract.
                     VHRenderView vhRenderView = new VHRenderView(getActivity());
                     vhRenderView.init(null, null);
                     stream.addRenderView(vhRenderView);
+                    if (llRenderView == null) {
+                        return;
+                    }
                     llRenderView.addView(vhRenderView, renderViewWidth, renderViewHeight);
                 }
             }
@@ -295,6 +349,9 @@ public class WatchNoDelayLiveFragment extends Fragment implements WatchContract.
                 if (stream.userId.equals(mainUserId)) {
                     stream.removeAllRenderView();
                 } else {
+                    if (llRenderView == null) {
+                        return;
+                    }
                     int childCount = llRenderView.getChildCount();
                     for (int i = 0; i < childCount; i++) {
                         VHRenderView view = (VHRenderView) llRenderView.getChildAt(i);
@@ -356,14 +413,18 @@ public class WatchNoDelayLiveFragment extends Fragment implements WatchContract.
         shareRenderView.setVisibility(View.VISIBLE);
         stream.removeAllRenderView();
         stream.addRenderView(shareRenderView);
-        noDelayCl.setVisibility(View.GONE);
-        llRenderView.setVisibility(View.GONE);
+        if (llRenderView != null)
+            llRenderView.setVisibility(View.GONE);
+        if (noDelayCl != null)
+            noDelayCl.setVisibility(View.GONE);
     }
 
     private void removeShareView(Stream stream) {
         shareRenderView.setVisibility(View.GONE);
-        noDelayCl.setVisibility(View.VISIBLE);
-        llRenderView.setVisibility(View.VISIBLE);
+        if (noDelayCl != null)
+            noDelayCl.setVisibility(View.VISIBLE);
+        if (llRenderView != null)
+            llRenderView.setVisibility(View.VISIBLE);
         stream.removeAllRenderView();
     }
 

@@ -104,7 +104,17 @@ public class DirectorPushActivity extends FragmentActivity implements View.OnCli
                 }
                 tvTitle.setText(String.format("推流到云导播台-%s", webinarInfo.seatName));
                 //自动推流
-                broadcast.start();
+                broadcast.start(new RequestCallback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError(int errorCode, String errorMsg) {
+                        ToastUtil.showToast(errorMsg);
+                    }
+                });
             }
 
             @Override
@@ -142,7 +152,17 @@ public class DirectorPushActivity extends FragmentActivity implements View.OnCli
             VhallSDK.directorSelectSeat(param.broId, param.seatId, new RequestCallback() {
                 @Override
                 public void onSuccess() {
-                    broadcast.start();
+                    broadcast.start(new RequestCallback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError(int errorCode, String errorMsg) {
+                            ToastUtil.showToast(errorMsg);
+                        }
+                    });
                 }
 
                 @Override

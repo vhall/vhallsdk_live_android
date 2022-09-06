@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/dimen_85dp"
+    android:layout_height="@dimen/dimen_85dp"
+    android:layout_marginBottom="10dp"
+    tools:ignore="RtlCompat">
+
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="@dimen/dimen_60dp"
+        android:layout_height="@dimen/dimen_60dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="@dimen/dimen_38dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_10dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintEnd_toEndOf="@+id/image_view"
+        app:layout_constraintStart_toStartOf="@+id/image_view"
+        app:layout_constraintTop_toBottomOf="@+id/image_view" />
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="@dimen/dimen_80dp"
+        android:layout_height="@dimen/dimen_80dp"
+        android:background="@drawable/shape_gift_send_line"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_send"
+        android:layout_width="@dimen/dimen_80dp"
+        android:layout_height="@dimen/dimen_26dp"
+        android:background="@drawable/shape_gift_send_bg"
+        android:gravity="center"
+        android:text="赠送"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</android.support.constraint.ConstraintLayout>

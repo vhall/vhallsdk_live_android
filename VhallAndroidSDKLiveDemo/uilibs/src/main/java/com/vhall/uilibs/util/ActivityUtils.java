@@ -16,4 +16,12 @@ public class ActivityUtils {
         transaction.commitAllowingStateLoss();
     }
 
+    public static void remove(FragmentManager fragmentManager,
+                                             Fragment fragment) {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.remove(fragment);
+        transaction.commitAllowingStateLoss();
+    }
+
+
 }

@@ -71,7 +71,7 @@ public class WebViewActivity extends FragmentActivity {
 
         String url = getIntent().getStringExtra("url");
         if (TextUtils.isEmpty(url)) {
-            WebinarInfoRemote.getInstance().getWatchWebinarInfo(roomId, "", "", "", "", "", new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+            WebinarInfoRemote.getInstance().getWatchWebinarInfo(roomId, "","", "", "", "", "", new WebinarInfoDataSource.LoadWebinarInfoCallback() {
                 @Override
                 public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                     baseUrl = "https://t-webinar.e.vhall.com/v3/lives/watch/";
