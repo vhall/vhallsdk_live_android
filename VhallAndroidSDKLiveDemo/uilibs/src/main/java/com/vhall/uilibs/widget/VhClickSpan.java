@@ -1,6 +1,5 @@
 package com.vhall.uilibs.widget;
 
-import android.content.Context;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.view.View;

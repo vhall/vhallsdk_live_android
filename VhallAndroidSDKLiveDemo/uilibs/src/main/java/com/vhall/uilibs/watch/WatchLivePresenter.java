@@ -930,7 +930,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     private class MessageEventCallback implements MessageServer.Callback {
         @Override
         public void onEvent(MessageServer.MsgInfo messageInfo) {
-            Log.e(TAG, "messageInfo " + messageInfo.event + ((null != messageInfo.responseImMessageInfo) ? messageInfo.responseImMessageInfo.getData() : "nulllll"));
+            Log.e("vhall_", "messageInfo " + messageInfo.event +" msg_id  "+ messageInfo.msg_id + ((null != messageInfo.responseImMessageInfo) ? messageInfo.responseImMessageInfo.getData() : "nulllll"));
             switch (messageInfo.event) {
                 case MessageServer.EVENT_KICKOUT://踢出
                     watchView.showToast("您已被踢出");

@@ -70,7 +70,7 @@ public class OnlyRenderView extends FrameLayout {
         }
         renderView1 = findViewById(R.id.image1);
         renderView1.init(null, null);
-        renderView1.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFit);
+        renderView1.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFill);
         stream.addRenderView(renderView1);
         TextView tvName = findViewById(R.id.tv_name1);
         if (TextUtils.equals(mainId, userId)) {

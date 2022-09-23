@@ -251,6 +251,7 @@ public class BroadcastPresenter implements BroadcastContract.Presenter, ChatCont
             if (webinarInfo.layout == 2 || webinarInfo.layout == 4) {
                 config.streamType = VHLivePushFormat.STREAM_TYPE_A;
                 mView.getCameraView().setVisibility(View.GONE);
+                mView.showMsg("音频直播没有画面");
             } else {
                 config.streamType = VHLivePushFormat.STREAM_TYPE_AV;
             }

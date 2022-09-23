@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.7.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.7.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.8.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.8.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -41,6 +41,12 @@ allprojects {
 
 二、版本更新信息：
 
+  版本：v6.8.0  更新时间 2022.9.23
+ 
+1. 【新增】 彩排权限 [live_rehearsal](https://saas-doc.vhall.com/docs/show/1630)<br>
+2. 【新增】主持人发起互动混流支持pc配置的图片和背景（sdk内部处理，不需要用户处理）<br>
+3.  优化sdk中一些已知问题<br>
+
   版本：v6.7.0  更新时间 2022.9.6
 
 1. 【新增】 [点赞](https://saas-doc.vhall.com/docs/show/1573)
@@ -52,9 +58,6 @@ allprojects {
 7.  demo新增极简观看模式
 8.  优化sdk中一些已知问题
 
-
-
-#
 
  版本：v6.6.0 更新时间 2022.8.9 <br>
  
