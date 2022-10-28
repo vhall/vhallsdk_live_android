@@ -49,6 +49,7 @@ import com.vhall.uilibs.interactive.dialog.ChooseDocDialog;
 import com.vhall.uilibs.interactive.dialog.OutDialog;
 import com.vhall.uilibs.interactive.dialog.OutDialogBuilder;
 import com.vhall.uilibs.interactive.dialog.UserListNewDialog;
+import com.vhall.uilibs.interactive.doc.DocumentPublicView;
 import com.vhall.uilibs.util.BaseUtil;
 import com.vhall.uilibs.util.CommonUtil;
 import com.vhall.uilibs.util.DensityUtils;
@@ -359,6 +360,14 @@ public class RtcActivity extends FragmentActivity implements View.OnClickListene
         initRtc();
 
         docFragment = DocFragment.getInstance(webinar_type, String.valueOf(webinar_show_type));
+        docFragment.setDocMsgCallBack(new DocumentPublicView.DocMsgCallBack() {
+            @Override
+            public void onEvent(String event, String type) {
+                if (broadcastRtcFragment != null) {
+                    broadcastRtcFragment.onEvent(event, type);
+                }
+            }
+        });
         if (isGuest) {
             processGuest();
         } else {

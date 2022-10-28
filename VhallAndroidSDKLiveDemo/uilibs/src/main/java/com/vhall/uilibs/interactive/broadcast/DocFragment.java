@@ -38,6 +38,16 @@ public class DocFragment extends BaseFragment {
     private TextView tvEmpty;
     private WebinarInfoData webinarInfoData;
 
+    public DocumentPublicView.DocMsgCallBack docMsgCallBack;
+
+    public void setDocMsgCallBack(DocumentPublicView.DocMsgCallBack docMsgCallBack) {
+        this.docMsgCallBack = docMsgCallBack;
+        if (documentPublicView!=null){
+            documentPublicView.setDocMsgCallBack(docMsgCallBack);
+        }
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -45,6 +55,7 @@ public class DocFragment extends BaseFragment {
         documentPublicView = rootView.findViewById(R.id.rl_doc_view);
         String orientation = getArguments().getString("orientation");
         documentPublicView.setOrientation(orientation);
+        documentPublicView.setDocMsgCallBack(docMsgCallBack);
         tvEmpty = rootView.findViewById(R.id.tv_empty);
         documentPublicView.setDocViewLister(new IDocViewLister() {
             @Override

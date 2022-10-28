@@ -1,7 +1,9 @@
 package com.vhall.uilibs.util;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.http.SslError;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -66,6 +68,23 @@ public class SurveyView extends WebView {
         mSettings.setJavaScriptEnabled(true);
         addJavascriptInterface(new JS2Android(), JSNAME);
         addJavascriptInterface(new JS2Android(), JSNAME1);
+
+
+        //增加下面配置 跳转生效
+        mSettings.setUseWideViewPort(true); //将图片调整到适合webview的大小
+        mSettings.setLoadWithOverviewMode(true); // 缩放至屏幕的大小
+        mSettings.setDomStorageEnabled(true);////启用或禁用DOM缓存
+
+        mSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        mSettings.setDefaultTextEncodingName("UTF-8");
+        mSettings.setAllowContentAccess(true); // 是否可访问Content Provider的资源，默认值 true
+        mSettings.setAllowFileAccess(true);    // 是否可访问本地文件，默认值 true
+        // 是否允许通过file url加载的Javascript读取本地文件，默认值 false
+        mSettings.setAllowFileAccessFromFileURLs(true);
+        // 是否允许通过file url加载的Javascript读取全部资源(包括文件,http,https)，默认值 false
+        mSettings.setAllowUniversalAccessFromFileURLs(true);
+        // 支持缩放
+        mSettings.setSupportZoom(true);
         setWebViewClient(new MyWebViewClient());
     }
 
@@ -118,11 +137,6 @@ public class SurveyView extends WebView {
             if (eventListener != null) {
                 eventListener.onEvent(EVENT_PAGE_LOADED, "on page finished");
             }
-        }
-
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-            return super.shouldOverrideUrlLoading(view, request);
         }
     }
 

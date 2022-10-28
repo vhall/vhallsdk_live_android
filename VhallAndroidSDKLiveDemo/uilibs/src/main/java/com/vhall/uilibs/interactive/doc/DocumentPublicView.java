@@ -551,10 +551,13 @@ public class DocumentPublicView extends RelativeLayout {
         @Override
         public void onEvent(String event, String type, String cid) {
             if (event.equals(KEY_OPERATE)) {
+                if (docMsgCallBack != null) {
+                    docMsgCallBack.onEvent(event, type);
+                }
                 if (type.equals(TYPE_ACTIVE)) {
                     documentView = vhops.getActiveView();
                     if (documentView != null) {
-                        if ((TextUtils.equals(ownerId, mainId)||isHost) && vhops.isEditAble()) {
+                        if ((TextUtils.equals(ownerId, mainId) || isHost) && vhops.isEditAble()) {
                             documentView.addListener(eventListener);
                             onTouchListener = new DocTouchListener();
                             documentView.setOnTouchListener(onTouchListener);
@@ -587,12 +590,12 @@ public class DocumentPublicView extends RelativeLayout {
 
                 } else if (type.equals(TYPE_SWITCHOFF)) {
                     //关闭文档演示
-//                    if (rlDocView != null) {
-//                        rlDocView.setVisibility(GONE);
-//                        if (docViewLister != null) {
-//                            docViewLister.setVisibility(VISIBLE, GONE);
-//                        }
-//                    }
+                    if (rlDocView != null) {
+                        rlDocView.setVisibility(GONE);
+                        if (docViewLister != null) {
+                            docViewLister.setVisibility(VISIBLE, GONE);
+                        }
+                    }
                 } else if (type.equals(TYPE_SWITCHON)) {
                     //打开文档演示
                     if (rlDocView != null) {
@@ -613,4 +616,13 @@ public class DocumentPublicView extends RelativeLayout {
         }
     };
 
+    public DocMsgCallBack docMsgCallBack;
+
+    public void setDocMsgCallBack(DocMsgCallBack docMsgCallBack) {
+        this.docMsgCallBack = docMsgCallBack;
+    }
+
+    public interface DocMsgCallBack {
+        void onEvent(String event, String type);
+    }
 }

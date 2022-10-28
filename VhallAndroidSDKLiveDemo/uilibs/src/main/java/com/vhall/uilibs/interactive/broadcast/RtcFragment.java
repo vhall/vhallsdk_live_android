@@ -55,7 +55,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import static com.vhall.ilss.VHInteractive.CANVAS_LAYOUT_PATTERN_GRID_1;
-import static com.vhall.ilss.VHInteractive.CANVAS_LAYOUT_PATTERN_TILED_6_1T5D;
+import static com.vhall.ops.VHOPS.*;
 
 
 /**
@@ -131,6 +131,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
      * 1，主次悬浮 - CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE
      * 2，主次平铺 - CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
      * 3，均匀排列 - CANVAS_ADAPTIVE_LAYOUT_GRID_MODE
+     * 4，小窗口在上面 - CANVAS_ADAPTIVE_LAYOUT_TILED_TOP_MAX16
      */
 
     private int layout = VHInteractive.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE;
@@ -313,6 +314,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                  * 1，主次悬浮 - CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE
                  * 2，主次平铺 - CANVAS_ADAPTIVE_LAYOUT_TILED_MODE
                  * 3，均匀排列 - CANVAS_ADAPTIVE_LAYOUT_GRID_MODE
+                 * 4，小窗口在上面 -CANVAS_ADAPTIVE_LAYOUT_TILED_TOP_MAX16 服务端返回 CANVAS_ADAPTIVE_LAYOUT_TILED_EXT1_MODE
                  */
                 if (TextUtils.equals("CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE", mWebinarInfo.inter_active_type)) {
                     layout = VHInteractive.CANVAS_ADAPTIVE_LAYOUT_FLOAT_MODE;
@@ -320,6 +322,8 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     layout = VHInteractive.CANVAS_ADAPTIVE_LAYOUT_TILED_MODE;
                 } else if (TextUtils.equals("CANVAS_ADAPTIVE_LAYOUT_GRID_MODE", mWebinarInfo.inter_active_type)) {
                     layout = VHInteractive.CANVAS_ADAPTIVE_LAYOUT_GRID_MODE;
+                } else if (TextUtils.equals("CANVAS_ADAPTIVE_LAYOUT_TILED_EXT1_MODE", roomInfo.roomToolsStatusData.layout)) {
+                    layout = VHInteractive.CANVAS_ADAPTIVE_LAYOUT_TILED_TOP_MAX16;
                 }
             }
             if (mInteractive == null) {
@@ -328,6 +332,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             mInteractive.init(mWebinarInfo, new RequestCallback() {
                 @Override
                 public void onSuccess() {
+//                    mInteractive.setCropType(2);
                     if (callBack != null) {
                         callBack.onSuccess("onSuccess");
                     }
@@ -370,6 +375,45 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         mInteractive.enterRoom();
     }
 
+
+    private boolean hasDoc = false;//当前是否有演示文档
+    private boolean openDoc = false;//当前文档开关
+    private Stream docStream = null;
+
+    public void onEvent(String event, String type) {
+        if (event.equals(KEY_OPERATE)) {
+            if (type.equals(TYPE_ACTIVE)) {
+                hasDoc = true;
+                setRtcDoc();
+            } else if (type.equals(TYPE_SWITCHOFF)) {
+                openDoc = false;
+                setRtcDoc();
+            } else if (type.equals(TYPE_SWITCHON)) {
+                openDoc = true;
+                setRtcDoc();
+            }
+        }
+    }
+
+    //设置文档融屏幕
+    private void setRtcDoc() {
+        if (mInteractive != null && roomInfo != null
+                && roomInfo.interact != null
+                && (UserManger.isHost(roomInfo.getJoin_info().getRole_name()))
+                && roomInfo.roomToolsStatusData.speakerAndShowLayout == 1) {
+            if (hasDoc && openDoc) {
+                mInteractive.startDocCloudRender(null);
+                if (!hasShare && docStream != null) {
+                    setMixLayoutMainScreen(docStream);
+                }
+            } else {
+                mInteractive.stopDocCloudRender(null);
+                if (!hasShare && mainStream != null) {
+                    setMixLayoutMainScreen(mainStream);
+                }
+            }
+        }
+    }
 
     class RoomCallback extends SimpleRoomCallbackV2 {
 
@@ -490,6 +534,32 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     });
                 }
             }
+        }
+
+        @Override
+        public void onDidInternalStreamAdded(Room room, Stream stream) {
+            super.onDidInternalStreamAdded(room, stream);
+            if (stream != null) {
+                docStream = stream;
+                if (!hasShare)
+                    setMixLayoutMainScreen(stream);
+            }
+        }
+
+        @Override
+        public void onDidInternalStreamFailed(Room room, Stream stream, JSONObject jsonObject) {
+            super.onDidInternalStreamFailed(room, stream, jsonObject);
+            docStream = null;
+            if (!hasShare)
+                setMixLayoutMainScreen(mainStream);
+        }
+
+        @Override
+        public void onDidInternalStreamRemoved(Room room, Stream stream) {
+            super.onDidInternalStreamRemoved(room, stream);
+            docStream = null;
+            if (!hasShare)
+                setMixLayoutMainScreen(mainStream);
         }
     }
 
@@ -776,7 +846,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                     if (updateMainStreamLister != null) {
                         updateMainStreamLister.updateMainStream(mainStream);
                     }
-                    if (!hasShare && isPush) {
+                    if (!hasShare && isPush && !(docStream != null && hasDoc && openDoc && roomInfo.roomToolsStatusData.speakerAndShowLayout == 1)) {
                         setMixLayoutMainScreen(mainStream);
                     }
                 }
@@ -802,7 +872,7 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
                 return;
             }
             if (mainStream != null) {
-                //旁路主讲人设置未大画面
+                //把当前流 在混流中设置为大画面
                 mainStream.setMixLayoutMainScreen("", null);
             }
         } else {
@@ -858,6 +928,9 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
 
     /**
      * 添加共享画面
+     * <p>
+     * 6.9.0 我们产品需求 共享桌面作为主画面
+     * 主画面优先级  共享桌面>文档>主讲人
      */
     private void addShareView(Stream stream) {
         hasShare = true;
@@ -869,8 +942,10 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         adapter.notifyDataSetChanged();
         setMixLayoutMainScreen(stream);
 
-        //设置共享桌面、插播 大画面
-        mInteractive.setMixLayoutMode(CANVAS_LAYOUT_PATTERN_GRID_1, null);
+        //设置共享桌面、插播 大画面 6.9.0 产品需求变更 开启文档融屏共享屏幕不在单独设置大屏 具体使用可以根据自己的产品需求
+        if (roomInfo.roomToolsStatusData.speakerAndShowLayout == 0) {
+            mInteractive.setMixLayoutMode(CANVAS_LAYOUT_PATTERN_GRID_1, null);
+        }
         setChoose(selectPoint);
     }
 
@@ -890,10 +965,16 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
             shareView = null;
             adapter.notifyDataSetChanged();
         }
-        if (mainStream != null) {
+        if (docStream != null && hasDoc && openDoc && roomInfo.roomToolsStatusData.speakerAndShowLayout == 1) {
+            setMixLayoutMainScreen(docStream);
+        } else if (mainStream != null) {
             setMixLayoutMainScreen(mainStream);
         }
-        mInteractive.setMixLayoutMode(layout, null);
+
+        //恢复布局
+        if (roomInfo.roomToolsStatusData.speakerAndShowLayout == 0) {
+            mInteractive.setMixLayoutMode(layout, null);
+        }
     }
 
     public Stream getMainStream() {
@@ -1054,6 +1135,9 @@ public class RtcFragment extends BaseFragment implements ViewPager.OnPageChangeL
         if (mInteractive == null) {
             return;
         }
+        if (roomInfo != null && roomInfo.join_info != null
+                && UserManger.isHost(roomInfo.getJoin_info().getRole_name()))
+            mInteractive.stopDocCloudRender(null);
         if (isPublic) {
             noSpeak();
         }
