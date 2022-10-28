@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.8.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.8.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.9.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.9.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
