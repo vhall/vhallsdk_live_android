@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
     <LinearLayout
@@ -13,7 +13,7 @@
             android:id="@+id/contentVideo"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <LinearLayout
             android:id="@+id/ll_detail"
@@ -24,11 +24,12 @@
             android:visibility="visible">
 
             <TextView
-                android:layout_width="match_parent"
-                android:background="@color/white"
-                android:textColor="@color/color_22"
                 android:id="@+id/status"
-                android:layout_height="@dimen/dimen_40dp"/>
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/dimen_40dp"
+                android:background="@color/white"
+                android:textColor="@color/color_22" />
+
             <RadioGroup
                 android:id="@+id/radio_tabs"
                 android:layout_width="match_parent"
@@ -75,10 +76,10 @@
                     android:layout_weight="1.0"
                     android:background="@drawable/bg_radiobutton_selector"
                     android:button="@null"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:lines="1"
                     android:ellipsize="end"
+                    android:gravity="center"
+                    android:lines="1"
+                    android:padding="8dp"
                     android:text="问答"
                     android:textColor="@drawable/tabs_red_color_selector"
                     android:textSize="@dimen/common_content_size_16"
@@ -98,6 +99,21 @@
                     android:textColor="@drawable/tabs_red_color_selector"
                     android:textSize="@dimen/common_content_size_16" />
 
+                <RadioButton
+                    android:id="@+id/rb_chapters"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_radiobutton_selector"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="章节"
+                    android:textColor="@drawable/tabs_red_color_selector"
+                    android:textSize="@dimen/common_content_size_16"
+                    android:visibility="gone" />
+
 
                 <RadioButton
                     android:id="@+id/rb_detail"
@@ -110,9 +126,9 @@
                     android:gravity="center"
                     android:padding="8dp"
                     android:text="详情"
-                    android:visibility="gone"
                     android:textColor="@drawable/tabs_red_color_selector"
-                    android:textSize="@dimen/common_content_size_16" />
+                    android:textSize="@dimen/common_content_size_16"
+                    android:visibility="gone" />
 
 
             </RadioGroup>
@@ -146,19 +162,19 @@
                     android:id="@+id/contentChat"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <FrameLayout
                     android:id="@+id/contentDoc"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <FrameLayout
                     android:id="@+id/contentQuestion"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <FrameLayout
                     android:id="@+id/contentLottery"
@@ -167,10 +183,16 @@
                     android:visibility="gone" />
 
                 <FrameLayout
+                    android:id="@+id/contentChapters"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone" />
+
+                <FrameLayout
                     android:id="@+id/contentDetail"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
                 <RelativeLayout
                     android:layout_width="wrap_content"
@@ -214,8 +236,8 @@
         android:id="@+id/tv_pv_num"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/tv_online_num"
         android:layout_toEndOf="@id/tv_online_num"
+        android:layout_toRightOf="@id/tv_online_num"
         android:text="  pv:0"
         android:textColor="@color/red_main" />
 
@@ -224,7 +246,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/doc_action_back"

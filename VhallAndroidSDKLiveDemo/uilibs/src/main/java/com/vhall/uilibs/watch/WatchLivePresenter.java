@@ -23,6 +23,7 @@ import com.vhall.business.WatchLive;
 import com.vhall.business.common.Constants;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.RequestDataCallback;
+import com.vhall.business.data.RequestDataCallbackV2;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
@@ -30,6 +31,7 @@ import com.vhall.business.utils.SurveyInternal;
 import com.vhall.business_interactive.InterActive;
 import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.business_support.dlna.DeviceDisplay;
+import com.vhall.logmanager.L;
 import com.vhall.net.NetBroadcastReceiver;
 import com.vhall.net.NetUtil;
 import com.vhall.player.VHPlayerListener;
@@ -52,6 +54,8 @@ import com.vhall.vhallrtc.client.Stream;
 import com.vhall.vhallrtc.client.VHRenderView;
 import com.vhall.vhss.TokenManger;
 import com.vhall.vhss.data.LotteryCheckData;
+import com.vhall.vhss.data.LotteryWinningDetailData;
+import com.vhall.vhss.data.LotteryWinningUserInfoData;
 import com.vhall.vhss.data.RoundUserListData;
 import com.vhall.vhss.data.SurveyInfoData;
 
@@ -1238,6 +1242,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             if (!isRound || isPublic) {
                 if (interactive == null) {
                     interactive = new InterActive(watchView.getActivity(), new RoomCallback(), null);
+                    //round 代表是轮巡进入互动
                     interactive.init(true, webinarInfo, new RequestCallback() {
                         @Override
                         public void onSuccess() {
@@ -1282,6 +1287,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             getRoundUsers(false);
     }
 
+    //后台释放 互动
     @Override
     public void onPause() {
         releaseRound();

@@ -95,10 +95,10 @@ import java.util.Collection;
  */
 public class WatchActivity extends FragmentActivity implements WatchContract.WatchView {
 
-    private FrameLayout contentDoc, contentDetail, contentChat, contentQuestion, contentLottery;
+    private FrameLayout contentDoc, contentDetail, contentChat, contentQuestion, contentLottery, contentChapters;
     private RelativeLayout contentDocFull;
     private RadioGroup radio_tabs;
-    private RadioButton questionBtn, chatBtn, lotteryBtn;
+    private RadioButton questionBtn, chatBtn, lotteryBtn, chaptersBtn;
     private LinearLayout ll_detail;
     private CircleView mHand;
     ExtendTextView tv_notice;
@@ -115,6 +115,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     public ChatFragment chatFragment;
     public LotteryFragment lotteryFragment;
     public ChatFragment questionFragment;
+    public ChapterFragment chapterFragment;
     private int onlineVirtual = 0, pvVirtual = 0;
 
     InputView inputView;
@@ -160,6 +161,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         DetailFragment detailFragment = (DetailFragment) getSupportFragmentManager().findFragmentById(R.id.contentDetail);
         lotteryFragment = (LotteryFragment) getSupportFragmentManager().findFragmentById(R.id.contentLottery);
         questionFragment = (ChatFragment) getSupportFragmentManager().findFragmentById(R.id.contentQuestion);
+        chapterFragment = (ChapterFragment) getSupportFragmentManager().findFragmentById(R.id.contentChapters);
         initView();
         if (chatFragment == null) {
             chatFragment = ChatFragment.newInstance(type, false);
@@ -182,6 +184,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             lotteryFragment = LotteryFragment.newInstance();
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                     lotteryFragment, R.id.contentLottery);
+        }
+
+        if (chapterFragment == null) {
+            chapterFragment = ChapterFragment.newInstance();
+            ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
+                    chapterFragment, R.id.contentChapters);
         }
 
 
@@ -258,7 +266,8 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     };
 
 
-    private String roomId="";
+    private String roomId = "";
+    private WebinarInfo info;
 
     public void initWatch(Param params) {
         //可以不设置这两个参数
@@ -271,7 +280,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         } else {
             watchType = WebinarInfo.VIDEO;
         }
-        VhallSDK.initWatch(params.watchId, "", "", params.key, watchType,params.k_id, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
+        VhallSDK.initWatch(params.watchId, "", "", params.key, watchType, params.k_id, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
             public void onWebinarInfoLoaded(String jsonStr, WebinarInfo webinarInfo) {
                 if (getActivity().isFinishing()) {
@@ -283,6 +292,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     finish();
                     return;
                 }
+                info = webinarInfo;
                 status.setText(String.format("进入房间初始化值 举手开关=%s、问答开关=%d、禁言=%s、自己的禁言=%s、全体禁言=%s、" +
                                 "问答禁言状态=%s、公聊禁言状态=%s、",
                         webinarInfo.hands_up, webinarInfo.question_status, webinarInfo.chatforbid,
@@ -334,7 +344,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     playbackFragment = WatchPlaybackFragment.newInstance();
                     ActivityUtils.addFragmentToActivity(getSupportFragmentManager(),
                             playbackFragment, R.id.contentVideo);
-                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, webinarInfo);
+                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView,chapterFragment, param, webinarInfo);
                 }
                 onlineVirtual = webinarInfo.onlineVirtual;
                 if (webinarInfo.onlineShow == 1) {
@@ -411,10 +421,12 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         contentChat = (FrameLayout) findViewById(R.id.contentChat);
         contentQuestion = (FrameLayout) findViewById(R.id.contentQuestion);
         contentLottery = (FrameLayout) findViewById(R.id.contentLottery);
+        contentChapters = (FrameLayout) findViewById(R.id.contentChapters);
 
         questionBtn = (RadioButton) this.findViewById(R.id.rb_question);
         chatBtn = (RadioButton) this.findViewById(R.id.rb_chat);
         lotteryBtn = (RadioButton) this.findViewById(R.id.rb_lottery);
+        chaptersBtn = (RadioButton) this.findViewById(R.id.rb_chapters);
         mHand = this.findViewById(R.id.image_hand);
         mHand.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -455,6 +467,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
         if (type == VhallUtil.WATCH_PLAYBACK) {
             chatBtn.setText("聊天");
             contentChat.setVisibility(View.VISIBLE);
+            lotteryBtn.setVisibility(View.VISIBLE);
         }
         radio_tabs = (RadioGroup) findViewById(R.id.radio_tabs);
         radio_tabs.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -467,12 +480,14 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     contentDetail.setVisibility(View.GONE);
                     contentQuestion.setVisibility(View.GONE);
                     contentLottery.setVisibility(View.GONE);
+                    contentChapters.setVisibility(View.GONE);
                 } else if (checkedId == R.id.rb_doc) {
                     contentDoc.setVisibility(View.VISIBLE);
                     contentChat.setVisibility(View.GONE);
                     contentDetail.setVisibility(View.GONE);
                     contentQuestion.setVisibility(View.GONE);
                     contentLottery.setVisibility(View.GONE);
+                    contentChapters.setVisibility(View.GONE);
                 } else if (checkedId == R.id.rb_question) {
                     chatEvent = ChatFragment.CHAT_EVENT_QUESTION;
                     contentDoc.setVisibility(View.GONE);
@@ -480,11 +495,13 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     contentQuestion.setVisibility(View.VISIBLE);
                     contentChat.setVisibility(View.GONE);
                     contentLottery.setVisibility(View.GONE);
+                    contentChapters.setVisibility(View.GONE);
                 } else if (checkedId == R.id.rb_lottery) {
                     contentDoc.setVisibility(View.GONE);
                     contentDetail.setVisibility(View.GONE);
                     contentQuestion.setVisibility(View.GONE);
                     contentLottery.setVisibility(View.VISIBLE);
+                    contentChapters.setVisibility(View.GONE);
                     contentChat.setVisibility(View.GONE);
                 } else if (checkedId == R.id.rb_detail) {
                     contentDoc.setVisibility(View.GONE);
@@ -492,6 +509,14 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
                     contentLottery.setVisibility(View.GONE);
                     contentQuestion.setVisibility(View.GONE);
                     contentDetail.setVisibility(View.VISIBLE);
+                    contentChapters.setVisibility(View.GONE);
+                } else if (checkedId == R.id.rb_chapters) {
+                    contentDoc.setVisibility(View.GONE);
+                    contentChat.setVisibility(View.GONE);
+                    contentLottery.setVisibility(View.GONE);
+                    contentQuestion.setVisibility(View.GONE);
+                    contentDetail.setVisibility(View.GONE);
+                    contentChapters.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -598,6 +623,15 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     public void dismissQAndA() {
         questionBtn.setVisibility(View.GONE);
         chatBtn.setChecked(true);
+    }
+
+    //隐藏章节打点
+    @Override
+    public void showChapters() {
+        chaptersBtn.setVisibility(View.VISIBLE);
+        if (chapterFragment != null && info != null) {
+            chapterFragment.loadData(info);
+        }
     }
 
     @Override
@@ -736,7 +770,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             invitedDialog.setNegativeOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mPresenter.replyInvite(2,null);
+                    mPresenter.replyInvite(2, null);
                     invitedDialog.dismiss();
                     //发送拒绝上麦信息
                 }
@@ -746,7 +780,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
             @Override
             public void refuseInvite() {
                 //超时
-                mPresenter.replyInvite(3,null);
+                mPresenter.replyInvite(3, null);
             }
         });
         invitedDialog.show();
@@ -979,7 +1013,7 @@ public class WatchActivity extends FragmentActivity implements WatchContract.Wat
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,  String[] permissions,
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PUSH) {

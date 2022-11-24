@@ -9,6 +9,7 @@ import android.widget.SeekBar;
 import com.vhall.business.MessageServer;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.Survey;
+import com.vhall.business.data.WebinarInfo;
 import com.vhall.business_support.dlna.DMCControl;
 import com.vhall.business_support.dlna.DeviceDisplay;
 import com.vhall.player.vod.VodPlayerView;
@@ -59,6 +60,11 @@ public class WatchContract {
 
         //显示问答
         void showQAndA(String name);
+
+        //显示章节打点
+        default void showChapters() {
+
+        }
 
         //隐藏问答
         void dismissQAndA();
@@ -135,6 +141,10 @@ public class WatchContract {
     }
 
     interface DetailView extends BaseView<BasePresenter> {
+    }
+
+    interface ChapterView extends BaseView<ChapterPresenter> {
+        void loadData(WebinarInfo info);
     }
 
     interface LotteryView extends BaseView<BasePresenter> {
@@ -226,7 +236,6 @@ public class WatchContract {
         void setQualityChecked(String dpi);
 
         void setPlaySpeedText(String text);
-
 
 
         void setScrollInfo(final ScrollInfoData scrollInfo);
@@ -409,5 +418,9 @@ public class WatchContract {
          */
         default void clickDocFullBack() {
         }
+    }
+
+    interface ChapterPresenter extends BasePresenter {
+        void setSeekToChapter(int time);
     }
 }

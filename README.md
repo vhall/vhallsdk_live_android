@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.9.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.9.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.10.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.10.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -40,6 +40,15 @@ allprojects {
 ```
 
 二、版本更新信息：
+
+
+ 版本：v6.10.0  更新时间 2022.11.24
+ 
+1. 【新增】 [暖场视频功能](https://saas-doc.vhall.com/opendocs/show/1391)
+2. 【新增】回放 [获取回放禁言状态](https://saas-doc.vhall.com/opendocs/show/1395#获取活动配置开关)  和  [章节打点](https://saas-doc.vhall.com/opendocs/show/1237#获取章节打点信息) 
+3. 优化sdk中一些已知问题
+
+
 
 
  版本：v6.9.0  更新时间 2022.10.28

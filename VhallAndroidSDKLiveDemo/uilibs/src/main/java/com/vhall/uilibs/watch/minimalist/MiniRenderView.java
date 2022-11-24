@@ -23,6 +23,7 @@ import org.vhwebrtc.SurfaceViewRenderer;
 
 /**
  * @author hkl
+ * 显示互动流的小窗口
  * Date: 2021/9/27 12:34 PM
  */
 public class MiniRenderView extends FrameLayout {

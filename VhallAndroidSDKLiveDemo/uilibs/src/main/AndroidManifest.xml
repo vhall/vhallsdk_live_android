@@ -24,12 +24,23 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
         <activity
+            android:name=".watch.warmup.WatchBaseWarmUpActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
+            android:name=".watch.warmup.WatchWarmUpActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
             android:name=".watch.minimalist.MinimalistWatchActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
-
         <activity
             android:name=".watch.minimalist.MinimalistBaseWatchActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

@@ -26,6 +26,7 @@ import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.WatchPlayback;
 import com.vhall.business.data.RequestCallback;
+import com.vhall.business.data.RequestDataCallbackV2;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business_support.dlna.DMCControl;
@@ -38,6 +39,9 @@ import com.vhall.uilibs.chat.ChatContract;
 import com.vhall.uilibs.chat.ChatFragment;
 import com.vhall.uilibs.util.VhallUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.vhss.CallBack;
+import com.vhall.vhss.data.RecordChaptersData;
+import com.vhall.vhss.network.ActivityNetworkRequest;
 
 import org.fourthline.cling.android.AndroidUpnpService;
 import org.json.JSONArray;
@@ -53,7 +57,7 @@ import java.util.TimerTask;
 /**
  * 观看回放的Presenter
  */
-public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, ChatContract.ChatPresenter {
+public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, ChatContract.ChatPresenter, WatchContract.ChapterPresenter {
     private static final String TAG = "PlaybackPresenter";
     private Param param;
     private WebinarInfo webinarInfo;
@@ -81,6 +85,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     private boolean loadingVideo = false;
     private boolean loadingComment = false;
+    private boolean canChat = true;
 
     private Timer timer;
     @SuppressLint("HandlerLeak")
@@ -101,7 +106,7 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         }
     };
 
-    public WatchPlaybackPresenter(WatchContract.PlaybackView playbackView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, WatchContract.WatchView watchView, Param param, WebinarInfo webinarInfo) {
+    public WatchPlaybackPresenter(WatchContract.PlaybackView playbackView, WatchContract.DocumentView documentView, ChatContract.ChatView chatView, WatchContract.WatchView watchView, WatchContract.ChapterView chapterView, Param param, WebinarInfo webinarInfo) {
         this.playbackView = playbackView;
         this.documentView = documentView;
         this.watchView = watchView;
@@ -112,6 +117,8 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
         this.chatView.setPresenter(this);
         this.watchView.setPresenter(this);
         this.documentView.setPresenter(this);
+        if (chapterView != null)
+            chapterView.setPresenter(this);
     }
 
     @Override
@@ -154,7 +161,27 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
             if (webinarInfo.getWebinarInfoData() != null && webinarInfo.getWebinarInfoData().scrollInfoData != null) {
                 playbackView.setScrollInfo(webinarInfo.getWebinarInfoData().scrollInfoData);
             }
+
+            VhallSDK.permissionsCheck(webinarInfo.webinar_id, webinarInfo.hostId, new RequestDataCallbackV2<String>() {
+                @Override
+                public void onSuccess(String data) {
+                    try {
+                        JSONObject permissions = new JSONObject(data);
+                        if (Integer.parseInt(permissions.optString("ui.watch_record_chapter")) == 1) {
+                            watchView.showChapters();
+                        }
+                        canChat = Integer.parseInt(permissions.optString("ui.watch_record_no_chatting")) == 0;
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onError(int errorCode, String errorMsg) {
+                }
+            });
         }
+
     }
 
     @Override
@@ -371,6 +398,17 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
 
     }
 
+    @Override
+    public void setSeekToChapter(int time) {
+        getWatchPlayback().seekTo(time);
+        playerCurrentPosition = time;
+        playbackView.setSeekbarCurrentPosition((int) playerCurrentPosition);
+        playbackView.showProgressbar(true);
+        if (!getWatchPlayback().isPlaying()) {
+            startPlay();
+        }
+    }
+
     private class DocCallback implements WatchPlayback.DocumentEventCallback {
 
         @Override
@@ -546,6 +584,10 @@ public class WatchPlaybackPresenter implements WatchContract.PlaybackPresenter, 
     public void sendChat(final String text) {
         if (!VhallSDK.isLogin()) {
             Toast.makeText(watchView.getActivity(), R.string.vhall_login_first, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!canChat) {
+            Toast.makeText(watchView.getActivity(), "开启回放禁言", Toast.LENGTH_SHORT).show();
             return;
         }
         getWatchPlayback().sendComment(text, new RequestCallback() {

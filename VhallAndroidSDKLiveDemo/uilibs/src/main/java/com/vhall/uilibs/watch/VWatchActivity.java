@@ -178,7 +178,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
                 } else if (playbackFragment == null && type == VhallUtil.WATCH_PLAYBACK) {
                     playbackFragment = WatchPlaybackFragment.newInstance();
                     ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), playbackFragment, R.id.contentVideo);
-                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, webinarInfo);
+                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView,null, param, webinarInfo);
                 }
             }
 
@@ -197,7 +197,7 @@ public class VWatchActivity extends FragmentActivity implements WatchContract.Wa
                     ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), playbackFragment, R.id.contentVideo);
                     docFragment = new DocumentFragment();
                     fragmentManager.beginTransaction().replace(R.id.contentDoc, docFragment).commit();
-                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, param, null);
+                    new WatchPlaybackPresenter(playbackFragment, (WatchContract.DocumentView) docFragment, chatFragment, watchView, null,param, null);
                 }
             }
         });

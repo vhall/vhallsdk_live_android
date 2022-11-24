@@ -24,6 +24,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.vhall.business.MessageServer;
+import com.vhall.business.NewH5ImManager;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.LotteryPrizeListInfo;
 import com.vhall.business.data.LotteryWinnerData;
@@ -56,7 +57,7 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
     // 中奖者列表   提交中奖信息列表
     private RecyclerView lotteryWinnerRecyclerView, commitRecyclerView;
     private ImageView ivCover, ivEnd, ivClose;
-    private TextView tvCommit, tvLotteryIng, tvLotterName, tvEndHint, tvEndBtn, tvJoin,tv_title_name;
+    private TextView tvCommit, tvLotteryIng, tvLotterName, tvEndHint, tvEndBtn, tvJoin, tv_title_name;
     private View rootView;
     private LinearLayout llIng, llEnd, llCommit, llResult, llOldCommit;
     private String lotteryId;
@@ -195,6 +196,8 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                         endBtnGoLook = true;
                         tvEndHint.setText(getString(R.string.lottery_commit_success));
                         ivEnd.setBackgroundResource(R.drawable.icon_success_commit_prize);
+                        VhallSDK.lotteryWinningDetail(NewH5ImManager.getInstance().getRoomId(), lotteryId, null);
+                        VhallSDK.lotteryWinningUserInfo(NewH5ImManager.getInstance().getRoomId(), null);
                     }
 
                     @Override
@@ -258,10 +261,10 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                 final MessageServer.LotteryInfo lotteryInfo = lotteryData.lotteryInfo;
                 if (lotteryInfo != null) {
                     tvLotteryIng.setText(lotteryInfo.remark);
-                    if (!TextUtils.isEmpty(lotteryInfo.title)){
+                    if (!TextUtils.isEmpty(lotteryInfo.title)) {
                         tv_title_name.setText(lotteryInfo.title);
                         tv_title_name.setVisibility(View.VISIBLE);
-                    }else {
+                    } else {
                         tv_title_name.setVisibility(View.GONE);
                     }
                 }
@@ -321,10 +324,10 @@ public class LotteryFragment extends Fragment implements WatchContract.LotteryVi
                 String award_image = getString(R.string.lottery);
                 if (lotteryData.lotteryInfo != null) {
                     lotteryId = lotteryData.lotteryInfo.lottery_id;
-                    if (!TextUtils.isEmpty(lotteryData.lotteryInfo.title)){
+                    if (!TextUtils.isEmpty(lotteryData.lotteryInfo.title)) {
                         tv_title_name.setText(lotteryData.lotteryInfo.title);
                         tv_title_name.setVisibility(View.VISIBLE);
-                    }else {
+                    } else {
                         tv_title_name.setVisibility(View.GONE);
                     }
                 }

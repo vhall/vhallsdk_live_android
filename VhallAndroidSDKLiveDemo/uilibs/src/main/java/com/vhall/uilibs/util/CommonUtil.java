@@ -1,8 +1,13 @@
 package com.vhall.uilibs.util;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.widget.FrameLayout;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class CommonUtil {
 
@@ -57,5 +62,52 @@ public class CommonUtil {
         return showNum;
     }
 
+    public static String converStringTimeToStr(String startTime) {
+        try {
+            if (TextUtils.isEmpty(startTime)) {
+                return "";
+            }
+            String[] split = startTime.split(":");
+            if (split == null) {
+                return "";
+            }
+            if (split.length == 2) {
+                startTime = startTime + ":00";
+            }
+            Calendar calendar = Calendar.getInstance();
+            Date now = calendar.getTime();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
+            Date start = dateFormat.parse(startTime);
+            if (start != null) {
+                long time = start.getTime() - now.getTime();
+                if (time < 0) {
+                    return converLongTimeToStr2(0);
+                }
+                return converLongTimeToStr2(time);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static String converLongTimeToStr2(long time) {
+        int ss = 1000;
+        int mi = ss * 60;
+        int hh = mi * 60;
+        int da = hh * 24;
+
+        long day = (time) / da;
+        long hour = (time - da * day) / hh;
+        long minute = (time - da * day - hour * hh) / mi;
+        long second = (time - da * day - hour * hh - minute * mi) / ss;
+
+        String strDay = day < 10 ? "0" + day : "" + day;
+        String strHour = hour < 10 ? "0" + hour : "" + hour;
+        String strMinute = minute < 10 ? "0" + minute : "" + minute;
+        String strSecond = second < 10 ? "0" + second : "" + second;
+
+        return String.format("距离开播 <font><big><big><big><big>%s</big></big></big></big>天 <font><big><big><big><big>%s</big></big></big></big>时 <big><big><big><big>%s</big></big></big></big>分 <big><big><big><big>%s</big></big></big></big>秒", strDay, strHour, strMinute, strSecond);
+    }
 }
