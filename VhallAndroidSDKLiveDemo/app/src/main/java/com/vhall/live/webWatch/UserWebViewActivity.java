@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.PermissionRequest;
@@ -20,12 +19,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.RelativeLayout;
 
-import com.vhall.business.VhallSDK;
-import com.vhall.business.data.WebinarInfo;
-import com.vhall.business.data.WebinarInfoRemote;
-import com.vhall.business.data.source.WebinarInfoDataSource;
 import com.vhall.live.R;
-import com.vhall.uilibs.Param;
 
 /**
  *  清单文件设置
