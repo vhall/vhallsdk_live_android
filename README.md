@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.10.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.10.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.11.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.11.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -41,6 +41,12 @@ allprojects {
 
 二、版本更新信息：
 
+ 版本：v6.11.0  更新时间 2022.12.23
+
+
+1. 【新增】新增直播中 [快问快答](https://saas-doc.vhall.com/opendocs/show/1417)功能，提升直播的转化效果；
+2. 【优化】优化互动连麦、文档水印等已知问题。
+3.  优化sdk中一些已知问题|
 
  版本：v6.10.0  更新时间 2022.11.24
  
