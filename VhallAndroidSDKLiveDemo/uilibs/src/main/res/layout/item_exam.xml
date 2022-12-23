@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/dimen_94dp"
+    android:layout_marginLeft="@dimen/dimen_16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginRight="@dimen/dimen_16dp"
+    android:background="@drawable/shape_bg_white"
+    tools:ignore="RtlCompat">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="@dimen/dimen_250dp"
+        android:layout_height="@dimen/dp_40"
+        android:layout_marginStart="@dimen/dimen_16dp"
+        android:layout_marginTop="@dimen/dimen_16dp"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:text="今年最新发布的iPhone 14Pro有哪些色有哪些Pro有哪些色有哪些 Pro有哪些色有哪些："
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_14dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_push_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_16dp"
+        android:layout_marginTop="8dp"
+        android:text="推送时间：20:10"
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+    <TextView
+        android:id="@+id/tv_q_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_5dp"
+        android:layout_marginTop="8dp"
+        android:text="限时：20:10"
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_10dp"
+        app:layout_constraintStart_toEndOf="@id/tv_push_time"
+        app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+    <TextView
+        android:id="@+id/tv_score_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_5dp"
+        android:layout_marginTop="8dp"
+        android:text="总分："
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_10dp"
+        app:layout_constraintStart_toEndOf="@id/tv_q_time"
+        app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+    <TextView
+        android:id="@+id/tv_all_score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:gravity="start"
+        android:text="100"
+        android:textColor="@color/color_FB3A32"
+        android:textSize="@dimen/dimen_10dp"
+        app:layout_constraintStart_toEndOf="@id/tv_score_hint"
+        app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+    <TextView
+        android:id="@+id/tv_q_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginTop="8dp"
+        android:text="题数: 10"
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_10dp"
+        app:layout_constraintStart_toEndOf="@id/tv_all_score"
+        app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#5Dffffff"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_get_score"
+        android:layout_width="@dimen/dimen_60dp"
+        android:layout_height="@dimen/dimen_30dp"
+        android:layout_marginEnd="@dimen/dimen_16dp"
+        android:gravity="center"
+        android:text="100fen"
+        android:textColor="@color/color_FB3A32"
+        android:textSize="@dimen/dimen_17dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_title" />
+</android.support.constraint.ConstraintLayout>

@@ -108,7 +108,7 @@ public class ScrollingTextView extends SurfaceView implements SurfaceHolder.Call
     private ScrollInfoData scrollingInfo;
 
     public void setScrollingInfo(ScrollInfoData scrollingInfo) {
-        if (scrollingInfo == null || TextUtils.isEmpty(scrollingInfo.getText())) {
+        if (scrollingInfo == null) {
             setVisibility(GONE);
         } else {
             this.scrollingInfo = scrollingInfo;

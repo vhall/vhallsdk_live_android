@@ -29,6 +29,7 @@ import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.MarqueeView;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.EmojiUtils;
+import com.vhall.uilibs.widget.ExamListDialog;
 import com.vhall.vhss.data.LotteryCheckData;
 import com.vhall.vhss.data.ScrollInfoData;
 import com.vhall.vhss.data.SurveyInfoData;
@@ -55,7 +56,7 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 
     private WatchContract.LivePresenter mPresenter;
 
-    private ImageView clickOrientation, clickStart, mVrButton, btn_mute;
+    private ImageView clickOrientation, clickStart, mVrButton, btn_mute,iv_exam;
     private RadioButton radioButtonShowDEFAULT, radioButtonShowSD, radioButtonShowHD, radioButtonShowUHD, radioButtonShowA;
 
     private RadioGroup radioChoose;
@@ -145,6 +146,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
 //        btnChangePlayStatus.setOnClickListener(this);
         btn_change_scaletype = (ImageView) root.findViewById(R.id.btn_change_scaletype);
         btn_change_scaletype.setOnClickListener(this);
+        iv_exam = (ImageView) root.findViewById(R.id.iv_exam);
+        iv_exam.setOnClickListener(this);
         progressbar = (ProgressBar) root.findViewById(R.id.progressbar);
         root.findViewById(R.id.image_action_back).setOnClickListener(this);
         // 设置最大显示行数
@@ -281,6 +284,8 @@ public class WatchLiveFragment extends Fragment implements WatchContract.LiveVie
         }else if (i == R.id.fl_notice) {
             noticeRedPoint.setVisibility(View.GONE);
             mPresenter.showNoticeDialog();
+        }else if (i == R.id.iv_exam) {
+            mPresenter.showExamDialog();
         }
     }
 

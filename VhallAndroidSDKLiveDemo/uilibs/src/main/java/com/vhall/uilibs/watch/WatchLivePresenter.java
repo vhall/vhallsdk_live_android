@@ -27,6 +27,7 @@ import com.vhall.business.data.RequestDataCallbackV2;
 import com.vhall.business.data.Survey;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.data.source.SurveyDataSource;
+import com.vhall.business.module.exam.ExamServer;
 import com.vhall.business.utils.SurveyInternal;
 import com.vhall.business_interactive.InterActive;
 import com.vhall.business_support.dlna.DMCControl;
@@ -46,6 +47,8 @@ import com.vhall.uilibs.interactive.RtcInternal;
 import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.ToastUtil;
 import com.vhall.uilibs.util.emoji.InputUser;
+import com.vhall.uilibs.widget.ExamListDialog;
+import com.vhall.uilibs.widget.ExamWebView;
 import com.vhall.uilibs.widget.LotteryListDialog;
 import com.vhall.uilibs.widget.NoticeListDialog;
 import com.vhall.uilibs.widget.SurveyListDialog;
@@ -279,6 +282,28 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
         });
     }
 
+    private ExamServer examServer;
+
+    @Override
+    public void showExam(String pageId) {
+        if (examServer == null) {
+            examServer = new ExamServer.Builder()
+                    .webinarInfo(webinarInfo).build();
+        }
+        ExamWebView examWebView = new ExamWebView(watchView.getActivity(), examServer.getExamUrl(pageId));
+        examWebView.show();
+    }
+
+    @Override
+    public void showExamRank(String pageId) {
+        if (examServer == null) {
+            examServer = new ExamServer.Builder()
+                    .webinarInfo(webinarInfo).build();
+        }
+        ExamWebView examWebView = new ExamWebView(watchView.getActivity(), examServer.getExamRankUrl(pageId));
+        examWebView.show();
+    }
+
     boolean force = false;
 
     @Override
@@ -444,6 +469,18 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
             noticeListDialog.show();
         } else {
             ToastUtil.showToast("当前主持人没有发布公告");
+        }
+    }
+
+    private ExamListDialog examListDialog;
+
+    @Override
+    public void showExamDialog() {
+        if (webinarInfo != null) {
+            if (examListDialog == null) {
+                examListDialog = new ExamListDialog(chatView.getContext(), webinarInfo);
+            }
+            examListDialog.show();
         }
     }
 
@@ -872,6 +909,9 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                     //支持的分辨率 msg
                     try {
                         JSONArray array = new JSONArray(msg);
+                        for (int i = 0; i < array.length(); i++) {
+                            
+                        }
                         liveView.showRadioButton(getWatchLive().getDefinitionAvailable());
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -934,7 +974,7 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
     private class MessageEventCallback implements MessageServer.Callback {
         @Override
         public void onEvent(MessageServer.MsgInfo messageInfo) {
-            Log.e("vhall_", "messageInfo " + messageInfo.event +" msg_id  "+ messageInfo.msg_id + ((null != messageInfo.responseImMessageInfo) ? messageInfo.responseImMessageInfo.getData() : "nulllll"));
+            Log.e("vhall_", "messageInfo " + messageInfo.event + " msg_id  " + messageInfo.msg_id + ((null != messageInfo.responseImMessageInfo) ? messageInfo.responseImMessageInfo.getData() : "nulllll"));
             switch (messageInfo.event) {
                 case MessageServer.EVENT_KICKOUT://踢出
                     watchView.showToast("您已被踢出");
@@ -1144,6 +1184,14 @@ public class WatchLivePresenter implements WatchContract.LivePresenter, ChatCont
                 case MessageServer.EVENT_VIDEO_ROUND_USERS:
                     //轮巡用户 再次之前必需要有麦克风、摄像头权限 uids次轮参与用户id
                     dealRound(messageInfo.uids, false);
+                    break;
+
+                case MessageServer.EVENT_EXAM_PAPER_SEND:
+                case MessageServer.EVENT_EXAM_PAPER_END:
+                case MessageServer.EVENT_EXAM_PAPER_AUTO_END:
+                case MessageServer.EVENT_EXAM_PAPER_SEND_RANK:
+                case MessageServer.EVENT_EXAM_PAPER_AUTO_SEND_RANK:
+                    chatView.notifyDataChanged(ChatFragment.CHAT_EVENT_EXAM, messageInfo);
                     break;
                 default:
                     break;

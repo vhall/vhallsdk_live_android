@@ -384,6 +384,10 @@ public class WatchContract {
 
         }
 
+        default void showExamDialog() {
+
+        }
+
         default void showSurvey(SurveyInfoData data) {
 
         }

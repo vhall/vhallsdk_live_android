@@ -7,6 +7,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.vhall.uilibs.R;
+import com.vhall.uilibs.util.ToastUtil;
 
 
 /**
@@ -32,5 +33,8 @@ public abstract class BaseBottomDialog extends Dialog {
         win.setAttributes(lp);
         win.setBackgroundDrawableResource(android.R.color.transparent);
         this.onWindowAttributesChanged(lp);
+    }
+    protected void showToast(String message){
+        ToastUtil.showToast(message);
     }
 }

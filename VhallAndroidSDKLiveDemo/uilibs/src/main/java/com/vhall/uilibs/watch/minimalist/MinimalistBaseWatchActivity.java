@@ -468,10 +468,14 @@ public abstract class MinimalistBaseWatchActivity extends AppCompatActivity impl
                     break;
                 case ChatServer.eventOnlineKey:
                     pv++;
+                    Log.e("vhall_",chatInfo.onlineData.concurrent_user+"");
+
                 case ChatServer.eventOfflineKey:
                     if (chatInfo.onlineData != null) {
                         online = chatInfo.onlineData.concurrent_user;
                     }
+                    Log.e("vhall_",chatInfo.onlineData.concurrent_user+"");
+
                     addChatData(chatInfo);
                     setLookNum();
                     break;

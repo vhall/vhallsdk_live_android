@@ -3,6 +3,7 @@ package com.vhall.uilibs.chat;
 import android.content.Context;
 
 import com.vhall.business.ChatServer;
+import com.vhall.business.MessageServer;
 import com.vhall.business.data.Survey;
 import com.vhall.uilibs.BasePresenter;
 import com.vhall.uilibs.BaseView;
@@ -20,8 +21,12 @@ public class ChatContract {
 
     public interface ChatView extends BaseView<ChatPresenter> {
         void notifyDataChanged(int type, ChatServer.ChatInfo data);
-        void notifyDataChanged(int type, List<ChatServer.ChatInfo> list);
 
+        default void notifyDataChanged(int type, MessageServer.MsgInfo data) {
+
+        }
+
+        void notifyDataChanged(int type, List<ChatServer.ChatInfo> list);
 
 
         void showToast(String content);
@@ -50,7 +55,15 @@ public class ChatContract {
 
         void showSurvey(String surveyid);
 
-        default void acquireChatRecord(int page,ChatServer.ChatRecordCallback callback){
+        default void showExam(String pageId) {
+
+        }
+
+        default void showExamRank(String pageId) {
+
+        }
+
+        default void acquireChatRecord(int page, ChatServer.ChatRecordCallback callback) {
 
         }
 

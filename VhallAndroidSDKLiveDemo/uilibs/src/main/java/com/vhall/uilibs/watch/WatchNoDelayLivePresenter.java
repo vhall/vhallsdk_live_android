@@ -1110,7 +1110,8 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
             Log.e(TAG, "onDidRoomStatus  " + vhRoomStatus);
             switch (vhRoomStatus) {
                 case VHRoomStatusDisconnected:
-                    watchView.getActivity().finish();
+                    //这个是 网络中断会收到的回调 在这里移除自己的本地回显画面
+                    liveNoDelayView.updateStream(true, interactive.getLocalStream(), null);
                     break;
                 case VHRoomStatusError:
                     watchView.showToast("互动房间链接失败");
@@ -1122,6 +1123,8 @@ public class WatchNoDelayLivePresenter implements WatchContract.LivePresenter, C
                     break;
                 case VHRoomStatusConnected: // 重连进房间
                     Log.e(TAG, "VHRoomStatusConnected");
+                    //这个是重连成功（网络恢复）收到的回调，在这重新推流  你会收到
+//                    interactive.publish();
                     break;
                 default:
                     break;

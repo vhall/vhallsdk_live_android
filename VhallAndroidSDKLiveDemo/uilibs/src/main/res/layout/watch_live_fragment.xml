@@ -38,6 +38,14 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="@dimen/dimen_60dp">
 
+        <ImageView
+            android:id="@+id/iv_exam"
+            android:layout_width="@dimen/dimen_30dp"
+            android:layout_height="@dimen/dimen_30dp"
+            android:layout_marginRight="@dimen/dimen_10dp"
+            android:src="@drawable/icon_exam"
+            android:visibility="visible" />
+
         <FrameLayout
             android:id="@+id/fl_timer"
             android:layout_width="@dimen/dimen_30dp"

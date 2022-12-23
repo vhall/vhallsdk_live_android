@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_60dp"
+        android:background="@drawable/shape_list_lottery"
+        app:layout_constraintBottom_toTopOf="@+id/recycle_view" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_15dp"
+        android:layout_marginLeft="@dimen/dimen_15dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:text="快问快答列表"
+        android:textColor="@color/color_22"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/line" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_view"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/color_FFF5F5"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/tv_cancel"
+        android:layout_width="@dimen/dimen_16dp"
+        android:layout_height="@dimen/dimen_16dp"
+        android:layout_alignTop="@id/recycle_view"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="end|center_vertical"
+        android:layout_margin="@dimen/dimen_16dp"
+        android:background="@drawable/icon_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/line" />
+</android.support.constraint.ConstraintLayout>

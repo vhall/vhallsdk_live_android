@@ -110,4 +110,47 @@ public class CommonUtil {
 
         return String.format("距离开播 <font><big><big><big><big>%s</big></big></big></big>天 <font><big><big><big><big>%s</big></big></big></big>时 <big><big><big><big>%s</big></big></big></big>分 <big><big><big><big>%s</big></big></big></big>秒", strDay, strHour, strMinute, strSecond);
     }
+
+    public static String changeRoleNameToString(String roleName) {
+        if (TextUtils.isEmpty(roleName)) {
+            return "观众";
+        }
+        String role;
+        switch (roleName) {
+            case "1":
+            case "host":
+                role = "主持人";
+                break;
+            case "3":
+            case "assistant":
+                role = "助理";
+                break;
+            case "4":
+            case "guest":
+                role = "嘉宾";
+                break;
+            default:
+                role = "观众";
+                break;
+        }
+        return role;
+    }
+
+    public static String examConverTimeToStr(String pushTime) {
+        try {
+            long time = Long.parseLong(pushTime)*60;
+            int mi = 60;
+            long minute = (time) / mi;
+            long second = (time - minute * mi);
+
+            String strMinute = minute < 10 ? "0" + minute : "" + minute;
+            String strSecond = second < 10 ? "0" + second : "" + second;
+            if (minute > 0)
+                return strMinute + "：" + strSecond;
+            else
+                return strSecond;
+        } catch (Exception e) {
+            return pushTime;
+        }
+    }
 }

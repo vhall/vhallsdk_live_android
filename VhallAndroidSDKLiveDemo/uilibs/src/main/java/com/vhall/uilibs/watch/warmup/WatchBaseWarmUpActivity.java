@@ -26,6 +26,7 @@ import com.vhall.uilibs.util.BaseUtil;
 import com.vhall.uilibs.util.CommonUtil;
 import com.vhall.uilibs.util.ListUtils;
 import com.vhall.uilibs.util.handler.WeakHandler;
+import com.vhall.uilibs.widget.ExamRequestDialog;
 import com.vhall.vhss.data.WarmInfoData;
 
 import java.util.TimerTask;
@@ -72,6 +73,7 @@ public abstract class WatchBaseWarmUpActivity extends AppCompatActivity {
         initData();
     }
 
+    private ExamRequestDialog examRequestDialog;
     private void initData() {
         VhallSDK.initWatch(params.watchId, "", "", params.key, params.k_id, new WebinarInfoDataSource.LoadWebinarInfoCallback() {
             @Override
@@ -82,7 +84,8 @@ public abstract class WatchBaseWarmUpActivity extends AppCompatActivity {
                 webinarInfo = data;
                 dealData(data);
                 //预告状态
-
+                examRequestDialog =new ExamRequestDialog(WatchBaseWarmUpActivity.this,data);
+//                examRequestDialog.show();
                 VhallSDK.getWarmInfo(params.watchId, new RequestDataCallbackV2<WarmInfoData>() {
                     @Override
                     public void onSuccess(WarmInfoData data) {
