@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -11,17 +11,18 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_40dp"
         android:gravity="center"
-        android:textColor="@color/color_33"
+        android:background="@color/color_FB3A32"
+        android:textColor="@color/white"
         android:textSize="@dimen/dimen_16dp"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/iv_close"
-        android:layout_width="@dimen/dimen_18dp"
-        android:layout_height="@dimen/dimen_18dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dimen_17dp"
         android:layout_marginLeft="@dimen/dimen_17dp"
-        android:background="@drawable/icon_close_black"
+        android:background="@drawable/svg_ic_back_white"
         app:layout_constraintBottom_toBottomOf="@id/tv_title"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_title"
@@ -45,7 +46,6 @@
         android:layout_marginLeft="6dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="@string/sure"
         android:textColor="@color/color_22"
         android:textSize="@dimen/dimen_12dp"
         app:layout_constraintBottom_toBottomOf="@id/iv_host_avatar"
@@ -56,8 +56,10 @@
         android:id="@+id/iv_cover"
         android:layout_width="match_parent"
         android:layout_height="@dimen/dimen_200dp"
+        android:scaleType="fitXY"
         android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@id/iv_host_avatar" />
+        app:layout_constraintTop_toBottomOf="@id/iv_host_avatar"
+        tools:background="@color/color_FB3A32" />
 
     <com.vhall.player.vod.VodPlayerView
         android:id="@+id/vodPlayerView"
@@ -70,7 +72,7 @@
         android:id="@+id/iv_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/icon_play_start"
+        android:background="@mipmap/icon_play_start"
         app:layout_constraintBottom_toBottomOf="@id/vodPlayerView"
         app:layout_constraintEnd_toEndOf="@id/vodPlayerView"
         app:layout_constraintStart_toStartOf="@id/vodPlayerView"
@@ -85,11 +87,13 @@
         android:layout_marginTop="20dp"
         android:gravity="center"
         android:textColor="@color/color_22"
+        tools:text="距离开播00天00时00分00秒"
         android:textSize="10dp"
         android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@id/iv_cover" />
 
     <View
+        android:id="@+id/warmup_divider_gray"
         android:layout_width="match_parent"
         android:layout_height="10dp"
         android:layout_marginTop="20dp"
@@ -100,32 +104,41 @@
         android:id="@+id/tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dimen_50dp"
-        android:paddingStart="@dimen/dimen_12dp"
-        android:paddingLeft="@dimen/dimen_12dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:layout_marginStart="@dimen/dimen_12dp"
+        android:layout_marginLeft="@dimen/dimen_12dp"
         android:text="简介"
         android:textColor="@color/color_22"
         android:textSize="@dimen/dimen_14dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_time" />
+        app:layout_constraintTop_toBottomOf="@id/warmup_divider_gray" />
+
+    <View
+        android:layout_width="@dimen/dimen_20dp"
+        android:layout_height="2dp"
+        app:layout_constraintStart_toStartOf="@+id/tv"
+        app:layout_constraintEnd_toEndOf="@+id/tv"
+        android:layout_marginTop="@dimen/dimen_5dp"
+        android:background="#FB2626"
+        app:layout_constraintTop_toBottomOf="@id/tv" />
 
     <TextView
         android:id="@+id/tv_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dimen_50dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
         android:paddingEnd="@dimen/dimen_12dp"
         android:paddingRight="@dimen/dimen_12dp"
         android:text="预告"
         android:textColor="@color/color_FB3A32"
         android:textSize="@dimen/dimen_14dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_time" />
+        app:layout_constraintTop_toBottomOf="@id/warmup_divider_gray" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
         android:background="#f8f8f8"
         app:layout_constraintTop_toBottomOf="@id/tv" />
 
@@ -133,11 +146,12 @@
         android:id="@+id/tv_title2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dimen_30dp"
         android:paddingStart="@dimen/dimen_12dp"
         android:paddingLeft="@dimen/dimen_12dp"
         android:textColor="@color/color_22"
         android:textSize="@dimen/dimen_16dp"
+        tools:text="标题"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/tv" />
 
@@ -151,10 +165,34 @@
         android:textSize="@dimen/dimen_14dp"
         app:layout_constraintTop_toBottomOf="@id/tv_title2" />
 
-    <WebView
-        android:id="@+id/web"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/tv_time2" />
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_time2">
 
-</android.support.constraint.ConstraintLayout>
+        <WebView
+            android:id="@+id/web"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/web_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableTop="@mipmap/icon_info_empty"
+        android:gravity="center_horizontal"
+        android:text="这里空空如也"
+        android:textColor="@color/color_8c"
+        android:textSize="@dimen/dimen_14sp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_time2"
+        tools:ignore="UseCompatTextViewDrawableXml" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

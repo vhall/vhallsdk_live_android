@@ -1,38 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="@dimen/dimen_15dp"
-    android:layout_marginTop="@dimen/dimen_5dp"
-    android:background="@drawable/shape_bg_black_chat"
-    android:paddingStart="@dimen/dimen_8dp"
-    android:paddingTop="@dimen/dimen_3dp"
-    android:paddingEnd="@dimen/dimen_8dp"
-    android:paddingBottom="@dimen/dimen_3dp"
     tools:ignore="RtlCompat">
 
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="@dimen/dimen_28dp"
+        android:layout_height="@dimen/dimen_28dp"
+        android:layout_marginStart="@dimen/dimen_12dp"
+        android:layout_marginTop="@dimen/dimen_12dp"
+        android:background="@mipmap/icon_avatar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
-        android:id="@+id/tv_text"
-        android:layout_width="match_parent"
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/dimen_8dp"
         android:text="2019新潮搭配推201"
-        android:textColor="@color/white"
-        android:textSize="@dimen/dimen_12dp"
+        android:textColor="@color/color_8c"
+        android:textSize="@dimen/dimen_14sp"
+        app:layout_constraintStart_toEndOf="@id/iv_avatar"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dimen_12dp"
+        android:text="2019新潮搭配推201"
+        android:textColor="@color/color_8c"
+        android:textSize="@dimen/dimen_14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+
+    <RelativeLayout
+        android:id="@+id/rl"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_8dp"
+        android:layout_marginTop="@dimen/dimen_6dp"
+        android:background="@drawable/shape_bg_white"
+        android:paddingStart="@dimen/dimen_8dp"
+        android:paddingTop="@dimen/dimen_3dp"
+        android:paddingEnd="@dimen/dimen_8dp"
+        android:paddingBottom="@dimen/dimen_3dp"
+        app:layout_constraintEnd_toEndOf="@id/tv_time"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@id/iv_avatar"
+        app:layout_constraintTop_toBottomOf="@id/tv_name"
+        app:layout_constraintWidth_default="wrap">
+
+        <TextView
+            android:id="@+id/tv_or_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/shape_chat_reply"
+            android:drawablePadding="@dimen/dimen_6dp"
+            android:textColor="@color/color_59"
+            android:textSize="@dimen/dimen_14sp"
+            tools:ignore="UseCompatTextViewDrawableXml" />
+
+        <TextView
+            android:id="@+id/tv_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_or_text"
+            android:textColor="@color/color_22"
+            android:textSize="@dimen/dimen_14sp" />
+
+
+        <com.vhall.uimodule.module.chat.ChatImagesView
+            android:id="@+id/chat_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_text" />
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/tv_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dimen_24dp"
+        android:layout_marginTop="@dimen/dimen_12dp"
+        android:background="@drawable/shape_bg_chat_msg"
+        android:gravity="center"
+        android:maxLines="1"
+        android:paddingStart="@dimen/dimen_12dp"
+        android:paddingEnd="@dimen/dimen_39dp"
+        android:textColor="@color/color_59"
+        android:textSize="@dimen/dimen_14sp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/iv_gift"
-        android:layout_width="@dimen/dimen_16dp"
-        android:layout_height="@dimen/dimen_16dp"
-        android:layout_marginStart="2dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tv_text"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/iv_msg"
+        android:layout_width="@dimen/dimen_20dp"
+        android:layout_height="@dimen/dimen_20dp"
+        android:layout_marginEnd="@dimen/dimen_12dp"
+        app:layout_constraintBottom_toBottomOf="@id/tv_msg"
+        app:layout_constraintEnd_toEndOf="@id/tv_msg"
+        app:layout_constraintTop_toTopOf="@id/tv_msg" />
 
-</android.support.constraint.ConstraintLayout>
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="iv_avatar,tv_name,tv_time,rl" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/group_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="tv_msg,iv_msg" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

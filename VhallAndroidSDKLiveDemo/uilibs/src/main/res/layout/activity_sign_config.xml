@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+
+    <TextView
+        android:id="@+id/tv"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_40dp"
+        android:background="@color/color_FB3A32"
+        android:gravity="center"
+        android:text="签名设置"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_15dp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/dimen_15dp"
+        android:paddingTop="@dimen/dp_10"
+        android:paddingEnd="@dimen/dimen_35dp"
+        android:paddingBottom="@dimen/dp_10"
+        android:src="@drawable/svg_ic_back_white"
+        app:layout_constraintBottom_toBottomOf="@id/tv"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv" />
+
+    <ImageView
+        android:id="@+id/iv_q"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/dimen_15dp"
+        android:paddingTop="@dimen/dp_10"
+        android:paddingEnd="@dimen/dimen_35dp"
+        android:paddingBottom="@dimen/dp_10"
+        android:src="@drawable/svg_ic_question_white"
+        app:layout_constraintBottom_toBottomOf="@id/tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv" />
+
+    <TextView
+        android:id="@+id/tv_base_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_60dp"
+        android:text="基本信息"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_back" />
+
+    <TextView
+        android:id="@+id/tv_app_key"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:text="APPKey"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_14sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_base_info" />
+
+    <EditText
+        android:id="@+id/ed_app_key"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_43dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_5dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@drawable/shape_ed_line"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:paddingStart="@dimen/dimen_10dp"
+        android:paddingEnd="@dimen/dimen_10dp"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_app_key" />
+
+    <TextView
+        android:id="@+id/tv_app_secret_key"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:text="APP SecretKey"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toBottomOf="@id/ed_app_key" />
+
+    <EditText
+        android:id="@+id/ed_app_secret_key"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_43dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_5dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@drawable/shape_ed_line"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingStart="@dimen/dimen_10dp"
+        android:paddingEnd="@dimen/dimen_10dp"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_app_secret_key" />
+
+    <TextView
+        android:id="@+id/tv_sign_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_30dp"
+        android:text="签名信息"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ed_app_secret_key" />
+
+    <TextView
+        android:id="@+id/tv_app_rsa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:text="安全码SHA1"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_sign_info" />
+
+    <TextView
+        android:id="@+id/ed_app_rsa"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_43dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_5dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@drawable/shape_ed_line"
+        android:drawableEnd="@drawable/svg_ic_copy"
+        android:drawablePadding="@dimen/dimen_5dp"
+        android:ellipsize="end"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingStart="@dimen/dimen_10dp"
+        android:paddingEnd="@dimen/dimen_10dp"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_app_rsa" />
+
+    <TextView
+        android:id="@+id/tv_app_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:text="包名"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toBottomOf="@id/ed_app_rsa" />
+
+    <TextView
+        android:id="@+id/ed_app_name"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_43dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_5dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@drawable/shape_ed_line"
+        android:drawableEnd="@drawable/svg_ic_copy"
+        android:drawablePadding="@dimen/dimen_5dp"
+        android:ellipsize="end"
+        android:gravity="center_vertical"
+        android:maxLines="1"
+        android:paddingStart="@dimen/dimen_10dp"
+        android:paddingEnd="@dimen/dimen_10dp"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_app_name" />
+
+    <TextView
+        android:id="@+id/tv_save"
+        android:layout_width="match_parent"
+        android:layout_height="43dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_40dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@drawable/shape_bg_rounded_red"
+        android:gravity="center"
+        android:text="保存"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ed_app_name" />
+</androidx.constraintlayout.widget.ConstraintLayout>

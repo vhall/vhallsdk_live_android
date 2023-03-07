@@ -3,20 +3,26 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@android:id/background">
         <shape>
-            <solid android:color="#ffffffff" />
+            <solid android:color="@color/color_7F807F" />
+            <size android:height="@dimen/dimen_2dp"/>
+            <corners android:radius="@dimen/dimen_4dp"/>
         </shape>
     </item>
     <item android:id="@android:id/secondaryProgress">
         <clip>
             <shape>
-                <solid android:color="#ffffffff" />
+                <solid android:color="@color/color_7F807F" />
+                <size android:height="@dimen/dimen_2dp"/>
+                <corners android:radius="@dimen/dimen_4dp"/>
             </shape>
         </clip>
     </item>
     <item android:id="@android:id/progress">
         <clip>
             <shape>
-                <solid android:color="#ffd30000" />
+                <solid android:color="@color/color_FB3A32" />
+                <size android:height="@dimen/dimen_2dp"/>
+                <corners android:radius="@dimen/dimen_4dp"/>
             </shape>
         </clip>
     </item>

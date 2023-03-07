@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <View
+        android:id="@+id/bg_top"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="@mipmap/main_bg_top"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:layout_width="@dimen/dimen_150dp"
+        android:layout_height="@dimen/dimen_150dp"
+        android:background="@mipmap/icon_avatar_bg"
+        app:layout_constraintBottom_toBottomOf="@id/bg_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/bg_top" />
+
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="104dp"
+        android:layout_height="104dp"
+        android:background="@mipmap/icon_avatar"
+        app:layout_constraintBottom_toBottomOf="@id/bg_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/bg_top" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_25dp"
+        tools:text="@string/app_name"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_avatar" />
+
+    <TextView
+        android:id="@+id/tv_login_out"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dimen_25dp"
+        android:text="退出登录"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/tv_watch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_40dp"
+        android:layout_marginTop="@dimen/dimen_25dp"
+        android:text="观看直播"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bg_top" />
+
+    <EditText
+        android:id="@+id/ed_watch_id"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_43dp"
+        android:layout_marginStart="@dimen/dimen_40dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:layout_marginEnd="@dimen/dimen_40dp"
+        android:background="@color/transparent"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:hint="请输入直播ID"
+        android:textColor="@color/color_22"
+        android:textColorHint="@color/color_99"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_watch" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_1dp"
+        android:layout_marginStart="@dimen/dimen_40dp"
+        android:layout_marginEnd="@dimen/dimen_40dp"
+        android:background="@color/color_99"
+        app:layout_constraintTop_toBottomOf="@id/ed_watch_id" />
+
+    <Switch
+        android:id="@+id/main_authmodel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_20dp"
+        android:layout_marginEnd="@dimen/dimen_40dp"
+        android:checked="false"
+        android:theme="@style/SwitchTheme"
+        android:trackTint="@color/color_FC5659"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ed_watch_id" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/watch_authmodel_switch"
+        android:layout_marginRight="@dimen/dimen_10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/main_authmodel"
+        app:layout_constraintRight_toLeftOf="@+id/main_authmodel"
+        app:layout_constraintTop_toTopOf="@+id/main_authmodel" />
+
+    <TextView
+        android:id="@+id/tv_join"
+        android:layout_width="@dimen/dimen_100dp"
+        android:layout_height="43dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:background="@drawable/shape_bg_rounded_red"
+        android:gravity="center"
+        android:text="进入"
+        android:layout_marginBottom="50dp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_18dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ed_watch_id" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/tv_sign"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dimen_15dp"
+        android:text="@string/sign_config"
+        android:textColor="@color/color_66"
+        android:textSize="@dimen/dimen_15sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_150dp"
+        android:background="@mipmap/icon_login_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/ed_account"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_43dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_250dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@color/transparent"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:hint="@string/app_login_account"
+        android:textColor="@color/color_22"
+        android:textColorHint="@color/color_99"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_q"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dimen_10dp"
+        android:src="@drawable/svg_ic_question"
+        app:layout_constraintBottom_toBottomOf="@id/ed_account"
+        app:layout_constraintEnd_toEndOf="@id/ed_account"
+        app:layout_constraintTop_toTopOf="@id/ed_account" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_1dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@color/color_99"
+        app:layout_constraintTop_toBottomOf="@id/ed_account" />
+
+    <EditText
+        android:id="@+id/ed_password"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_43dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_25dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@color/transparent"
+        android:gravity="center_vertical"
+        android:hint="@string/app_login_password"
+        android:textColor="@color/color_22"
+        android:textColorHint="@color/color_99"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toBottomOf="@id/ed_account" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_1dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@color/color_99"
+        app:layout_constraintTop_toBottomOf="@id/ed_password" />
+
+    <EditText
+        android:id="@+id/ed_head"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_43dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_25dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@color/transparent"
+        android:gravity="center_vertical"
+        android:hint="@string/app_head_url_hint"
+        android:textColor="@color/color_22"
+        android:textColorHint="@color/color_99"
+        android:textSize="@dimen/dimen_16sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/ed_password" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_1dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@color/color_99"
+        app:layout_constraintTop_toBottomOf="@id/ed_head" />
+
+
+    <TextView
+        android:id="@+id/tv_join"
+        android:layout_width="match_parent"
+        android:layout_height="43dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_40dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@drawable/shape_bg_rounded_red"
+        android:gravity="center"
+        android:text="登录"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_18dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ed_head" />
+
+    <RadioGroup
+        android:id="@+id/rg_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_25dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="@id/ed_account"
+        app:layout_constraintTop_toBottomOf="@id/tv_join">
+
+        <RadioButton
+            android:id="@+id/account_login"
+            style="@style/MyLoginCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/app_account_login" />
+
+        <RadioButton
+            android:id="@+id/id_login"
+            style="@style/MyLoginCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dimen_10dp"
+            android:text="@string/app_id_login" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/tv_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_20dp"
+        android:layout_marginBottom="@dimen/dimen_30dp"
+        android:textColor="@color/color_99"
+        android:textSize="@dimen/dimen_12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -21,16 +21,17 @@
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dimen_25dp"
         android:gravity="center"
         android:text="确定要退出当前帐号吗？"
         android:textColor="@color/color_22"
         android:textSize="@dimen/dimen_16dp"
+        app:layout_constraintBottom_toTopOf="@+id/view6"
         app:layout_constraintEnd_toEndOf="@id/bg"
         app:layout_constraintStart_toStartOf="@id/bg"
         app:layout_constraintTop_toTopOf="@id/bg" />
 
     <View
+        android:id="@+id/view5"
         android:layout_width="0dp"
         android:layout_height="@dimen/dimen_1px"
         android:layout_marginBottom="@dimen/dimen_45dp"
@@ -40,6 +41,7 @@
         app:layout_constraintStart_toStartOf="@id/bg" />
 
     <View
+        android:id="@+id/view6"
         android:layout_width="@dimen/dimen_1px"
         android:layout_height="@dimen/dimen_45dp"
         android:background="@color/color_E2"
@@ -64,10 +66,10 @@
         android:layout_width="@dimen/dimen_100dp"
         android:layout_height="@dimen/dimen_45dp"
         android:gravity="center"
-        android:text="@string/sure"
-        android:textColor="@color/color_FC5659"
+        android:text="确定"
+        android:textColor="@color/color_FB3A32"
         android:textSize="@dimen/dimen_16dp"
         app:layout_constraintBottom_toBottomOf="@id/bg"
         app:layout_constraintEnd_toEndOf="@id/bg"
         app:layout_constraintStart_toEndOf="@id/tv_1" />
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,59 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.vhall.live">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:name=".VhallApplication"
         android:allowBackup="true"
-        android:icon="@drawable/logo"
-        tools:overrideLibrary="com.vhall.core"
-        tools:replace="android:allowBackup"
-        android:hardwareAccelerated="true"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        >
+        android:supportsRtl="true"
+        android:name=".VhallApplication"
+        android:theme="@style/Theme.SaasSdkDemo">
         <activity
             android:name=".SplashActivity"
-            android:icon="@drawable/icon_vhall"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".LoginActivity"
-            android:icon="@drawable/icon_vhall"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".MainActivity"
-            android:icon="@drawable/icon_vhall"
-            android:label="@string/app_name"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name=".SetParamActivity"
-            android:icon="@drawable/icon_vhall"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"/>
-
-        <activity
-            android:name=".LiveListActivity"
-            android:screenOrientation="portrait"/>
-
-        <activity android:name=".webWatch.WebViewActivity"
-            android:configChanges="orientation|screenSize|keyboardHidden"
-            android:screenOrientation="sensor"
-            android:hardwareAccelerated="true"/>
-
     </application>
+
 </manifest>

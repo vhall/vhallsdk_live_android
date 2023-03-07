@@ -1,25 +1,27 @@
 <resources>
 
-    <style name="AppBaseTheme" parent="android:Theme.Light.NoTitleBar"></style>
-
-    <style name="AppTheme" parent="AppBaseTheme"></style>
 
     <style name="BaseAppButtonForRed">
-        <item name="android:background">@drawable/bg_common_rounded_red</item>
+        <item name="android:background">@drawable/shape_bg_rounded_red</item>
         <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40dp</item>
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">@dimen/common_content_size_16</item>
+        <item name="android:textSize">@dimen/dimen_16sp</item>
     </style>
 
-    <style name="style0">
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">#FF961F</item>
+    <style name="AppLineEditInputTheme">
+        <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:textSize">@dimen/dimen_12sp</item>
+        <item name="android:layout_marginRight">@dimen/dimen_10sp</item>
+        <item name="android:gravity">right|center</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:background">@null</item>
     </style>
 
-    <style name="Dialog_Fullscreen">
-        <item name="android:windowIsTranslucent">false</item>
-        <item name="android:indeterminateDrawable">@drawable/progress_large</item>
-        <item name="android:windowCloseOnTouchOutside">false</item>
+    <style name="MyLoginCheckBox" parent="Theme.AppCompat.Light">
+        <item name="android:textSize">@dimen/dimen_12sp</item>
+        <item name="android:textColor">@color/color_22</item>
+        <item name="android:button">@drawable/check_box_selector</item>
     </style>
 
     <!--底部弹出dialog使用-->
@@ -29,17 +31,7 @@
         <item name="android:windowFullscreen">true</item>
     </style>
 
-    <style name="full_dialog" parent="@android:style/Theme.Dialog">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowIsTranslucent">false</item>
-        <item name="android:backgroundDimEnabled">false</item>
+    <style name="SwitchTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorAccent">@color/color_FC5659</item>
     </style>
-
-    <style name="MyCheckBox" parent="Theme.AppCompat.Light">
-        <item name="android:button">@drawable/check_box_selector</item>
-    </style>
-
 </resources>

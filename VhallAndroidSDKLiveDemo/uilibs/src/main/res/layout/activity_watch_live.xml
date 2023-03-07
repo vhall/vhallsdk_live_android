@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_40dp"
+        android:background="@color/color_FB3A32"
+        android:gravity="center"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="@dimen/dimen_20dp"
+        android:paddingLeft="@dimen/dimen_17dp"
+        android:src="@drawable/svg_ic_back_white"
+        app:layout_constraintBottom_toBottomOf="@id/tv_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_title"
+        tools:ignore="ContentDescription" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_50dp"
+        android:background="@color/white"
+        app:layout_constraintTop_toBottomOf="@+id/fl_video"
+        app:tabGravity="start"
+        app:tabIndicator="@drawable/tab_selected"
+        app:tabIndicatorColor="@color/color_FB3A32"
+        app:tabMaxWidth="@dimen/dimen_280dp"
+        app:tabMode="scrollable"
+
+        app:tabSelectedTextColor="@color/color_22"
+        app:tabTextColor="@color/color_66"
+        tools:ignore="MissingConstraints" />
+
+    <FrameLayout
+        android:id="@+id/fl_tab"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tab" />
+
+    <com.vhall.uimodule.widget.ExtendTextView
+        android:id="@+id/tv_notice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_notice"
+        android:clickable="true"
+        android:drawableStart="@drawable/svg_icon_notice_ic"
+        android:drawableEnd="@mipmap/icon_close"
+        android:drawablePadding="12dp"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center_vertical"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:padding="10dp"
+        android:singleLine="true"
+        android:textColor="#646464"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tab" />
+
+    <FrameLayout
+        android:id="@+id/fl_video"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_title" />
+
+
+    <RelativeLayout
+        android:id="@+id/rl_user"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dimen_38dp"
+        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:background="@drawable/bg_black_30_shape"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/fl_video">
+
+        <ImageView
+            android:id="@+id/iv_host_avatar"
+            android:layout_width="@dimen/dimen_30dp"
+            android:layout_height="@dimen/dimen_30dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/dimen_3dp" />
+
+        <TextView
+            android:id="@+id/tv_host_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginEnd="@dimen/dimen_20dp"
+            android:layout_toEndOf="@id/iv_host_avatar"
+            android:ellipsize="end"
+            android:maxEms="6"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="@dimen/dimen_12sp" />
+
+        <TextView
+            android:id="@+id/tv_look_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="6dp"
+            android:layout_marginBottom="3dp"
+            android:layout_toEndOf="@id/iv_host_avatar"
+            android:drawablePadding="2dp"
+            android:maxLines="1"
+            android:textColor="@color/color_CECED1"
+            android:textSize="@dimen/dimen_10sp"
+            app:drawableStartCompat="@drawable/svg_icon_look_num" />
+
+        <TextView
+            android:id="@+id/tv_hot_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="6dp"
+            android:layout_marginEnd="@dimen/dimen_20dp"
+            android:layout_marginBottom="3dp"
+            android:layout_toEndOf="@id/tv_look_num"
+            android:drawableStart="@drawable/svg_icon_hot"
+            android:drawablePadding="2dp"
+            android:maxLines="1"
+            android:textColor="@color/color_CECED1"
+            android:textSize="@dimen/dimen_10sp"
+            tools:ignore="UseCompatTextViewDrawableXml" />
+
+    </RelativeLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

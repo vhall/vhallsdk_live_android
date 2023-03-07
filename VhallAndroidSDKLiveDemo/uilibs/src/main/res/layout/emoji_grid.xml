@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.vhall.uilibs.util.emoji.EmojiGridView
+    <com.vhall.uimodule.utils.emoji.EmojiGridView
         android:id="@+id/gv_emoji"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

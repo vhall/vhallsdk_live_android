@@ -1,70 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginTop="2dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dimen_12dp"
     tools:ignore="RtlCompat">
 
-    <TextView
-        android:id="@+id/tv_time"
-        android:layout_width="@dimen/dimen_38dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dimen_16dp"
-        android:text="99:99"
-        android:gravity="center"
-        android:textColor="@color/color_26"
-        android:textSize="@dimen/dimen_14dp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_0dp"
+        android:layout_marginStart="@dimen/dimen_22dp"
+        android:layout_marginEnd="@dimen/dimen_22dp"
+        android:background="@drawable/shape_bg_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_title" />
 
     <TextView
         android:id="@+id/tv_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/dimen_20dp"
+        android:layout_marginEnd="@dimen/dimen_35dp"
+        android:paddingTop="@dimen/dimen_10dp"
         android:text="填写"
-        android:textSize="@dimen/dimen_14dp"
+        android:textSize="@dimen/dimen_14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-
-    <ImageView
-        android:id="@+id/tv_top"
-        android:layout_width="@dimen/dimen_12dp"
-        android:layout_height="@dimen/dimen_12dp"
-        android:layout_marginStart="@dimen/dimen_10dp"
-        android:background="@drawable/svg_icon_survey_point"
-        app:layout_constraintStart_toEndOf="@id/tv_time"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/iv_line"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/dimen_43dp"
-        android:layout_marginTop="2dp"
-        android:background="@drawable/icon_survey_line"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/tv_top"
-        app:layout_constraintStart_toStartOf="@id/tv_top"
-        app:layout_constraintTop_toBottomOf="@id/tv_top" />
 
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginStart="@dimen/dimen_35dp"
         android:layout_marginEnd="@dimen/dimen_10dp"
-        android:ellipsize="end"
         android:gravity="start"
-        android:lines="2"
+        android:paddingTop="@dimen/dimen_10dp"
         android:textColor="@color/color_1a"
-        android:textSize="@dimen/dimen_14dp"
+        android:textSize="@dimen/dimen_14sp"
         app:layout_constraintEnd_toStartOf="@id/tv_status"
-        app:layout_constraintStart_toEndOf="@id/tv_top"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_35dp"
+        android:textColor="@color/color_8c"
+        android:textSize="@dimen/dimen_14sp"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:paddingBottom="@dimen/dimen_10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,20 +1,5 @@
 <resources>
 
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
-
-
-
-    <dimen name="common_margin_size_5">5dp</dimen>
-    <dimen name="common_margin_size_10">10dp</dimen>
-    <dimen name="common_content_size_16">16sp</dimen>
-    <dimen name="common_content_size_14">14sp</dimen>
-    <dimen name="common_content_size_12">12sp</dimen>
-    <dimen name="common_line_padding">5dp</dimen>
-    <dimen name="big_line_padding">20dp</dimen>
-    <dimen name="common_viewpager_tab_height">40dp</dimen>
-
     <dimen name="dimen_0dp">0dp</dimen>
     <dimen name="dimen_1px">1px</dimen>
     <dimen name="dimen_1dp">1dp</dimen>
@@ -151,5 +136,27 @@
     <dimen name="dimen_400dp">400dp</dimen>
     <dimen name="dimen_420dp">420dp</dimen>
     <dimen name="dimen_450dp">450dp</dimen>
+
+
+    <dimen name="dimen_2sp">2sp</dimen>
+    <dimen name="dimen_5sp">5sp</dimen>
+    <dimen name="dimen_8sp">8sp</dimen>
+    <dimen name="dimen_9sp">9sp</dimen>
+    <dimen name="dimen_10sp">10sp</dimen>
+    <dimen name="dimen_11sp">11sp</dimen>
+    <dimen name="dimen_12sp">12sp</dimen>
+    <dimen name="dimen_13sp">13sp</dimen>
+    <dimen name="dimen_14sp">14sp</dimen>
+    <dimen name="dimen_15sp">15sp</dimen>
+    <dimen name="dimen_16sp">16sp</dimen>
+    <dimen name="dimen_17sp">17sp</dimen>
+    <dimen name="dimen_18sp">18sp</dimen>
+    <dimen name="dimen_20sp">20sp</dimen>
+    <dimen name="dimen_21sp">21sp</dimen>
+    <dimen name="dimen_22sp">22sp</dimen>
+    <dimen name="dimen_25sp">25sp</dimen>
+    <dimen name="dimen_30sp">30sp</dimen>
+
+
 
 </resources>

@@ -1,62 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">uiModule</string>
+    <string name="sign_config">签名设置</string>
+    <string name="phone_user">手机用户</string>
 
-    <string name="app_name">VhallSDKSelfServiceDemo</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_broadcast">BroadcastActivity</string>
-    <string name="title_activity_watch">WatchActivity</string>
-    <string name="title_activity_broadcast_land">BroadcastLandActivity</string>
-    <string name="title_activity_watch_land">WatchLandActivity</string>
+    <string name="app_account_login">&#160;&#160;密码登录</string>
+    <string name="app_id_login">&#160;&#160;三方ID登录</string>
 
-    <string name="vhall_button_broadcast_start">开始直播</string>
-    <string name="vhall_button_watch">观看</string>
-    <string name="vhall_button_orientation">横竖屏切换</string>
-    <string name="vhall_button_back">返回</string>
-    <string name="vhall_login_username">账号:</string>
-    <string name="vhall_login_userpass">密码:</string>
-
-    <string name="vhall_login_first">请先登录</string>
-    <string name="a">很遗憾，/n您与大奖擦肩而过，感谢您的参与！</string>
-
-    <string name="test">test</string>
-
-    <string name="pay_hint_fee">打赏金额</string>
-    <string name="pay_hint_note">打赏说明</string>
-    <string name="pay_hint_type">支付类型:</string>
-    <string name="vhall_lottery_title_start">趣味抽奖</string>
-    <string name="vhall_lottery_title_show">抽奖结果</string>
-    <string name="vhall_lottery_title_submit">提交信息</string>
-    <string name="vhall_lottery_true">恭喜您中奖了</string>
-    <string name="vhall_lottery_false">很遗憾您没中</string>
-
-    <string name="vhall_hint">提示</string>
-    <string name="vhall_mic_invited">邀请您上麦，是否接受？</string>
-    <string name="vhall_agree">同意</string>
-    <string name="vhall_disagree">取消</string>
-    <string name="vhall_mic_invited_title">上麦邀请</string>
-    <string name="lottery_look_winner">查看中奖名单</string>
-    <string name="lottery_commit_success">信息提交成功</string>
-    <string name="lottery_commit_failed">信息提交失败</string>
-    <string name="lottery">礼品</string>
-    <string name="lottery_incoming_msg">收到一条抽奖消息</string>
-    <string name="accept_the_prize">立即领奖</string>
-    <string name="lottery_lose">很遗憾，\n您与大奖擦肩而过，感谢您的参与！</string>
-    <string name="lottery_win">中奖啦，\n恭喜您获得" %s "</string>
-
-    <string name="start_broadcast">开始直播</string>
-    <string name="start_dress_rehearsal">开始彩排</string>
-    <string name="live_send_msg_hint">说点什么吧…</string>
-    <string name="send_msg_hint">参与聊天</string>
-    <string name="sure">确定</string>
-    <string name="vhall_no_member">暂时没有成员列表</string>
-    <string name="vhall_forbit_member">暂时没有禁言或踢出成员</string>
-
-    <string name="choose_camera_stand">选择推流机位</string>
-
-    <string name="live_director">以视频推流形式推流到云导播</string>
-    <string name="live_host">以主持人身份发起直播</string>
+    <string name="app_login_account">账号</string>
+    <string name="app_login_password">密码</string>
+    <string name="app_login_id">三方ID登录</string>
+    <string name="app_login_nickname">昵称（非必填）</string>
+    <string name="app_head_url_hint">头像(非必填)</string>
+    <string name="app_id_hint">请输入三方ID</string>
+    <string name="app_please_input_rtc_id">请输入互动房间id</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_permission_av_none">没有音视频权限不可以上麦</string>
 
+    <string name="watch_auth_hint_pwd">请输入密码</string>
+    <string name="watch_auth_hint_whitelist">请输入白名单手机号</string>
+    <string name="watch_authmodel_switch">是否校验观看限制权限</string>
 </resources>

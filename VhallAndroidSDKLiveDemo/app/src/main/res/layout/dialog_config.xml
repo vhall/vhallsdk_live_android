@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_400dp"
+        android:layout_margin="@dimen/dimen_20dp"
+        android:background="@drawable/shape_bg_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingStart="@dimen/dimen_35dp"
+        android:layout_marginBottom="@dimen/dimen_10dp"
+        android:paddingEnd="@dimen/dimen_35dp"
+        android:text="可以输入     release       pre         test0(1-n) 比如 test01  "
+        android:textColor="@color/color_22"
+        android:textIsSelectable="true"
+        android:textSize="@dimen/dimen_18sp"
+        app:layout_constraintBottom_toTopOf="@id/ed_config"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/ed_config"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dimen_35dp"
+        android:hint="请输入环境"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <RadioGroup
+        android:id="@+id/rg_ns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_35dp"
+        android:layout_marginEnd="@dimen/dimen_35dp"
+        android:orientation="horizontal"
+        android:gravity="right"
+        android:checkedButton="@id/rb_saas_api"
+        app:layout_constraintTop_toBottomOf="@+id/ed_config">
+
+        <RadioButton
+            android:id="@+id/rb_saas_api"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ns_saas_api" />
+
+        <RadioButton
+            android:id="@+id/rb_saas_open"
+            android:layout_width="wrap_content"
+            android:layout_marginStart="@dimen/dimen_10dp"
+            android:layout_height="wrap_content"
+            android:text="@string/ns_saas_open" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_40dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/rg_ns">
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="100dp"
+            android:layout_height="43dp"
+            android:layout_marginRight="@dimen/dimen_40dp"
+            android:background="@drawable/shape_bg_rounded_f0"
+            android:gravity="center"
+            android:text="取消"
+            android:textColor="@color/black"
+            android:textSize="@dimen/dimen_18sp" />
+
+        <TextView
+            android:id="@+id/tv_save"
+            android:layout_width="100dp"
+            android:layout_height="43dp"
+            android:background="@drawable/shape_bg_rounded_red"
+            android:gravity="center"
+            android:text="保存"
+            android:textColor="@color/white"
+            android:textSize="@dimen/dimen_18sp"
+            app:layout_constraintEnd_toEndOf="parent" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

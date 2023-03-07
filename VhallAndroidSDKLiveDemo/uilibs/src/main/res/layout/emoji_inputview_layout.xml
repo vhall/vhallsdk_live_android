@@ -4,16 +4,18 @@
     android:layout_height="wrap_content"
     android:background="#00000000"
     android:orientation="vertical">
+
     <View
         android:id="@+id/view_bg"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#00000000"/>
+        android:background="#00000000" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/red_gray"
+        android:background="@color/white"
         android:gravity="center_vertical"
         android:padding="2dp">
 
@@ -22,45 +24,41 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:src="@mipmap/inputview_icon_emoji" />
+            android:src="@mipmap/icon_emoji" />
 
         <EditText
             android:id="@+id/et_content"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/bg_common_rounded_white_border_gray"
+            android:background="@drawable/shape_bg_rounded_f0"
             android:imeOptions="flagNoExtractUi|actionSend"
             android:padding="10dp"
             android:singleLine="true"
-            android:textColor="@color/gray_deep"
-            android:textColorHint="@color/gray_normal"
+            android:textColor="@color/color_22"
+            android:textColorHint="@color/color_99"
             android:textSize="15dp" />
 
         <TextView
             android:id="@+id/tv_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_common_rounded_red"
-            android:layout_marginLeft="@dimen/common_margin_size_5"
-            android:layout_marginRight="@dimen/common_margin_size_5"
+            android:layout_marginLeft="@dimen/dimen_5dp"
+            android:layout_marginRight="@dimen/dimen_5dp"
+            android:background="@mipmap/icon_chat_send"
             android:paddingLeft="15dp"
+            android:paddingTop="@dimen/dimen_10dp"
             android:paddingRight="15dp"
-            android:paddingTop="@dimen/common_margin_size_10"
-            android:paddingBottom="@dimen/common_margin_size_10"
-            android:text="发送"
+            android:paddingBottom="@dimen/dimen_10dp"
             android:textColor="@color/white"
             android:textSize="15dp" />
-
-
     </LinearLayout>
 
-    <android.support.v4.view.ViewPager
+    <androidx.viewpager.widget.ViewPager
         android:id="@+id/vp_emoji"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:visibility="gone"
-        android:background="#ffffff"/>
-
+        android:background="#ffffff"
+        android:visibility="gone" />
 
 </LinearLayout>

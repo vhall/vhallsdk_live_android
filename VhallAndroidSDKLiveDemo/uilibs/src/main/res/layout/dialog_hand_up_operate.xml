@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/shape_help_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_hand_cancel"
+        tools:layout_editor_absoluteX="1dp" />
+
+    <TextView
+        android:id="@+id/tv_video"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dimen_45dp"
+        android:drawableTop="@drawable/svg_icon_video_open"
+        android:drawablePadding="@dimen/dimen_8dp"
+        android:gravity="center"
+        android:paddingTop="@dimen/dimen_30dp"
+        android:text="摄像头"
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_14sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_audio"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="UseCompatTextViewDrawableXml" />
+
+    <TextView
+        android:id="@+id/tv_audio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dimen_45dp"
+        android:drawableTop="@drawable/svg_icon_audio_open"
+        android:drawablePadding="@dimen/dimen_8dp"
+        android:gravity="center"
+        android:paddingTop="@dimen/dimen_30dp"
+        android:text="麦克风"
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_14sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_camera"
+        app:layout_constraintStart_toEndOf="@id/tv_video"
+        tools:ignore="UseCompatTextViewDrawableXml" />
+
+    <TextView
+        android:id="@+id/tv_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dimen_45dp"
+        android:drawableTop="@drawable/svg_icon_camera"
+        android:drawablePadding="@dimen/dimen_8dp"
+        android:gravity="center"
+        android:paddingTop="@dimen/dimen_30dp"
+        android:text="相机"
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_14sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tv_hand_cancel"
+        app:layout_constraintStart_toEndOf="@id/tv_audio"
+        tools:ignore="UseCompatTextViewDrawableXml" />
+
+    <TextView
+        android:id="@+id/tv_hand_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dimen_45dp"
+        android:drawableTop="@drawable/svg_icon_hand_pic"
+        android:drawablePadding="@dimen/dimen_8dp"
+        android:gravity="center"
+        android:paddingTop="@dimen/dimen_30dp"
+        android:text="下麦"
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_14sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/tv_camera"
+        tools:ignore="UseCompatTextViewDrawableXml" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

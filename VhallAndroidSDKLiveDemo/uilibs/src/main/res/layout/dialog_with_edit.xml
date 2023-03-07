@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent">
+
+    <View
+        android:id="@+id/bg"
+        android:layout_width="300dp"
+        android:layout_height="@dimen/dimen_120dp"
+        android:background="@drawable/shape_bg_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/et_content"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="1"
+        android:singleLine="true"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16dp"
+        app:layout_constraintBottom_toTopOf="@+id/view6"
+        app:layout_constraintEnd_toEndOf="@id/bg"
+        app:layout_constraintStart_toStartOf="@id/bg"
+        app:layout_constraintTop_toTopOf="@id/bg"
+        tools:hint="请输入密码1111111111112" />
+
+    <View
+        android:id="@+id/view5"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dimen_1px"
+        android:layout_marginBottom="@dimen/dimen_45dp"
+        android:background="@color/color_E2"
+        app:layout_constraintBottom_toBottomOf="@id/bg"
+        app:layout_constraintEnd_toEndOf="@id/bg"
+        app:layout_constraintStart_toStartOf="@id/bg" />
+
+    <View
+        android:id="@+id/view6"
+        android:layout_width="@dimen/dimen_1px"
+        android:layout_height="@dimen/dimen_45dp"
+        android:background="@color/color_E2"
+        app:layout_constraintBottom_toBottomOf="@id/bg"
+        app:layout_constraintEnd_toEndOf="@id/bg"
+        app:layout_constraintStart_toStartOf="@id/bg" />
+
+    <TextView
+        android:id="@+id/tv_cancel"
+        android:layout_width="@dimen/dimen_100dp"
+        android:layout_height="@dimen/dimen_45dp"
+        android:gravity="center"
+        android:text="取消"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16dp"
+        app:layout_constraintBottom_toBottomOf="@id/bg"
+        app:layout_constraintEnd_toStartOf="@id/tv_confirm"
+        app:layout_constraintStart_toStartOf="@id/bg" />
+
+    <TextView
+        android:id="@+id/tv_confirm"
+        android:layout_width="@dimen/dimen_100dp"
+        android:layout_height="@dimen/dimen_45dp"
+        android:gravity="center"
+        android:text="确定"
+        android:textColor="@color/color_FB3A32"
+        android:textSize="@dimen/dimen_16dp"
+        app:layout_constraintBottom_toBottomOf="@id/bg"
+        app:layout_constraintEnd_toEndOf="@id/bg"
+        app:layout_constraintStart_toEndOf="@id/tv_cancel" />
+</androidx.constraintlayout.widget.ConstraintLayout>
