@@ -124,7 +124,8 @@ class RtcFragment :
 
     private fun initInteractive() {
         interactive = InterActive(mContext, RoomCallback(), chatCallBack, messageCallBack)
-        interactive.init(false, webinarInfo, object : RequestCallback {
+        interactive.init(webinarInfo.webinar_id,webinarInfo.nick_name,"","", object : RequestCallback {
+//        interactive.init(false, webinarInfo, object : RequestCallback {
             override fun onSuccess() {
                 setLocalView()
                 interactive.enterRoom()
@@ -132,7 +133,7 @@ class RtcFragment :
 
             override fun onError(errorCode: Int, errorMsg: String) {
                 showToast(errorMsg)
-                activity?.finish()
+                rtcClose()
             }
         })
 
@@ -211,11 +212,11 @@ class RtcFragment :
                 VHRoomStatus.VHRoomStatusDisconnected -> {
                     //断开链接-断网或者弱网
                     isDisconnected = true
-                    activity?.finish()
+                    rtcClose()
                 }
                 VHRoomStatus.VHRoomStatusError -> {
                     if (!isDisconnected) {
-                        activity?.finish()
+                        rtcClose()
                         showToast("互动房间链接失败")
                     }
                 }
@@ -315,9 +316,18 @@ class RtcFragment :
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         handUpOperateDialog?.dismiss()
         onDownMic()
+        interactive.leaveRoom()
         interactive.onDestroy()
+        super.onDestroy()
+    }
+
+    private fun rtcClose()  {
+        if(activity != null){
+            val activity: WatchLiveActivity = activity as WatchLiveActivity
+            activity.leaveInteractive()
+            activity.continueWithLive()
+        }
     }
 }

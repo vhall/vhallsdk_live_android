@@ -42,6 +42,7 @@ public class ExtendTextView extends AppCompatTextView {
     @Override
     public void setText(CharSequence text, BufferType type) {
         showTest=text;
+        //todo 文字不满一行也可以滚动
         super.setText(showTest, type);
     }
 

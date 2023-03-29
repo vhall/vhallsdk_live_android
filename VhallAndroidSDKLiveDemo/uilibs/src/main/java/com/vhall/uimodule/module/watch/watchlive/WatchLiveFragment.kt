@@ -21,6 +21,7 @@ import com.vhall.uimodule.widget.OutDialogBuilder
 import com.vhall.uimodule.widget.ScrollChooseTypeDialog
 import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
 import java.util.*
 
 
@@ -166,14 +167,21 @@ class WatchLiveFragment :
      * @param is_role     0：不筛选主办方 1：筛选主办方 默认是0
      */
     fun getHistory(page: Int, msgId: String?, callback: ChatServer.ChatRecordCallback) {
-        watchLive.acquireChatRecord(
-            page,
-            100,
-            msgId,
-            "down",
-            "0",
-            callback
-        )
+        if(webinarInfo.is_new_version == 3){
+            watchLive.acquireChatRecord(
+                page,
+                100,
+                msgId,
+                "down",
+                "0",
+                callback
+            )
+        }else{
+            watchLive.acquireChatRecord(
+                true,
+                callback
+            )
+        }
     }
 
     fun sendChat(msg: String) {
@@ -187,6 +195,18 @@ class WatchLiveFragment :
 
         })
     }
+    fun sendCustomMsg(msg: String) {
+        watchLive.sendCustom( JSONObject(msg), object : RequestCallback {
+            override fun onError(p0: Int, p1: String?) {
+                showToast(p1)
+            }
+
+            override fun onSuccess() {
+
+            }
+        })
+    }
+
 
     fun sendQA(msg: String) {
         watchLive.sendQuestion(msg, object : RequestCallback {

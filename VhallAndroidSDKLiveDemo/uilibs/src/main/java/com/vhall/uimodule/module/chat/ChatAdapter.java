@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
@@ -20,6 +21,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.vhall.business.ChatServer;
+import com.vhall.business.ErrorCode;
 import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestDataCallback;
@@ -27,13 +29,17 @@ import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.module.survey.SurveyServer;
 import com.vhall.business.utils.SurveyInternal;
 import com.vhall.uimodule.R;
+import com.vhall.uimodule.module.lottery.LotteryListDialog;
 import com.vhall.uimodule.module.survey.SurveyWebView;
+import com.vhall.uimodule.module.watch.WatchLiveActivity;
 import com.vhall.uimodule.utils.CommonUtil;
 import com.vhall.uimodule.utils.ToastUtils;
 import com.vhall.uimodule.utils.emoji.EmojiUtils;
 import com.vhall.uimodule.widget.RadiusBackgroundSpan;
 import com.vhall.uimodule.widget.VhClickSpan;
 import com.vhall.vhss.data.SurveyInfoData;
+
+import org.json.JSONException;
 
 import java.util.List;
 
@@ -45,14 +51,20 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
     private Context mContext;
     WebinarInfo webinarInfo;
     private SurveyServer mSurveyServer;
-
-    public ChatAdapter(Context context, WebinarInfo webinarInfo) {
+    private FragmentActivity activity;
+    public ChatAdapter(Context context, WebinarInfo webinarInfo, FragmentActivity activity) {
         super(R.layout.item_chat_list);
         mContext = context;
         this.webinarInfo = webinarInfo;
-        mSurveyServer = new SurveyServer.Builder()
-                .webinarInfo(webinarInfo)
-                .build();
+        this.activity = activity;
+
+        try {
+            mSurveyServer = new SurveyServer.Builder()
+                    .webinarInfo(webinarInfo)
+                    .build();
+        } catch (IllegalArgumentException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -138,7 +150,8 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
 
                                 @Override
                                 public void onError(int errorCode, String errorMsg) {
-
+                                    if(errorCode == ErrorCode.ERROR_NO_SUPPORT)
+                                        new SurveyWebView(mContext, SurveyInternal.createSurveyUrl(webinarInfo, msgInfo.id)).show();
                                 }
                             });
                         }
@@ -159,6 +172,20 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
                             .append(msgInfo.status == 0 ? " 关闭" : " 开启")
                             .append("了问答");
                     break;
+                case MessageServer.EVENT_START_LOTTERY://开始抽奖
+                    builder.append("抽奖正在进行中");
+                    break;
+                case MessageServer.EVENT_END_LOTTERY://结束抽奖
+                    String str = "抽奖已结束，查看中奖名单";
+                    builder.append(str);
+                    VhClickSpan lotteryspan = new VhClickSpan(mContext.getResources().getColor(R.color.color_3562FA), false) {
+                        @Override
+                        public void onClick(View widget) {
+                            new LotteryListDialog(mContext, webinarInfo,msgInfo.lotteryInfo.lottery_id,activity).show();
+                        }
+                    };
+                    builder.setSpan(lotteryspan, str.length() - 6, str.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+                    break;
                 default:
                     break;
             }
@@ -178,7 +205,10 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
             RequestOptions requestOptions = RequestOptions.bitmapTransform(new CircleCrop()).placeholder(R.mipmap.icon_avatar);
             ImageView iv_avatar = viewHolder.getView(R.id.iv_avatar);
             ChatImagesView imagesView = viewHolder.getView(R.id.chat_image);
-            Glide.with(mContext).load(chatInfo.avatar).apply(requestOptions).into(iv_avatar);
+            if(chatInfo.avatar != null && chatInfo.avatar.contains("https"))
+                Glide.with(mContext).load(chatInfo.avatar).apply(requestOptions).into(iv_avatar);
+            else if(chatInfo.avatar != null && !chatInfo.avatar.contains("https"))
+                Glide.with(mContext).load("https:"+chatInfo.avatar).apply(requestOptions).into(iv_avatar);
             viewHolder.setText(R.id.tv_time, CommonUtil.converChatTime(chatInfo.time));
             //处理回复消息
             switch (chatInfo.event) {

@@ -16,10 +16,12 @@ import com.vhall.uimodule.databinding.FragmentWatchPlaybackBinding
 import com.vhall.uimodule.module.watch.WatchLiveActivity
 import com.vhall.uimodule.utils.CommonUtil
 import com.vhall.uimodule.widget.ScrollChooseTypeDialog
+import com.vhall.vhss.data.RecordChaptersData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
@@ -168,6 +170,29 @@ class WatchPlaybackFragment :
                     "",
                     msg!!
                 )
+                Constants.Event.EVENT_CUE_POINT -> {
+                    if(msg == null)
+                        return;
+                    try {
+                        val obj = JSONObject()
+                        val array = JSONArray(msg)
+                        var pointList: MutableList<RecordChaptersData.ListBean>  = arrayListOf()
+                        for (i in 0 until array.length()) {
+                            val point = array.getJSONObject(i)
+                            point.put("title",point.getString("msg"))
+                            point.put("created_at",point.getInt("timePoint"))
+                        }
+                        obj.put("doc_titles",array)
+                        var data: RecordChaptersData  = RecordChaptersData(obj)
+                        if (data != null && data.list != null && data.list.size!=0) {
+                            val a: WatchLiveActivity = activity as WatchLiveActivity
+                            a.showVideoPoint(data.list)
+                        }
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                    }
+//                    showToast(msg)
+                }
                 ErrorCode.ERROR_LOGIN_MORE -> {
                     showToast(msg)
                     activity?.finish()
@@ -192,15 +217,37 @@ class WatchPlaybackFragment :
      * @param is_role     0：不筛选主办方 1：筛选主办方 默认是0
      */
     fun getHistory(page: Int, msgId: String?, callback: ChatServer.ChatRecordCallback) {
-        watchPlayback.requestCommentHistory(
-            webinarInfo.webinar_id,
-            100,
-            page,
-            msgId,
-            "down",
-            "0",
-            callback
-        )
+        if(webinarInfo.is_new_version == 3){
+            watchPlayback.requestCommentHistory(
+                webinarInfo.webinar_id,
+                100,
+                page,
+                msgId,
+                "down",
+                "0",
+                callback
+            )
+        }else{
+            watchPlayback.requestCommentHistory(
+                webinarInfo.webinar_id,
+                100,
+                page,
+                callback
+            )
+        }
+    }
+
+    /**
+     * 获取当前房间聊天列表
+     *
+     * @param page        获取条目节点，默认为1
+     * @param limit       获取条目数量，最大100
+     * @param msg_id      获取条目数量，聊天记录 锚点消息id,此参数存在时anchor_path 参数必须存在
+     * @param anchor_path 锚点方向，up 向上查找，down 向下查找,此参数存在时 msg_id 参数必须存在
+     * @param is_role     0：不筛选主办方 1：筛选主办方 默认是0
+     */
+    fun seekTo(time: Int) {
+        watchPlayback.seekTo(time.toLong())
     }
 
     override fun onPause() {

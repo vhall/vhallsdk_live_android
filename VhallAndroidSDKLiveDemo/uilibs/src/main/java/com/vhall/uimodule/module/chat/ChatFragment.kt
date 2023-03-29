@@ -65,7 +65,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
         arguments?.let {
             webinarInfo = it.getSerializable(INFO_KEY) as WebinarInfo
             type = it.getString(TYPE)
-            chatAdapter = ChatAdapter(mContext, webinarInfo)
+            chatAdapter = ChatAdapter(mContext, webinarInfo,activity)
             qaAdapter = QAAdapter(mContext, webinarInfo)
             initConfig()
             allForbid = webinarInfo.chatAllForbid
@@ -150,6 +150,9 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
             else
                 getQaHistory()
         }
+        mViewBinding.ivAvatar.setOnClickListener {
+            activity.call(CUSTOMMSG_KEY, "", null)
+        }
     }
 
     private var likeNumTimer: CountDownTimer = object : CountDownTimer(2000, 1000) {
@@ -181,38 +184,23 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
     }
 
     private fun initConfig() {
-        VhallSDK.permissionsCheck(
-            webinarInfo.webinar_id,
-            webinarInfo.hostId,
-            object : RequestDataCallbackV2<String?> {
-                override fun onSuccess(data: String?) {
-                    var permissions: JSONObject? = null
-                    try {
-                        permissions = JSONObject(data)
-                        likePermission = permissions.optString("ui.watch_hide_like").toInt()
-                        if (likePermission == 0) {
-                            mViewBinding.ivLike.visibility = View.GONE
-                            mViewBinding.tvLikeNum.visibility = View.GONE
-                        }
-                        if (permissions.optString("ui.hide_gifts").toInt() == 0) {
-                            mViewBinding.ivGift.visibility = View.GONE
-                        }
-                        //回放禁言
-                        if (webinarInfo.status == 4 || webinarInfo.status == 4)
-                            canChat =
-                                permissions.optString("ui.watch_record_no_chatting").toInt() == 0
-                        setHint()
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                    }
-                }
 
-                override fun onError(errorCode: Int, errorMsg: String) {
-                }
-
-            })
     }
-
+    public fun setPermissions(permissions:JSONObject){
+        likePermission = permissions.optString("ui.watch_hide_like").toInt()
+        if (likePermission == 0) {
+            mViewBinding.ivLike.visibility = View.GONE
+            mViewBinding.tvLikeNum.visibility = View.GONE
+        }
+        if (permissions.optString("ui.hide_gifts").toInt() == 0) {
+            mViewBinding.ivGift.visibility = View.GONE
+        }
+        //回放禁言
+        if (webinarInfo.status == 4 || webinarInfo.status == 4)
+            canChat =
+                permissions.optString("ui.watch_record_no_chatting").toInt() == 0
+        setHint()
+    }
 
     private fun getChatHistory(activity: WatchLiveActivity) {
         activity.getHistory(page, msgId, object : ChatServer.ChatRecordCallback {
@@ -243,7 +231,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
 
             override fun onFailed(p0: Int, p1: String?) {
                 mViewBinding.refreshLayout.isRefreshing = false
-                showToast(p1)
+                showToast("聊天历史:"+p1)
             }
 
         })
@@ -266,7 +254,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
             }
 
             override fun onFailed(errorcode: Int, messaage: String) {
-                showToast(messaage)
+//                showToast(messaage)
             }
         })
     }
@@ -299,9 +287,12 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
                     }
                 }
             }
+
+            ChatServer.eventCustomKey -> {
+                showToast("收到自定义消息："+chatInfo.msgData.text)
+            }
         }
     }
-
     @JvmName("setLikeNum1")
     private fun setLikeNum(num: Int) {
         mViewBinding.tvLikeNum.text = if (num > 999) "999+" else num.toString()
@@ -333,7 +324,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
     fun dealMessageData(messageInfo: MsgInfo) {
         if (type.equals("chat"))
             when (messageInfo.event) {
-                EVENT_GIFT_SEND_SUCCESS, EVENT_SURVEY, EVENT_QUESTION, EVENT_SIGNIN -> {
+                EVENT_GIFT_SEND_SUCCESS, EVENT_SURVEY, EVENT_QUESTION, EVENT_SIGNIN, EVENT_START_LOTTERY, EVENT_END_LOTTERY -> {
                     val e = ChatMessageData()
                     e.msgInfo = messageInfo
                     chatAdapter.addData(e)
@@ -351,7 +342,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
                     } else {
                         showToast("全员禁言")
                         canChat = false
-                        canQa = messageInfo.qa_status.equals("1")
+                        canQa = messageInfo.qa_status.equals("0")
                     }
                     setHint()
                 }

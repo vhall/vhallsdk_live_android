@@ -26,16 +26,19 @@ import com.gyf.immersionbar.ImmersionBar
 import com.vhall.business.ChatServer
 import com.vhall.business.MessageServer
 import com.vhall.business.VhallSDK
+import com.vhall.business.data.RequestDataCallbackV2
 import com.vhall.business.data.WebinarInfo
-import com.vhall.logmanager.VLog
 import com.vhall.uimodule.R
 import com.vhall.uimodule.base.BaseActivity
+import com.vhall.uimodule.base.BaseBottomDialog
 import com.vhall.uimodule.base.IBase.*
 import com.vhall.uimodule.databinding.ActivityWatchLiveBinding
+import com.vhall.uimodule.module.chapters.ChaptersFragment
 import com.vhall.uimodule.module.chat.ChatFragment
 import com.vhall.uimodule.module.doc.DocFragment
 import com.vhall.uimodule.module.interactive.RtcFragment
 import com.vhall.uimodule.module.introduction.WebinarInfoFragment
+import com.vhall.uimodule.module.lottery.LotteryDialog
 import com.vhall.uimodule.module.sign.SignDialog
 import com.vhall.uimodule.module.warmup.WatchWarmUpActivity
 import com.vhall.uimodule.module.watch.watchlive.WatchLiveFragment
@@ -46,6 +49,9 @@ import com.vhall.uimodule.utils.DensityUtils
 import com.vhall.uimodule.utils.emoji.InputView
 import com.vhall.uimodule.utils.emoji.KeyBoardManager
 import com.vhall.uimodule.widget.ExtendTextView
+import com.vhall.vhss.data.RecordChaptersData
+import org.json.JSONException
+import org.json.JSONObject
 
 class WatchLiveActivity :
     BaseActivity<ActivityWatchLiveBinding>(ActivityWatchLiveBinding::inflate) {
@@ -68,16 +74,22 @@ class WatchLiveActivity :
     private lateinit var chatTab: TabLayout.Tab
     private lateinit var infoTab: TabLayout.Tab
     private lateinit var qaTab: TabLayout.Tab
+    private lateinit var chaptersTab: TabLayout.Tab
+    private lateinit var pointsTab: TabLayout.Tab
     private var selectTab: TabLayout.Tab? = null
 
     private lateinit var chatFragment: ChatFragment
     private lateinit var qaFragment: ChatFragment
     private lateinit var docFragment: DocFragment
     private lateinit var webinarInfoFragment: WebinarInfoFragment
+    private lateinit var chaptersFragment: ChaptersFragment
+    private lateinit var pointsFragment: ChaptersFragment
     private val docTag = 1
     private val chatTag = 2
     private val qaTag = 3
     private val infoTag = 4
+    private val chapterTag = 5
+    private val pointTag = 6
     private var isChat = true
 
     private var inputView: InputView? = null
@@ -89,6 +101,8 @@ class WatchLiveActivity :
     private val messageCallback = MessageCallback()
 
     private var mSignDialog: SignDialog? = null
+    private var mlotteryDialog: LotteryDialog? = null
+    private var mCurDialog: BaseBottomDialog? = null//当前弹出的Dialog
 
     private var videoHeight = 0
 
@@ -122,6 +136,8 @@ class WatchLiveActivity :
         qaFragment = ChatFragment.newInstance(webinarInfo, "qa")
         docFragment = DocFragment.newInstance(webinarInfo)
         webinarInfoFragment = WebinarInfoFragment.newInstance(webinarInfo)
+        chaptersFragment = ChaptersFragment.newInstance(webinarInfo,"chapters")
+        pointsFragment = ChaptersFragment.newInstance(webinarInfo,"videoPoints")
 
         mViewBinding.tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -161,6 +177,22 @@ class WatchLiveActivity :
                         )
                         showFragment = webinarInfoFragment
                     }
+                    chapterTag -> {
+                        ActivityUtils.changeFragmentToActivity(
+                            supportFragmentManager,
+                            chaptersFragment, showFragment,
+                            mViewBinding.flTab.id
+                        )
+                        showFragment = chaptersFragment
+                    }
+                    pointTag -> {
+                        ActivityUtils.changeFragmentToActivity(
+                            supportFragmentManager,
+                            pointsFragment, showFragment,
+                            mViewBinding.flTab.id
+                        )
+                        showFragment = pointsFragment
+                    }
                 }
             }
 
@@ -188,6 +220,33 @@ class WatchLiveActivity :
                 }
 
             }
+        }
+
+        if(webinarInfo.is_new_version == 3 && webinarInfo.status == 4){
+            VhallSDK.permissionsCheck(
+                webinarInfo.webinar_id,
+                webinarInfo.hostId,
+                object : RequestDataCallbackV2<String?> {
+                    override fun onSuccess(data: String?) {
+                        var permissions: JSONObject? = null
+                        try {
+                            permissions = JSONObject(data)
+                            chatFragment.setPermissions(permissions)
+                            var ischapter = permissions.optString("ui.watch_record_chapter").toInt()
+                            if(ischapter != 0){//有章节信息
+                                mViewBinding.tab.selectedTabPosition
+                                chaptersTab = mViewBinding.tab.newTab().setText("章节")
+                                chaptersTab.tag = chapterTag
+                                mViewBinding.tab.addTab(chaptersTab,mViewBinding.tab.tabCount)
+                                selectTab?.select()
+                            }
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
+                        }
+                    }
+                    override fun onError(errorCode: Int, errorMsg: String) {
+                    }
+                })
         }
     }
 
@@ -236,7 +295,7 @@ class WatchLiveActivity :
             chatTab = tab.newTab().setText("聊天")
             chatTab.tag = chatTag
 
-            qaTab = tab.newTab().setText(webinarInfo.question_name)
+            qaTab = tab.newTab().setText(if(TextUtils.isEmpty(webinarInfo.question_name)) "问答" else webinarInfo.question_name)
             qaTab.tag = qaTag
 
             infoTab = tab.newTab().setText("简介")
@@ -244,6 +303,10 @@ class WatchLiveActivity :
 
             docTab = tab.newTab().setText("文档")
             docTab.tag = docTag
+
+            chaptersTab = tab.newTab().setText("章节")
+            chaptersTab.tag = chapterTag;
+
             tab.addTab(docTab)
             tab.addTab(chatTab)
             if (webinarInfo.question_status == 1 && webinarInfo.status == 1) {
@@ -277,10 +340,13 @@ class WatchLiveActivity :
             CommonUtil.getLimitString(webinarInfo.subject, 8)
         mViewBinding.tvHostName.text =
             CommonUtil.getLimitString(webinarInfo.hostName, 8)
-        val requestOptions: RequestOptions =
-            RequestOptions.bitmapTransform(CircleCrop()).placeholder(R.mipmap.icon_avatar)
-        Glide.with(mContext).load(webinarInfo.hostAvatar).apply(requestOptions)
-            .into(mViewBinding.ivHostAvatar)
+
+        if(webinarInfo.hostAvatar != null) {
+            val requestOptions =
+                RequestOptions.bitmapTransform(CircleCrop()).placeholder(R.mipmap.icon_avatar)
+            Glide.with(mContext).load(webinarInfo.hostAvatar).apply(requestOptions)
+                .into(mViewBinding.ivHostAvatar)
+        }
         when (webinarInfo.status) {
             1 -> {
                 watchLiveFragment = WatchLiveFragment.newInstance(webinarInfo)
@@ -374,6 +440,9 @@ class WatchLiveActivity :
                     }
                 }
             }
+            CUSTOMMSG_KEY -> {//发送自定义消息
+                watchLiveFragment?.sendCustomMsg("{\"code\":200,\"data\":[123,31,33]}")
+            }
         }
         return super.call(method, arg, extras)
     }
@@ -443,21 +512,24 @@ class WatchLiveActivity :
         }
     }
 
-    private fun continueWithLive() {
+     fun continueWithLive() {
         mViewBinding.rlUser.visibility = View.VISIBLE
         watchLiveFragment?.start()
         watchLiveFragment?.setOPSDelayTime(-1)
     }
 
     fun leaveInteractive() {
+        if(rtcFragment == null)
+            return;
+
         isPublish = false
-        ActivityUtils.remove(
-            supportFragmentManager,
-            rtcFragment
-        )
         ActivityUtils.show(
             supportFragmentManager,
             watchLiveFragment
+        )
+        ActivityUtils.remove(
+            supportFragmentManager,
+            rtcFragment
         )
         if (isChat) {
             chatFragment.setIsPublish(isPublish)
@@ -489,8 +561,10 @@ class WatchLiveActivity :
                 showToast("直播开始了")
             }
             MessageServer.EVENT_INTERACTIVE_DOWN_MIC -> {
-                leaveInteractive()
-                continueWithLive()
+                if(isPublish){
+                    leaveInteractive()
+                    continueWithLive()
+                }
             }
             MessageServer.EVENT_INTERACTIVE_ALLOW_MIC -> {
                 enterInteractive()
@@ -539,6 +613,22 @@ class WatchLiveActivity :
             }
             MessageServer.EVENT_SIGN_END -> {
                 mSignDialog?.dismiss()
+            }
+            MessageServer.EVENT_START_LOTTERY -> {
+                if(mlotteryDialog == null)
+                    mlotteryDialog = LotteryDialog(mContext, webinarInfo, messageInfo,this).apply { show() }
+                else {
+                    mlotteryDialog!!.show();
+                    mlotteryDialog!!.lotteryMsg(messageInfo);
+                }
+            }
+            MessageServer.EVENT_END_LOTTERY -> {
+                if(mlotteryDialog == null)
+                    mlotteryDialog = LotteryDialog(mContext, webinarInfo, messageInfo,this).apply { show() }
+                else {
+                    mlotteryDialog!!.show();
+                    mlotteryDialog!!.lotteryMsg(messageInfo);
+                }
             }
             MessageServer.EVENT_SHOWH5DOC -> {
                 showDoc = if (messageInfo.watchType == 1) {
@@ -590,11 +680,6 @@ class WatchLiveActivity :
         }
     }
 
-    fun getHistory(page: Int, msgId: String?, callback: ChatServer.ChatRecordCallback) {
-        watchLiveFragment?.getHistory(page, msgId, callback)
-        watchPlaybackFragment?.getHistory(page, msgId, callback)
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -639,6 +724,36 @@ class WatchLiveActivity :
     private inner class NoticeCountDownRunnable : Runnable {
         override fun run() {
             mViewBinding.tvNotice.visibility = View.GONE
+        }
+    }
+
+    fun getHistory(page: Int, msgId: String?, callback: ChatServer.ChatRecordCallback) {
+        watchLiveFragment?.getHistory(page, msgId, callback)
+        watchPlaybackFragment?.getHistory(page, msgId, callback)
+    }
+
+    fun seekTo(time: Int) {
+        watchPlaybackFragment?.seekTo(time)
+    }
+
+    //视频打点
+    fun showVideoPoint(points: Collection<RecordChaptersData.ListBean>?) {
+        if (points == null || points.size==0) {
+            return
+        }
+
+        pointsFragment?.showVideoPoint(points)
+
+        mViewBinding.tab.selectedTabPosition
+        pointsTab = mViewBinding.tab.newTab().setText("打点")
+        pointsTab.tag = pointTag
+        mViewBinding.tab.addTab(pointsTab,mViewBinding.tab.tabCount)
+        selectTab?.select()
+    }
+    fun setCurDialog(dialog:BaseBottomDialog){
+        if(!dialog.equals(mCurDialog)) {
+            mCurDialog?.dismiss()
+            mCurDialog = dialog
         }
     }
 }

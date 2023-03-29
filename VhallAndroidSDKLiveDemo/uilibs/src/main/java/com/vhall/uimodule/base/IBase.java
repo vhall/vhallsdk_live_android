@@ -19,6 +19,7 @@ public interface IBase {
     String SHOW_INPUT_VIEW_KEY = "show_input_view";
     String HAND_UP_KEY = "hand_up";
     String HAND_UP_KEY_STATUS = "hand_up_status";
+    String CUSTOMMSG_KEY = "custom_msg";
 
     default void showToast(String s) {
         ToastUtils.Companion.showToast(s);
