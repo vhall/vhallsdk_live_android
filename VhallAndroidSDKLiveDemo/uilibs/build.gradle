@@ -13,7 +13,7 @@ android {
         versionCode 6130
         versionName "$app_version"
         buildConfigField 'String', 'VH_VERSION_NAME', "\"" + "$app_version" + "\""
-
+        buildConfigField "int", 'VH_VERSION_CODE', "$versionCode"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 

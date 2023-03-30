@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/top"
+        android:layout_width="match_parent"
+        android:layout_height="7dp"
+        app:layout_constraintBottom_toTopOf="@+id/line" />
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:background="@drawable/shape_list_lottery"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_top"
+        android:layout_width="@dimen/dimen_240dp"
+        android:layout_height="@dimen/dimen_40dp"
+        android:text="中奖名单"
+        android:textSize="@dimen/dimen_16sp"
+        android:textColor="#AD2000"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:background="@mipmap/icon_lottery_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/top" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycle_view"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_margin="@dimen/dp_10"
+        android:paddingTop="@dimen/dimen_5dp"
+        android:background="@color/white"
+
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageView
+        android:id="@+id/tv_cancel"
+        android:layout_width="@dimen/dimen_16dp"
+        android:layout_height="@dimen/dimen_16dp"
+        android:layout_gravity="end|center_vertical"
+        android:layout_margin="@dimen/dimen_16dp"
+        android:background="@mipmap/icon_close2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/line" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/dimen_5dp"
+    tools:ignore="RtlCompat">
+
+    <View
+        android:id="@+id/v_bg"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_0dp"
+        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginEnd="@dimen/dimen_10dp"
+        android:background="@drawable/shape_bg_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ed_value" />
+
+    <TextView
+        android:id="@+id/tv_idx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_22dp"
+        android:paddingTop="@dimen/dimen_10dp"
+        android:paddingBottom="@dimen/dimen_10dp"
+        android:textColor="@color/color_FB3A32"
+        android:textSize="@dimen/dimen_16sp"
+        android:text="*"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <EditText
+        android:id="@+id/ed_value"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_43dp"
+        android:layout_marginStart="@dimen/dimen_35dp"
+        android:layout_marginEnd="@dimen/dimen_20dp"
+        android:background="@color/transparent"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:hint=""
+        android:textColor="@color/color_22"
+        android:textColorHint="@color/color_99"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/v_bg"
+        app:layout_constraintEnd_toEndOf="@+id/v_bg"/>
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/dimen_22dp"
+        android:layout_marginEnd="@dimen/dimen_22dp"
+        android:textSize="@dimen/dimen_14sp"
+        android:text=""
+        android:gravity="center"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/iv_qrcode"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:background="@color/transparent"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/v_bg"
+        app:layout_constraintStart_toStartOf="@id/v_bg"
+        app:layout_constraintTop_toTopOf="@id/v_bg" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
