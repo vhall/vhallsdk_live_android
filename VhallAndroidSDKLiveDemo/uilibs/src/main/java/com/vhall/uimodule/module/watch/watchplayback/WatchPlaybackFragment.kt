@@ -46,10 +46,10 @@ class WatchPlaybackFragment :
 
     //是否全屏
     private var isFull = false
-
+    var parentActivity: WatchLiveActivity? = null
 
     override fun initView() {
-        val a: WatchLiveActivity = activity as WatchLiveActivity
+        parentActivity = activity as WatchLiveActivity
         starTime()
         arguments?.let {
             webinarInfo = it.getSerializable(INFO_KEY) as WebinarInfo
@@ -57,13 +57,10 @@ class WatchPlaybackFragment :
         }
         mViewBinding.ivFull.setOnClickListener {
             if (isFull) {
-                a.call(HALF_WATCH_SCREEN_KEY, "", null)
-                mViewBinding.ivFull.setBackgroundResource(R.drawable.svg_ic_full)
+                video2Portrait()
             } else {
-                a.call(FULL_WATCH_SCREEN_KEY, "", null)
-                mViewBinding.ivFull.setBackgroundResource(R.drawable.svg_ic_full_exit)
+                video2Landscape()
             }
-            isFull = !isFull
         }
         mViewBinding.tvDefinition.setOnClickListener {
             showChooseDefinition()
@@ -111,6 +108,18 @@ class WatchPlaybackFragment :
                 .build()
         watchPlayback.setWebinarInfo(webinarInfo)
         watchPlayback.scaleType = Constants.VideoMode.DRAW_MODE_ASPECTFIT
+    }
+
+    fun video2Portrait() {
+        parentActivity?.call(HALF_WATCH_SCREEN_KEY, "", null)
+        mViewBinding.ivFull.setBackgroundResource(R.drawable.svg_ic_full)
+        isFull = !isFull
+    }
+
+    private fun video2Landscape() {
+        parentActivity?.call(FULL_WATCH_SCREEN_KEY, "", null)
+        mViewBinding.ivFull.setBackgroundResource(R.drawable.svg_ic_full_exit)
+        isFull = !isFull
     }
 
     private fun starTime() {
@@ -228,12 +237,12 @@ class WatchPlaybackFragment :
                 callback
             )
         }else{
-            watchPlayback.requestCommentHistory(
-                webinarInfo.webinar_id,
-                100,
-                page,
-                callback
-            )
+//            watchPlayback.requestCommentHistory(
+//                webinarInfo.webinar_id,
+//                100,
+//                page,
+//                callback
+//            )
         }
     }
 
@@ -252,9 +261,13 @@ class WatchPlaybackFragment :
 
     override fun onPause() {
         super.onPause()
-        if (watchPlayback.isPlaying)
-            watchPlayback.onPause()
     }
+
+//    override fun onStop() {
+//        super.onStop()
+//        if (watchPlayback.isPlaying)
+//            watchPlayback.onPause()
+//    }
 
     fun sendChat(msg: String) {
         watchPlayback.sendComment(msg, object : RequestCallback {

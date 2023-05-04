@@ -1,5 +1,6 @@
 package com.vhall.uimodule.module.interactive;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +26,11 @@ public class RenderAdapter extends RecyclerView.Adapter<RenderAdapter.RenderHold
 
     private String mainId;
     private ArrayList<StreamData> mStreamDataList = new ArrayList<>();
+    private int videoHeight;
 
     public RenderAdapter(String mainId) {
         this.mainId = mainId;
+        this.videoHeight = DensityUtils.getScreenWidth() / 2;
     }
 
     public void setMainId(String mainId) {
@@ -55,6 +58,25 @@ public class RenderAdapter extends RecyclerView.Adapter<RenderAdapter.RenderHold
         if (index >= 0) {
             mStreamDataList.remove(index);
             notifyItemRemoved(index);
+        }
+    }
+
+    public void removeAllData() {
+        StreamData targetStream = null;
+
+        for (StreamData data: mStreamDataList) {
+            if (data.getStream().isLocal) {
+                targetStream = data;
+                break;
+            }
+        }
+
+        int cnt = mStreamDataList.size();
+        mStreamDataList.clear();
+        notifyItemRangeRemoved(0,cnt);
+        if(targetStream!=null){
+            mStreamDataList.add(0, targetStream);
+            notifyItemInserted(0);
         }
     }
 
@@ -118,7 +140,8 @@ public class RenderAdapter extends RecyclerView.Adapter<RenderAdapter.RenderHold
     public void onBindViewHolder(@NonNull RenderHolder holder, int position) {
         StreamData itemStreamData = mStreamDataList.get(position);
         holder.renderView.setStream(itemStreamData);
-        holder.renderView.setLayoutParams(new ConstraintLayout.LayoutParams(DensityUtils.getScreenWidth() / 2, DensityUtils.getScreenWidth() * 9 / 32));
+        holder.renderView.setLayoutParams(new ConstraintLayout.LayoutParams(videoHeight, videoHeight * 9 / 16));
+//        Log.e("=====",DensityUtils.getScreenWidth()+"");
         if (itemStreamData.getCamera() == 0) {
             showAvatar(holder.avatar, itemStreamData.getAvatar());
         }

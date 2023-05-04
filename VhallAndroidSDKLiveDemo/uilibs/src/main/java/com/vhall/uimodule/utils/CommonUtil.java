@@ -185,4 +185,35 @@ public class CommonUtil {
         activity.requestPermissions(new String[]{CAMERA, RECORD_AUDIO}, requestCode);
         return false;
     }
+
+    //Android12蓝牙权限申请
+    public static boolean isGrantedAndRequestBlueToothPermission(Activity activity, int requestCode){
+        //compileSdkVersion项目中编译SDK版本大于30申请以下权限可使用
+        //Manifest.permission.BLUETOOTH_SCAN、Manifest.permission.BLUETOOTH_ADVERTISE、Manifest.permission.BLUETOOTH_CONNECT
+        //若小于30可以直接使用权限对应的字符串
+        if (Build.VERSION.SDK_INT>Build.VERSION_CODES.R){
+            if (activity.checkSelfPermission("android.permission.BLUETOOTH_SCAN")!= PackageManager.PERMISSION_GRANTED
+                    || activity.checkSelfPermission("android.permission.BLUETOOTH_ADVERTISE")!= PackageManager.PERMISSION_GRANTED
+                    || activity.checkSelfPermission("android.permission.BLUETOOTH_CONNECT")!= PackageManager.PERMISSION_GRANTED){
+                activity.requestPermissions(new String[]{
+                        "android.permission.BLUETOOTH_SCAN",
+                        "android.permission.BLUETOOTH_ADVERTISE",
+                        "android.permission.BLUETOOTH_CONNECT"}, requestCode);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isGrantedAndRequestTelPermission(Activity activity, int requestCode){
+        if (Build.VERSION.SDK_INT>Build.VERSION_CODES.M){
+            if (activity.checkSelfPermission("android.permission.READ_PHONE_STATE")!= PackageManager.PERMISSION_GRANTED){
+                activity.requestPermissions(new String[]{
+                        "android.permission.READ_PHONE_STATE"}, requestCode);
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

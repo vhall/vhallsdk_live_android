@@ -2,6 +2,7 @@ package com.vhall.uimodule.module.watch.watchlive
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import com.vhall.business.*
 import com.vhall.business.data.RequestCallback
 import com.vhall.business.data.WebinarInfo
@@ -111,15 +112,19 @@ class WatchLiveFragment :
 
     inner class WatchCallback : VHPlayerListener {
         override fun onStateChanged(state: Constants.State?) {
+            Log.e("===onStateChanged",state.toString())
             when (state) {
                 Constants.State.START -> {
                     mViewBinding.ivPlay.setBackgroundResource(R.mipmap.icon_play_pause)
+                    mViewBinding.ivLoading.visibility = View.GONE
                 }
                 Constants.State.BUFFER -> {
                     mViewBinding.ivPlay.setBackgroundResource(R.mipmap.icon_playing)
+                    mViewBinding.ivLoading.visibility = View.VISIBLE
                 }
                 Constants.State.STOP -> {
                     mViewBinding.ivPlay.setBackgroundResource(R.mipmap.icon_playing)
+                    mViewBinding.ivLoading.visibility = View.GONE
                 }
                 else -> {}
             }
@@ -153,7 +158,14 @@ class WatchLiveFragment :
         }
 
         override fun onError(errorCode: Int, innerErrorCode: Int, msg: String?) {
-            showToast(msg)
+            mViewBinding.ivLoading.visibility = View.GONE
+            if(errorCode == Constants.ErrorCode.ERROR_CONNECT || errorCode == Constants.ErrorCode.ERROR_REC){
+                watchLive.start()
+                showToast("播放失败重试中")
+                return;
+            }
+            else
+                showToast("("+errorCode+","+innerErrorCode+")"+msg)
         }
     }
 
@@ -177,10 +189,10 @@ class WatchLiveFragment :
                 callback
             )
         }else{
-            watchLive.acquireChatRecord(
-                true,
-                callback
-            )
+//            watchLive.acquireChatRecord(
+//                true,
+//                callback
+//            )
         }
     }
 

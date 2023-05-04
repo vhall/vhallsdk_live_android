@@ -10,7 +10,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 6130
+        versionCode 6140
         versionName "$app_version"
         buildConfigField 'String', 'VH_VERSION_NAME', "\"" + "$app_version" + "\""
         buildConfigField "int", 'VH_VERSION_CODE', "$versionCode"
@@ -37,18 +37,13 @@ android {
 
 dependencies {
 
-    api 'androidx.appcompat:appcompat:1.2.0'
+    api 'androidx.appcompat:appcompat:1.3.1'
     api 'com.google.android.material:material:1.3.0'
     api 'androidx.constraintlayout:constraintlayout:1.1.3'
     api 'androidx.recyclerview:recyclerview:1.2.0'
     api 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.11'
     api "com.github.bumptech.glide:glide:4.8.0"
     implementation 'com.geyifeng.immersionbar:immersionbar:3.2.2'
-
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.13.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.13.1'
-
-
     api ("androidx.datastore:datastore:1.0.0")
     api ("androidx.datastore:datastore-preferences:1.0.0")
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
@@ -60,4 +55,10 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt ("androidx.lifecycle:lifecycle-common-java8:2.3.1")
     api("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
+
+    //扫描二维码 用于快速输入appkey等信息
+    api 'com.github.vhall.android.library:vh-zxing-client:3.5.0'
+    //可根据微吼直播官网文档版本升级
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.14.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.14.0'
 }

@@ -35,11 +35,23 @@
         android:id="@+id/iv_q"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/dimen_15dp"
+        android:paddingStart="@dimen/dimen_5dp"
         android:paddingTop="@dimen/dp_10"
-        android:paddingEnd="@dimen/dimen_35dp"
+        android:paddingEnd="@dimen/dimen_5dp"
         android:paddingBottom="@dimen/dp_10"
         android:src="@drawable/svg_ic_question_white"
+        app:layout_constraintBottom_toBottomOf="@id/tv"
+        app:layout_constraintEnd_toStartOf="@id/iv_qrcode"
+        app:layout_constraintTop_toTopOf="@id/tv" />
+    <ImageView
+        android:id="@+id/iv_qrcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/dimen_10dp"
+        android:paddingTop="@dimen/dp_10"
+        android:paddingEnd="@dimen/dimen_15dp"
+        android:paddingBottom="@dimen/dp_10"
+        android:src="@mipmap/icon_qrcodew"
         app:layout_constraintBottom_toBottomOf="@id/tv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv" />
@@ -74,7 +86,7 @@
     <EditText
         android:id="@+id/ed_app_key"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dimen_43dp"
+        android:layout_height="@dimen/dimen_40dp"
         android:layout_marginStart="@dimen/dimen_32dp"
         android:layout_marginTop="@dimen/dimen_5dp"
         android:layout_marginEnd="@dimen/dimen_32dp"
@@ -84,7 +96,7 @@
         android:paddingStart="@dimen/dimen_10dp"
         android:paddingEnd="@dimen/dimen_10dp"
         android:textColor="@color/color_22"
-        android:textSize="@dimen/dimen_16sp"
+        android:textSize="@dimen/dimen_14sp"
         app:layout_constraintTop_toBottomOf="@id/tv_app_key" />
 
     <TextView
@@ -96,7 +108,7 @@
         android:layout_marginEnd="@dimen/dimen_32dp"
         android:enabled="true"
         android:gravity="center_vertical"
-        android:text="APP SecretKey"
+        android:text="App SecretKey"
         android:textColor="@color/color_22"
         android:textSize="@dimen/dimen_16sp"
         app:layout_constraintTop_toBottomOf="@id/ed_app_key" />
@@ -104,7 +116,7 @@
     <EditText
         android:id="@+id/ed_app_secret_key"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dimen_43dp"
+        android:layout_height="@dimen/dimen_40dp"
         android:layout_marginStart="@dimen/dimen_32dp"
         android:layout_marginTop="@dimen/dimen_5dp"
         android:layout_marginEnd="@dimen/dimen_32dp"
@@ -115,7 +127,7 @@
         android:paddingStart="@dimen/dimen_10dp"
         android:paddingEnd="@dimen/dimen_10dp"
         android:textColor="@color/color_22"
-        android:textSize="@dimen/dimen_16sp"
+        android:textSize="@dimen/dimen_14sp"
         app:layout_constraintTop_toBottomOf="@id/tv_app_secret_key" />
 
     <TextView
@@ -148,7 +160,7 @@
     <TextView
         android:id="@+id/ed_app_rsa"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dimen_43dp"
+        android:layout_height="@dimen/dimen_40dp"
         android:layout_marginStart="@dimen/dimen_32dp"
         android:layout_marginTop="@dimen/dimen_5dp"
         android:layout_marginEnd="@dimen/dimen_32dp"
@@ -158,11 +170,11 @@
         android:ellipsize="end"
         android:enabled="true"
         android:gravity="center_vertical"
-        android:maxLines="1"
+        android:maxLines="2"
         android:paddingStart="@dimen/dimen_10dp"
         android:paddingEnd="@dimen/dimen_10dp"
         android:textColor="@color/color_22"
-        android:textSize="@dimen/dimen_16sp"
+        android:textSize="@dimen/dimen_12sp"
         app:layout_constraintTop_toBottomOf="@id/tv_app_rsa" />
 
     <TextView
@@ -182,7 +194,7 @@
     <TextView
         android:id="@+id/ed_app_name"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dimen_43dp"
+        android:layout_height="@dimen/dimen_40dp"
         android:layout_marginStart="@dimen/dimen_32dp"
         android:layout_marginTop="@dimen/dimen_5dp"
         android:layout_marginEnd="@dimen/dimen_32dp"
@@ -195,7 +207,7 @@
         android:paddingStart="@dimen/dimen_10dp"
         android:paddingEnd="@dimen/dimen_10dp"
         android:textColor="@color/color_22"
-        android:textSize="@dimen/dimen_16sp"
+        android:textSize="@dimen/dimen_14sp"
         app:layout_constraintTop_toBottomOf="@id/tv_app_name" />
 
     <TextView
@@ -203,7 +215,7 @@
         android:layout_width="match_parent"
         android:layout_height="43dp"
         android:layout_marginStart="@dimen/dimen_32dp"
-        android:layout_marginTop="@dimen/dimen_40dp"
+        android:layout_marginTop="@dimen/dimen_20dp"
         android:layout_marginEnd="@dimen/dimen_32dp"
         android:background="@drawable/shape_bg_rounded_red"
         android:gravity="center"

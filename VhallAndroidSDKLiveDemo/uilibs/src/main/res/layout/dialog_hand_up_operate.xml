@@ -65,8 +65,26 @@
         android:textSize="@dimen/dimen_14sp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/tv_hand_cancel"
+        app:layout_constraintEnd_toStartOf="@id/tv_beautify"
         app:layout_constraintStart_toEndOf="@id/tv_audio"
+        tools:ignore="UseCompatTextViewDrawableXml" />
+
+    <TextView
+        android:id="@+id/tv_beautify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/dimen_45dp"
+        android:drawableTop="@mipmap/icon_beautify"
+        android:drawablePadding="@dimen/dimen_8dp"
+        android:gravity="center"
+        android:paddingTop="@dimen/dimen_30dp"
+        android:text="美颜"
+        android:textColor="@color/color_26"
+        android:textSize="@dimen/dimen_14sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tv_hand_cancel"
+        app:layout_constraintStart_toEndOf="@id/tv_camera"
         tools:ignore="UseCompatTextViewDrawableXml" />
 
     <TextView
@@ -84,7 +102,7 @@
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tv_camera"
+        app:layout_constraintStart_toEndOf="@id/tv_beautify"
         tools:ignore="UseCompatTextViewDrawableXml" />
 
 

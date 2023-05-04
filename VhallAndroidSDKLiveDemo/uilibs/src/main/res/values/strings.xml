@@ -16,6 +16,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="app_permission_av_none">没有音视频权限不可以上麦</string>
+    <string name="app_permission_av_none1">没有相机权限</string>
 
     <string name="watch_auth_hint_pwd">请输入密码</string>
     <string name="watch_auth_hint_whitelist">请输入白名单手机号</string>

@@ -1,9 +1,12 @@
 package com.vhall.uimodule.module.interactive
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
-import com.vhall.business.*
+import com.vhall.business.ChatServer
 import com.vhall.business.MessageServer.*
+import com.vhall.business.VhallSDK
 import com.vhall.business.data.RequestCallback
 import com.vhall.business.data.RequestDataCallbackV2
 import com.vhall.business.data.WebinarInfo
@@ -12,11 +15,13 @@ import com.vhall.business_interactive.Rtc
 import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase.INFO_KEY
 import com.vhall.uimodule.databinding.FragmentRtcBinding
+import com.vhall.uimodule.module.interactive.HandUpOperateDialog.Companion.clickBeautify
 import com.vhall.uimodule.module.interactive.HandUpOperateDialog.Companion.clickTypeAudio
 import com.vhall.uimodule.module.interactive.HandUpOperateDialog.Companion.clickTypeCamera
 import com.vhall.uimodule.module.interactive.HandUpOperateDialog.Companion.clickTypeHandCancel
 import com.vhall.uimodule.module.interactive.HandUpOperateDialog.Companion.clickTypeVideo
 import com.vhall.uimodule.module.watch.WatchLiveActivity
+import com.vhall.uimodule.utils.WeakHandler
 import com.vhall.uimodule.widget.ItemClickLister
 import com.vhall.vhallrtc.client.Room
 import com.vhall.vhallrtc.client.Room.VHRoomStatus
@@ -25,7 +30,8 @@ import com.vhall.vhallrtc.client.VHRenderView
 import com.vhall.vhss.data.RoomToolsStatusData
 import org.json.JSONObject
 import org.vhwebrtc.SurfaceViewRenderer
-import vhall.com.vss2.module.room.MessageTypeData.*
+import vhall.com.vss2.module.room.MessageTypeData.MESSAGE_VRTC_FRAMES_DISPLAY
+import vhall.com.vss2.module.room.MessageTypeData.MESSAGE_VRTC_FRAMES_FORBID
 
 
 class RtcFragment :
@@ -50,7 +56,7 @@ class RtcFragment :
     private var isOpenVideo = true
     private var isOpenAudio = true
     private var isDisconnected = false
-
+    private var isEnableBeautify = false
     //主讲人
     private var mainId = ""
 
@@ -61,8 +67,8 @@ class RtcFragment :
     override fun initView() {
         arguments?.let {
             webinarInfo = it.getSerializable(INFO_KEY) as WebinarInfo
-            initInteractive()
             mainId = webinarInfo.mainId
+            initInteractive()
         }
         adapter = RenderAdapter(mainId)
         val gridLayoutManager = GridLayoutManager(mContext, 2, GridLayoutManager.HORIZONTAL, false)
@@ -103,17 +109,19 @@ class RtcFragment :
                         clickTypeCamera -> {
                             interactive.localStream.switchCamera()
                         }
+                        clickBeautify -> {
+                            isEnableBeautify = !isEnableBeautify
+//打开美颜功能
+                            interactive.localStream.setEnableBeautify(isEnableBeautify);
+//设置美颜等级 0-4 4效果最强
+                            interactive.localStream.setBeautifyLevel(4);
+//注：基础美颜一定要关闭视频采集回调开关
+                            interactive.localStream.setEnableCaptureCallback(false)
+                        }
                         clickTypeHandCancel -> {
-                            interactive.unpublish(object : RequestCallback {
-                                override fun onError(errorCode: Int, errorMsg: String?) {
-                                    showToast(errorMsg)
-                                }
-
-                                override fun onSuccess() {
-                                    showToast("下麦成功")
-                                    handUpOperateDialog?.dismiss()
-                                }
-                            })
+                            handUpOperateDialog?.dismiss()
+                            onDownMic()
+                            rtcClose()
                         }
                     }
                 }
@@ -141,6 +149,7 @@ class RtcFragment :
 
     override fun onResume() {
         super.onResume()
+        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
     }
 
     override fun onPause() {
@@ -163,6 +172,30 @@ class RtcFragment :
             Stream.VhallStreamType.VhallStreamTypeAudioAndVideo,
             null
         )
+
+        //打开基础美颜功能
+        interactive.localStream.setEnableCaptureCallback(false);
+        interactive.localStream.setEnableBeautify (isEnableBeautify);
+        interactive.localStream.setStreamDelegate(StreamCallback())
+
+        adapter.addNewData(StreamData(interactive.localStream))
+    }
+
+    inner class StreamCallback : Stream.StreamDelegate {
+        override fun onEvent(p0: Stream.VhallStreamEventType?, p1: String?) {
+            Log.e("StreamCallback:",p1+" "+p0)
+            if(p0 == Stream.VhallStreamEventType.CameraDisconnected||
+                p0 == Stream.VhallStreamEventType.CameraFreezed){
+                rtcClose()
+            }
+        }
+
+        override fun onError(p0: Stream.VhallStreamEventType?, p1: String?) {
+            if(p0 == Stream.VhallStreamEventType.VhallStreamEventTypeCameraError) {
+                showToast("相机采集错误")
+                rtcClose()
+            }
+        }
     }
 
     inner class RoomCallback : Rtc.RoomCallback {
@@ -172,14 +205,16 @@ class RtcFragment :
         }
 
         override fun onDidError() {
+            rtcClose()
+            showToast("互动房间错误")
         }
 
         override fun onDidPublishStream() {
-            adapter.addNewData(StreamData(interactive.localStream))
+//            adapter.addNewData(StreamData(interactive.localStream))
         }
 
         override fun onDidUnPublishStream() {
-            adapter.removeData(StreamData(interactive.localStream))
+//            adapter.removeData(StreamData(interactive.localStream))
         }
 
         override fun onDidSubscribeStream(stream: Stream?, newRenderView: VHRenderView?) {
@@ -208,11 +243,14 @@ class RtcFragment :
         }
 
         override fun onDidRoomStatus(room: Room?, vhRoomStatus: VHRoomStatus?) {
+            Log.e("RtcFragment: ",vhRoomStatus.toString())
             when (vhRoomStatus) {
                 VHRoomStatus.VHRoomStatusDisconnected -> {
+                    if (!isDisconnected)
+                        adapter.removeAllData()
+
                     //断开链接-断网或者弱网
                     isDisconnected = true
-                    rtcClose()
                 }
                 VHRoomStatus.VHRoomStatusError -> {
                     if (!isDisconnected) {
@@ -326,8 +364,15 @@ class RtcFragment :
     private fun rtcClose()  {
         if(activity != null){
             val activity: WatchLiveActivity = activity as WatchLiveActivity
-            activity.leaveInteractive()
-            activity.continueWithLive()
+            try {
+                activity.runOnUiThread(Runnable {
+                    activity.leaveInteractive()
+                    activity.continueWithLive()
+                })
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
+
         }
     }
 }

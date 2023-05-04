@@ -4,10 +4,13 @@ package com.vhall.uimodule.module.main
 import android.content.Intent
 import android.text.TextUtils
 import android.view.View
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
+import com.vhall.zxing.client.android.CaptureActivity
 import com.vhall.business.VhallSDK
 import com.vhall.business.data.WatchAuthInfo
 import com.vhall.business.data.WebinarInfo
@@ -46,6 +49,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         mViewBinding.tvJoin.setOnClickListener(object : OnNoDoubleClickListener() {
             override fun onNoDoubleClick(v: View?) {
                 prepareJoin()
+            }
+        })
+        mViewBinding.ivQrcode.setOnClickListener(object : OnNoDoubleClickListener() {
+            override fun onNoDoubleClick(v: View?) {
+                launchCaptureActivity()
             }
         })
     }
@@ -211,6 +219,29 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 showToast("没有权限影响轮训和上麦")
             }
             WatchLiveActivity.startActivity(mContext,webinarInfo)
+        }
+    }
+
+    //以下为扫描二维码代码
+    private val launcherActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
+        if (result != null && result?.resultCode == RESULT_OK) {
+            var qrcodeStr: String = result?.data?.getStringExtra("qrcode").toString()
+            qrcodeStr=qrcodeStr?.trim().lowercase()
+            if(qrcodeStr != null && qrcodeStr.length>0 && qrcodeStr.startsWith("http")){
+                var url= qrcodeStr.split("?")[0]
+                var urlList= url.split("/")
+                mViewBinding.edWatchId.setText(urlList.last())
+            } else {
+                showToast("请扫描正确的二维码")
+            }
+        }
+    }
+
+    fun launchCaptureActivity(){
+        if (CommonUtil.isGrantedAndRequestPermission(this, 102)){
+            launcherActivity.launch(Intent(this, CaptureActivity::class.java))
+        }else{
+            showToast(getString(R.string.app_permission_av_none1))
         }
     }
 }

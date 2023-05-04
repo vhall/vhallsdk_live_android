@@ -14,6 +14,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
+import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
@@ -254,6 +255,9 @@ class WatchLiveActivity :
 
     private fun doFinish() {
         setResult(WatchWarmUpActivity.CODE_REQUEST)
+        if(isPublish && rtcFragment != null){
+            leaveInteractive()
+        }
         finish()
     }
 
@@ -383,17 +387,17 @@ class WatchLiveActivity :
             HALF_WATCH_SCREEN_KEY -> {
                 mViewBinding.flVideo.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
                 mViewBinding.flVideo.layoutParams.height = videoHeight
-                if (webinarInfo.webinar_show_type == 1) {
+//                if (webinarInfo.webinar_show_type == 1) {
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                }
+//                }
                 liveVideoFull = false
             }
             FULL_WATCH_SCREEN_KEY -> {
                 mViewBinding.flVideo.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
                 mViewBinding.flVideo.layoutParams.height = ViewGroup.LayoutParams.MATCH_PARENT
-                if (webinarInfo.webinar_show_type == 1) {
+//                if (webinarInfo.webinar_show_type == 1) {
                     requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                }
+//                }
                 liveVideoFull = true
             }
             HALF_DOC_SCREEN_KEY -> {
@@ -435,6 +439,7 @@ class WatchLiveActivity :
                             watchLiveFragment?.hintApplyHandUpDialog()
                         }
                     } else {
+                        CommonUtil.isGrantedAndRequestBlueToothPermission(this@WatchLiveActivity, 104)
                         if (CommonUtil.isGrantedAndRequestPermission(this@WatchLiveActivity, 101))
                             watchLiveFragment?.showApplyHandUpDialog()
                     }
@@ -745,7 +750,7 @@ class WatchLiveActivity :
         pointsFragment?.showVideoPoint(points)
 
         mViewBinding.tab.selectedTabPosition
-        pointsTab = mViewBinding.tab.newTab().setText("打点")
+        pointsTab = mViewBinding.tab.newTab().setText("精彩时刻")
         pointsTab.tag = pointTag
         mViewBinding.tab.addTab(pointsTab,mViewBinding.tab.tabCount)
         selectTab?.select()
@@ -755,5 +760,19 @@ class WatchLiveActivity :
             mCurDialog?.dismiss()
             mCurDialog = dialog
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (liveVideoFull) {
+                watchLiveFragment?.video2Portrait()
+                watchPlaybackFragment?.video2Portrait()
+                return false
+            } else if (docFull) {
+                docFragment?.doc2Portrait()
+                return false
+            }
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

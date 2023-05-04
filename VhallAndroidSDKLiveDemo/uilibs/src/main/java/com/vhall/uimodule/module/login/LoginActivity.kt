@@ -14,6 +14,7 @@ import com.vhall.uimodule.base.BaseActivity
 import com.vhall.uimodule.dao.UserDataStore
 import com.vhall.uimodule.databinding.ActivityLoginBinding
 import com.vhall.uimodule.module.main.MainActivity
+import com.vhall.uimodule.utils.CommonUtil
 import com.vhall.uimodule.widget.MainListPop
 import kotlinx.coroutines.launch
 
@@ -36,6 +37,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
         mViewBinding.tvSign.setOnClickListener { SignConfigActivity.startActivity(mContext) }
         mViewBinding.ivQ.setOnClickListener { showQ() }
         setThirdData()
+        CommonUtil.isGrantedAndRequestTelPermission(this,0)
     }
 
 

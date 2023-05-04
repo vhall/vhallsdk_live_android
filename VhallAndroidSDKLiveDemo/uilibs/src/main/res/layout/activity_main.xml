@@ -79,10 +79,24 @@
         android:enabled="true"
         android:gravity="center_vertical"
         android:hint="请输入直播ID"
+        android:inputType="number"
         android:textColor="@color/color_22"
         android:textColorHint="@color/color_99"
         android:textSize="@dimen/dimen_16sp"
         app:layout_constraintTop_toBottomOf="@id/tv_watch" />
+
+    <ImageView
+        android:id="@+id/iv_qrcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/dimen_10dp"
+        android:paddingTop="@dimen/dp_10"
+        android:paddingEnd="@dimen/dimen_15dp"
+        android:paddingBottom="@dimen/dp_10"
+        android:src="@mipmap/icon_qrcode"
+        app:layout_constraintBottom_toBottomOf="@id/ed_watch_id"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ed_watch_id" />
 
     <View
         android:layout_width="match_parent"
