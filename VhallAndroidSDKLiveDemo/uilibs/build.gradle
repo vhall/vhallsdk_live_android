@@ -10,7 +10,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 6140
+        versionCode 6150
         versionName "$app_version"
         buildConfigField 'String', 'VH_VERSION_NAME', "\"" + "$app_version" + "\""
         buildConfigField "int", 'VH_VERSION_CODE', "$versionCode"
@@ -59,6 +59,6 @@ dependencies {
     //扫描二维码 用于快速输入appkey等信息
     api 'com.github.vhall.android.library:vh-zxing-client:3.5.0'
     //可根据微吼直播官网文档版本升级
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.14.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.14.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.15.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.15.0'
 }

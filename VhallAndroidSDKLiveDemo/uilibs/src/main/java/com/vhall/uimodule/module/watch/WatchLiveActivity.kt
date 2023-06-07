@@ -29,6 +29,7 @@ import com.vhall.business.MessageServer
 import com.vhall.business.VhallSDK
 import com.vhall.business.data.RequestDataCallbackV2
 import com.vhall.business.data.WebinarInfo
+import com.vhall.business.data.source.WebinarInfoDataSource
 import com.vhall.uimodule.R
 import com.vhall.uimodule.base.BaseActivity
 import com.vhall.uimodule.base.BaseBottomDialog
@@ -40,7 +41,9 @@ import com.vhall.uimodule.module.doc.DocFragment
 import com.vhall.uimodule.module.interactive.RtcFragment
 import com.vhall.uimodule.module.introduction.WebinarInfoFragment
 import com.vhall.uimodule.module.lottery.LotteryDialog
+import com.vhall.uimodule.module.records.RecordsFragment
 import com.vhall.uimodule.module.sign.SignDialog
+import com.vhall.uimodule.module.warmup.WatchBaseWarmUpActivity
 import com.vhall.uimodule.module.warmup.WatchWarmUpActivity
 import com.vhall.uimodule.module.watch.watchlive.WatchLiveFragment
 import com.vhall.uimodule.module.watch.watchplayback.WatchPlaybackFragment
@@ -51,6 +54,7 @@ import com.vhall.uimodule.utils.emoji.InputView
 import com.vhall.uimodule.utils.emoji.KeyBoardManager
 import com.vhall.uimodule.widget.ExtendTextView
 import com.vhall.vhss.data.RecordChaptersData
+import com.vhall.vhss.data.RecordsData
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -77,6 +81,7 @@ class WatchLiveActivity :
     private lateinit var qaTab: TabLayout.Tab
     private lateinit var chaptersTab: TabLayout.Tab
     private lateinit var pointsTab: TabLayout.Tab
+    private lateinit var recordsTab: TabLayout.Tab
     private var selectTab: TabLayout.Tab? = null
 
     private lateinit var chatFragment: ChatFragment
@@ -85,29 +90,31 @@ class WatchLiveActivity :
     private lateinit var webinarInfoFragment: WebinarInfoFragment
     private lateinit var chaptersFragment: ChaptersFragment
     private lateinit var pointsFragment: ChaptersFragment
+    private lateinit var recordsFragment: RecordsFragment
     private val docTag = 1
     private val chatTag = 2
     private val qaTag = 3
     private val infoTag = 4
     private val chapterTag = 5
     private val pointTag = 6
+    private val recordsTag = 7
     private var isChat = true
 
     private var inputView: InputView? = null
     private var showFragment: Fragment? = null
     private var rtcFragment: RtcFragment? = null
-    private var watchLiveFragment: WatchLiveFragment? = null
+    public var watchLiveFragment: WatchLiveFragment? = null
     private var watchPlaybackFragment: WatchPlaybackFragment? = null
     private val chatCallBack = ChatCallback()
     private val messageCallback = MessageCallback()
 
-    private var mSignDialog: SignDialog? = null
+    public var mSignDialog: SignDialog? = null
     private var mlotteryDialog: LotteryDialog? = null
     private var mCurDialog: BaseBottomDialog? = null//当前弹出的Dialog
 
     private var videoHeight = 0
 
-    private var isPublish = false
+    public var isPublish = false
     private var pv = 0
     private var pvVirtual = 0
     private var online = 0
@@ -137,8 +144,6 @@ class WatchLiveActivity :
         qaFragment = ChatFragment.newInstance(webinarInfo, "qa")
         docFragment = DocFragment.newInstance(webinarInfo)
         webinarInfoFragment = WebinarInfoFragment.newInstance(webinarInfo)
-        chaptersFragment = ChaptersFragment.newInstance(webinarInfo,"chapters")
-        pointsFragment = ChaptersFragment.newInstance(webinarInfo,"videoPoints")
 
         mViewBinding.tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -194,6 +199,14 @@ class WatchLiveActivity :
                         )
                         showFragment = pointsFragment
                     }
+                    recordsTag -> {
+                        ActivityUtils.changeFragmentToActivity(
+                            supportFragmentManager,
+                            recordsFragment, showFragment,
+                            mViewBinding.flTab.id
+                        )
+                        showFragment = recordsFragment
+                    }
                 }
             }
 
@@ -223,32 +236,8 @@ class WatchLiveActivity :
             }
         }
 
-        if(webinarInfo.is_new_version == 3 && webinarInfo.status == 4){
-            VhallSDK.permissionsCheck(
-                webinarInfo.webinar_id,
-                webinarInfo.hostId,
-                object : RequestDataCallbackV2<String?> {
-                    override fun onSuccess(data: String?) {
-                        var permissions: JSONObject? = null
-                        try {
-                            permissions = JSONObject(data)
-                            chatFragment.setPermissions(permissions)
-                            var ischapter = permissions.optString("ui.watch_record_chapter").toInt()
-                            if(ischapter != 0){//有章节信息
-                                mViewBinding.tab.selectedTabPosition
-                                chaptersTab = mViewBinding.tab.newTab().setText("章节")
-                                chaptersTab.tag = chapterTag
-                                mViewBinding.tab.addTab(chaptersTab,mViewBinding.tab.tabCount)
-                                selectTab?.select()
-                            }
-                        } catch (e: JSONException) {
-                            e.printStackTrace()
-                        }
-                    }
-                    override fun onError(errorCode: Int, errorMsg: String) {
-                    }
-                })
-        }
+        checkChapters()
+        checkRecords()
     }
 
     override fun checkNonEditArea(): Boolean = false;
@@ -741,20 +730,122 @@ class WatchLiveActivity :
         watchPlaybackFragment?.seekTo(time)
     }
 
-    //视频打点
+
+    fun openRecod(recodid: String) {
+        if (recodid == webinarInfo.record_id)
+            return;
+
+        ActivityUtils.remove(
+            supportFragmentManager,
+            watchPlaybackFragment
+        )
+        watchPlaybackFragment = null
+        showLoading(null, "正在加载回放信息")
+        VhallSDK.initWatch(
+            webinarInfo.webinar_id,
+            recodid,
+            "",
+            "",
+            true,
+            object : WebinarInfoDataSource.LoadWebinarInfoCallback {
+                override fun onError(p0: Int, errorMsg: String?) {
+                    finishLoading()
+                    showToast(errorMsg)
+                }
+
+                override fun onWebinarInfoLoaded(js: String?, info: WebinarInfo) {
+                    //活动状态 1直播；2预告；3结束；4回放或点播；5录播
+                    webinarInfo = info
+                    finishLoading()
+
+
+                    when (info.status) {
+                        1, 4, 5 -> {
+                            WatchLiveActivity.startActivity(mContext, info)
+                            finish()
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        )
+    }
+
+    //视频打点 精彩瞬间
     fun showVideoPoint(points: Collection<RecordChaptersData.ListBean>?) {
         if (points == null || points.size==0) {
             return
         }
 
+        if(!::pointsFragment.isInitialized)
+            pointsFragment = ChaptersFragment.newInstance(webinarInfo,"videoPoints")
         pointsFragment?.showVideoPoint(points)
 
         mViewBinding.tab.selectedTabPosition
         pointsTab = mViewBinding.tab.newTab().setText("精彩时刻")
         pointsTab.tag = pointTag
+
         mViewBinding.tab.addTab(pointsTab,mViewBinding.tab.tabCount)
         selectTab?.select()
     }
+
+    fun checkChapters() {
+        if (webinarInfo.status != 4 && webinarInfo.status != 5)
+            return
+
+        VhallSDK.permissionsCheck(
+            webinarInfo.webinar_id,
+            webinarInfo.hostId,
+            object : RequestDataCallbackV2<String?> {
+                override fun onSuccess(data: String?) {
+                    var permissions: JSONObject? = null
+                    try {
+                        permissions = JSONObject(data)
+                        chatFragment.setPermissions(permissions)
+                        var ischapter = permissions.optString("ui.watch_record_chapter").toInt()
+                        if(ischapter != 0){//有章节信息
+                            mViewBinding.tab.selectedTabPosition
+                            chaptersTab = mViewBinding.tab.newTab().setText("章节")
+                            chaptersTab.tag = chapterTag
+                            mViewBinding.tab.addTab(chaptersTab,mViewBinding.tab.tabCount)
+                            if(!::chaptersFragment.isInitialized)
+                                chaptersFragment = ChaptersFragment.newInstance(webinarInfo,"chapters")
+                            selectTab?.select()
+                        }
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                    }
+                }
+                override fun onError(errorCode: Int, errorMsg: String) {
+                }
+            })
+
+    }
+    //回放列表 精彩片段
+    fun checkRecords() {
+        if(webinarInfo.status != 4 && webinarInfo.status != 5)
+            return
+
+        VhallSDK.getRecordList(
+            webinarInfo.webinar_id,0,2,
+            object : RequestDataCallbackV2<RecordsData?> {
+                override fun onSuccess(data: RecordsData?) {
+                    if(data != null &&  data.total > 1){
+                        if(!::recordsFragment.isInitialized)
+                            recordsFragment =  RecordsFragment.newInstance(webinarInfo,"")
+
+                        mViewBinding.tab.selectedTabPosition
+                        recordsTab = mViewBinding.tab.newTab().setText("精彩片段")
+                        recordsTab.tag = recordsTag
+                        mViewBinding.tab.addTab(recordsTab,mViewBinding.tab.tabCount)
+//                        selectTab?.select()
+                    }
+                }
+                override fun onError(errorCode: Int, errorMsg: String) {
+                }
+            })
+    }
+
     fun setCurDialog(dialog:BaseBottomDialog){
         if(!dialog.equals(mCurDialog)) {
             mCurDialog?.dismiss()

@@ -35,7 +35,11 @@ class AESUtils {
             cipher.init(Cipher.DECRYPT_MODE, keySpec)
             //加密、解密
             val encrypt = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                cipher.doFinal(Base64.getDecoder().decode(input))
+                try {
+                    cipher.doFinal(Base64.getDecoder().decode(input))
+                } catch (e: Exception) {
+                    return ""
+                }
             } else {
                 TODO("VERSION.SDK_INT < O")
             }

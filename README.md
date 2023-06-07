@@ -4,7 +4,7 @@
 
 APP直接依赖uilib库即可，界面可在UI库中自定义
 具体API调用方式请参考uilib，或官方文档
-####注释
+#### 注释
 uilib里面的aar替换为maven依赖
 具体使用 参考demo
 项目的 build.gradle里面添加
@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.11.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.11.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.15.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.15.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -39,7 +39,27 @@ allprojects {
     
 ```
 
+#### Demo 运行
+
+1.  微吼控制台获取 Appkey、appSecretKey， 签名设置页可以获得控制台配置具体参数  对接文档： https://saas-doc.vhall.com/opendocs/show/1224
+2.  Demo 的 com.vhall.live.vhall.EvConfigProvider 中填写 Appkey、appSecretKey
+
+
+
 二、版本更新信息：
+
+版本：v6.15.0  更新时间 2023.06.7
+
+1. 【新增】SDK新增播放指定回放或视频能力，支持精彩片段播放场景；
+2. 【新增】新增播放器截图功能；
+3. 【优化】支持播放1080P视频；
+4. 【优化】修复了外接蓝牙设备互动连麦的兼容性问题；
+
+版本：v6.14.0  更新时间 2023.05.5
+
+1. 【优化】优化SDK对弱网、断网及异常中断等异常场景的兼容性
+
+
 版本：v6.13.0  更新时间 2023.03.29
 
 1. 【新增】SDK新增显示章节、视频打点能力; 新增查看中奖名单等抽奖相关接口

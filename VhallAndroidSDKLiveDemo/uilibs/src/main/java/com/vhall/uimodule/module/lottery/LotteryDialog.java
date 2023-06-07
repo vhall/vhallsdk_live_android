@@ -115,10 +115,7 @@ public class LotteryDialog  extends BaseBottomDialog implements View.OnClickList
         else if(this.msgInfo.event == MessageServer.EVENT_END_LOTTERY){
             tv_btn.setVisibility(View.VISIBLE);
 
-            if(webinarInfo.is_new_version == 3)
-                tv_btn.setText((this.msgInfo.winnerLottery && this.msgInfo.lotteryInfo.need_take_award == 1)?"立即领奖":"查看中奖名单");
-            else
-                tv_btn.setVisibility(View.GONE);
+            tv_btn.setText((this.msgInfo.winnerLottery && this.msgInfo.lotteryInfo.need_take_award == 1)?"立即领奖":"查看中奖名单");
 
             int idx = this.msgInfo.winnerLottery?R.mipmap.icon_lottery_winer:R.mipmap.icon_lottery_no;
             RequestOptions requestOptions  = RequestOptions.noTransformation().placeholder(idx);

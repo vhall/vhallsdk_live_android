@@ -79,13 +79,15 @@ class SignConfigActivity :
             if(qrcodeStr.length>64){
                 try {
                     val jsonstr = AESUtils.decrypt(qrcodeStr.replace(" ","+"),"EDaaff63bcB4d4M9")
-                    val userInfo: JSONObject = JSONObject(jsonstr)
-                    val sha1 = userInfo["s1"].toString()
-                    val ar = userInfo["ar"].toString()
-                    mViewBinding.edAppKey.setText(userInfo["a"].toString())
-                    mViewBinding.edAppSecretKey.setText(userInfo["as"].toString())
-                    if(ar.length==0 || sha1.length==0)
-                        showToast("请填写Android包名签名")
+                    if(jsonstr.length>0){
+                        val userInfo: JSONObject = JSONObject(jsonstr)
+                        val sha1 = userInfo["s1"].toString()
+                        val ar = userInfo["ar"].toString()
+                        mViewBinding.edAppKey.setText(userInfo["a"].toString())
+                        mViewBinding.edAppSecretKey.setText(userInfo["as"].toString())
+                        if(ar.length==0 || sha1.length==0)
+                            showToast("请填写Android包名签名")
+                    }
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }

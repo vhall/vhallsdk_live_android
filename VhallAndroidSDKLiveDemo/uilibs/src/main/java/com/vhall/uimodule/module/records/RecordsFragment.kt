@@ -1,4 +1,4 @@
-package com.vhall.uimodule.module.chapters
+package com.vhall.uimodule.module.records
 
 import android.os.Bundle
 import android.view.View
@@ -12,13 +12,13 @@ import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase
 import com.vhall.uimodule.databinding.FragmentChaptersBinding
 import com.vhall.uimodule.module.watch.WatchLiveActivity
-import com.vhall.vhss.data.RecordChaptersData
+import com.vhall.vhss.data.RecordsData
 
-class ChaptersFragment : BaseFragment<FragmentChaptersBinding>(FragmentChaptersBinding::inflate) {
+class RecordsFragment : BaseFragment<FragmentChaptersBinding>(FragmentChaptersBinding::inflate) {
     companion object {
         @JvmStatic
         fun newInstance(info: WebinarInfo, type: String) =
-            ChaptersFragment().apply {
+            RecordsFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(IBase.INFO_KEY, info)
                     putString(TYPE, type)
@@ -27,21 +27,20 @@ class ChaptersFragment : BaseFragment<FragmentChaptersBinding>(FragmentChaptersB
     }
     private val TYPE = "type"
     private var type: String? = ""
-    lateinit var chapterAdapter: ChapterAdapter
-    lateinit var pointList: Collection<RecordChaptersData.ListBean>
+    lateinit var rcordAdapter: RecordAdapter
     override fun initView() {
         val activity: WatchLiveActivity = activity as WatchLiveActivity
         arguments?.let {
             webinarInfo = it.getSerializable(IBase.INFO_KEY) as WebinarInfo
             type = it.getString(TYPE)
-            chapterAdapter = ChapterAdapter(mContext, webinarInfo)
-            chapterAdapter.setOnItemClickListener(OnItemClickListener { baseQuickAdapter: BaseQuickAdapter<*, *>?, view: View?, i: Int ->
-                var seekTime = (chapterAdapter.data.get(i).created_at * 1000).toInt();
-                activity.seekTo(seekTime)
+            rcordAdapter = RecordAdapter(mContext, webinarInfo)
+            rcordAdapter.setOnItemClickListener(OnItemClickListener { baseQuickAdapter: BaseQuickAdapter<*, *>?, view: View?, i: Int ->
+                var recodID = (rcordAdapter.data.get(i).record_id).toString();
+                activity.openRecod(recodID)
             })
         }
         mViewBinding.recycleView.layoutManager = LinearLayoutManager(mContext)
-        mViewBinding.recycleView.adapter = chapterAdapter
+        mViewBinding.recycleView.adapter = rcordAdapter
         mViewBinding.recycleView.setHasFixedSize(true)
         mViewBinding.refreshLayout.setOnRefreshListener {
             loadData()
@@ -50,30 +49,18 @@ class ChaptersFragment : BaseFragment<FragmentChaptersBinding>(FragmentChaptersB
     }
 
     private fun loadData(){
-        if (!type.equals("chapters")) {
-            chapterAdapter.setList(pointList)
-            mViewBinding.refreshLayout.isRefreshing = false
-            return;
-        }
-
-        VhallSDK.getRecordChaptersList(
-            webinarInfo.record_id,
-            object : RequestDataCallbackV2<RecordChaptersData?> {
-                override fun onSuccess(data: RecordChaptersData?) {
+        VhallSDK.getRecordList(
+            webinarInfo.webinar_id,0,100,
+            object : RequestDataCallbackV2<RecordsData?> {
+                override fun onSuccess(data: RecordsData?) {
                     mViewBinding.refreshLayout.isRefreshing = false
                     if (data != null) {
-                        chapterAdapter.setList(data.list)
+                        rcordAdapter.setList(data.list)
                     }
                 }
                 override fun onError(errorCode: Int, errorMsg: String) {
                     mViewBinding.refreshLayout.isRefreshing = false
                 }
             })
-    }
-
-    fun showVideoPoint(list: Collection<RecordChaptersData.ListBean>?) {
-        if (list != null) {
-            pointList = list
-        };
     }
 }

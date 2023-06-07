@@ -38,7 +38,7 @@ public class OutDialog extends Dialog {
             setContentView(R.layout.dialog_out_login_exit);
         TextView tv1 = findViewById(R.id.tv_1);
         TextView tv2 = findViewById(R.id.tv_2);
-        tvTitle = findViewById(R.id.tv_title);
+        tvTitle = findViewById(R.id.tv_dialog_title);
 
         if (!TextUtils.isEmpty(builder.title)) {
             tvTitle.setText(builder.title);

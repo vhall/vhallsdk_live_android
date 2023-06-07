@@ -17,6 +17,16 @@
         android:background="@drawable/bg_watch_shape"
         app:layout_constraintBottom_toBottomOf="parent" />
 
+    <ImageView
+        android:id="@+id/iv_screenshot"
+        android:layout_width="@dimen/dimen_160dp"
+        android:layout_height="@dimen/dimen_90dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <SeekBar
         android:id="@+id/seekbar"
         android:layout_width="match_parent"

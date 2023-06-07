@@ -1,7 +1,9 @@
 package com.vhall.uimodule.module.watch.watchplayback
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.SeekBar
 import androidx.lifecycle.lifecycleScope
 import com.vhall.business.*
@@ -9,6 +11,7 @@ import com.vhall.business.data.RequestCallback
 import com.vhall.business.data.WebinarInfo
 import com.vhall.player.Constants
 import com.vhall.player.VHPlayerListener
+import com.vhall.player.stream.play.impl.VHVideoPlayerView
 import com.vhall.uimodule.R
 import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase.*
@@ -43,7 +46,8 @@ class WatchPlaybackFragment :
     lateinit var messageCallBack: MessageServer.Callback
     private var definitionList: MutableList<String> = arrayListOf()
     private var timer: Timer? = null
-
+    private var  mLastTime:Long = 0
+    private var  mCurTime:Long = 0
     //是否全屏
     private var isFull = false
     var parentActivity: WatchLiveActivity? = null
@@ -95,6 +99,26 @@ class WatchPlaybackFragment :
             }
 
         })
+
+        mViewBinding.vodPlayerView.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                mLastTime = mCurTime
+                mCurTime = System.currentTimeMillis()
+                if (mCurTime - mLastTime < 500) {
+                    if (watchPlayback.isPlaying) {
+                        watchPlayback.takeVideoScreenshot(object : VHVideoPlayerView.ScreenShotCallback {
+                            override open fun screenBack(bitmap: Bitmap?){
+                                mViewBinding.ivScreenshot.setImageBitmap(bitmap)
+                                mViewBinding.ivScreenshot.visibility= View.VISIBLE
+                            }
+                        })
+                    }
+                }
+            }
+        })
+        mViewBinding.ivScreenshot.setOnClickListener {
+            mViewBinding.ivScreenshot.visibility= View.GONE
+        }
     }
 
     private fun initWatchPlayback() {
@@ -127,15 +151,15 @@ class WatchPlaybackFragment :
         timer = null
         timer = fixedRateTimer("time", true, 1000, 1000) {
             lifecycleScope.launch(Dispatchers.Main) {
-                if (watchPlayback.isPlaying) {
-                    val playerCurrentPosition = watchPlayback.currentPosition
-                    mViewBinding.seekbar.progress = playerCurrentPosition.toInt()
-                    mViewBinding.tvTime.text =
-                        CommonUtil.converLongTimeToStr(watchPlayback.currentPosition).plus("/")
-                            .plus(CommonUtil.converLongTimeToStr(watchPlayback.duration))
-                }
+                upSeekbar(watchPlayback.currentPosition,watchPlayback.duration)
             }
         }
+    }
+    private fun upSeekbar(currentPosition:Long,duration : Long) {
+        mViewBinding.seekbar.progress = currentPosition.toInt()
+        mViewBinding.tvTime.text =
+            CommonUtil.converLongTimeToStr(currentPosition).plus("/")
+                .plus(CommonUtil.converLongTimeToStr(duration))
     }
 
     inner class WatchCallback : VHPlayerListener {
@@ -226,24 +250,15 @@ class WatchPlaybackFragment :
      * @param is_role     0：不筛选主办方 1：筛选主办方 默认是0
      */
     fun getHistory(page: Int, msgId: String?, callback: ChatServer.ChatRecordCallback) {
-        if(webinarInfo.is_new_version == 3){
-            watchPlayback.requestCommentHistory(
-                webinarInfo.webinar_id,
-                100,
-                page,
-                msgId,
-                "down",
-                "0",
-                callback
-            )
-        }else{
-//            watchPlayback.requestCommentHistory(
-//                webinarInfo.webinar_id,
-//                100,
-//                page,
-//                callback
-//            )
-        }
+        watchPlayback.requestCommentHistory(
+            webinarInfo.webinar_id,
+            100,
+            page,
+            msgId,
+            "down",
+            "0",
+            callback
+        )
     }
 
     /**

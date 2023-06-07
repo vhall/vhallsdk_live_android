@@ -161,6 +161,10 @@ public class CommonUtil {
                 break;
             case "720p":
                 text = "超高清";
+                break;
+            case "1080p":
+                text = "1080p";
+                break;
         }
         return text;
     }
