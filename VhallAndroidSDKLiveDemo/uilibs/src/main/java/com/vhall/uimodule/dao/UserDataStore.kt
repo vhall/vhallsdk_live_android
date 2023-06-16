@@ -23,6 +23,7 @@ class UserDataStore {
         private val thirdPicKey = stringPreferencesKey("thirdPicName")
         private val appKey = stringPreferencesKey("appKey")
         private val appSecretKey = stringPreferencesKey("appSecretKey")
+        private val rsaPrivateKey = stringPreferencesKey("rsaPrivateKey")
         private val watchIdKey = stringPreferencesKey("watchId")
         private val watchKKey = stringPreferencesKey("watchK")
         private val watchKIDKey = stringPreferencesKey("watchKId")
@@ -47,10 +48,11 @@ class UserDataStore {
             }
         }
 
-        suspend fun saveToAppKey(app: String, appSecret: String, context: Context) {
+        suspend fun saveToAppKey(app: String, appSecret: String, rsaPrivate: String, context: Context) {
             context.userStore.edit { setting ->
                 setting[appKey] = app
                 setting[appSecretKey] = appSecret
+                setting[rsaPrivateKey] = rsaPrivate
             }
         }
 
@@ -104,6 +106,10 @@ class UserDataStore {
 
         suspend fun getAppSecret(context: Context): String {
             return getValue(context, appSecretKey)
+        }
+
+        suspend fun getRsaPrivateKey(context: Context): String {
+            return getValue(context, rsaPrivateKey)
         }
 
         suspend fun getWatchId(context: Context): String {

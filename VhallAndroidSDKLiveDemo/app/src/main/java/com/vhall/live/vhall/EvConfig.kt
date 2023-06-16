@@ -26,6 +26,7 @@ object EvConfig {
         GlobalScope.launch {
             EvConfigProvider.appKey = UserDataStore.getAppKey(context)
             EvConfigProvider.appSecretKey = UserDataStore.getAppSecret(context)
+            EvConfigProvider.rsaPrivateKey = UserDataStore.getRsaPrivateKey(context)
             EvConfigProvider.doConfigEnv(context)
         }
     }

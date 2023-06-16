@@ -28,30 +28,24 @@ public class CommonUtil {
 
 
     public static String converLongTimeToStr(long time) {
-        int ss = 1000;
-        int mi = ss * 60;
-        int hh = mi * 60;
+        if(time<=0)
+            return "00:00:00";
 
-        long hour = (time) / hh;
-        long minute = (time - hour * hh) / mi;
-        long second = (time - hour * hh - minute * mi) / ss;
-
-        String strHour = hour < 10 ? "0" + hour : "" + hour;
-        String strMinute = minute < 10 ? "0" + minute : "" + minute;
-        String strSecond = second < 10 ? "0" + second : "" + second;
-        return strHour + ":" + strMinute + ":" + strSecond;
+        int times = (int)time/1000;
+        int hour = times / 3600;
+        int minute = (times - hour * 3600) / 60;
+        int second = times % 60;
+        return String.format("%02d:%02d:%02d",hour,minute,second);
     }
 
     public static String converLongTimeToStr1(long time) {
-        int ss = 1000;
-        int mi = ss * 60;
+        if(time<=0)
+            return "00:00";
 
-        long minute = (time) / mi;
-        long second = (time - minute * mi) / ss;
-
-        String strMinute = minute < 10 ? "0" + minute : "" + minute;
-        String strSecond = second < 10 ? "0" + second : "" + second;
-        return strMinute + ":" + strSecond;
+        int times = (int)time/1000;
+        int minute = times / 60;
+        int second = times % 60;
+        return String.format("%02d:%02d",minute,second);
     }
 
     public static String converStringTimeToStr(String startTime) {
@@ -98,22 +92,15 @@ public class CommonUtil {
     }
 
     public static String converLongTimeToStr2(long time) {
-        int ss = 1000;
-        int mi = ss * 60;
-        int hh = mi * 60;
-        int da = hh * 24;
+        if(time <= 0)
+            time = 0;
 
-        long day = (time) / da;
-        long hour = (time - da * day) / hh;
-        long minute = (time - da * day - hour * hh) / mi;
-        long second = (time - da * day - hour * hh - minute * mi) / ss;
-
-        String strDay = day < 10 ? "0" + day : "" + day;
-        String strHour = hour < 10 ? "0" + hour : "" + hour;
-        String strMinute = minute < 10 ? "0" + minute : "" + minute;
-        String strSecond = second < 10 ? "0" + second : "" + second;
-
-        return String.format("距离开播 <font><big><big><big><big>%s</big></big></big></big>天 <font><big><big><big><big>%s</big></big></big></big>时 <big><big><big><big>%s</big></big></big></big>分 <big><big><big><big>%s</big></big></big></big>秒", strDay, strHour, strMinute, strSecond);
+        int times  = (int)time/1000;
+        int day    = times / 3600 / 24;
+        int hour   = (times - day*24*3600)/ 3600;
+        int minute = (times - day*24*3600 - hour * 3600) / 60;
+        int second = times % 60;
+        return String.format("距离开播 <font><big><big><big><big>%02d</big></big></big></big>天 <font><big><big><big><big>%02d</big></big></big></big>时 <big><big><big><big>%02d</big></big></big></big>分 <big><big><big><big>%02d</big></big></big></big>秒", day, hour, minute, second);
     }
 
     public static String changeRoleNameToString(String roleName) {

@@ -37,6 +37,7 @@ class SignConfigActivity :
         lifecycleScope.launch {
             mViewBinding.edAppKey.setText(UserDataStore.getAppKey(mContext))
             mViewBinding.edAppSecretKey.setText(UserDataStore.getAppSecret(mContext))
+            mViewBinding.edRsaPrivateKey.setText(UserDataStore.getRsaPrivateKey(mContext))
         }
         mViewBinding.edAppRsa.setOnClickListener {
             mViewBinding.edAppRsa.text.toString().copy(mContext)
@@ -57,10 +58,12 @@ class SignConfigActivity :
             lifecycleScope.launch {
                 val appKey = mViewBinding.edAppKey.text.toString()
                 val appSecretKey = mViewBinding.edAppSecretKey.text.toString()
+                val rsa_private_key = mViewBinding.edRsaPrivateKey.text.toString()
+
                 if (appKey.isEmpty() || appSecretKey.isEmpty()) {
                     showToast("请完善app key或app secret key")
                 } else {
-                    UserDataStore.saveToAppKey(appKey, appSecretKey, mContext)
+                    UserDataStore.saveToAppKey(appKey, appSecretKey,rsa_private_key, mContext)
                     UIModuleProvider.doSignConfig()
                     showToast("保存成功")
                     finish()

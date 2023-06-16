@@ -27,6 +27,7 @@ import com.vhall.uimodule.module.warmup.WatchBaseWarmUpActivity
 import com.vhall.uimodule.module.warmup.WatchWarmUpActivity
 import com.vhall.uimodule.module.watch.WatchLiveActivity
 import com.vhall.uimodule.utils.CommonUtil
+import com.vhall.uimodule.webview.WebviewActivity
 import com.vhall.uimodule.widget.EditDialog
 import com.vhall.uimodule.widget.EditDialog.ClickLister
 import com.vhall.uimodule.widget.OnNoDoubleClickListener
@@ -49,6 +50,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         mViewBinding.tvJoin.setOnClickListener(object : OnNoDoubleClickListener() {
             override fun onNoDoubleClick(v: View?) {
                 prepareJoin()
+            }
+        })
+        mViewBinding.tvJoinH5.setOnClickListener(object : OnNoDoubleClickListener() {
+            override fun onNoDoubleClick(v: View?) {
+                var url:String? = null
+                if (mViewBinding.edWatchId.text.toString().isNotEmpty())
+                    url = "https://live.vhall.com/v3/lives/embedclient/watch/"+mViewBinding.edWatchId.text.toString()
+                WebviewActivity.startActivity(this@MainActivity,url)
             }
         })
         mViewBinding.ivQrcode.setOnClickListener(object : OnNoDoubleClickListener() {

@@ -129,17 +129,30 @@
 
     <TextView
         android:id="@+id/tv_join"
-        android:layout_width="@dimen/dimen_100dp"
+        android:layout_width="@dimen/dimen_150dp"
         android:layout_height="43dp"
-        android:layout_marginTop="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_50dp"
         android:background="@drawable/shape_bg_rounded_red"
         android:gravity="center"
         android:text="进入"
-        android:layout_marginBottom="50dp"
         android:textColor="@color/white"
         android:textSize="@dimen/dimen_18dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ed_watch_id" />
+    <TextView
+        android:id="@+id/tv_join_h5"
+        android:layout_width="@dimen/dimen_150dp"
+        android:layout_height="@dimen/dimen_22dp"
+        android:layout_marginTop="@dimen/dimen_5dp"
+        android:background="@drawable/shape_bg_rounded_f1"
+        android:gravity="center"
+        android:text="H5 进入"
+        android:layout_marginBottom="50dp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_join" />
 </androidx.constraintlayout.widget.ConstraintLayout>

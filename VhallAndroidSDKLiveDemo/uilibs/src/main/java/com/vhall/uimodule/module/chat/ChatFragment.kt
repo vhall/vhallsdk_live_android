@@ -367,6 +367,15 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
                     handsUp = messageInfo.status.toString()
                     setPublishIcon()
                 }
+                EVENT_CHART_DELETE -> {
+                    for ( i in 0 until chatAdapter.itemCount) {
+                        var msg : ChatMessageData? = chatAdapter.getItemOrNull(i)
+                        if(msg != null && msg.chatInfo.msg_id == messageInfo.msg_id_delete) {
+                            chatAdapter.remove(msg)
+                            break
+                        }
+                    }
+                }
             }
         else
             if (messageInfo.event == EVENT_CHAT_FORBID_ALL) {

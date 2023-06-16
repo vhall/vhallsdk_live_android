@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.15.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.15.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.16.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.16.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -47,6 +47,12 @@ allprojects {
 
 
 二、版本更新信息：
+
+版本：v6.16.0  更新时间 2023.06.16
+
+1. 【新增】文件下载功能；
+2. 【新增】删除聊天信息功能；
+
 
 版本：v6.15.0  更新时间 2023.06.07
 

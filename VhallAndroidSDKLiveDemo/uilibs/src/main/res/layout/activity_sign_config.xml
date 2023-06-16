@@ -131,6 +131,37 @@
         app:layout_constraintTop_toBottomOf="@id/tv_app_secret_key" />
 
     <TextView
+        android:id="@+id/tv_rsa_private_key"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_15dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:text="RSA Private Key"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintTop_toBottomOf="@id/ed_app_secret_key" />
+
+    <EditText
+        android:id="@+id/ed_rsa_private_key"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_40dp"
+        android:layout_marginStart="@dimen/dimen_32dp"
+        android:layout_marginTop="@dimen/dimen_5dp"
+        android:layout_marginEnd="@dimen/dimen_32dp"
+        android:background="@drawable/shape_ed_line"
+        android:enabled="true"
+        android:gravity="center_vertical"
+        android:maxLines="10"
+        android:paddingStart="@dimen/dimen_10dp"
+        android:paddingEnd="@dimen/dimen_10dp"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_9sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_rsa_private_key" />
+
+    <TextView
         android:id="@+id/tv_sign_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -141,7 +172,7 @@
         android:textSize="@dimen/dimen_20sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ed_app_secret_key" />
+        app:layout_constraintTop_toBottomOf="@id/ed_rsa_private_key" />
 
     <TextView
         android:id="@+id/tv_app_rsa"

@@ -38,6 +38,7 @@ import com.vhall.uimodule.databinding.ActivityWatchLiveBinding
 import com.vhall.uimodule.module.chapters.ChaptersFragment
 import com.vhall.uimodule.module.chat.ChatFragment
 import com.vhall.uimodule.module.doc.DocFragment
+import com.vhall.uimodule.module.download.FilesFragment
 import com.vhall.uimodule.module.interactive.RtcFragment
 import com.vhall.uimodule.module.introduction.WebinarInfoFragment
 import com.vhall.uimodule.module.lottery.LotteryDialog
@@ -82,6 +83,7 @@ class WatchLiveActivity :
     private lateinit var chaptersTab: TabLayout.Tab
     private lateinit var pointsTab: TabLayout.Tab
     private lateinit var recordsTab: TabLayout.Tab
+    private lateinit var filesDownloadTab: TabLayout.Tab
     private var selectTab: TabLayout.Tab? = null
 
     private lateinit var chatFragment: ChatFragment
@@ -91,6 +93,7 @@ class WatchLiveActivity :
     private lateinit var chaptersFragment: ChaptersFragment
     private lateinit var pointsFragment: ChaptersFragment
     private lateinit var recordsFragment: RecordsFragment
+    private lateinit var filesDownloadFragment: FilesFragment
     private val docTag = 1
     private val chatTag = 2
     private val qaTag = 3
@@ -98,6 +101,7 @@ class WatchLiveActivity :
     private val chapterTag = 5
     private val pointTag = 6
     private val recordsTag = 7
+    private val filesDownloadTag = 8
     private var isChat = true
 
     private var inputView: InputView? = null
@@ -207,6 +211,14 @@ class WatchLiveActivity :
                         )
                         showFragment = recordsFragment
                     }
+                    filesDownloadTag -> {
+                        ActivityUtils.changeFragmentToActivity(
+                            supportFragmentManager,
+                            filesDownloadFragment, showFragment,
+                            mViewBinding.flTab.id
+                        )
+                        showFragment = filesDownloadFragment
+                    }
                 }
             }
 
@@ -300,6 +312,8 @@ class WatchLiveActivity :
             chaptersTab = tab.newTab().setText("章节")
             chaptersTab.tag = chapterTag;
 
+
+
             tab.addTab(docTab)
             tab.addTab(chatTab)
             if (webinarInfo.question_status == 1 && webinarInfo.status == 1) {
@@ -309,6 +323,13 @@ class WatchLiveActivity :
             tab.addTab(infoTab)
             tab.removeTab(docTab)
             tab.selectTab(chatTab)
+            if(webinarInfo.is_file_download == 1){
+                filesDownloadTab = tab.newTab().setText(webinarInfo.file_download_menu.name)
+                filesDownloadTab.tag = filesDownloadTag;
+                if(!::filesDownloadFragment.isInitialized)
+                    filesDownloadFragment = FilesFragment.newInstance(webinarInfo,"")
+                tab.addTab(filesDownloadTab)
+            }
         }
     }
 
@@ -473,6 +494,9 @@ class WatchLiveActivity :
                     onlineVirtual += chatInfo.virtualNumUpdateData.update_online_num
                 }
                 setLookNum()
+            }
+            ChatServer.eventCustomKey -> {
+
             }
         }
     }
@@ -669,6 +693,26 @@ class WatchLiveActivity :
                     else
                         selectTab?.select()
 
+                }
+            }
+            MessageServer.EVENT_DATA_DOWNLOAD_UPDATE -> {
+                if (messageInfo.file_download_menu.status == 1) {
+                    if(selectTab != filesDownloadTab)
+                    {
+                        if(filesDownloadTab != null)
+                            mViewBinding.tab.removeTab(filesDownloadTab)
+                        filesDownloadTab = mViewBinding.tab.newTab().setText(messageInfo.file_download_menu.name)
+                        filesDownloadTab.tag = filesDownloadTag
+                        if(!::filesDownloadFragment.isInitialized)
+                            filesDownloadFragment = FilesFragment.newInstance(webinarInfo,"")
+                        mViewBinding.tab.addTab(filesDownloadTab, mViewBinding.tab.tabCount)
+                        selectTab?.select()
+                    }
+                    filesDownloadTab.setText(messageInfo.file_download_menu.name)
+                    filesDownloadFragment?.refreshData()
+                } else {
+                    mViewBinding.tab.removeTab(filesDownloadTab)
+                    chatTab.select()
                 }
             }
         }

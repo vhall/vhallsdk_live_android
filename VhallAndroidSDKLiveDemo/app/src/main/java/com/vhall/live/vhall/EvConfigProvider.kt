@@ -15,9 +15,9 @@ class EvConfigProvider {
     companion object {
         var appKey: String? = "申请的 appKey"
         var appSecretKey: String? = "申请的 appSecretKey"
-
+        var rsaPrivateKey: String? = null
         fun doConfigEnv(context: Context) {
-            VhallSDK.setTest(false)
+            VhallSDK.setRsaPrivateKey(rsaPrivateKey)
             VhallSDK.init(
                 context,
                 appKey,

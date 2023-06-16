@@ -1,8 +1,8 @@
 buildscript {
 
     ext {
-        app_version = "6.15.0"
-        app_code = 6150
+        app_version = "6.16.0"
+        app_code = 6160
         kotlin_version = '1.6.10'
         coroutines_version = '1.6.0'
     }
@@ -15,8 +15,6 @@ buildscript {
         maven{ url 'https://maven.aliyun.com/nexus/content/groups/public/'}
         mavenCentral()
         google()
-        jcenter()
-
     }
 }
 
@@ -24,7 +22,7 @@ allprojects {
     repositories {
         mavenCentral()
         google()
-        jcenter()
+        maven{ url 'https://maven.aliyun.com/nexus/content/groups/public/'}
         maven { url "https://jitpack.io" }
         maven {url 'http://4thline.org/m2'}
 
