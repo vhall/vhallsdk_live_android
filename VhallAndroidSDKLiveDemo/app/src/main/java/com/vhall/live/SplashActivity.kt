@@ -6,8 +6,8 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.vhall.business.VhallSDK
 import com.vhall.live.databinding.ActivitySplashBinding
-import com.vhall.uimodule.module.login.LoginActivity
-import com.vhall.uimodule.module.main.MainActivity
+import com.vhall.uimodule.login.LoginActivity
+import com.vhall.uimodule.main.MainActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

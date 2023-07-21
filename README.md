@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.16.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.16.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.17.1'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.17.1'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -47,6 +47,12 @@ allprojects {
 
 
 二、版本更新信息：
+
+版本：v6.17.1  更新时间 2023.07.21
+
+1. 【新增】推屏卡片互动功能，提升直播间营销互动能力，对接说明见 推屏卡片 ；
+2. 【优化】解决底层包引用冲突问题
+3. 【优化】优化弱网环境下，互动连麦弱网问题
 
 版本：v6.16.0  更新时间 2023.06.16
 

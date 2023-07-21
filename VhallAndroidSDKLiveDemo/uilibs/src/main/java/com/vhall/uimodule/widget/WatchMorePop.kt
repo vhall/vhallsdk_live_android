@@ -7,8 +7,9 @@ import android.widget.PopupWindow
 import com.vhall.business.data.WebinarInfo
 import com.vhall.uimodule.R
 import com.vhall.uimodule.databinding.PopWatchMoreBinding
-import com.vhall.uimodule.module.notice.NoticeListDialog
-import com.vhall.uimodule.module.survey.SurveyListDialog
+import com.vhall.uimodule.watch.card.CardListDialog
+import com.vhall.uimodule.watch.notice.NoticeListDialog
+import com.vhall.uimodule.watch.survey.SurveyListDialog
 
 class WatchMorePop @JvmOverloads constructor(private val mContext: Context, val webinarInfo: WebinarInfo) :
     PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT) {
@@ -25,7 +26,7 @@ class WatchMorePop @JvmOverloads constructor(private val mContext: Context, val 
         isFocusable = true
 
         binding.ivNotice.setOnClickListener {
-            NoticeListDialog(mContext, webinarInfo, true)
+            NoticeListDialog(mContext, webinarInfo,  true)
             dismiss()
         }
 
@@ -33,6 +34,14 @@ class WatchMorePop @JvmOverloads constructor(private val mContext: Context, val 
             SurveyListDialog(
                 mContext,
                 webinarInfo
+            )
+            dismiss()
+        }
+        binding.ivCard.setOnClickListener {
+            CardListDialog(
+                mContext,
+                webinarInfo,
+                true
             )
             dismiss()
         }

@@ -64,12 +64,12 @@ public class WebviewActivity extends AppCompatActivity {
 //                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        getPushPermission(100, this);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
 
         webSettings = webView.getSettings();
+        //开启JavaScript支持
         webSettings.setJavaScriptEnabled(true);
         webSettings.setDomStorageEnabled(true);
 
@@ -77,19 +77,23 @@ public class WebviewActivity extends AppCompatActivity {
         webSettings.setUseWideViewPort(true); //将图片调整到适合webview的大小
         webSettings.setLoadWithOverviewMode(true); // 缩放至屏幕的大小
         webSettings.setDomStorageEnabled(true);////启用或禁用DOM缓存
-        webSettings.setAllowContentAccess(true);////启用或禁用DOM缓存
-        webSettings.setAllowFileAccess(true);////启用或禁用DOM缓存
-        webSettings.setAllowFileAccessFromFileURLs(false);////启用或禁用DOM缓存
-        webSettings.setAllowUniversalAccessFromFileURLs(false);////启用或禁用DOM缓存
 
+        webSettings.setAllowContentAccess(true); // 是否可访问Content Provider的资源，默认值 true
+        webSettings.setAllowFileAccess(true);    // 是否可访问本地文件，默认值 true
+        // 是否允许通过file url加载的Javascript读取本地文件，默认值 false
+        webSettings.setAllowFileAccessFromFileURLs(true);
+        // 是否允许通过file url加载的Javascript读取全部资源(包括文件,http,https)，默认值 false
+        webSettings.setAllowUniversalAccessFromFileURLs(true);
+
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webSettings.setMediaPlaybackRequiresUserGesture(false);
+        webSettings.setDefaultTextEncodingName("UTF-8");
+
+        // 支持缩放
+        webSettings.setSupportZoom(true);
         webSettings.setBuiltInZoomControls(true);
         webSettings.setDisplayZoomControls(false);
 
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            webSettings.setMediaPlaybackRequiresUserGesture(false);
-        }
-        webView.setWebContentsDebuggingEnabled(true);
         webView.setWebViewClient(new WebViewClient() {
 
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -213,13 +217,6 @@ public class WebviewActivity extends AppCompatActivity {
         loadLocalHtml(getIntent().getStringExtra("defaulturl"));
     }
 
-    @SuppressLint("JavascriptInterface")
-    private void initJSInterface() {
-        if (null != webView) {
-            webView.addJavascriptInterface(this, "vhandroid");
-        }
-    }
-
     private void loadLocalHtml(String url) {
         if (null != webView) {
             url = (url!=null)?url:"https://live.vhall.com/v3/lives/embedclient/watch/927829294";
@@ -228,20 +225,38 @@ public class WebviewActivity extends AppCompatActivity {
         }
     }
 
+    //JS 调用原生方法
+    //webView
+    @SuppressLint("JavascriptInterface")
+    private void initJSInterface() {
+        if (null != webView) {
+            webView.addJavascriptInterface(this, "vhandroid");
+        }
+    }
     @JavascriptInterface
     public void methodName() {
-        showJSIncoming("JS called Java method: methodName()");
+        showJSCallbackMsg("JS called Java method: methodName()");
     }
-
     @JavascriptInterface
     public void methodNameWithArgs(String arg1, String arg2) {
-        showJSIncoming("JS called Java method: methodNameWithArgs(arg1, arg2) \n" + "arg1 = " + arg1 + "\n" + "arg2 = " + arg2);
+        showJSCallbackMsg("JS called Java method: methodNameWithArgs(arg1, arg2) \n" + "arg1 = " + arg1 + "\n" + "arg2 = " + arg2);
+    }
+    //原生调用JS方法
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private void executeJS(String code) {
+        String url = "javascript:" + code;
+        webView.evaluateJavascript(url, new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String value) {
+            }
+        });
     }
 
-    private void showJSIncoming(final String msg) {
+    private void showJSCallbackMsg(final String msg) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                findViewById(R.id.tv_jslog).setVisibility(View.VISIBLE);
                 ((TextView) findViewById(R.id.tv_display)).setText(msg);
             }
         });
@@ -268,18 +283,6 @@ public class WebviewActivity extends AppCompatActivity {
         hideInput();
     }
 
-    //调用JS方法
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    private void executeJS(String code) {
-        String url = "javascript:" + code;
-        webView.evaluateJavascript(url, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String value) {
-
-            }
-        });
-    }
-
     /**
      * 隐藏键盘
      */
@@ -291,24 +294,8 @@ public class WebviewActivity extends AppCompatActivity {
         }
     }
 
-
-    private long lastTime;
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
     }
-
-
-    public static boolean getPushPermission(int requestCode, AppCompatActivity activity) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        if (activity.checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED && activity.checkSelfPermission(MODIFY_AUDIO_SETTINGS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        activity.requestPermissions(new String[]{CAMERA, RECORD_AUDIO, MODIFY_AUDIO_SETTINGS}, requestCode);
-        return false;
-    }
-
 }

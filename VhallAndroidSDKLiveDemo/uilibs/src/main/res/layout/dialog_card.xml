@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_root_card"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_marginRight="@dimen/dimen_45dp"
+        android:layout_marginLeft="@dimen/dimen_45dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+
+        <TextView
+            android:id="@+id/tv_timeclose"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/dimen_10dp"
+            android:layout_marginBottom="@dimen/dimen_10dp"
+            android:gravity="right"
+            android:text="5s 关闭"
+            android:textColor="@color/white"
+            android:textSize="@dimen/dimen_15dp"/>
+
+        <ImageView
+            android:id="@+id/iv_card"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/dimen_200dp"/>
+        <TextView
+            android:id="@+id/tv_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dimen_5dp"
+            android:layout_marginBottom="@dimen/dimen_5dp"
+            android:gravity="center"
+            android:text="描述描述描述描述描述描述描述描述描述描述描述"
+            android:textColor="@color/color_FFF1D7"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textSize="@dimen/dimen_12dp"/>
+
+        <TextView
+            android:id="@+id/tv_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/dimen_44dp"
+            android:layout_marginTop="@dimen/dimen_5dp"
+            android:paddingLeft="@dimen/dimen_15dp"
+            android:paddingRight="@dimen/dimen_15dp"
+            android:minWidth="160dp"
+            android:background="@drawable/shape_bg_rounded_red"
+            android:gravity="center"
+            android:text="立即查看"
+            android:textColor="@color/white"
+            android:textSize="@dimen/dimen_16dp"/>
+        <ImageView
+            android:id="@+id/tv_cancel"
+            android:layout_width="@dimen/dimen_36dp"
+            android:layout_height="@dimen/dimen_36dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/dimen_10dp"
+            android:padding="@dimen/dimen_15dp"
+            android:background="@mipmap/icon_close1"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -75,7 +75,7 @@
             android:textSize="@dimen/dimen_14sp" />
 
 
-        <com.vhall.uimodule.module.chat.ChatImagesView
+        <com.vhall.uimodule.watch.chat.ChatImagesView
             android:id="@+id/chat_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -86,15 +86,18 @@
     <TextView
         android:id="@+id/tv_msg"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/dimen_24dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dimen_12dp"
         android:background="@drawable/shape_bg_chat_msg"
         android:gravity="center"
-        android:maxLines="1"
+        android:maxLines="2"
         android:paddingStart="@dimen/dimen_12dp"
-        android:paddingEnd="@dimen/dimen_39dp"
+        android:paddingEnd="@dimen/dimen_12dp"
+        android:paddingTop="@dimen/dimen_5dp"
+        android:paddingBottom="@dimen/dimen_5dp"
         android:textColor="@color/color_59"
         android:textSize="@dimen/dimen_14sp"
+        android:ellipsize="end"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -9,17 +9,17 @@
         android:supportsRtl="true"
         tools:replace="android:allowBackup">
         <activity
-            android:name=".module.watch.WatchLiveActivity"
+            android:name=".watch.WatchLiveActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".module.login.SignConfigActivity"
+            android:name=".login.SignConfigActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".module.main.MainActivity"
+            android:name=".main.MainActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
@@ -31,24 +31,30 @@
             android:windowSoftInputMode="adjustNothing"
             tools:ignore="Instantiatable" />
         <activity
-            android:name=".module.login.LoginActivity"
+            android:name=".login.LoginActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".module.warmup.WatchBaseWarmUpActivity"
+            android:name=".watch.warmup.WatchBaseWarmUpActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".module.warmup.WatchWarmUpActivity"
+            android:name=".watch.warmup.WatchWarmUpActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
         <activity
             android:name=".webview.WebviewActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
+            android:name=".publish.PublishActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:screenOrientation="portrait"

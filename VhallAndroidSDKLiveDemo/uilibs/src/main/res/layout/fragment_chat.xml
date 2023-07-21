@@ -79,7 +79,7 @@
             android:background="@mipmap/icon_like" />
     </LinearLayout>
 
-    <com.vhall.uimodule.module.like.PressLikeView
+    <com.vhall.uimodule.watch.like.PressLikeView
         android:id="@+id/press_like"
         android:layout_width="70dp"
         android:layout_height="340dp"

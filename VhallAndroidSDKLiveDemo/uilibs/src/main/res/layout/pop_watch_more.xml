@@ -18,8 +18,16 @@
         android:id="@+id/iv_notice"
         android:layout_width="@dimen/dimen_30dp"
         android:layout_height="@dimen/dimen_30dp"
-        android:layout_marginTop="@dimen/dimen_10dp"
+        android:layout_marginTop="@dimen/dimen_5dp"
         android:background="@mipmap/icon_notice"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/iv_survey" />
+    <ImageView
+        android:id="@+id/iv_card"
+        android:layout_width="@dimen/dimen_30dp"
+        android:layout_height="@dimen/dimen_30dp"
+        android:layout_marginTop="@dimen/dimen_5dp"
+        android:background="@mipmap/icon_card"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_notice" />
 </androidx.constraintlayout.widget.ConstraintLayout>

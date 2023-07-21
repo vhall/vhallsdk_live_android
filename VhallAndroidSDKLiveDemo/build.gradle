@@ -1,8 +1,8 @@
 buildscript {
 
     ext {
-        app_version = "6.16.0"
-        app_code = 6160
+        app_version = "6.17.1"
+        app_code = 6171
         kotlin_version = '1.6.10'
         coroutines_version = '1.6.0'
     }
@@ -12,9 +12,10 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
     repositories {
-        maven{ url 'https://maven.aliyun.com/nexus/content/groups/public/'}
         mavenCentral()
         google()
+
+        maven{ url 'https://maven.aliyun.com/nexus/content/groups/public/'}
     }
 }
 
@@ -23,6 +24,7 @@ allprojects {
         mavenCentral()
         google()
         maven{ url 'https://maven.aliyun.com/nexus/content/groups/public/'}
+        maven { url 'https://s01.oss.sonatype.org/content/repositories/releases/' }
         maven { url "https://jitpack.io" }
         maven {url 'http://4thline.org/m2'}
 

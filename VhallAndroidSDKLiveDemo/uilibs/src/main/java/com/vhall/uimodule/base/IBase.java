@@ -20,6 +20,7 @@ public interface IBase {
     String HAND_UP_KEY = "hand_up";
     String HAND_UP_KEY_STATUS = "hand_up_status";
     String CUSTOMMSG_KEY = "custom_msg";
+    String EXIT_FULL_SCREEN = "exit_full_screen";//退出全屏
 
     default void showToast(String s) {
         ToastUtils.Companion.showToast(s);
