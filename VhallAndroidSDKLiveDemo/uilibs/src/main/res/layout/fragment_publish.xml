@@ -66,6 +66,12 @@
             android:text="FILL"
             android:textColor="@color/white" />
 
+        <Button
+            android:id="@+id/btn_mirror"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/icon_mirror_selected" />
 
         <Button
             android:id="@+id/btn_changeFlash"
@@ -79,7 +85,6 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_margin="5dp"
-            android:visibility="gone"
             android:background="@drawable/rtc_live_beauty_open" />
 
         <Button
@@ -122,7 +127,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="@dimen/dimen_250dp"
+        android:layout_marginBottom="@dimen/dimen_310dp"
         android:orientation="horizontal">
 
         <TextView

@@ -176,7 +176,7 @@ public class CardDialog extends BaseBottomDialog implements View.OnClickListener
             default:break;
         }
         params.height = height;
-        mImageView.setScaleType(cardInfo.scaleType);
+        mImageView.setScaleType(cardInfo.scale_type);
         mImageView.setLayoutParams(params);
         //圆角
         RequestOptions options = new RequestOptions().transform(new RoundedCorners(DensityUtils.dpToPxInt(8)));
@@ -212,7 +212,7 @@ public class CardDialog extends BaseBottomDialog implements View.OnClickListener
             }
         });
     }
-    public class RoundViewOutlineProvider extends ViewOutlineProvider {
+    public static class RoundViewOutlineProvider extends ViewOutlineProvider {
         private final float radius;
         public RoundViewOutlineProvider(float radius) {
             this.radius = radius;

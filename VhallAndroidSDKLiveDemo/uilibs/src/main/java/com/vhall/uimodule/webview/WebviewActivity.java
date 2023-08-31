@@ -6,11 +6,14 @@ import static android.Manifest.permission.RECORD_AUDIO;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,16 +39,24 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.vhall.logmanager.VLog;
 import com.vhall.uimodule.R;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.socket.client.Url;
 
 public class WebviewActivity extends AppCompatActivity {
     WebSettings webSettings;
     private WebView webView;
     private EditText web_site;
+    private String referer = "https://test02-live.vhall.com";
 
     public static void startActivity(Context context, String url) {
         Intent intent = new Intent(context, WebviewActivity.class);
@@ -99,8 +110,22 @@ public class WebviewActivity extends AppCompatActivity {
             @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                view.loadUrl(request.getUrl().toString());
-                return true;
+                String url = request.getUrl().toString();
+                if(!url.startsWith("http"))
+                {
+                    PackageManager packageManager = getPackageManager();
+                    VLog.e("========",url);
+                    //通过浏览器打开URL
+                    Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(url));
+                    try {
+                        startActivity(intent);
+                        // 可以处理该scheme
+                    } catch (ActivityNotFoundException e) {
+                        Toast.makeText(getApplicationContext(), "未安装应用", Toast.LENGTH_SHORT).show();
+                    }
+                    return true;
+                }
+                return false;
             }
 
             @Nullable
@@ -214,14 +239,28 @@ public class WebviewActivity extends AppCompatActivity {
 
         });
         initJSInterface();
-        loadLocalHtml(getIntent().getStringExtra("defaulturl"));
+        loadUrl(getIntent().getStringExtra("defaulturl"));
     }
 
-    private void loadLocalHtml(String url) {
+    private void loadUrl(String url) {
+        loadUrl(url,true);
+    }
+
+    private void loadUrl(String url, boolean updateTitle) {
         if (null != webView) {
-            url = (url!=null)?url:"https://live.vhall.com/v3/lives/embedclient/watch/927829294";
-            web_site.setText(url);
-            webView.loadUrl(url);
+            if(url == null ||url.length()==0)
+                return;
+//            url = (url!=null)?url:"https://live.vhall.com/v3/lives/embedclient/watch/927829294";
+            if(updateTitle)
+                web_site.setText(url);
+
+            if(referer!= null && referer.length()>0){
+                Map<String,String> webviewHead =new HashMap<>();
+                webviewHead.put("Referer", referer);
+                webView.loadUrl(url,webviewHead);
+            } else
+                webView.loadUrl(url);
+
         }
     }
 
@@ -273,8 +312,7 @@ public class WebviewActivity extends AppCompatActivity {
             url = "https://" + url;
             web_site.setText(url);
         }
-
-        webView.loadUrl(url);
+        loadUrl(url);
         hideInput();
     }
 

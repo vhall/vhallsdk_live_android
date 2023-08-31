@@ -29,9 +29,11 @@ import com.vhall.business.data.WebinarInfo;
 import com.vhall.business.module.survey.SurveyServer;
 import com.vhall.business.utils.SurveyInternal;
 import com.vhall.uimodule.R;
-import com.vhall.uimodule.base.BaseBottomDialog;
+import com.vhall.uimodule.base.IBase;
 import com.vhall.uimodule.utils.DensityUtils;
+import com.vhall.uimodule.watch.WatchLiveActivity;
 import com.vhall.uimodule.watch.card.CardDialog;
+import com.vhall.uimodule.watch.goods.GoodsDetailsDialog;
 import com.vhall.uimodule.watch.lottery.LotteryListDialog;
 import com.vhall.uimodule.watch.survey.SurveyWebView;
 import com.vhall.uimodule.utils.CommonUtil;
@@ -121,9 +123,7 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
                     builder.append(msgInfo.giftInfoData.gift_name);
                     break;
                 case MessageServer.EVENT_SURVEY:
-                    builder.append(name);
-                    builder.append(" ");
-                    builder.append(ssb);
+                    builder.append(ssb).append(" ").append(name);
                     String sp = " 推送了" + msgInfo.survey_name + " 点击查看";
                     builder.append(sp);
                     VhClickSpan span = new VhClickSpan(mContext.getResources().getColor(R.color.color_3562FA), false) {
@@ -160,17 +160,12 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
                     break;
 
                 case MessageServer.EVENT_SIGNIN:
-                    builder.append(name);
-                    builder.append(" ");
-                    builder.append(ssb);
+                    builder.append(ssb).append(" ").append(name);
                     builder.append(" 发起了签到");
                     break;
                 case MessageServer.EVENT_QUESTION:
-                    builder.append(name)
-                            .append(" ")
-                            .append(ssb)
-                            .append(msgInfo.status == 0 ? " 关闭" : " 开启")
-                            .append("了问答");
+                    builder.append(ssb).append(" ").append(name);
+                    builder.append(msgInfo.status == 0 ? " 关闭" : " 开启").append("了问答");
                     break;
                 case MessageServer.EVENT_START_LOTTERY://开始抽奖
                     builder.append("抽奖正在进行中");
@@ -187,9 +182,7 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
                     builder.setSpan(lotteryspan, str.length() - 6, str.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
                     break;
                 case MessageServer.EVENT_PUSH_SCREEN_CRAD://结束抽奖
-                    builder.append(name);
-                    builder.append(" ");
-                    builder.append(ssb);
+                    builder.append(ssb).append(" ").append(name);
                     String title = TextUtils.ellipsize(msgInfo.cardInfo.title, tv_msg.getPaint(), DensityUtils.getScreenWidth(mContext)-200,TextUtils.TruncateAt.END).toString();
                     String cardstr = " 推送了卡片 点击查看 \n"+title;
                     builder.append(cardstr);
@@ -201,7 +194,19 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
                         }
                     };
                     builder.setSpan(cardspan, name.length() + showRoleText.length() + 7, name.length() + showRoleText.length() + 12, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-
+                    break;
+                case MessageServer.EVENT_PUSH_GOODS_CARD://
+                    builder.append(ssb).append(" ").append(name);
+                    String title1 = TextUtils.ellipsize(msgInfo.goodsInfo.name, tv_msg.getPaint(), DensityUtils.getScreenWidth(mContext)-200,TextUtils.TruncateAt.END).toString();
+                    String goodsdstr = " 推送了商品 点击查看 \n"+title1;
+                    builder.append(goodsdstr);
+                    VhClickSpan cardspan1 = new VhClickSpan(mContext.getResources().getColor(R.color.color_3562FA), false) {
+                        @Override
+                        public void onClick(View widget) {
+                            ((WatchLiveActivity)activity).call(IBase.SHOW_GOODS_DETAILS,"",msgInfo.goodsInfo);
+                        }
+                    };
+                    builder.setSpan(cardspan1, name.length() + showRoleText.length() + 7, name.length() + showRoleText.length() + 12, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
                     break;
                 default:
                     break;

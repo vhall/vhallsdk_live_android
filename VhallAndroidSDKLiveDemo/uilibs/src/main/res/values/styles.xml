@@ -24,6 +24,12 @@
         <item name="android:button">@drawable/check_box_selector</item>
     </style>
 
+    <style name="VHCheckBox" parent="Theme.AppCompat.Light">
+        <item name="android:textSize">@dimen/dimen_12sp</item>
+        <item name="android:textColor">@color/color_22</item>
+        <item name="android:button">@drawable/check_box_selector1</item>
+    </style>
+
     <!--底部弹出dialog使用-->
     <style name="DialogBottomInAndOutStyle">
         <item name="android:windowEnterAnimation">@null</item>

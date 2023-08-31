@@ -11,8 +11,10 @@ import android.os.Handler
 import android.os.Looper
 import android.text.TextUtils
 import android.view.KeyEvent
+import android.view.View
 import android.view.WindowManager
 import com.gyf.immersionbar.ImmersionBar
+import com.vhall.beautifykit.control.FaceBeautyControlView
 import com.vhall.business.ChatServer
 import com.vhall.business.MessageServer
 import com.vhall.business.VhallSDK
@@ -21,13 +23,14 @@ import com.vhall.uimodule.R
 import com.vhall.uimodule.base.BaseActivity
 import com.vhall.uimodule.base.BaseBottomDialog
 import com.vhall.uimodule.base.IBase.*
+import com.vhall.uimodule.beautysource.FaceBeautyDataFactory
 import com.vhall.uimodule.databinding.ActivityPublishBinding
-import com.vhall.uimodule.watch.chat.ChatFragment
-import com.vhall.uimodule.watch.warmup.WatchWarmUpActivity
 import com.vhall.uimodule.utils.ActivityUtils
 import com.vhall.uimodule.utils.CommonUtil
 import com.vhall.uimodule.utils.emoji.InputView
 import com.vhall.uimodule.utils.emoji.KeyBoardManager
+import com.vhall.uimodule.watch.chat.ChatFragment
+import com.vhall.uimodule.watch.warmup.WatchWarmUpActivity
 
 class PublishActivity :
     BaseActivity<ActivityPublishBinding>(ActivityPublishBinding::inflate) {
@@ -105,6 +108,9 @@ class PublishActivity :
         initINPUT()
 
 //        mViewBinding.ivClose.setOnClickListener { doFinish() }
+
+        publishFragment.setIFaceBeautySwitch(IFaceBeautySwitch { this@PublishActivity.changeVisibility() })
+        initBeautifyData(1)
     }
 
     override fun checkNonEditArea(): Boolean = false;
@@ -141,7 +147,7 @@ class PublishActivity :
         }
     }
 
-    override fun call(method: String?, arg: String?, extras: Bundle?): Bundle {
+    override fun call(method: String?, arg: String?, extras: Any?): Bundle {
         when (method) {
             SHOW_INPUT_VIEW_KEY -> {
                 inputView?.show(false,"参与聊天")
@@ -257,5 +263,27 @@ class PublishActivity :
 
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    // 高级美颜相关
+    private var mFaceBeautyControlView: FaceBeautyControlView? = null
+    private var mFaceBeautyDataFactory: FaceBeautyDataFactory? = null
+
+    private fun changeVisibility() {
+        //新的美颜
+        if (mFaceBeautyControlView!!.visibility == View.VISIBLE) {
+            mFaceBeautyControlView!!.visibility = View.GONE
+        } else {
+            mFaceBeautyControlView!!.visibility = View.VISIBLE
+        }
+    }
+
+    private fun initBeautifyData(orientation: Int) {
+        mFaceBeautyDataFactory = FaceBeautyDataFactory(this)
+        mFaceBeautyControlView = findViewById(R.id.faceBeautyControlView)
+        mFaceBeautyControlView!!.setMainTabVisibility(false, true, true, false)
+        mFaceBeautyControlView!!.setSelectLineVisible()
+        mFaceBeautyControlView!!.changeOrientation(orientation)
+        mFaceBeautyControlView!!.bindDataFactory(mFaceBeautyDataFactory!!)
     }
 }

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/draggableLayout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    >
+
+    <View
+        android:id="@+id/v_bg"
+        android:layout_width="96dp"
+        android:layout_height="152dp"
+        android:background="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_head"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:background="@drawable/shape_bg_rounded_f2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_idx"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dimen_13dp"
+        android:paddingLeft="@dimen/dimen_3dp"
+        android:paddingRight="@dimen/dimen_3dp"
+        android:textColor="@color/white"
+        android:visibility="gone"
+        android:textSize="@dimen/dimen_9dp"
+        android:background="@drawable/bg_black_45_shape"
+        android:text="01"
+        android:gravity="left"
+        app:layout_constraintStart_toStartOf="@id/iv_head"
+        app:layout_constraintTop_toTopOf="@id/iv_head"/>
+
+    <ImageView
+        android:id="@+id/iv_cancel"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_margin="@dimen/dimen_5dp"
+        android:background="@drawable/vh_goods_card_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="@dimen/dimen_90dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dimen_3dp"
+        android:layout_marginRight="@dimen/dimen_3dp"
+        android:layout_marginTop= "@dimen/dimen_3dp"
+        android:ellipsize="end"
+        android:gravity="start"
+        android:lines="2"
+        android:text="避险PK逆向？听持有人说--聊投资上讨论区聊投资上讨论区"
+        android:textColor="@color/black_85"
+        android:textSize="@dimen/dimen_10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_head" />
+
+    <ImageView
+        android:id="@+id/iv_bg"
+        android:layout_width="90dp"
+        android:layout_height="22dp"
+        android:layout_margin="@dimen/dimen_3dp"
+        android:background="@drawable/shape_bg_rounded_4_red"
+        app:layout_constraintStart_toStartOf="@id/v_bg"
+        app:layout_constraintEnd_toEndOf="@id/v_bg"
+        app:layout_constraintBottom_toBottomOf="parent" />
+    <ImageView
+        android:layout_width="@dimen/dimen_22dp"
+        android:layout_height="22dp"
+        android:layout_margin="@dimen/dimen_3dp"
+        android:background="@drawable/vh_goods_card_qiang_bg"
+        app:layout_constraintTop_toTopOf="@id/iv_bg"
+        app:layout_constraintEnd_toEndOf="@id/v_bg"
+        app:layout_constraintBottom_toBottomOf="@id/iv_bg" />
+    <ImageView
+        android:layout_width="14dp"
+        android:layout_height="12dp"
+        android:layout_marginEnd="@dimen/dimen_6dp"
+        android:background="@drawable/vh_goods_card_qiang"
+        app:layout_constraintTop_toTopOf="@id/iv_bg"
+        app:layout_constraintEnd_toEndOf="@id/v_bg"
+        app:layout_constraintBottom_toBottomOf="@id/iv_bg" />
+
+    <TextView
+        android:id="@+id/tv_l"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_marginLeft="@dimen/dimen_5dp"
+        android:layout_marginBottom="@dimen/dimen_6dp"
+        android:textSize="@dimen/dimen_8sp"
+        android:text="￥"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_price"
+        android:layout_width="@dimen/dimen_60dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_marginLeft="@dimen/dimen_12dp"
+        android:layout_marginBottom="@dimen/dimen_3dp"
+        android:textStyle="bold"
+        android:textSize="@dimen/dimen_14sp"
+        android:text="9999.99 "
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

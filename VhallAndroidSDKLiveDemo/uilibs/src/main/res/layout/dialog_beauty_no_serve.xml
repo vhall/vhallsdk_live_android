@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/cl_root"
+    android:background="@color/transparent"
+    tools:ignore="MissingDefaultResource">
+
+    <View
+        android:id="@+id/bg"
+        android:layout_width="300dp"
+        android:layout_height="@dimen/dimen_120dp"
+        android:background="@drawable/shape_bg_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_25dp"
+        android:gravity="center"
+        android:text="当前服务不可用，请联系客服"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16dp"
+        app:layout_constraintEnd_toEndOf="@id/bg"
+        app:layout_constraintStart_toStartOf="@id/bg"
+        app:layout_constraintTop_toTopOf="@id/bg" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dimen_1px"
+        android:layout_marginBottom="@dimen/dimen_45dp"
+        android:background="@color/color_E2"
+        app:layout_constraintBottom_toBottomOf="@id/bg"
+        app:layout_constraintEnd_toEndOf="@id/bg"
+        app:layout_constraintStart_toStartOf="@id/bg" />
+
+
+    <TextView
+        android:id="@+id/tv_1"
+        android:layout_width="@dimen/dimen_100dp"
+        android:layout_height="@dimen/dimen_45dp"
+        android:gravity="center"
+        android:text="取消"
+        android:textColor="@color/color_22"
+        android:textSize="@dimen/dimen_16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/bg"
+        app:layout_constraintEnd_toStartOf="@id/tv_2"
+        app:layout_constraintStart_toStartOf="@id/bg" />
+
+    <TextView
+        android:id="@+id/tv_2"
+        android:layout_width="@dimen/dimen_100dp"
+        android:layout_height="@dimen/dimen_45dp"
+        android:gravity="center"
+        android:text="@string/sure"
+        android:textColor="@color/color_FC5659"
+        android:textSize="@dimen/dimen_16dp"
+        app:layout_constraintBottom_toBottomOf="@id/bg"
+        app:layout_constraintEnd_toEndOf="@id/bg"
+        app:layout_constraintStart_toEndOf="@id/tv_1" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -332,6 +332,15 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
                     if (chatAdapter.itemCount > 0)
                         mViewBinding.recycleView.smoothScrollToPosition(chatAdapter.itemCount - 1)
                 }
+                EVENT_PUSH_GOODS_CARD -> {
+                    if(messageInfo.goodsInfo.push_status == 1){
+                        val e = ChatMessageData()
+                        e.msgInfo = messageInfo
+                        chatAdapter.addData(e)
+                        if (chatAdapter.itemCount > 0)
+                            mViewBinding.recycleView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                    }
+                }
                 EVENT_CHAT_FORBID_ALL -> {
                     //问答状态 根据全体禁言判断 如果开启禁言则根据 qa_status判断 1开启 0关闭  如果关闭全体禁言 则直接开启问答
                     //聊天 如果开启 则不可以聊 如果关闭则根据当前的 个人禁言情况 status 1开启 0关闭

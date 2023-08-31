@@ -21,6 +21,9 @@ public interface IBase {
     String HAND_UP_KEY_STATUS = "hand_up_status";
     String CUSTOMMSG_KEY = "custom_msg";
     String EXIT_FULL_SCREEN = "exit_full_screen";//退出全屏
+    String SHOW_GOODS_CARD = "SHOW_GOODS_CARD";//显示商品卡片
+    String SHOW_GOODS_TAB = "SHOW_GOODS_TAB";//显示商品卡片
+    String SHOW_GOODS_DETAILS = "SHOW_GOODS_DETAILS";//显示商品详情
 
     default void showToast(String s) {
         ToastUtils.Companion.showToast(s);
@@ -30,7 +33,7 @@ public interface IBase {
         ToastUtils.Companion.showToast(s);
     }
 
-    default Bundle call(String method, String arg, Bundle extras) {
+    default Bundle call(String method, String arg, Object extras) {
         return new Bundle();
     }
 } 

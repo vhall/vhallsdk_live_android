@@ -48,4 +48,12 @@ public class ActivityUtils {
         transaction.show(fragment);
         transaction.commitAllowingStateLoss();
     }
+
+    public static void hideAddFragmentToActivity(FragmentManager fragmentManager,
+                                                 Fragment fragment, int frameId) {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.add(frameId, fragment);
+        transaction.hide(fragment);
+        transaction.commitAllowingStateLoss();
+    }
 }

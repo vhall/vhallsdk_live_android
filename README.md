@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.17.1'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.17.1'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.18.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.18.0'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -47,6 +47,11 @@ allprojects {
 
 
 二、版本更新信息：
+
+版本：v6.18.0  更新时间 2023.08.31
+
+1. 【新增】SDK新增商品订单支付能力，支持微信、支付宝支付；
+2. 【优化】SDK新增SHA256、SM3签名加密方式；
 
 版本：v6.17.1  更新时间 2023.07.21
 

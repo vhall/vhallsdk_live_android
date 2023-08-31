@@ -7,17 +7,24 @@
     <color name="color_FB2626">#FB2626</color>
     <color name="color_0FBB5A">#0FBB5A</color>
     <color name="color_FC5659">#FC5659</color>
+    <color name="color_FFF0F0">#FFF0F0</color>
     <color name="white_25">#40ffffff</color>
     <color name="white_30">#4dffffff</color>
     <color name="white_40">#66ffffff</color>
     <color name="black">#000000</color>
+    <color name="black_85">#D9000000</color>
     <color name="black_80">#CC000000</color>
+    <color name="black_65">#A7000000</color>
     <color name="black_60">#99000000</color>
     <color name="black_50">#80000000</color>
     <color name="black_45">#73000000</color>
-    <color name="black_30">#40000000</color>
-    <color name="color_FFD1C9_20">#33FFD1C9</color>
+    <color name="black_30">#4D000000</color>
+    <color name="black_25">#40000000</color>
+    <color name="black_15">#26000000</color>
     <color name="black_10">#1a000000</color>
+    <color name="black_6">#0F000000</color>
+    <color name="black_4">#0A000000</color>
+    <color name="color_FFD1C9_20">#33FFD1C9</color>
     <color name="color_F0">#f0f0f0</color>
     <color name="color_F2">#FFF2F2F2</color>
     <color name="color_F7">#FFF7F7F7</color>
@@ -47,4 +54,5 @@
     <color name="color_CECED1">#CECED1</color>
     <color name="color_7F807F">#7F807F</color>
     <color name="color_FFF1D7">#FFF1D7</color>
+    <color name="divider">#ffd2d2d2</color>
 </resources>

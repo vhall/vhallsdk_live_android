@@ -1,13 +1,13 @@
 package com.vhall.uimodule.publish
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.pm.ActivityInfo
 import android.hardware.Camera
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import com.vhall.beautify.VHBeautifyKit
 import com.vhall.business.Broadcast
 import com.vhall.business.ChatServer
 import com.vhall.business.MessageServer
@@ -22,6 +22,9 @@ import com.vhall.uimodule.R
 import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase
 import com.vhall.uimodule.databinding.FragmentPublishBinding
+import com.vhall.uimodule.widget.OutDialog
+import com.vhall.uimodule.widget.OutDialogBuilder
+
 
 class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBinding::inflate) {
     companion object {
@@ -34,12 +37,19 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
             }
     }
 
+    private var iFaceBeautySwitch: IFaceBeautySwitch? = null
+    private var beautyDialog: OutDialog? = null
+
+    fun setIFaceBeautySwitch(iFaceBeautySwitch: IFaceBeautySwitch?) {
+        this.iFaceBeautySwitch = iFaceBeautySwitch
+    }
     var parentActivity: PublishActivity? = null
     private var broadcast: Broadcast? = null
     lateinit var chatCallBack: ChatServer.Callback
     lateinit var messageCallBack: MessageServer.Callback
     private var isPublishing = false
     private var isFlashOpen = false
+    private var isMirror = false
     private var mode = VHLivePushFormat.DRAW_MODE_ASPECTFILL
 
     override fun initView() {
@@ -83,6 +93,26 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
             val isMute = getBroadcast()!!.isMute
             getBroadcast()!!.isMute = !isMute
             mViewBinding.btnChangeAudio.setBackgroundResource(if (isMute) R.drawable.img_round_audio_close else R.drawable.img_round_audio_open)
+        }
+        //闪光灯
+        mViewBinding.btnMirror.setOnClickListener {
+            isMirror = !isMirror
+            mViewBinding.cameraview.setMirror(isMirror)
+            mViewBinding.btnMirror.setBackgroundResource(if (isMirror) R.drawable.icon_mirror_normal else R.drawable.icon_mirror_selected )
+        }
+
+        mViewBinding.btnChangeFilter.setOnClickListener {
+            VHBeautifyKit.getInstance().setBeautifyEnable(true)
+            //  showPopupWindow();  //之前的美颜只能选等级
+            if (VHBeautifyKit.getInstance().setBeautifyEnable(true)) {
+                    iFaceBeautySwitch!!.changeVisibility()
+            } else {
+                if (beautyDialog == null) {
+                    beautyDialog = OutDialogBuilder().layout(R.layout.dialog_beauty_no_serve)
+                        .build(activity)
+                }
+                beautyDialog!!.show()
+            }
         }
     }
 

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:ignore="RtlCompat">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_106dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dimen_1dp"
+        android:background="@color/black_6"
+        android:layout_marginLeft="@dimen/dimen_13dp"
+        android:layout_marginRight="@dimen/dimen_13dp"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <ImageView
+        android:id="@+id/iv_head"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_margin="@dimen/dimen_13dp"
+        android:background="@drawable/shape_bg_rounded_f2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_idx"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/dimen_13dp"
+        android:paddingLeft="@dimen/dimen_3dp"
+        android:paddingRight="@dimen/dimen_3dp"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_9dp"
+        android:background="@drawable/bg_black_45_shape"
+        android:text="01"
+        android:gravity="left"
+        app:layout_constraintStart_toStartOf="@id/iv_head"
+        app:layout_constraintTop_toTopOf="@id/iv_head"/>
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginEnd="@dimen/dimen_10dp"
+        android:gravity="start"
+        android:text="避险PK逆向？听持有人说--聊投资上讨论区聊投资上讨论区"
+        android:textColor="@color/black_85"
+        android:textSize="@dimen/dimen_15sp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/iv_head"
+        app:layout_constraintTop_toTopOf="@id/iv_head"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintWidth_default="wrap"/>
+
+    <TextView
+        android:id="@+id/tv_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dimen_10dp"
+        android:layout_marginEnd="@dimen/dimen_10dp"
+        android:gravity="start"
+        android:text="避险PK逆向？听持有人说--聊投资上讨论区聊投资上讨论区"
+        android:textColor="@color/black_65"
+        android:textSize="@dimen/dimen_12sp"
+        android:lines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/iv_head"
+        app:layout_constraintTop_toBottomOf="@id/tv_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintWidth_default="wrap"/>
+
+    <TextView
+        android:id="@+id/tv_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_FB3A32"
+        android:layout_marginLeft="@dimen/dimen_10dp"
+        android:paddingStart="@dimen/dimen_3dp"
+        android:paddingEnd="@dimen/dimen_3dp"
+        android:textSize="@dimen/dimen_10sp"
+        android:text="优惠价"
+        android:background="@drawable/shape_bg_rounded_f2"
+        app:layout_constraintStart_toEndOf="@id/iv_head"
+        app:layout_constraintBottom_toBottomOf="@id/iv_head" />
+
+    <TextView
+        android:id="@+id/tv_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_FB3A32"
+        android:layout_marginLeft="@dimen/dimen_3dp"
+        android:textSize="@dimen/dimen_14sp"
+        android:text="¥999999.99 "
+        app:layout_constraintStart_toEndOf="@id/tv_label"
+        app:layout_constraintBottom_toBottomOf="@id/tv_label" />
+
+    <TextView
+        android:id="@+id/tv_price1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black_25"
+        android:layout_marginLeft="@dimen/dimen_3dp"
+        android:textSize="@dimen/dimen_14sp"
+        android:text="¥999999.99 "
+        app:layout_constraintStart_toEndOf="@id/tv_price"
+        app:layout_constraintBottom_toBottomOf="@id/tv_label" />
+
+    <TextView
+        android:id="@+id/tv_buy"
+        android:layout_width="@dimen/dimen_48dp"
+        android:layout_height="@dimen/dimen_26dp"
+        android:layout_marginBottom="@dimen/dimen_7dp"
+        android:layout_marginEnd="@dimen/dimen_10dp"
+        android:background="@drawable/shape_bg_rounded_red"
+        android:gravity="center"
+        android:text="购买"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

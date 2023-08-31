@@ -24,4 +24,5 @@
 
     <string name="start_broadcast">开始直播</string>
     <string name="start_dress_rehearsal">开始彩排</string>
+    <string name="sure">确定</string>
 </resources>

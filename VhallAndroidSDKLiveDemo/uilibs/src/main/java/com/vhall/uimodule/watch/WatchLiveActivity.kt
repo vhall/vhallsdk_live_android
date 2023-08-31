@@ -15,10 +15,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
-import android.view.KeyEvent
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
+import android.view.*
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
@@ -34,9 +31,6 @@ import com.vhall.business.data.WebinarInfo
 import com.vhall.business.data.source.WebinarInfoDataSource
 import com.vhall.business.module.exam.ExamMessageCallBack
 import com.vhall.business.module.exam.ExamServer
-import com.vhall.business.module.survey.SurveyMessageCallBack
-import com.vhall.business.module.survey.SurveyServer
-import com.vhall.business.utils.ExamInternal
 import com.vhall.uimodule.R
 import com.vhall.uimodule.base.BaseActivity
 import com.vhall.uimodule.base.BaseBottomDialog
@@ -52,6 +46,8 @@ import com.vhall.uimodule.watch.chapters.ChaptersFragment
 import com.vhall.uimodule.watch.chat.ChatFragment
 import com.vhall.uimodule.watch.doc.DocFragment
 import com.vhall.uimodule.watch.download.FilesFragment
+import com.vhall.uimodule.watch.goods.GoodsCardPop
+import com.vhall.uimodule.watch.goods.GoodsFragment
 import com.vhall.uimodule.watch.interactive.RtcFragment
 import com.vhall.uimodule.watch.introduction.WebinarInfoFragment
 import com.vhall.uimodule.watch.lottery.LotteryDialog
@@ -60,12 +56,14 @@ import com.vhall.uimodule.watch.sign.SignDialog
 import com.vhall.uimodule.watch.warmup.WatchWarmUpActivity
 import com.vhall.uimodule.watch.watchlive.WatchLiveFragment
 import com.vhall.uimodule.watch.watchplayback.WatchPlaybackFragment
-import com.vhall.uimodule.webview.WebviewActivity
 import com.vhall.uimodule.widget.ExtendTextView
+import com.vhall.vhss.data.GoodsInfoData
+import com.vhall.vhss.data.GoodsInfoData.GoodsInfo
 import com.vhall.vhss.data.RecordChaptersData
 import com.vhall.vhss.data.RecordsData
 import org.json.JSONException
 import org.json.JSONObject
+import java.util.Objects
 
 class WatchLiveActivity :
     BaseActivity<ActivityWatchLiveBinding>(ActivityWatchLiveBinding::inflate) {
@@ -92,6 +90,7 @@ class WatchLiveActivity :
     private lateinit var pointsTab: TabLayout.Tab
     private lateinit var recordsTab: TabLayout.Tab
     private lateinit var filesDownloadTab: TabLayout.Tab
+    private var goodsTab: TabLayout.Tab? = null
     private var selectTab: TabLayout.Tab? = null
 
     private lateinit var chatFragment: ChatFragment
@@ -101,6 +100,7 @@ class WatchLiveActivity :
     private lateinit var chaptersFragment: ChaptersFragment
     private lateinit var pointsFragment: ChaptersFragment
     private lateinit var recordsFragment: RecordsFragment
+    private lateinit var goodsFragment: GoodsFragment
     private lateinit var filesDownloadFragment: FilesFragment
     private val docTag = 1
     private val chatTag = 2
@@ -110,6 +110,7 @@ class WatchLiveActivity :
     private val pointTag = 6
     private val recordsTag = 7
     private val filesDownloadTag = 8
+    private val goodsTag = 9
     private var isChat = true
 
     private var inputView: InputView? = null
@@ -123,7 +124,7 @@ class WatchLiveActivity :
     public var mSignDialog: SignDialog? = null
     private var mlotteryDialog: LotteryDialog? = null
     private var mCurDialog: BaseBottomDialog? = null//当前弹出的Dialog
-
+    private var goodsCardPop: GoodsCardPop? = null
     private var videoHeight = 0
 
     public var isPublish = false
@@ -156,6 +157,7 @@ class WatchLiveActivity :
         qaFragment = ChatFragment.newInstance(webinarInfo, "qa")
         docFragment = DocFragment.newInstance(webinarInfo)
         webinarInfoFragment = WebinarInfoFragment.newInstance(webinarInfo)
+        goodsFragment =  GoodsFragment.newInstance(webinarInfo,"")
 
         mViewBinding.tab.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
@@ -227,6 +229,14 @@ class WatchLiveActivity :
                         )
                         showFragment = filesDownloadFragment
                     }
+                    goodsTag -> {
+                        ActivityUtils.changeFragmentToActivity(
+                            supportFragmentManager,
+                            goodsFragment, showFragment,
+                            mViewBinding.flTab.id
+                        )
+                        showFragment = goodsFragment
+                    }
                 }
             }
 
@@ -258,6 +268,13 @@ class WatchLiveActivity :
 
         checkChapters()
         checkRecords()
+
+        //由于需要提前显示卡片需要提前初始化商品Fragment，监听卡片信息 注要放到房间初始化后
+        ActivityUtils.hideAddFragmentToActivity(
+            supportFragmentManager,
+            goodsFragment,
+            mViewBinding.flTab.id
+        )
     }
 
     override fun checkNonEditArea(): Boolean = false;
@@ -319,8 +336,6 @@ class WatchLiveActivity :
 
             chaptersTab = tab.newTab().setText("章节")
             chaptersTab.tag = chapterTag;
-
-
 
             tab.addTab(docTab)
             tab.addTab(chatTab)
@@ -400,7 +415,7 @@ class WatchLiveActivity :
     }
 
 
-    override fun call(method: String?, arg: String?, extras: Bundle?): Bundle {
+    override fun call(method: String?, arg: String?, extras: Any?): Bundle {
         when (method) {
             HALF_WATCH_SCREEN_KEY -> {
                 mViewBinding.flVideo.layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
@@ -451,12 +466,12 @@ class WatchLiveActivity :
             }
             HAND_UP_KEY -> {
                 if (isPublish) {
-                    if (null == extras || !extras.containsKey(HAND_UP_KEY_STATUS)) {
+                    if (null == extras || !(extras as Bundle).containsKey(HAND_UP_KEY_STATUS)) {
                         rtcFragment?.showHandUpOperate()
                     }
                 } else {
-                    if (extras?.containsKey(HAND_UP_KEY_STATUS) == true) {
-                        if (!extras.getBoolean(HAND_UP_KEY_STATUS)) {
+                    if ((extras as Bundle)?.containsKey(HAND_UP_KEY_STATUS) == true) {
+                        if (!(extras as Bundle).getBoolean(HAND_UP_KEY_STATUS)) {
                             watchLiveFragment?.hintApplyHandUpDialog()
                         }
                     } else {
@@ -468,6 +483,39 @@ class WatchLiveActivity :
             }
             CUSTOMMSG_KEY -> {//发送自定义消息
                 watchLiveFragment?.sendCustomMsg("{\"code\":200,\"data\":[123,31,33]}")
+            }
+            SHOW_GOODS_TAB -> {//商品TAB
+                if(arg != null){
+                    if(arg.equals("show_goods_tab")) {
+                        if(goodsTab == null){
+                            mViewBinding.tab.selectedTabPosition
+                            goodsTab = mViewBinding.tab.newTab().setText("商品")
+                            goodsTab!!.tag = goodsTag
+                            mViewBinding.tab.addTab(goodsTab!!, 2)
+                        }
+                        selectTab?.select()
+                    }
+                    else if(goodsTab != null){
+                        if(mViewBinding.tab.getTabAt(2) == goodsTab) {
+                            mViewBinding.tab.removeTab(goodsTab!!)
+                        }
+                        goodsTab = null
+                        if (mViewBinding.tab.selectedTabPosition == 2)
+                            chatTab.select()
+                        else
+                            selectTab?.select()
+                    }
+                }
+            }
+            SHOW_GOODS_CARD -> {//商品卡片
+                if(extras != null ){
+                    showGoodsPop(extras as GoodsInfo, mViewBinding.flCard)
+                }
+            }
+            SHOW_GOODS_DETAILS -> {//商品详情
+                if(extras != null ){
+                    goodsFragment.showGoodsDetailsDialog(extras as GoodsInfo)
+                }
             }
         }
         return super.call(method, arg, extras)
@@ -774,7 +822,9 @@ class WatchLiveActivity :
                 }
 //                WebviewActivity.startActivity(this@WatchLiveActivity,examServer?.getExamUrl(messageInfo?.examInfo?.paper_id))
             }
-
+            MessageServer.EVENT_PUSH_GOODS_CARD -> {
+                showGoodsPop(messageInfo.goodsInfo,mViewBinding.flCard)
+            }
         }
     }
 
@@ -949,6 +999,32 @@ class WatchLiveActivity :
                 override fun onError(errorCode: Int, errorMsg: String) {
                 }
             })
+    }
+
+    public fun showGoodsPop(goodsInfo: GoodsInfoData.GoodsInfo, view:View){
+        val location = IntArray(2)
+        view.getLocationOnScreen(location)
+        if (goodsCardPop == null) {
+            goodsCardPop = GoodsCardPop(
+                mContext,
+                webinarInfo,
+                goodsInfo,
+                View.OnClickListener {
+                    goodsFragment.showGoodsDetailsDialog(goodsCardPop?.getCurCardGoodsInfo())
+                }
+            )
+        }
+        if(goodsInfo.push_status == 1){
+            goodsCardPop?.showAtLocation(
+                view,
+                Gravity.NO_GRAVITY,
+                location[0],
+                location[1]
+            )
+            goodsCardPop?.updateUI( goodsInfo)
+        }else{
+            goodsCardPop?.dismiss()
+        }
     }
 
     fun setCurDialog(dialog:BaseBottomDialog){
