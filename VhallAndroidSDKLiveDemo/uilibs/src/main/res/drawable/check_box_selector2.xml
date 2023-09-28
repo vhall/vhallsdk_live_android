@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/icon_coupon_radio_disenabled" android:state_enabled="false"/>
+    <item android:drawable="@drawable/icon_coupon_radio_unselect" android:state_checked="false"/>
+    <item android:drawable="@drawable/icon_coupon_radio" android:state_checked="true"/>
+
+</selector>

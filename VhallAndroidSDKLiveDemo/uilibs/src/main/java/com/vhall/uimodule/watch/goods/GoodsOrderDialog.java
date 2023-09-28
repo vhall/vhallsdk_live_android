@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
@@ -33,22 +34,31 @@ import com.vhall.uimodule.utils.DensityUtils;
 import com.vhall.uimodule.utils.WeakHandler;
 import com.vhall.uimodule.watch.WatchLiveActivity;
 import com.vhall.uimodule.watch.card.CardDialog;
+import com.vhall.uimodule.watch.coupon.CouponListDialog;
+import com.vhall.uimodule.watch.coupon.OnCouponSelectedListener;
 import com.vhall.uimodule.widget.AmountView;
 import com.vhall.uimodule.widget.OutDialogBuilder;
+import com.vhall.vhss.data.CouponInfoData;
 import com.vhall.vhss.data.GoodsInfoData;
 import com.vhall.vhss.data.GoodsOrderSetting;
 import com.vhall.vhss.data.OrderInfoData;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickListener {
     public GoodsInfoData.GoodsInfo goodsInfo;
     private WebinarInfo webinarInfo;
     private volatile static GoodsOrderDialog curCardDialog = null;
     private AmountView mAmountView;
+    private TextView tvCoupon;
     private int mAmount = 1;
     private String mPayType;//0 wx  1 ali
     private GoodsServer goodsServer;
-
+    private CouponInfoData.CouponItem selectedCoupon;
+    private Timer getCouponTimer;
     public GoodsOrderDialog(@NonNull Context context, WebinarInfo webinarInfo, GoodsInfoData.GoodsInfo goodsInfo) {
         super(context);
         this.goodsInfo = goodsInfo;
@@ -97,18 +107,42 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
         setContentView(R.layout.dialog_goods_order);
         findViewById(R.id.tv_cancel).setOnClickListener(this);
         mAmountView = (AmountView) findViewById(R.id.amount_view);
+        tvCoupon = findViewById(R.id.tv_coupon);
         mAmountView.setGoods_storage(100);
         mAmountView.setOnAmountChangeListener(new AmountView.OnAmountChangeListener() {
             @Override
             public void onAmountChange(View view, int amount) {
                 mAmount = amount;
                 updateUI(goodsInfo);
+                limitGetCoupon();
             }
         });
+
+        tvCoupon.setOnClickListener(this);
+
         findViewById(R.id.tv_buy).setOnClickListener(this);
         loadGoodsSetting();
         loadGoodsInfo();
         updateUI(this.goodsInfo);
+        getCoupon();
+    }
+
+    void limitGetCoupon(){
+        if(getCouponTimer != null) {
+            getCouponTimer.cancel();//销毁
+        }
+        getCouponTimer = new Timer();
+        getCouponTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                // 要执行的操作
+                getCoupon();
+
+                if(getCouponTimer != null) {
+                    getCouponTimer.cancel();//销毁
+                }
+            }
+        }, 500); // 延时3s 执行TimeTask的run方法
     }
 
     @Override
@@ -127,6 +161,12 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
                     String price = (TextUtils.isEmpty(goodsInfo.discount_price))? goodsInfo.price : goodsInfo.discount_price;
                     double pay_Amount = Double.parseDouble(price)*mAmount;
 
+                    List<String> coupon_user_ids = null ;
+                    if(selectedCoupon != null){
+                        pay_Amount = pay_Amount - Double.parseDouble(selectedCoupon.deduction_amount);
+                        coupon_user_ids = new ArrayList<String>();
+                        coupon_user_ids.add(selectedCoupon.coupon_user_id);
+                    }
                     getActivity().showLoading(null, "创建订单中");
                     goodsServer.createOrder(goodsInfo.goods_id,
                             mAmount,
@@ -136,13 +176,14 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
                             et_phone.getText().toString(),
                             et_mark.getText().toString(),
                             "ios",
+                            coupon_user_ids,
                             new RequestDataCallbackV2<OrderInfoData>() {
 //                        goodsServer.createOrder(params, new RequestDataCallbackV2<OrderInfoData>() {
                                 @Override
                                 public void onSuccess(OrderInfoData data) {
                                     getActivity().finishLoading();
                                     //唤起支付页面
-                                    goodsServer.payOrderPage(getContext(),data, new RequestDataCallbackV2<String>() {
+                                    goodsServer.payOrder(getContext(),data, new RequestDataCallbackV2<String>() {
                                         @Override
                                         public void onSuccess(String data) {
 
@@ -173,6 +214,16 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
                 default:
                     break;
             }
+        } else if (v.getId() == R.id.tv_coupon) {//
+            CouponListDialog couponListDialog = new CouponListDialog(getContext(), webinarInfo,goodsInfo.goods_id,mAmount);
+            couponListDialog.setOnCouponSelectedListener(new OnCouponSelectedListener() {
+                @Override
+                public void onCouponSelectedClick(CouponInfoData.CouponItem couponItem) {
+                    selectedCoupon = couponItem;
+                    updateUI(goodsInfo);
+                }
+            });
+            couponListDialog.show();
         }
     }
     @Override
@@ -196,6 +247,7 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
         TextView tv_desc =  findViewById(R.id.tv_description);
         TextView tv_price =  findViewById(R.id.tv_price);
         TextView tv_price_totle =  findViewById(R.id.tv_price_totle);
+        TextView tv_price_coupon =  findViewById(R.id.tv_price_coupon);
 
         findViewById(R.id.tv_input_info).setVisibility(goodsInfo.buy_type == 3? View.GONE:View.VISIBLE);
 
@@ -213,6 +265,9 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
         if(!TextUtils.isEmpty(price)){
             SpannableStringBuilder builder = new SpannableStringBuilder();
             double pay_Amount = Double.parseDouble(price)*mAmount;
+            if(selectedCoupon != null)
+                pay_Amount = pay_Amount - Double.parseDouble(selectedCoupon.deduction_amount);
+
             String text = "￥"+price;
             RelativeSizeSpan sizeSpan = new RelativeSizeSpan(0.7f);
             builder.append(text);
@@ -239,6 +294,19 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
             tv_price_totle.setText("");
         }
 
+        if(selectedCoupon != null){
+            tvCoupon.setText("减 ￥" + String.format("%.2f",Double.parseDouble(selectedCoupon.deduction_amount)) +" 〉");
+            tvCoupon.setTextColor(ContextCompat.getColor(getMContext(), R.color.color_FB2626));
+            tv_price_coupon.setText("共减 ￥"+String.format("%.2f",Double.parseDouble(selectedCoupon.deduction_amount)));
+            tv_price_coupon.setVisibility(View.VISIBLE);
+            findViewById(R.id.tv_coupon_label).setVisibility(View.VISIBLE);
+        }
+        else {
+            tvCoupon.setText("无可用优惠券 〉");
+            tvCoupon.setTextColor(ContextCompat.getColor(getMContext(), R.color.black_45));
+            tv_price_coupon.setVisibility(View.GONE);
+            findViewById(R.id.tv_coupon_label).setVisibility(View.GONE);
+        }
     }
 
 
@@ -277,6 +345,33 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
             }
         });
     }
+
+    public void getCoupon() {
+        if(goodsInfo.buy_type != 1)
+            return;
+
+        GoodsServer.getCouponAvailableList(webinarInfo.webinar_id, goodsInfo.goods_id, mAmount, new RequestDataCallbackV2<CouponInfoData>() {
+            @Override
+            public void onSuccess(CouponInfoData data) {
+                selectedCoupon = null;
+                if(data.coupon_items.size()>0)
+                    selectedCoupon = data.coupon_items.get(0);
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        updateUI(goodsInfo);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+
+            }
+        });
+    }
+
     private WatchLiveActivity getActivity() {
         Context context = getContext();
         while (context instanceof ContextWrapper) {

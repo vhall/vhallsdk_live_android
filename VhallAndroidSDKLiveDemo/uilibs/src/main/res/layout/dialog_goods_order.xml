@@ -58,7 +58,7 @@
 
         <TextView
             android:id="@+id/tv_name"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dimen_10dp"
             android:layout_marginEnd="@dimen/dimen_10dp"
@@ -73,11 +73,11 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintWidth_default="wrap"/>
+            app:layout_constrainedWidth="true"/>
 
         <TextView
             android:id="@+id/tv_description"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dimen_10dp"
             android:layout_marginEnd="@dimen/dimen_10dp"
@@ -92,7 +92,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintWidth_default="wrap"/>
+            app:layout_constrainedWidth="true"/>
 
         <TextView
             android:id="@+id/tv_price"
@@ -127,13 +127,50 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/line" >
+        <TextView
+            android:id="@+id/tv_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black_85"
+            android:layout_marginLeft="@dimen/dimen_30dp"
+            android:textSize="@dimen/dimen_14dp"
+            android:text="优惠券"
+            android:textColorHint="@color/color_99"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_coupon" />
+        <TextView
+            android:id="@+id/tv_coupon_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/color_FB3A32"
+            android:layout_marginLeft="@dimen/dimen_5dp"
+            android:layout_marginTop="@dimen/dimen_3dp"
+            android:paddingStart="@dimen/dimen_3dp"
+            android:paddingEnd="@dimen/dimen_3dp"
+            android:textSize="@dimen/dimen_10sp"
+            android:text="已选优惠券"
+            android:background="@drawable/shape_coupon_label_line"
+            app:layout_constraintStart_toEndOf="@id/tv_label"
+            app:layout_constraintTop_toTopOf="@id/tv_coupon" />
+        <TextView
+            android:id="@+id/tv_coupon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black_45"
+            android:layout_marginEnd="@dimen/dimen_8dp"
+            android:textSize="@dimen/dimen_14dp"
+            android:text="无可用优惠券 〉"
+            android:textColorHint="@color/color_99"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <EditText
             android:id="@+id/et_name"
             android:layout_width="200dp"
             android:layout_height="@dimen/dimen_22dp"
             android:layout_marginEnd="@dimen/dimen_14dp"
-            android:layout_marginTop="@dimen/dimen_1dp"
+            android:layout_marginTop="@dimen/dimen_15dp"
             android:ellipsize="end"
             android:gravity="right"
             android:maxLines="1"
@@ -144,7 +181,7 @@
             android:hint="请填写姓名"
             android:textColorHint="@color/color_99"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@id/tv_coupon"/>
         <TextView
             android:id="@+id/tv_xing"
             android:layout_width="wrap_content"
@@ -155,23 +192,24 @@
             android:textSize="@dimen/dimen_14dp"
             android:text="*"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/et_name" />
+            app:layout_constraintTop_toTopOf="@id/tv_user_name" />
         <TextView
             android:id="@+id/tv_user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black_85"
+            android:layout_marginTop="@dimen/dimen_15dp"
             android:textSize="@dimen/dimen_14dp"
             android:text="用户信息"
             android:textColorHint="@color/color_99"
             app:layout_constraintStart_toEndOf="@id/tv_xing"
-            app:layout_constraintTop_toTopOf="@id/et_name" />
+            app:layout_constraintTop_toBottomOf="@id/tv_coupon" />
 
         <EditText
             android:id="@+id/et_phone"
             android:layout_width="230dp"
             android:layout_height="@dimen/dimen_22dp"
-            android:layout_marginTop="@dimen/dimen_20dp"
+            android:layout_marginTop="@dimen/dimen_15dp"
             android:layout_marginEnd="@dimen/dimen_14dp"
             android:ellipsize="end"
             android:gravity="right"
@@ -338,6 +376,19 @@
         android:text="¥999999.99 "
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/tv_buy" />
+
+    <TextView
+        android:id="@+id/tv_price_coupon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/color_FB3A32"
+        android:layout_marginStart="@dimen/dimen_25dp"
+        android:layout_marginBottom="@dimen/dimen_8dp"
+        android:textSize="@dimen/dimen_12sp"
+        android:visibility="gone"
+        android:text="共减 ￥0.00 "
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_price_totle" />
 
     <TextView
         android:id="@+id/tv_buy"

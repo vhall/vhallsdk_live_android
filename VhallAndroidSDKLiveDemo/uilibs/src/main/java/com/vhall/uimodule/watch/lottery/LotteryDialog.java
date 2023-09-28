@@ -14,6 +14,7 @@ import com.vhall.business.MessageServer;
 import com.vhall.business.VhallSDK;
 import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.WebinarInfo;
+import com.vhall.business.module.lottery.LotteryServer;
 import com.vhall.uimodule.R;
 import com.vhall.uimodule.base.BaseBottomDialog;
 import com.vhall.uimodule.watch.WatchLiveActivity;
@@ -58,7 +59,7 @@ public class LotteryDialog  extends BaseBottomDialog implements View.OnClickList
         }
         else if (v.getId() == R.id.tv_btn) {//按钮
             if(this.msgInfo.lotteryInfo.lottery_status == 0 && this.msgInfo.lotteryInfo.lottery_type.equals("8")){//开始抽奖
-                VhallSDK.joinCodeLottery(this.webinarInfo.vss_room_id, this.msgInfo.lotteryInfo.lottery_id, this.msgInfo.lotteryInfo.command, new RequestCallback() {
+                LotteryServer.joinCodeLottery(this.webinarInfo.vss_room_id, this.msgInfo.lotteryInfo.lottery_id, this.msgInfo.lotteryInfo.command, new RequestCallback() {
                     @Override
                     public void onSuccess() {
                         showToast("已发送口令");

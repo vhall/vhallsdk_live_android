@@ -54,5 +54,10 @@
     <color name="color_CECED1">#CECED1</color>
     <color name="color_7F807F">#7F807F</color>
     <color name="color_FFF1D7">#FFF1D7</color>
+    <color name="color_FFE8E4">#FFE8E4</color>
+    <color name="color_FF7C7C">#FF7C7C</color>
+    <color name="color_D2D2D2">#D2D2D2</color>
+
+
     <color name="divider">#ffd2d2d2</color>
 </resources>

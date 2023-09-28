@@ -22,6 +22,7 @@ import com.vhall.business.VhallSDK;
 import com.vhall.business.data.LotteryWinnerData;
 import com.vhall.business.data.RequestDataCallback;
 import com.vhall.business.data.WebinarInfo;
+import com.vhall.business.module.lottery.LotteryServer;
 import com.vhall.uimodule.R;
 import com.vhall.uimodule.base.BaseBottomDialog;
 import com.vhall.uimodule.watch.WatchLiveActivity;
@@ -76,7 +77,7 @@ public class LotteryListDialog extends BaseBottomDialog implements View.OnClickL
     }
 
     private void loadData() {
-        VhallSDK.getLotteryWinner(this.webinarInfo.vss_room_id, this.lotteryID, new RequestDataCallback() {
+        LotteryServer.getLotteryWinner(this.webinarInfo.vss_room_id, this.lotteryID, new RequestDataCallback() {
             @Override
             public void onSuccess(Object o) {
                 mDataList = ((LotteryWinnerData) o).list;

@@ -290,7 +290,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     private val launcherActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult? ->
         if (result != null && result?.resultCode == RESULT_OK) {
             var qrcodeStr: String = result?.data?.getStringExtra("qrcode").toString()
-            qrcodeStr=qrcodeStr?.trim().lowercase()
+            qrcodeStr= qrcodeStr?.trim()?.lowercase().toString()
             if(qrcodeStr != null && qrcodeStr.length>0 && qrcodeStr.startsWith("http")){
                 var url= qrcodeStr.split("?")[0]
                 var urlList= url.split("/")

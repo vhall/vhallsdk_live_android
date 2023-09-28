@@ -17,6 +17,7 @@ import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
@@ -34,6 +35,7 @@ import com.vhall.business.module.exam.ExamServer
 import com.vhall.uimodule.R
 import com.vhall.uimodule.base.BaseActivity
 import com.vhall.uimodule.base.BaseBottomDialog
+import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase.*
 import com.vhall.uimodule.databinding.ActivityWatchLiveBinding
 import com.vhall.uimodule.utils.ActivityUtils
@@ -145,7 +147,6 @@ class WatchLiveActivity :
             return field
         }
     private var mNoticeCountDownRunnable: NoticeCountDownRunnable? = null
-    private var examServer : ExamServer ? = null
     override fun initView() {
         super.initView()
 
@@ -163,90 +164,25 @@ class WatchLiveActivity :
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 selectTab = tab
                 when (tab?.tag) {
-                    docTag -> {
-                        ActivityUtils.changeFragmentToActivity(
-                            supportFragmentManager,
-                            docFragment, showFragment,
-                            mViewBinding.flTab.id
-                        )
-                        showFragment = docFragment
-                    }
+                    docTag -> { changeTab(docFragment) }
                     chatTag -> {
-                        ActivityUtils.changeFragmentToActivity(
-                            supportFragmentManager,
-                            chatFragment, showFragment,
-                            mViewBinding.flTab.id
-                        )
-                        showFragment = chatFragment
+                        changeTab(chatFragment)
                         isChat = true
                     }
                     qaTag -> {
-                        ActivityUtils.changeFragmentToActivity(
-                            supportFragmentManager,
-                            qaFragment, showFragment,
-                            mViewBinding.flTab.id
-                        )
-                        showFragment = qaFragment
+                        changeTab(qaFragment)
                         isChat = false
                     }
-                    infoTag -> {
-                        ActivityUtils.changeFragmentToActivity(
-                            supportFragmentManager,
-                            webinarInfoFragment, showFragment,
-                            mViewBinding.flTab.id
-                        )
-                        showFragment = webinarInfoFragment
-                    }
-                    chapterTag -> {
-                        ActivityUtils.changeFragmentToActivity(
-                            supportFragmentManager,
-                            chaptersFragment, showFragment,
-                            mViewBinding.flTab.id
-                        )
-                        showFragment = chaptersFragment
-                    }
-                    pointTag -> {
-                        ActivityUtils.changeFragmentToActivity(
-                            supportFragmentManager,
-                            pointsFragment, showFragment,
-                            mViewBinding.flTab.id
-                        )
-                        showFragment = pointsFragment
-                    }
-                    recordsTag -> {
-                        ActivityUtils.changeFragmentToActivity(
-                            supportFragmentManager,
-                            recordsFragment, showFragment,
-                            mViewBinding.flTab.id
-                        )
-                        showFragment = recordsFragment
-                    }
-                    filesDownloadTag -> {
-                        ActivityUtils.changeFragmentToActivity(
-                            supportFragmentManager,
-                            filesDownloadFragment, showFragment,
-                            mViewBinding.flTab.id
-                        )
-                        showFragment = filesDownloadFragment
-                    }
-                    goodsTag -> {
-                        ActivityUtils.changeFragmentToActivity(
-                            supportFragmentManager,
-                            goodsFragment, showFragment,
-                            mViewBinding.flTab.id
-                        )
-                        showFragment = goodsFragment
-                    }
+                    infoTag -> { changeTab(webinarInfoFragment) }
+                    chapterTag -> { changeTab(chaptersFragment) }
+                    pointTag -> { changeTab(pointsFragment) }
+                    recordsTag -> { changeTab(recordsFragment) }
+                    filesDownloadTag -> { changeTab(filesDownloadFragment) }
+                    goodsTag ->  { changeTab(goodsFragment) }
                 }
             }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {
-
-            }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
         })
 
         initTable()
@@ -262,14 +198,13 @@ class WatchLiveActivity :
                     showNotice = false
                     mViewBinding.tvNotice.visibility = View.GONE
                 }
-
             }
         }
 
         checkChapters()
         checkRecords()
 
-        //由于需要提前显示卡片需要提前初始化商品Fragment，监听卡片信息 注要放到房间初始化后
+        //由于需要提前显示商品卡片需要提前初始化商品Fragment，监听商品卡片信息 注要放到房间初始化后
         ActivityUtils.hideAddFragmentToActivity(
             supportFragmentManager,
             goodsFragment,
@@ -289,6 +224,15 @@ class WatchLiveActivity :
 
     override fun onBackPressed() {
         doFinish()
+    }
+    //直播间 Tab切换
+    private fun changeTab(fragment : Fragment){
+        ActivityUtils.changeFragmentToActivity(
+            supportFragmentManager,
+            fragment, showFragment,
+            mViewBinding.flTab.id
+        )
+        showFragment = fragment
     }
 
     private fun initINPUT() {
@@ -318,7 +262,6 @@ class WatchLiveActivity :
             }
         }
     }
-
 
     private fun initTable() {
         with(mViewBinding) {
@@ -414,7 +357,6 @@ class WatchLiveActivity :
         }
     }
 
-
     override fun call(method: String?, arg: String?, extras: Any?): Bundle {
         when (method) {
             HALF_WATCH_SCREEN_KEY -> {
@@ -470,7 +412,7 @@ class WatchLiveActivity :
                         rtcFragment?.showHandUpOperate()
                     }
                 } else {
-                    if ((extras as Bundle)?.containsKey(HAND_UP_KEY_STATUS) == true) {
+                    if (null != extras && (extras as Bundle)?.containsKey(HAND_UP_KEY_STATUS) == true) {
                         if (!(extras as Bundle).getBoolean(HAND_UP_KEY_STATUS)) {
                             watchLiveFragment?.hintApplyHandUpDialog()
                         }
@@ -486,25 +428,7 @@ class WatchLiveActivity :
             }
             SHOW_GOODS_TAB -> {//商品TAB
                 if(arg != null){
-                    if(arg.equals("show_goods_tab")) {
-                        if(goodsTab == null){
-                            mViewBinding.tab.selectedTabPosition
-                            goodsTab = mViewBinding.tab.newTab().setText("商品")
-                            goodsTab!!.tag = goodsTag
-                            mViewBinding.tab.addTab(goodsTab!!, 2)
-                        }
-                        selectTab?.select()
-                    }
-                    else if(goodsTab != null){
-                        if(mViewBinding.tab.getTabAt(2) == goodsTab) {
-                            mViewBinding.tab.removeTab(goodsTab!!)
-                        }
-                        goodsTab = null
-                        if (mViewBinding.tab.selectedTabPosition == 2)
-                            chatTab.select()
-                        else
-                            selectTab?.select()
-                    }
+                    showGoodsTab(arg.equals("show_goods_tab"))
                 }
             }
             SHOW_GOODS_CARD -> {//商品卡片
@@ -616,7 +540,7 @@ class WatchLiveActivity :
         rtcFragment = null
     }
 
-    override fun dealMessageData(messageInfo: MessageServer.MsgInfo) {
+    override fun dealMessageData(messageInfo: MsgInfo) {
         super.dealMessageData(messageInfo)
         chatFragment.dealMessageData(messageInfo)
         qaFragment.dealMessageData(messageInfo)
@@ -646,182 +570,43 @@ class WatchLiveActivity :
             MessageServer.EVENT_INTERACTIVE_ALLOW_MIC -> {
                 enterInteractive()
             }
+            //公告
             MessageServer.EVENT_NOTICE -> {
-                mViewBinding.tvNotice.visibility = if (docFull) View.GONE else View.VISIBLE
-                var contentStr: String?
-                val limit = 40
-                if (messageInfo.content.length < limit) {
-                    var placeHolder = ""
-                    for (time in 1..(limit - messageInfo.content.length)) {
-                        placeHolder = placeHolder.plus("0")
-                    }
-
-                    contentStr = messageInfo.content.plus(placeHolder)
-                } else {
-                    contentStr = messageInfo.content
-                }
-                val spannableString = SpannableString(contentStr)
-                val foregroundColorSpan = ForegroundColorSpan(Color.TRANSPARENT)
-                spannableString.setSpan(foregroundColorSpan, messageInfo.content.length, contentStr!!.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
-                mViewBinding.tvNotice.text = spannableString
-                showNotice = true
-                if (messageInfo.announceRemainingMS > 0) {
-                    //倒计时结束后关闭公告横幅
-                    mUIHandler?.apply {
-                        mNoticeCountDownRunnable?.let {
-                            removeCallbacks(it)
-                        } ?: let {
-                            mNoticeCountDownRunnable = NoticeCountDownRunnable()
-                        }
-                        postDelayed(
-                            mNoticeCountDownRunnable!!,
-                            messageInfo.announceRemainingMS
-                        )
-                    }
-                } else if (messageInfo.announceRemainingMS == 0L) {
-                    //长显
-                } else {
-                    //已超时
-                    mViewBinding.tvNotice.visibility = View.GONE
-                }
+                showNoticeInfo(messageInfo)
             }
+            //开始签到
             MessageServer.EVENT_SIGNIN -> {
                 mSignDialog = SignDialog(mContext, webinarInfo, messageInfo).apply { show() }
             }
+            //结束签到
             MessageServer.EVENT_SIGN_END -> {
                 mSignDialog?.dismiss()
             }
-            MessageServer.EVENT_START_LOTTERY -> {
-                if(!liveVideoFull && !docFull) {
-                    if (mlotteryDialog == null)
-                        mlotteryDialog =
-                            LotteryDialog(mContext, webinarInfo, messageInfo, this).apply { show() }
-                    else {
-                        mlotteryDialog!!.show();
-                        mlotteryDialog!!.lotteryMsg(messageInfo);
-                    }
-                }
+            //开始、结束抽奖
+            MessageServer.EVENT_START_LOTTERY,MessageServer.EVENT_END_LOTTERY  -> {
+                showLotteryDialog(messageInfo)
             }
+            //推屏卡片
             MessageServer.EVENT_PUSH_SCREEN_CRAD -> {
-                if(!liveVideoFull && !docFull) {
-                    val dialog: BaseBottomDialog =  CardDialog(mContext, messageInfo.cardInfo)
-                    dialog.show()
-                }
+                showCardDialog(messageInfo)
             }
-            MessageServer.EVENT_END_LOTTERY -> {
-                if(!liveVideoFull && !docFull) {
-                    if (mlotteryDialog == null)
-                        mlotteryDialog =
-                            LotteryDialog(mContext, webinarInfo, messageInfo, this).apply { show() }
-                    else {
-                        mlotteryDialog!!.show();
-                        mlotteryDialog!!.lotteryMsg(messageInfo);
-                    }
-                }
-            }
+            //文档演示
             MessageServer.EVENT_SHOWH5DOC -> {
-                showDoc = if (messageInfo.watchType == 1) {
-                    if (!showDoc) {
-                        mViewBinding.tab.selectedTabPosition
-                        docTab = mViewBinding.tab.newTab().setText("文档")
-                        docTab.tag = docTag
-                        mViewBinding.tab.addTab(docTab, 1)
-                        selectTab?.select()
-                    }
-                    true
-                } else {
-                    if (showDoc) {
-                        if (docFull) {
-                            docFragment.doc2Portrait()
-                        }
-                        mViewBinding.tab.removeTab(docTab)
-                        if (mViewBinding.tab.selectedTabPosition == 1)
-                            chatTab.select()
-                        else
-                            selectTab?.select()
-                    }
-                    false
-                }
+                showDocTab(messageInfo)
             }
+            //问答
             MessageServer.EVENT_QUESTION -> {
-                var questionName = "问答"
-                if (!TextUtils.isEmpty(messageInfo.question_name))
-                    questionName = messageInfo.question_name
-
-                showToast(questionName + "功能已" + if (messageInfo.status == 0) "关闭" else "开启")
-                if (messageInfo.status == 1) {
-                    qaTab = mViewBinding.tab.newTab().setText(questionName)
-                    qaTab.tag = qaTag
-                    selectQAPosition = if (showDoc) 2 else 1
-                    updateTextView()
-                    mViewBinding.tab.addTab(qaTab, selectQAPosition)
-                    qaFragment.setIsPublish(isPublish)
-                    selectTab?.select()
-                } else {
-                    mViewBinding.tab.removeTab(qaTab)
-                    if (mViewBinding.tab.selectedTabPosition == selectQAPosition)
-                        chatTab.select()
-                    else
-                        selectTab?.select()
-
-                }
+                showQATab(messageInfo)
             }
+            //文件下载
             MessageServer.EVENT_DATA_DOWNLOAD_UPDATE -> {
-                if (messageInfo.file_download_menu.status == 1) {
-                    if(selectTab != filesDownloadTab)
-                    {
-                        if(filesDownloadTab != null)
-                            mViewBinding.tab.removeTab(filesDownloadTab)
-                        filesDownloadTab = mViewBinding.tab.newTab().setText(messageInfo.file_download_menu.name)
-                        filesDownloadTab.tag = filesDownloadTag
-                        if(!::filesDownloadFragment.isInitialized)
-                            filesDownloadFragment = FilesFragment.newInstance(webinarInfo,"")
-                        mViewBinding.tab.addTab(filesDownloadTab, mViewBinding.tab.tabCount)
-                        selectTab?.select()
-                    }
-                    filesDownloadTab.setText(messageInfo.file_download_menu.name)
-                    filesDownloadFragment?.refreshData()
-                } else {
-                    mViewBinding.tab.removeTab(filesDownloadTab)
-                    chatTab.select()
-                }
+                showFilesDownloadTab(messageInfo)
             }
+            //快问快答（考试）
             MessageServer.EVENT_EXAM_PAPER_SEND -> {
-                if(examServer == null){
-                    examServer= ExamServer.Builder()
-                        .webinarInfo(webinarInfo)
-                        .examMessageCallBack(object : ExamMessageCallBack() {
-                            override fun examPush(msgInfo: MsgInfo?) {
-
-                            }
-
-                            override fun examEnd(msgInfo: MsgInfo?) {
-
-                            }
-
-                            override fun examAutoEnd(msgInfo: MsgInfo?) {
-
-                            }
-
-                            override fun examSendRank(msgInfo: MsgInfo?) {
-
-                            }
-
-                            override fun examAutoSendRank(msgInfo: MsgInfo?) {
-
-                            }
-                        })
-                        .build()
-                }
-                var url = examServer?.getExamUrl(messageInfo.examInfo.paper_id);
-                if (url != null && url.contains("https://")) {
-                    //通过浏览器打开URL
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.setData(Uri.parse(url))
-                    startActivity(intent)
-                }
-//                WebviewActivity.startActivity(this@WatchLiveActivity,examServer?.getExamUrl(messageInfo?.examInfo?.paper_id))
+                showExamInfo(messageInfo)
             }
+            //商品推屏卡片
             MessageServer.EVENT_PUSH_GOODS_CARD -> {
                 showGoodsPop(messageInfo.goodsInfo,mViewBinding.flCard)
             }
@@ -885,7 +670,6 @@ class WatchLiveActivity :
         watchPlaybackFragment?.seekTo(time)
     }
 
-
     fun openRecod(recodid: String) {
         if (recodid == webinarInfo.record_id)
             return;
@@ -943,7 +727,7 @@ class WatchLiveActivity :
         mViewBinding.tab.addTab(pointsTab,mViewBinding.tab.tabCount)
         selectTab?.select()
     }
-
+    //章节检查
     fun checkChapters() {
         if (webinarInfo.status != 4 && webinarInfo.status != 5)
             return
@@ -1000,7 +784,7 @@ class WatchLiveActivity :
                 }
             })
     }
-
+    //显示商品推屏卡片
     public fun showGoodsPop(goodsInfo: GoodsInfoData.GoodsInfo, view:View){
         val location = IntArray(2)
         view.getLocationOnScreen(location)
@@ -1031,6 +815,166 @@ class WatchLiveActivity :
         if(!dialog.equals(mCurDialog)) {
             mCurDialog?.dismiss()
             mCurDialog = dialog
+        }
+    }
+    //开始、结束抽奖
+    fun showLotteryDialog(messageInfo: MsgInfo) {
+        if(!liveVideoFull && !docFull) {
+            if (mlotteryDialog == null)
+                mlotteryDialog = LotteryDialog(mContext, webinarInfo, messageInfo, this).apply { show() }
+            else {
+                mlotteryDialog!!.show();
+                mlotteryDialog!!.lotteryMsg(messageInfo);
+            }
+        }
+    }
+    //推屏卡片
+    fun showCardDialog(messageInfo: MsgInfo) {
+        if(!liveVideoFull && !docFull) {
+            val dialog: BaseBottomDialog =  CardDialog(mContext, messageInfo.cardInfo)
+            dialog.show()
+        }
+    }
+    //文档演示
+    fun showDocTab(messageInfo: MsgInfo) {
+        showDoc = if (messageInfo.watchType == 1) {
+            if (!showDoc) {
+                mViewBinding.tab.selectedTabPosition
+                docTab = mViewBinding.tab.newTab().setText("文档")
+                docTab.tag = docTag
+                mViewBinding.tab.addTab(docTab, 1)
+                selectTab?.select()
+            }
+            true
+        } else {
+            if (showDoc) {
+                if (docFull) {
+                    docFragment.doc2Portrait()
+                }
+                mViewBinding.tab.removeTab(docTab)
+                if (mViewBinding.tab.selectedTabPosition == 1)
+                    chatTab.select()
+                else
+                    selectTab?.select()
+            }
+            false
+        }
+    }
+    //问答
+    fun showQATab(messageInfo: MsgInfo) {
+        var questionName = "问答"
+        if (!TextUtils.isEmpty(messageInfo.question_name))
+            questionName = messageInfo.question_name
+
+        showToast(questionName + "功能已" + if (messageInfo.status == 0) "关闭" else "开启")
+        if (messageInfo.status == 1) {
+            qaTab = mViewBinding.tab.newTab().setText(questionName)
+            qaTab.tag = qaTag
+            selectQAPosition = if (showDoc) 2 else 1
+            updateTextView()
+            mViewBinding.tab.addTab(qaTab, selectQAPosition)
+            qaFragment.setIsPublish(isPublish)
+            selectTab?.select()
+        } else {
+            mViewBinding.tab.removeTab(qaTab)
+            if (mViewBinding.tab.selectedTabPosition == selectQAPosition)
+                chatTab.select()
+            else
+                selectTab?.select()
+        }
+    }
+    //公告
+    fun showNoticeInfo(messageInfo: MsgInfo){
+        mViewBinding.tvNotice.visibility = if (docFull) View.GONE else View.VISIBLE
+        var contentStr: String?
+        val limit = 40
+        if (messageInfo.content.length < limit) {
+            var placeHolder = ""
+            for (time in 1..(limit - messageInfo.content.length)) {
+                placeHolder = placeHolder.plus("0")
+            }
+
+            contentStr = messageInfo.content.plus(placeHolder)
+        } else {
+            contentStr = messageInfo.content
+        }
+        val spannableString = SpannableString(contentStr)
+        val foregroundColorSpan = ForegroundColorSpan(Color.TRANSPARENT)
+        spannableString.setSpan(foregroundColorSpan, messageInfo.content.length, contentStr!!.length, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+        mViewBinding.tvNotice.text = spannableString
+        showNotice = true
+        if (messageInfo.announceRemainingMS > 0) {
+            //倒计时结束后关闭公告横幅
+            mUIHandler?.apply {
+                mNoticeCountDownRunnable?.let {
+                    removeCallbacks(it)
+                } ?: let {
+                    mNoticeCountDownRunnable = NoticeCountDownRunnable()
+                }
+                postDelayed(
+                    mNoticeCountDownRunnable!!,
+                    messageInfo.announceRemainingMS
+                )
+            }
+        } else if (messageInfo.announceRemainingMS == 0L) {
+            //长显
+        } else {
+            //已超时
+            mViewBinding.tvNotice.visibility = View.GONE
+        }
+    }
+    //文件下载
+    fun showFilesDownloadTab(messageInfo: MsgInfo){
+        if (messageInfo.file_download_menu.status == 1) {
+            if(selectTab != filesDownloadTab)
+            {
+                if(filesDownloadTab != null)
+                    mViewBinding.tab.removeTab(filesDownloadTab)
+                filesDownloadTab = mViewBinding.tab.newTab().setText(messageInfo.file_download_menu.name)
+                filesDownloadTab.tag = filesDownloadTag
+                if(!::filesDownloadFragment.isInitialized)
+                    filesDownloadFragment = FilesFragment.newInstance(webinarInfo,"")
+                mViewBinding.tab.addTab(filesDownloadTab, mViewBinding.tab.tabCount)
+                selectTab?.select()
+            }
+            filesDownloadTab.setText(messageInfo.file_download_menu.name)
+            filesDownloadFragment?.refreshData()
+        } else {
+            mViewBinding.tab.removeTab(filesDownloadTab)
+            chatTab.select()
+        }
+    }
+    //考试
+    fun showExamInfo(messageInfo: MsgInfo){
+        var url = ExamServer.getExamUrl(webinarInfo, messageInfo.examInfo.paper_id);
+        if (url != null && url.contains("https://")) {
+            //通过浏览器打开URL
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.setData(Uri.parse(url))
+            startActivity(intent)
+        }
+//       WebviewActivity.startActivity(this@WatchLiveActivity,examServer?.getExamUrl(messageInfo?.examInfo?.paper_id))
+    }
+    //商品Tab
+    fun showGoodsTab(show: Boolean){
+        if(show) {
+            if(goodsTab == null){
+                mViewBinding.tab.selectedTabPosition
+                goodsTab = mViewBinding.tab.newTab().setText("商品")
+                goodsTab!!.tag = goodsTag
+                mViewBinding.tab.addTab(goodsTab!!, 2)
+            }
+            selectTab?.select()
+        }
+        else if(goodsTab != null){
+            if(mViewBinding.tab.getTabAt(2) == goodsTab) {
+                mViewBinding.tab.removeTab(goodsTab!!)
+            }
+            goodsTab = null
+            if (mViewBinding.tab.selectedTabPosition == 2)
+                chatTab.select()
+            else
+                selectTab?.select()
         }
     }
 

@@ -29,6 +29,7 @@ import com.vhall.business.data.RequestCallback;
 import com.vhall.business.data.RequestDataCallback;
 import com.vhall.business.data.RequestDataCallbackV2;
 import com.vhall.business.data.WebinarInfo;
+import com.vhall.business.module.lottery.LotteryServer;
 import com.vhall.uimodule.R;
 import com.vhall.uimodule.base.BaseBottomDialog;
 import com.vhall.uimodule.watch.WatchLiveActivity;
@@ -101,7 +102,7 @@ public class LotteryRewardDialog extends BaseBottomDialog implements View.OnClic
                 }
             }
 
-            VhallSDK.submitLotteryInfo(this.msgInfo.lotteryInfo.lottery_id,mDataList, new RequestCallback() {
+            LotteryServer.submitLotteryInfo(this.msgInfo.lotteryInfo.lottery_id,mDataList, new RequestCallback() {
                 @Override
                 public void onSuccess() {
                     showToast("提交成功");
@@ -117,7 +118,7 @@ public class LotteryRewardDialog extends BaseBottomDialog implements View.OnClic
     }
 
     private void loadData() {
-        VhallSDK.getPrizeInfo(this.webinarInfo.vss_room_id,this.msgInfo.lotteryInfo.lottery_id, new RequestDataCallback() {
+        LotteryServer.getPrizeInfo(this.webinarInfo.vss_room_id,this.msgInfo.lotteryInfo.lottery_id, new RequestDataCallback() {
             @Override
             public void onSuccess(Object o) {
                 receive_award_way = ((LotteryPrizeInfo) o).receive_award_way;
@@ -145,7 +146,7 @@ public class LotteryRewardDialog extends BaseBottomDialog implements View.OnClic
     }
 
     private void lotteryWinningUserInfo() {
-        VhallSDK.lotteryWinningUserInfo(webinarInfo.vss_room_id, new RequestDataCallbackV2<LotteryWinningUserInfoData>() {
+        LotteryServer.lotteryWinningUserInfo(webinarInfo.vss_room_id, new RequestDataCallbackV2<LotteryWinningUserInfoData>() {
             @Override
             public void onSuccess(LotteryWinningUserInfoData data) {
                 for (LotteryPrizeListInfo info:  mDataList) {

@@ -3,10 +3,6 @@
     android:shape="oval">
     <size android:width="@dimen/dimen_6dp"
         android:height="@dimen/dimen_6dp"/>
-
+    <solid android:color="@color/white" />
     <corners android:radius="@dimen/dimen_180dp"/>
-    <gradient
-        android:startColor="#FDF1ED"
-        android:endColor="#F3F2FF"
-        android:angle="360"/>
 </shape>

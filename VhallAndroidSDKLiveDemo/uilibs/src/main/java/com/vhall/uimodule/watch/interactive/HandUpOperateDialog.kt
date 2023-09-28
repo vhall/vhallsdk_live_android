@@ -21,6 +21,8 @@ class HandUpOperateDialog constructor(
         const val clickTypeCamera = 3
         const val clickTypeHandCancel = 4
         const val clickBeautify = 5
+        const val clickStreamMirror = 6
+        const val clickMirror = 7
     }
 
     private var myItemClickLister: ItemClickLister? = null
@@ -43,6 +45,8 @@ class HandUpOperateDialog constructor(
         binding.tvCamera.setOnClickListener(this)
         binding.tvHandCancel.setOnClickListener(this)
         binding.tvBeautify.setOnClickListener(this)
+        binding.tvStreamMirror.setOnClickListener(this)
+        binding.tvMirror.setOnClickListener(this)
         binding.root.setOnClickListener(this)
         setVideo(isOpenVideo)
         setAudio(isOpenAudio)
@@ -64,6 +68,12 @@ class HandUpOperateDialog constructor(
             }
             binding.tvBeautify -> {
                 myItemClickLister?.onItemClick(clickBeautify)
+            }
+            binding.tvStreamMirror -> {
+                myItemClickLister?.onItemClick(clickStreamMirror)
+            }
+            binding.tvMirror -> {
+                myItemClickLister?.onItemClick(clickMirror)
             }
             binding.root -> dismiss()
         }

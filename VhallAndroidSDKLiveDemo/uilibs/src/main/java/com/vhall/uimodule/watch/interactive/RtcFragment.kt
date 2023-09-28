@@ -14,12 +14,14 @@ import com.vhall.business_interactive.Rtc
 import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase.INFO_KEY
 import com.vhall.uimodule.databinding.FragmentRtcBinding
+import com.vhall.uimodule.watch.WatchLiveActivity
 import com.vhall.uimodule.watch.interactive.HandUpOperateDialog.Companion.clickBeautify
+import com.vhall.uimodule.watch.interactive.HandUpOperateDialog.Companion.clickMirror
+import com.vhall.uimodule.watch.interactive.HandUpOperateDialog.Companion.clickStreamMirror
 import com.vhall.uimodule.watch.interactive.HandUpOperateDialog.Companion.clickTypeAudio
 import com.vhall.uimodule.watch.interactive.HandUpOperateDialog.Companion.clickTypeCamera
 import com.vhall.uimodule.watch.interactive.HandUpOperateDialog.Companion.clickTypeHandCancel
 import com.vhall.uimodule.watch.interactive.HandUpOperateDialog.Companion.clickTypeVideo
-import com.vhall.uimodule.watch.WatchLiveActivity
 import com.vhall.uimodule.widget.ItemClickLister
 import com.vhall.vhallrtc.client.Room
 import com.vhall.vhallrtc.client.Room.VHRoomStatus
@@ -55,6 +57,9 @@ class RtcFragment :
     private var isOpenAudio = true
     private var isDisconnected = false
     private var isEnableBeautify = false
+    private var isStreamMirror = false
+    private var isPreviewMirror = false
+
     //主讲人
     private var mainId = ""
 
@@ -112,9 +117,19 @@ class RtcFragment :
 //打开美颜功能
                             interactive.localStream.setEnableBeautify(isEnableBeautify);
 //设置美颜等级 0-4 4效果最强
-                            interactive.localStream.setBeautifyLevel(4);
+//                            interactive.localStream.setBeautifyLevel(4);
 //注：基础美颜一定要关闭视频采集回调开关
-                            interactive.localStream.setEnableCaptureCallback(false)
+//                            interactive.localStream.setEnableCaptureCallback(false)
+                        }
+                        clickStreamMirror -> {
+                            isStreamMirror = !isStreamMirror
+                            interactive.localStream.setMirror(isStreamMirror);
+                        }
+                        clickMirror -> {
+                            if(interactive.localStream.renderViews.size>0) {
+                                isPreviewMirror = !isPreviewMirror
+                                interactive.localStream.renderViews[0].setMirror(isPreviewMirror)
+                            }
                         }
                         clickTypeHandCancel -> {
                             handUpOperateDialog?.dismiss()
@@ -165,12 +180,12 @@ class RtcFragment :
         var vhRenderView = VHRenderView(context)
         vhRenderView.setScalingMode(SurfaceViewRenderer.VHRenderViewScalingMode.kVHRenderViewScalingModeAspectFit)
         vhRenderView.init(null, null)
+
         interactive.setLocalView(
             vhRenderView,
             Stream.VhallStreamType.VhallStreamTypeAudioAndVideo,
             null
         )
-
         //打开基础美颜功能
         interactive.localStream.setEnableCaptureCallback(false);
         interactive.localStream.setEnableBeautify (isEnableBeautify);
@@ -262,7 +277,18 @@ class RtcFragment :
                         judgePublish()
                     isDisconnected = false
                 }
+                else -> {}
             }
+        }
+
+        override fun onDidInternalStreamRemoved(var1: Room?, stream: Stream?) {
+            /**
+             * 视频轮巡 需要过滤不显示
+             */
+            if (stream != null && stream.streamType != 101) {
+                return
+            }
+            adapter.removeData(StreamData(stream))
         }
     }
 

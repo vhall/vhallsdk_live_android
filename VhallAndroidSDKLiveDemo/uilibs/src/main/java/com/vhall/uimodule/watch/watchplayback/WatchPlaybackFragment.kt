@@ -182,6 +182,7 @@ class WatchPlaybackFragment :
                 Constants.State.END -> {
                     mViewBinding.ivPlay.setBackgroundResource(R.mipmap.icon_playing)
                 }
+                else -> {}
             }
         }
 

@@ -85,7 +85,7 @@ public class RenderAdapter extends RecyclerView.Adapter<RenderAdapter.RenderHold
             mStreamDataList.remove(index);
             notifyItemRemoved(index);
         }
-        if (item.getStreamUserId().equals(mainId)) {
+        if (item.getStreamUserId() != null && item.getStreamUserId().equals(mainId)) {
             mStreamDataList.add(0, item);
             notifyItemInserted(0);
         } else {

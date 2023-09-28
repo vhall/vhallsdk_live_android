@@ -74,6 +74,14 @@
             android:background="@drawable/icon_mirror_selected" />
 
         <Button
+            android:id="@+id/btn_premirror"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:visibility="gone"
+            android:background="@drawable/icon_perview_mirror" />
+
+        <Button
             android:id="@+id/btn_changeFlash"
             android:layout_width="30dp"
             android:layout_height="30dp"

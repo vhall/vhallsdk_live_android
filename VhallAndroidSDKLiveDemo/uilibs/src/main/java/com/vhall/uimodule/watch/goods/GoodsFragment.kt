@@ -16,13 +16,15 @@ import com.vhall.business.module.goods.GoodsMessageCallBack
 import com.vhall.business.module.goods.GoodsServer
 import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase
-import com.vhall.uimodule.databinding.FragmentChaptersBinding
+import com.vhall.uimodule.databinding.FragmentGoodsBinding
 import com.vhall.uimodule.watch.WatchLiveActivity
+import com.vhall.uimodule.watch.coupon.CouponListDialog
+import com.vhall.uimodule.watch.gift.GiftListDialog
 import com.vhall.vhss.data.GoodsInfoData
 import com.vhall.vhss.data.GoodsInfoData.GoodsInfo
 import com.vhall.vhss.data.OrderInfoData
 
-class GoodsFragment : BaseFragment<FragmentChaptersBinding>(FragmentChaptersBinding::inflate) {
+class GoodsFragment : BaseFragment<FragmentGoodsBinding>(FragmentGoodsBinding::inflate) {
     companion object {
         @JvmStatic
         fun newInstance(info: WebinarInfo, type: String) =
@@ -59,6 +61,10 @@ class GoodsFragment : BaseFragment<FragmentChaptersBinding>(FragmentChaptersBind
         mViewBinding.recycleView.setHasFixedSize(true)
         mViewBinding.refreshLayout.setOnRefreshListener {
             loadData()
+        }
+        mViewBinding.tvCouponEnter.setOnClickListener {
+            val couponListDialog = CouponListDialog(mContext, webinarInfo,"",0)
+            couponListDialog.show()
         }
 
         goodsServer = GoodsServer.Builder()

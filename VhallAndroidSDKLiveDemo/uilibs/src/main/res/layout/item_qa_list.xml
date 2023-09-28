@@ -51,7 +51,7 @@
 
         <TextView
             android:id="@+id/tv_q"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/dimen_8dp"
             android:layout_marginTop="@dimen/dimen_6dp"
@@ -65,7 +65,7 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@id/iv_avatar"
             app:layout_constraintTop_toBottomOf="@id/tv_name"
-            app:layout_constraintWidth_default="wrap" />
+            app:layout_constrainedWidth="true"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -102,7 +102,7 @@
 
         <TextView
             android:id="@+id/tv_a"
-            android:layout_width="@dimen/dimen_0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dimen_8dp"
             android:layout_marginEnd="@dimen/dimen_12dp"
@@ -115,7 +115,7 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="@id/tv_name_re"
             app:layout_constraintTop_toBottomOf="@id/tv_name_re"
-            app:layout_constraintWidth_default="wrap" />
+            app:layout_constrainedWidth="true" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

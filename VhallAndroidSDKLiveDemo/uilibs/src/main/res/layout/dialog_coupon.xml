@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/line"
+        android:layout_width="match_parent"
+        android:layout_height="422dp"
+        android:background="@drawable/shape_list_lottery"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_14dp"
+        android:gravity="center"
+        android:text="我的优惠券"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/line" />
+
+    <TextView
+        android:id="@+id/tv_use_coupon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_45dp"
+        android:paddingBottom="@dimen/dimen_6dp"
+        android:gravity="center"
+        android:text="可用优惠券（0）"
+        android:textColor="@color/black"
+        android:textSize="@dimen/dimen_15dp"
+        app:layout_constraintEnd_toStartOf="@+id/tv_nouse_coupon"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/line" />
+
+    <TextView
+        android:id="@+id/tv_nouse_coupon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/dimen_6dp"
+        android:gravity="center"
+        android:text="不可用优惠券（0）"
+        android:textColor="@color/black_65"
+        android:textSize="@dimen/dimen_15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tv_use_coupon"
+        app:layout_constraintTop_toTopOf="@id/tv_use_coupon" />
+
+    <TextView
+        android:id="@+id/tv_use_coupon_bg"
+        android:layout_width="@dimen/dimen_50dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="@dimen/dimen_22dp"
+        android:background="@drawable/shape_bg_rounded_red_26"
+        app:layout_constraintEnd_toStartOf="@+id/tv_nouse_coupon"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tv_use_coupon" />
+
+    <TextView
+        android:id="@+id/tv_unuse_coupon_bg"
+        android:layout_width="@dimen/dimen_50dp"
+        android:layout_height="4dp"
+        android:layout_marginTop="@dimen/dimen_22dp"
+        android:visibility="invisible"
+        android:background="@drawable/shape_bg_rounded_red_26"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tv_use_coupon"
+        app:layout_constraintTop_toTopOf="@id/tv_use_coupon" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="342dp"
+        android:layout_marginTop="@dimen/dimen_44dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycle_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:paddingTop="@dimen/dimen_5dp"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <ImageView
+        android:id="@+id/im_empty"
+        android:layout_width="@dimen/dimen_113dp"
+        android:layout_height="@dimen/dimen_113dp"
+        android:layout_marginTop="@dimen/dimen_70dp"
+        android:background="@drawable/icon_coupon_empty"
+        app:layout_constraintTop_toBottomOf="@id/tv_use_coupon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+    <TextView
+        android:id="@+id/tv_empty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dimen_20dp"
+        android:text="暂无优惠券"
+        android:textColor="@color/color_8c"
+        android:textSize="@dimen/dimen_16sp"
+        app:layout_constraintStart_toStartOf="@+id/im_empty"
+        app:layout_constraintTop_toBottomOf="@id/im_empty" />
+
+    <ImageView
+        android:id="@+id/tv_cancel"
+        android:layout_width="@dimen/dimen_16dp"
+        android:layout_height="@dimen/dimen_16dp"
+        android:layout_alignTop="@id/refresh_layout"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="end|center_vertical"
+        android:layout_margin="@dimen/dimen_16dp"
+        android:background="@mipmap/icon_close"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/line" />
+</androidx.constraintlayout.widget.ConstraintLayout>

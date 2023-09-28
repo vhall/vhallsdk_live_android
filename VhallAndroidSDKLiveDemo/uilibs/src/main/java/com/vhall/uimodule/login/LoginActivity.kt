@@ -28,7 +28,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
 
     override fun initView() {
         getData()
-        mViewBinding.tvVersion.text = BuildConfig.VH_VERSION_NAME+"."+BuildConfig.VH_VERSION_CODE
+        mViewBinding.tvVersion.text = BuildConfig.VH_VERSION_NAME+"("+BuildConfig.BuildTime+")"
         mViewBinding.rgLogin.setOnCheckedChangeListener { group, checkedId ->
             if (checkedId == R.id.account_login) setAccountData()
             else if (checkedId == R.id.id_login) setThirdData()

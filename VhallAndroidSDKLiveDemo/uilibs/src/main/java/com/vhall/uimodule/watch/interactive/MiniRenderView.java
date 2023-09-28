@@ -94,22 +94,20 @@ public class MiniRenderView extends FrameLayout {
         // 1 false 关
         ivAvatarVisibility(streamData.getCamera() == 0);
 
-        if(!stream.isLocal){
-            stream.startStats(new Stream.StatsCallback() {
-                @Override
-                public void onResponse(String s, long l, Map<String, String> map) {
-                    if(l<10) {
-                        netbadTimes++;
-                    } else {
-                        netbadTimes = 0;
-                        handler.sendEmptyMessage(GONE);
-                    }
-                    if(netbadTimes>8)
-                        handler.sendEmptyMessage(VISIBLE);
-//                    handler.sendEmptyMessage((int) l);
+        stream.startStats(new Stream.StatsCallback() {
+            @Override
+            public void onResponse(String s, long l, Map<String, String> map) {
+                if(l<10) {
+                    netbadTimes++;
+                } else {
+                    netbadTimes = 0;
+                    handler.sendEmptyMessage(GONE);
                 }
-            });
-        }
+                if(netbadTimes>8)
+                    handler.sendEmptyMessage(VISIBLE);
+//                    handler.sendEmptyMessage((int) l);
+            }
+        });
     }
 
     public void ivAvatarVisibility(boolean show) {

@@ -50,6 +50,7 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
     private var isPublishing = false
     private var isFlashOpen = false
     private var isMirror = false
+    private var isPreMirror = false
     private var mode = VHLivePushFormat.DRAW_MODE_ASPECTFILL
 
     override fun initView() {
@@ -85,6 +86,7 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
             Camera.getCameraInfo(cameraId, cameraInfo)
             val hide:Boolean= (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK)
             mViewBinding.btnChangeFlash.setVisibility(if (hide) View.VISIBLE else View.GONE)
+            mViewBinding.btnPremirror.setVisibility(if (hide) View.GONE else View.VISIBLE)
             if(hide)
                 mViewBinding.btnChangeFlash.setBackgroundResource(R.drawable.img_round_flash_close)
         }
@@ -94,11 +96,16 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
             getBroadcast()!!.isMute = !isMute
             mViewBinding.btnChangeAudio.setBackgroundResource(if (isMute) R.drawable.img_round_audio_close else R.drawable.img_round_audio_open)
         }
-        //闪光灯
+
         mViewBinding.btnMirror.setOnClickListener {
             isMirror = !isMirror
             mViewBinding.cameraview.setMirror(isMirror)
             mViewBinding.btnMirror.setBackgroundResource(if (isMirror) R.drawable.icon_mirror_normal else R.drawable.icon_mirror_selected )
+        }
+
+        mViewBinding.btnPremirror.setOnClickListener {
+            isPreMirror = !isPreMirror
+            mViewBinding.cameraview.setFrontPreViewMirror(isPreMirror)
         }
 
         mViewBinding.btnChangeFilter.setOnClickListener {
