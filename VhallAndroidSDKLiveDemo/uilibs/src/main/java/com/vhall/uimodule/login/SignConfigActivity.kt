@@ -27,6 +27,9 @@ class SignConfigActivity :
             context.startActivity(Intent(context, SignConfigActivity::class.java))
         }
     }
+    var sha1 = ""
+    var packageid = ""
+
     override fun initView() {
         mViewBinding.ivBack.setOnClickListener { finish() }
         mViewBinding.edAppName.text = SignatureUtil.getPackageName(mContext)
@@ -62,6 +65,7 @@ class SignConfigActivity :
                     showToast("请完善app key或app secret key")
                 } else {
                     UserDataStore.saveToAppKey(appKey, appSecretKey,rsa_private_key, mContext)
+                    UserDataStore.savePS(this@SignConfigActivity.packageid, this@SignConfigActivity.sha1, mContext)
                     UIModuleProvider.doSignConfig()
                     showToast("保存成功")
                     finish()
@@ -82,12 +86,12 @@ class SignConfigActivity :
                     val jsonstr = AESUtils.decrypt(qrcodeStr.replace(" ","+"),"EDaaff63bcB4d4M9")
                     if(jsonstr.length>0){
                         val userInfo: JSONObject = JSONObject(jsonstr)
-                        val sha1 = userInfo["s1"].toString()
-                        val ar = userInfo["ar"].toString()
+                        this.sha1 = userInfo["s1"].toString()
+                        this.packageid = userInfo["ar"].toString()
                         mViewBinding.edAppKey.setText(userInfo["a"].toString())
                         mViewBinding.edAppSecretKey.setText(userInfo["as"].toString())
-                        if(ar.length==0 || sha1.length==0)
-                            showToast("请填写Android包名签名")
+                        if(this.packageid.length==0 || this.sha1.length==0)
+                            showToast("请填写Android包名sha1签名")
                     }
                 } catch (e: JSONException) {
                     e.printStackTrace()

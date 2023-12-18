@@ -27,6 +27,8 @@ class UserDataStore {
         private val watchIdKey = stringPreferencesKey("watchId")
         private val watchKKey = stringPreferencesKey("watchK")
         private val watchKIDKey = stringPreferencesKey("watchKId")
+        private val packageIDKey = stringPreferencesKey("packageIDKey")
+        private val sha1Key = stringPreferencesKey("sha1Key")
 
         suspend fun saveAccount(account: String, password: String, context: Context) {
             context.userStore.edit { setting ->
@@ -53,6 +55,13 @@ class UserDataStore {
                 setting[appKey] = app
                 setting[appSecretKey] = appSecret
                 setting[rsaPrivateKey] = rsaPrivate
+            }
+        }
+
+        suspend fun savePS(packageid: String, sha1: String, context: Context) {
+            context.userStore.edit { setting ->
+                setting[packageIDKey] = packageid
+                setting[sha1Key] = sha1
             }
         }
 
@@ -122,6 +131,14 @@ class UserDataStore {
 
         suspend fun getWatchKId(context: Context): String {
             return getValue(context, watchKIDKey)
+        }
+
+        suspend fun getPackageID(context: Context): String {
+            return getValue(context, packageIDKey)
+        }
+
+        suspend fun getSHA1(context: Context): String {
+            return getValue(context, sha1Key)
         }
     }
 

@@ -19,6 +19,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.JsResult;
@@ -33,12 +35,14 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.vhall.logmanager.LogTool;
 import com.vhall.logmanager.VLog;
 import com.vhall.uimodule.R;
 
@@ -57,12 +61,26 @@ public class WebviewActivity extends AppCompatActivity {
     private WebView webView;
     private EditText web_site;
     private String referer = "https://test02-live.vhall.com";
+    private FrameLayout rlContent;
 
     public static void startActivity(Context context, String url) {
         Intent intent = new Intent(context, WebviewActivity.class);
         intent.putExtra("defaulturl", url);
         context.startActivity(intent);
     }
+
+    @Override
+    protected void onDestroy() {
+        webView.loadUrl("about:blank");
+//        webView.removeJavascriptInterface("loadingJs");
+//        webView.freeMemory();
+//        webView.clearCache(true);
+//        webView.clearHistory();
+//        webView.removeAllViews();
+        super.onDestroy();
+        VLog.e("WebviewActivity","====onDestroy");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +88,7 @@ public class WebviewActivity extends AppCompatActivity {
         webView = findViewById(R.id.webview);
         web_site = findViewById(R.id.web_site);
         webView.requestFocus(View.FOCUS_DOWN);
-
+        rlContent = findViewById(R.id.rlContent);
 //        getWindow.setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
 //                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -209,32 +227,47 @@ public class WebviewActivity extends AppCompatActivity {
             @Override
             public void onShowCustomView(View view, CustomViewCallback callback) {
                 super.onShowCustomView(view, callback);
+                /* 隐藏状态栏 */
+//                supportRequestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 //实现播放器全屏响应
                 if (mCustomView != null) {
                     callback.onCustomViewHidden();
                     return;
                 }
                 mCustomView = view;
-//                rlContent.addView(view);
+                rlContent.addView(view);
+                rlContent.setVisibility(View.VISIBLE);
                 mCustomViewCallback = callback;
 //                webView.setVisibility(View.GONE);
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+                //横屏设置全屏展示直播间
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+                super.onShowCustomView(view, callback);
             }
 
             @Override
             public void onHideCustomView() {
-                super.onHideCustomView();
+
                 //实现播放器退出全屏响应
-                webView.setVisibility(View.VISIBLE);
+//                webView.setVisibility(View.VISIBLE);
+
                 webView.requestFocus(View.FOCUS_DOWN);
                 if (mCustomView == null) {
                     return;
                 }
                 mCustomView.setVisibility(View.GONE);
-//                rlContent.removeView(mCustomView);
+                rlContent.removeView(mCustomView);
+                rlContent.setVisibility(View.GONE);
                 mCustomViewCallback.onCustomViewHidden();
                 mCustomView = null;
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                //竖屏显示沉浸式状态栏
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+                super.onHideCustomView();
             }
 
         });

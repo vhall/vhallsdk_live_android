@@ -28,7 +28,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
 
     override fun initView() {
         getData()
-        mViewBinding.tvVersion.text = BuildConfig.VH_VERSION_NAME+"("+BuildConfig.BuildTime+")"
+        mViewBinding.tvVersion.text = BuildConfig.VH_VERSION_NAME+"("+BuildConfig.BuildTime+":"+BuildConfig.GitHash+")"
         mViewBinding.rgLogin.setOnCheckedChangeListener { group, checkedId ->
             if (checkedId == R.id.account_login) setAccountData()
             else if (checkedId == R.id.id_login) setThirdData()
@@ -37,7 +37,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
         mViewBinding.tvSign.setOnClickListener { SignConfigActivity.startActivity(mContext) }
         mViewBinding.ivQ.setOnClickListener { showQ() }
         setThirdData()
-        CommonUtil.isGrantedAndRequestTelPermission(this,0)
+//        CommonUtil.isGrantedAndRequestTelPermission(this,0)
     }
 
 
