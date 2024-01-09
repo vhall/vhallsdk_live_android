@@ -53,8 +53,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:hardwareAccelerated ="true"
-            android:windowSoftInputMode="adjustNothing" />
+            android:hardwareAccelerated ="true" />
         <activity
             android:name=".publish.PublishActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

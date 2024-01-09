@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.19.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.19.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.19.1'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.19.1'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -47,9 +47,14 @@ allprojects {
 
 
 二、版本更新信息：
+
+版本：v6.19.1  更新时间 2024.01.09
+
+1. 【优化】SDK targetSdkVersion 升级为30
+
 版本：v6.19.0  更新时间 2023.09.28
 
-1. 【【新增】SDK新增优惠券领用、核销功能，配合商品订单支付使用
+1. 【新增】SDK新增优惠券领用、核销功能，配合商品订单支付使用
 
 版本：v6.18.0  更新时间 2023.08.31
 
