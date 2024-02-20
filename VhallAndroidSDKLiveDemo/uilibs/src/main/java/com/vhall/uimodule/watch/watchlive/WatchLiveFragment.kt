@@ -15,8 +15,9 @@ import com.vhall.uimodule.R
 import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase.*
 import com.vhall.uimodule.databinding.FragmentWatchLiveBinding
-import com.vhall.uimodule.watch.WatchLiveActivity
 import com.vhall.uimodule.utils.CommonUtil
+import com.vhall.uimodule.watch.WatchLiveActivity
+import com.vhall.uimodule.watch.danmu.VHDanmakuHelper
 import com.vhall.uimodule.widget.ItemClickLister
 import com.vhall.uimodule.widget.OutDialog
 import com.vhall.uimodule.widget.OutDialogBuilder
@@ -49,6 +50,8 @@ class WatchLiveFragment :
     //是否全屏
     private var isFull = false
     var parentActivity: WatchLiveActivity? = null
+
+    private var danmakuHelper: VHDanmakuHelper? = null;//弹幕
 
     override fun initView() {
         parentActivity = activity as WatchLiveActivity
@@ -95,6 +98,13 @@ class WatchLiveFragment :
             mViewBinding.ivScreenshot.visibility=View.GONE
         }
 
+        //初始化弹幕
+        danmakuHelper = context?.let { VHDanmakuHelper(it,mViewBinding.svDanmaku) };
+    }
+
+    //装填弹幕
+    fun addDanmu(danmu: String?) {
+        danmakuHelper?.addDanmaku(danmu)
     }
 
     fun video2Portrait() {

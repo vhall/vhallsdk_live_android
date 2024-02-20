@@ -1,8 +1,8 @@
 buildscript {
 
     ext {
-        app_version = "6.19.1"
-        app_code = 6191
+        app_version = "6.19.2"
+        app_code = 6192
         kotlin_version = '1.6.10'
         coroutines_version = '1.6.0'
     }

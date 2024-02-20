@@ -457,6 +457,9 @@ class WatchLiveActivity :
         }
         chatFragment.dealChatData(chatInfo)
         qaFragment.dealChatData(chatInfo)
+        if(ChatServer.eventMsgKey == chatInfo.event){
+            watchLiveFragment?.addDanmu(chatInfo.msgData.text);
+        }
         when (chatInfo.event) {
             ChatServer.eventOnlineKey -> {
                 pv++
