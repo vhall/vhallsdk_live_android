@@ -24,8 +24,8 @@ allprojects {
 
 ```
  //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.19.2'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.19.2'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.19.3'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.19.3'
     //投屏相关
     api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
     
@@ -47,6 +47,10 @@ allprojects {
 
 
 二、版本更新信息：
+版本：v6.19.3  更新时间 2024.03.15
+
+1. 【新增】支持跑马灯功能
+
 
 版本：v6.19.2  更新时间 2024.02.20
 

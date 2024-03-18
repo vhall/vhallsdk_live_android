@@ -39,12 +39,19 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.vhall.logmanager.LogTool;
 import com.vhall.logmanager.VLog;
 import com.vhall.uimodule.R;
+import com.vhall.uimodule.utils.CommonUtil;
+import com.vhall.uimodule.utils.ToastUtils;
+import com.vhall.zxing.client.android.CaptureActivity;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -89,6 +96,12 @@ public class WebviewActivity extends AppCompatActivity {
         web_site = findViewById(R.id.web_site);
         webView.requestFocus(View.FOCUS_DOWN);
         rlContent = findViewById(R.id.rlContent);
+        findViewById(R.id.iv_qrcode).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchQrcodeActivity();
+            }
+        });
 //        getWindow.setFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
 //                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 //        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -368,5 +381,32 @@ public class WebviewActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    private ActivityResultLauncher<Intent> launcherActivity = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result != null && result.getResultCode() == RESULT_OK) {
+                        String qrcodeStr = result.getData().getStringExtra("qrcode");
+                        qrcodeStr = qrcodeStr != null ? qrcodeStr.trim().toLowerCase() : "";
+                        if (qrcodeStr != null && qrcodeStr.length() > 0 && qrcodeStr.startsWith("http")) {
+                            loadUrl(qrcodeStr);
+                        } else {
+                            Toast.makeText(getApplicationContext(),"请扫描正确的二维码", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            }
+    );
+
+    // 二维码扫描
+    public void launchQrcodeActivity() {
+        if (CommonUtil.isGrantedAndRequestPermission(this, 102)) {
+            launcherActivity.launch(new Intent(this, CaptureActivity.class));
+        } else {
+            Toast.makeText(getApplicationContext(), getString(R.string.app_permission_av_none1), Toast.LENGTH_SHORT).show();
+        }
     }
 }

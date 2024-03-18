@@ -45,18 +45,27 @@
                 android:layout_weight="1"
                 android:textSize="13sp"
                 android:lines="2"
-                android:hint="请输入需要访问的地址"
+                android:hint="请扫描或输入Url地址"
                 android:text="" />
             <Button
                 android:layout_width="15dp"
                 android:layout_height="20dp"
+                android:visibility="gone"
                 android:onClick="clear"
                 android:background="@android:drawable/ic_input_delete"/>
+
+            <ImageView
+                android:id="@+id/iv_qrcode"
+                android:layout_width="@dimen/dimen_30dp"
+                android:layout_height="@dimen/dimen_30dp"
+                android:layout_marginTop="@dimen/dimen_13dp"
+                android:src="@mipmap/icon_qrcode"/>
             <Button
-                android:layout_width="66dp"
-                android:layout_height="wrap_content"
+                android:layout_width="@dimen/dimen_50dp"
+                android:layout_height="@dimen/dimen_40dp"
                 android:onClick="load"
-                android:text="GO" />
+                android:textSize="@dimen/dimen_10sp"
+                android:text="加载" />
         </LinearLayout>
 
         <WebView
