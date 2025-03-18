@@ -51,5 +51,10 @@ public class MiniBaseCallBack {
         public void onChatServerClosed() {
 
         }
+
+        @Override
+        public void onChatServerKickOff() {
+
+        }
     }
 } 
