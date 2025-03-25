@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-  <item android:drawable="@drawable/svg_beauty_skin_buffing_checked" android:state_selected="true" />
-  <item android:drawable="@drawable/svg_beauty_skin_buffing_normal" />
+  <item android:drawable="@drawable/line_exfoliating_select" android:state_selected="true" />
+  <item android:drawable="@drawable/line_exfoliating_disable" />
 </selector>

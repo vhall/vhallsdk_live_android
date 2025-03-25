@@ -8,7 +8,7 @@ android {
         applicationId "com.vhall.live"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 62015
+        versionCode 6211
         versionName "$app_version"
     }
     buildTypes {
