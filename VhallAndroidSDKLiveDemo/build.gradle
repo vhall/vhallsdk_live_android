@@ -23,7 +23,8 @@ allprojects {
     repositories {
         mavenCentral()
         google()
-        maven { url 'https://s01.oss.sonatype.org/content/repositories/releases/' }
+        maven{url 'https://repository.liferay.com/nexus/content/repositories/public/'}
+        maven {url 'https://repo1.maven.org/maven2/'}
         maven{ url 'https://maven.aliyun.com/nexus/content/groups/public/'}
         maven { url "https://jitpack.io" }
         maven {url 'http://4thline.org/m2'}

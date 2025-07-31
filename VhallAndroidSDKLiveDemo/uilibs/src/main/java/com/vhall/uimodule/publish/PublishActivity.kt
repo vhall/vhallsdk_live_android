@@ -88,11 +88,15 @@ class PublishActivity :
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN or WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 
         webinarInfo = intent.getSerializableExtra(INFO_KEY) as WebinarInfo
+        var isV2 = intent.getBooleanExtra(V2_KEY,false);
 
-        requestedOrientation =  ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
+        if(webinarInfo.webinar_show_type == 1){
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        }else{
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
         chatFragment = ChatFragment.newInstance(webinarInfo, "chat")
-        publishFragment = PublishFragment.newInstance(webinarInfo)
+        publishFragment = PublishFragment.newInstance(webinarInfo,isV2)
         publishFragment?.chatCallBack = chatCallBack
         publishFragment?.messageCallBack = messageCallback
         ActivityUtils.addFragmentToActivity(

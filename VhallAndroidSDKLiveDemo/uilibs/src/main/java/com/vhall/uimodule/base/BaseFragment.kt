@@ -16,7 +16,7 @@ open class BaseFragment<VB : ViewBinding>(val inflateFunc: (LayoutInflater) -> V
         get() = _viewBinding
     protected lateinit var mContext: Context
     protected lateinit var webinarInfo: WebinarInfo
-
+    protected var isV2 = false;
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mContext = context

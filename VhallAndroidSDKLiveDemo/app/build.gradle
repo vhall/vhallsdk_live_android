@@ -5,7 +5,7 @@ plugins {
 android {
     compileSdkVersion 30
     defaultConfig {
-        applicationId "com.vhall.live"
+        applicationId "com.vhall.vhlive"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 6211

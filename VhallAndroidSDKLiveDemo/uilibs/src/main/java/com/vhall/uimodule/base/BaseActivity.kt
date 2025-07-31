@@ -19,6 +19,7 @@ open class BaseActivity<VB : ViewBinding>(val inflateFunc: (LayoutInflater) -> V
     protected val mViewBinding by lazy { inflateFunc(layoutInflater) }
     protected lateinit var mContext: Context
     protected lateinit var webinarInfo: WebinarInfo
+    protected var isV2 = false;
     private var mLoadingView: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

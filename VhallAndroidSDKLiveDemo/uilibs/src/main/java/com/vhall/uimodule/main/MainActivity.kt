@@ -67,6 +67,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 if (mViewBinding.edWatchId.text.toString().isNotEmpty()) {
                     if (CommonUtil.isGrantedAndRequestPermission(this@MainActivity, 101)){
                         showLoading(null, "正在加载活动信息")
+                        isV2 = false;
                         doInitPublish()
                     }else{
                         showToast(getString(R.string.app_permission_av_none1))
@@ -77,6 +78,23 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 }
             }
         })
+        mViewBinding.tvPushlishV2.setOnClickListener(object : OnNoDoubleClickListener() {
+            override fun onNoDoubleClick(v: View?) {
+                if (mViewBinding.edWatchId.text.toString().isNotEmpty()) {
+                    if (CommonUtil.isGrantedAndRequestPermission(this@MainActivity, 101)){
+                        showLoading(null, "正在加载活动信息")
+                        isV2 = true;
+                        doInitPublish()
+                    }else{
+                        showToast(getString(R.string.app_permission_av_none1))
+                    }
+                }
+                else {
+                    showToast("请填写活动id")
+                }
+            }
+        })
+
         mViewBinding.ivQrcode.setOnClickListener(object : OnNoDoubleClickListener() {
             override fun onNoDoubleClick(v: View?) {
                 launchQrcodeActivity()
@@ -228,6 +246,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                         return
                     }
                     intent.putExtra("webinarInfo", webinarInfo)
+                    intent.putExtra("isV2", isV2)
                     startActivity(intent)
                 }
 

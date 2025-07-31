@@ -154,6 +154,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_join" />
+
+    <TextView
+        android:id="@+id/tv_pushlish_v2"
+        android:layout_width="@dimen/dimen_150dp"
+        android:layout_height="@dimen/dimen_30dp"
+        android:layout_marginTop="@dimen/dimen_5dp"
+        android:background="@drawable/shape_bg_rounded_f1"
+        android:gravity="center"
+        android:text="发起直播V2"
+        android:textColor="@color/white"
+        android:textSize="@dimen/dimen_15dp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_pushlish" />
+
     <TextView
         android:id="@+id/tv_join_h5"
         android:layout_width="@dimen/dimen_150dp"
@@ -162,11 +178,11 @@
         android:background="@drawable/shape_bg_rounded_f1"
         android:gravity="center"
         android:text="H5观看活动"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="20dp"
         android:textColor="@color/white"
         android:textSize="@dimen/dimen_15dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_pushlish" />
+        app:layout_constraintTop_toBottomOf="@id/tv_pushlish_v2" />
 </androidx.constraintlayout.widget.ConstraintLayout>

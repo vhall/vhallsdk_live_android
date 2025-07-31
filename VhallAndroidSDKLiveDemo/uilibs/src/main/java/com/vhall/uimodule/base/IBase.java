@@ -12,6 +12,7 @@ import com.vhall.uimodule.utils.ToastUtils;
  */
 public interface IBase {
     String INFO_KEY = "webinarInfo";
+    String V2_KEY = "isV2";
     String HALF_WATCH_SCREEN_KEY = "half_watch_screen";
     String FULL_WATCH_SCREEN_KEY = "full_watch_screen";
     String HALF_DOC_SCREEN_KEY = "half_doc_screen";

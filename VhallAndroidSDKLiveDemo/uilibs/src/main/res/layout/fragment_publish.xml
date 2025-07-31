@@ -96,6 +96,13 @@
             android:background="@drawable/rtc_live_beauty_open" />
 
         <Button
+            android:id="@+id/btn_camera_enable"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="5dp"
+            android:background="@mipmap/icon_camera_open" />
+
+        <Button
             android:id="@+id/btn_changeCamera"
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -135,7 +142,7 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="@dimen/dimen_310dp"
+        android:layout_marginBottom="@dimen/dimen_210dp"
         android:orientation="horizontal">
 
         <TextView
@@ -164,5 +171,19 @@
             android:text="@string/start_broadcast"
             android:textColor="@color/white"
             android:textSize="@dimen/dimen_17dp" />
+
+        <TextView
+            android:id="@+id/re_push_stream"
+            android:layout_width="@dimen/dimen_140dp"
+            android:layout_height="@dimen/dimen_45dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="@dimen/dimen_30dp"
+            android:background="@drawable/shape_star_btn"
+            android:gravity="center"
+            android:text="@string/start_re_push"
+            android:textColor="@color/white"
+            android:textSize="@dimen/dimen_17dp" />
+
     </LinearLayout>
 </RelativeLayout>

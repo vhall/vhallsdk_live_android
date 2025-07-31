@@ -10,6 +10,7 @@ import android.widget.Toast
 import com.vhall.beautify.VHBeautifyKit
 import com.vhall.business.Broadcast
 import com.vhall.business.ChatServer
+import com.vhall.business.ErrorCode
 import com.vhall.business.MessageServer
 import com.vhall.business.VhallSDK
 import com.vhall.business.data.RequestCallback
@@ -29,10 +30,11 @@ import com.vhall.uimodule.widget.OutDialogBuilder
 class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBinding::inflate) {
     companion object {
         @JvmStatic
-        fun newInstance(info: WebinarInfo) =
+        fun newInstance(info: WebinarInfo,isV2:Boolean) =
             PublishFragment().apply {
                 arguments = Bundle().apply {
                     putSerializable(IBase.INFO_KEY, info)
+                    putBoolean(IBase.V2_KEY, isV2)
                 }
             }
     }
@@ -52,16 +54,23 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
     private var isMirror = false
     private var isPreMirror = false
     private var mode = VHLivePushFormat.DRAW_MODE_ASPECTFILL
+    private var frontCamera = true;
+    private var isStart = false;
+    private var isCameraOpen = true;
 
     override fun initView() {
         parentActivity = activity as PublishActivity
         arguments?.let {
             webinarInfo = it.getSerializable(IBase.INFO_KEY) as WebinarInfo
+            isV2 = it.getBoolean(IBase.V2_KEY, false)
             initPublish()
         }
 
         //开始直播
         mViewBinding.tvStart.setOnClickListener { startLive() }
+        //V2版本重新推流使用
+        mViewBinding.rePushStream.setOnClickListener { rePushStream() }
+        mViewBinding.rePushStream.visibility = View.GONE;
         //结束直播/返回按钮
         mViewBinding.btnBack.setOnClickListener {
             if(isPublishing) {
@@ -70,8 +79,9 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
                 parentActivity?.finish()
             }
         }
-        //画面填充模式
-        mViewBinding.cameraview.setCameraDrawMode(mode)
+        //使用V2 版本后，需要使用BroadCast进行画面填充模式设置
+        //mViewBinding.cameraview.setCameraDrawMode(mode)
+        getBroadcast()!!.setCameraDrawMode(mode);
         mViewBinding.tvMode.setOnClickListener { changeMode() }
         //闪光灯
         mViewBinding.btnChangeFlash.setOnClickListener {
@@ -81,31 +91,48 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
         }
         //切换相机
         mViewBinding.btnChangeCamera.setOnClickListener {
-            val cameraId = getBroadcast()!!.changeCamera()
-            val cameraInfo = Camera.CameraInfo()
-            Camera.getCameraInfo(cameraId, cameraInfo)
-            val hide:Boolean= (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK)
-            mViewBinding.btnChangeFlash.setVisibility(if (hide) View.VISIBLE else View.GONE)
-            mViewBinding.btnPremirror.setVisibility(if (hide) View.GONE else View.VISIBLE)
-            if(hide)
-                mViewBinding.btnChangeFlash.setBackgroundResource(R.drawable.img_round_flash_close)
+            if(isV2){
+                frontCamera = !frontCamera;
+                getBroadcast()!!.changeCameraV2(frontCamera);
+                mViewBinding.btnChangeFlash.setVisibility(if (frontCamera) View.GONE  else View.VISIBLE);
+            }else{
+                val cameraId = getBroadcast()!!.changeCamera()
+                val cameraInfo = Camera.CameraInfo()
+                Camera.getCameraInfo(cameraId, cameraInfo)
+                val hide:Boolean= (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK)
+                mViewBinding.btnChangeFlash.setVisibility(if (hide) View.VISIBLE else View.GONE)
+                mViewBinding.btnPremirror.setVisibility(if (hide) View.GONE else View.VISIBLE)
+                if(hide)
+                    mViewBinding.btnChangeFlash.setBackgroundResource(R.drawable.img_round_flash_close)
+            }
         }
         //声音采集开关
         mViewBinding.btnChangeAudio.setOnClickListener {
             val isMute = getBroadcast()!!.isMute
-            getBroadcast()!!.isMute = !isMute
-            mViewBinding.btnChangeAudio.setBackgroundResource(if (isMute) R.drawable.img_round_audio_close else R.drawable.img_round_audio_open)
+            getBroadcast()!!.setMute(!isMute);
+            mViewBinding.btnChangeAudio.setBackgroundResource(if (!isMute) R.drawable.img_round_audio_close else R.drawable.img_round_audio_open);
+        }
+
+        //摄像头开关
+        mViewBinding.btnCameraEnable.setOnClickListener {
+            isCameraOpen = !isCameraOpen;
+            getBroadcast()!!.setVideoCapture(isCameraOpen);
+            mViewBinding.btnCameraEnable.setBackgroundResource(if (isCameraOpen) R.mipmap.icon_camera_open else R.mipmap.icon_camera_close)
         }
 
         mViewBinding.btnMirror.setOnClickListener {
             isMirror = !isMirror
-            mViewBinding.cameraview.setMirror(isMirror)
+            //V1/V2 版本使用使用broadCast对象进行镜像设置。
+            //mViewBinding.cameraview.setMirror(isMirror)
+            getBroadcast()!!.setMirror(isMirror);
             mViewBinding.btnMirror.setBackgroundResource(if (isMirror) R.drawable.icon_mirror_normal else R.drawable.icon_mirror_selected )
         }
 
         mViewBinding.btnPremirror.setOnClickListener {
             isPreMirror = !isPreMirror
-            mViewBinding.cameraview.setFrontPreViewMirror(isPreMirror)
+            //使用broadCast对象进行镜像设置。V2 版本使用 getBroadcast()!!.setMirror(isMirror); 设置镜像
+           // mViewBinding.cameraview.setFrontPreViewMirror(isPreMirror);
+            getBroadcast()!!.setFrontPreViewMirror(isPreMirror);
         }
 
         mViewBinding.btnChangeFilter.setOnClickListener {
@@ -131,10 +158,28 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
         // Broadcast.Builder() 设置推流参数
         getBroadcast()!!.setWebinarInfo(webinarInfo)
     }
+
+    private fun rePushStream(){
+        // 未结束直播，仅重新推流使用此方法
+        getBroadcast()!!.pushStream(object :RequestCallback{
+            override fun onSuccess() {
+                isStart = true;
+                startLiveSuccess(true);
+            }
+            override fun onError(errorCode: Int, errorMsg: String?) {
+                parentActivity!!.finishLoading()
+                startLiveSuccess(false)
+                showMsg(errorMsg)
+            }
+        });
+        mViewBinding.rePushStream.visibility = View.GONE;
+    }
+
     fun startLive() {
         parentActivity!!.showLoading(null,"努力推流中...")
-        broadcast?.start(object :RequestCallback{
+        getBroadcast()?.start(object :RequestCallback{
             override fun onSuccess() {
+                isStart = true;
 //                    startBroadcastSuccess(true)
             }
 
@@ -163,7 +208,11 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
                     showMsg(reason)
                 }
             })
-        broadcast?.stop()
+        //V2版本stop默认会关闭摄像头。
+        getBroadcast()?.stop();
+        //V2版本可以重新开启摄像头或者根据业务状态显示遮罩图。
+        getBroadcast()?.setVideoCapture(isCameraOpen);
+        isStart = false;
     }
     override fun onPause() {
         super.onPause()
@@ -175,25 +224,41 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
     override fun onResume() {
         super.onResume()
         //自动恢复推流？
+        if(isStart){
+            //V2版本触发重新设置摄像头。
+            getBroadcast()!!.setVideoCapture(isCameraOpen);
+            //未结束直播，仅重新推流使用此方法
+            getBroadcast()!!.pushStream(object :RequestCallback{
+                override fun onSuccess() {
+                    isStart = true;
+                    startLiveSuccess(true);
+                }
+                override fun onError(errorCode: Int, errorMsg: String?) {
+                    parentActivity!!.finishLoading()
+                    startLiveSuccess(false)
+                    showMsg(errorMsg)
+                }
+            });
+        }
     }
     override fun onDestroy() {
-        mViewBinding.cameraview.releaseCapture()
-        getBroadcast()?.destroy()
+        //mViewBinding.cameraview.releaseCapture()
+        getBroadcast()?.destroy() // broadcast内部释放时会调用cameraview.releaseCapture()方法，外层不需要进行释放
         super.onDestroy()
     }
 
     //调整摄像头预览画面填充模式
     fun changeMode(){
         if (mode == VHLivePushFormat.DRAW_MODE_ASPECTFILL) {
-            getBroadcast()!!.changeMode(VHLivePushFormat.DRAW_MODE_ASPECTFIT)
+            getBroadcast()!!.setCameraDrawMode(VHLivePushFormat.DRAW_MODE_ASPECTFIT)
             mode = VHLivePushFormat.DRAW_MODE_ASPECTFIT
             mViewBinding.tvMode.setText("FIT")
         } else if (mode == VHLivePushFormat.DRAW_MODE_ASPECTFIT) {
-            getBroadcast()!!.changeMode(VHLivePushFormat.DRAW_MODE_NONE)
+            getBroadcast()!!.setCameraDrawMode(VHLivePushFormat.DRAW_MODE_NONE)
             mode = VHLivePushFormat.DRAW_MODE_NONE
             mViewBinding.tvMode.setText("NONE")
         } else if (mode == VHLivePushFormat.DRAW_MODE_NONE) {
-            getBroadcast()!!.changeMode(VHLivePushFormat.DRAW_MODE_ASPECTFILL)
+            getBroadcast()!!.setCameraDrawMode(VHLivePushFormat.DRAW_MODE_ASPECTFILL)
             mode = VHLivePushFormat.DRAW_MODE_ASPECTFILL
             mViewBinding.tvMode.setText("FILL")
         }
@@ -225,7 +290,11 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
         if (broadcast == null) {
             val config = VHLivePushConfig(VHLivePushFormat.PUSH_MODE_XHD)
             //不设置 美颜瘦脸没有效果
-            config.screenOri = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT //横竖屏设置 重要
+            if (webinarInfo.webinar_show_type == 0) {
+              config.screenOri = VHLivePushFormat.SCREEN_ORI_PORTRAIT
+            } else {
+              config.screenOri = VHLivePushFormat.SCREEN_ORI_LANDSPACE
+            }
             //可不设置
 //            config.videoFrameRate = 25 //帧率
 //            config.videoBitrate = 500 //码率
@@ -238,11 +307,15 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
                 config.streamType = VHLivePushFormat.STREAM_TYPE_AV
             }
             val builder = Broadcast.Builder()
-                .cameraView(mViewBinding.cameraview)
+                .cameraView(mViewBinding.cameraview)//使用V2版本不可以通过cameraview控制设备。需要使用broadcast控制镜像、填充模式、切换设备、闪光灯等操作；
                 .config(config)
                 .callback(BroadcastEventCallback())
                 .messageCallback(messageCallBack)
                 .chatCallback(chatCallBack)
+                .setContext(mContext)//使用V2版本必传参数
+                .isBuildV2(isV2)//V2版本提供更可靠的推流稳定性，V2版本开通需联系技术支持人员进行咨询。
+                .setLicenseKey("")//使用V2版本集成到您的app中是，需要联系技术支持人员协助开通获取license信息。
+                .setLicenseUrl("")//使用V2版本集成到您的app中是，需要联系技术支持人员协助开通获取license信息。
             broadcast = builder.build()
         }
         return broadcast
@@ -284,6 +357,11 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
 
         override fun onError(errorCode: Int, innerErrorCode: Int, msg: String?) {
 //            TODO("Not yet implemented")
+            if(isV2 && errorCode == ErrorCode.ERROR_V2_DISCONNECTED){
+                //停止推流或收到ErrorCode.ERROR_V2_DISCONNECTED 事件会默认关闭摄像头。应用层需重新开启摄像头
+                getBroadcast()!!.setVideoCapture(isCameraOpen);
+                mViewBinding.rePushStream.visibility = View.VISIBLE;
+            }
             showMsg(msg)
         }
     }
