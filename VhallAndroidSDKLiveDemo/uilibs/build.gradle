@@ -63,8 +63,8 @@ dependencies {
     //扫描二维码 用于快速输入appkey等信息
     api 'com.github.vhall.android.library:vh-zxing-client:3.5.1.1'
     //可根据微吼直播官网文档版本升级
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.22.0'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.22.0'
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.25.0'
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.25.0'
 
     //美颜相关
     api 'com.github.vhall.android.base:vhall-beautify-faceunity:1.1.11'

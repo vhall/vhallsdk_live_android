@@ -137,16 +137,7 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
 
         mViewBinding.btnChangeFilter.setOnClickListener {
             VHBeautifyKit.getInstance().setBeautifyEnable(true)
-            //  showPopupWindow();  //之前的美颜只能选等级
-            if (VHBeautifyKit.getInstance().setBeautifyEnable(true)) {
-                    iFaceBeautySwitch!!.changeVisibility()
-            } else {
-                if (beautyDialog == null) {
-                    beautyDialog = OutDialogBuilder().layout(R.layout.dialog_beauty_no_serve)
-                        .build(activity)
-                }
-                beautyDialog!!.show()
-            }
+            iFaceBeautySwitch!!.changeVisibility()
         }
     }
 
