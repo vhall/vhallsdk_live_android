@@ -19,10 +19,13 @@ import com.vhall.uimodule.base.IBase
 import com.vhall.uimodule.databinding.FragmentGoodsBinding
 import com.vhall.uimodule.watch.WatchLiveActivity
 import com.vhall.uimodule.watch.coupon.CouponListDialog
-import com.vhall.uimodule.watch.gift.GiftListDialog
 import com.vhall.vhss.data.GoodsInfoData
 import com.vhall.vhss.data.GoodsInfoData.GoodsInfo
 import com.vhall.vhss.data.OrderInfoData
+import java.util.UUID
+
+
+
 
 class GoodsFragment : BaseFragment<FragmentGoodsBinding>(FragmentGoodsBinding::inflate) {
     companion object {
@@ -74,7 +77,7 @@ class GoodsFragment : BaseFragment<FragmentGoodsBinding>(FragmentGoodsBinding::i
                 override fun pushGoodsCard(msgInfo: MsgInfo,push_status : Int) {
                     showGoodsCard(msgInfo.goodsInfo);
                     if(push_status == 1)
-                        loadData()
+                        loadData(true)
                 }
 
                 override fun addGoodsInfo( goodsInfo: GoodsInfoData.GoodsInfo,goods_list_cdn_url:String) {
@@ -128,6 +131,29 @@ class GoodsFragment : BaseFragment<FragmentGoodsBinding>(FragmentGoodsBinding::i
                 override fun orderStatusChange(orderInfo: OrderInfoData){
 
                 }
+
+                //商品售罄
+                override fun goodsSaleOut(goodsInfo: GoodsInfo, goods_list_cdn_url: String) {
+                    //隐藏商品，或者遮罩
+                    showGoodsCard(goodsInfo);
+                }
+
+                //商品在售卖中
+                override fun goodsSaleIng(goodsInfo: GoodsInfo, goods_list_cdn_url: String) {
+                    //更新在售状态
+                    showGoodsCard(goodsInfo);
+                }
+
+                //商品价格隐藏
+                override fun goodsPriceCovered(goodsInfo: GoodsInfo, goods_list_cdn_url: String) {
+                    showGoodsCard(goodsInfo);
+                }
+
+                //显示商品价格
+                override fun goodsPriceShow(goodsInfo: GoodsInfo, goods_list_cdn_url: String) {
+                    showGoodsCard(goodsInfo);
+                }
+
             })
             .build()
 
@@ -176,8 +202,20 @@ class GoodsFragment : BaseFragment<FragmentGoodsBinding>(FragmentGoodsBinding::i
             goodsDetailsDialog = GoodsDetailsDialog(mContext, webinarInfo, goodsInfo, View.OnClickListener {
                 when (goodsInfo.buy_type) {
                     1 -> {
-                        showGoodsOrderDialog(goodsDetailsDialog!!.goodsInfo)
-                        goodsDetailsDialog?.dismiss()
+                        //平台购买
+                        if(goodsInfo.goods_detail_url.isEmpty()){
+                            showGoodsOrderDialog(goodsDetailsDialog!!.goodsInfo)
+                            goodsDetailsDialog?.dismiss()
+                        }else{
+                            //如果有跳转购买地址，也可以使用嵌入地址打开下单页面进行下单。解决使用原生方式下单
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            //  携带自生成的 ext_order_no 作为参数方便回跳作为查询参数,查询订单信息
+                            val ext_order_no = UUID.randomUUID().toString()
+                            val url = goodsInfo.goods_detail_url + "&ext_order_no=" + ext_order_no
+                            intent.data = Uri.parse(url)
+                            startActivity(intent)
+                            goodsDetailsDialog?.dismiss()
+                        }
                     }
                     2 -> {
                         //外链购买

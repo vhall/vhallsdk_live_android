@@ -57,7 +57,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
         val text = mViewBinding.edAccount.text.toString()
         val text1 = mViewBinding.edPassword.text.toString()
         if (!TextUtils.isEmpty(text) && !TextUtils.isEmpty(text1)) {
-            VhallSDK.login(text, text1, LoginCallbackInternal())
+            VhallSDK.loginByAccount(text, text1, LoginCallbackInternal())
         }
     }
 

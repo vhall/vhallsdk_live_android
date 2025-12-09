@@ -94,6 +94,18 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
                     public void updateGoodsInfo(GoodsInfoData.GoodsInfo goodsInfo, String goods_list_cdn_url) {}
                     @Override
                     public void updateGoodsList(String goods_list_cdn_url) {}
+                    //商品售罄
+                    @Override
+                    public void goodsSaleOut(GoodsInfoData.GoodsInfo goodsInfo,String goods_list_cdn_url){}
+                    //商品在售中
+                    @Override
+                    public void goodsSaleIng(GoodsInfoData.GoodsInfo goodsInfo,String goods_list_cdn_url){}
+                    //商品价格隐藏
+                    @Override
+                    public void goodsPriceCovered(GoodsInfoData.GoodsInfo goodsInfo,String goods_list_cdn_url){}
+                    //显示商品价格
+                    @Override
+                    public void goodsPriceShow(GoodsInfoData.GoodsInfo goodsInfo,String goods_list_cdn_url){}
                 })
             .build();
     }
@@ -170,6 +182,7 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
                     getActivity().showLoading(null, "创建订单中");
                     goodsServer.createOrder(goodsInfo.goods_id,
                             mAmount,
+                            goodsInfo.buy_type,
                             pay_Amount,
                             mPayType,
                             et_name.getText().toString(),

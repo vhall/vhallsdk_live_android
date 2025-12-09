@@ -12,7 +12,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import androidx.appcompat.app.AlertDialog;
+import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
@@ -27,6 +28,8 @@ import com.vhall.uimodule.utils.DensityUtils;
 import com.vhall.uimodule.utils.ToastUtils;
 import com.vhall.uimodule.watch.card.CardDialog;
 import com.vhall.vhss.data.GoodsInfoData;
+
+import java.util.UUID;
 
 /**
  * @author hkl
@@ -68,9 +71,40 @@ public class GoodsAdapter extends BaseQuickAdapter<GoodsInfoData.GoodsInfo, Base
                     case 3:
                         Toast.makeText(getContext(), "三方商品id: "+goodsInfo.third_goods_id, Toast.LENGTH_SHORT).show();
                         break;
-                    case 1:
-                    default://平台购买
-                        goodsFragment.showGoodsOrderDialog(goodsInfo);
+                    case 1:{
+                        // 显示选择支付方式的 Dialog
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setTitle("选择支付方式");
+                        String[] options = {"平台购买：URL支付", "平台购买：本地支付"};
+                        builder.setItems(options, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0: // URL 支付  如果有跳转购买地址，也可以使用嵌入地址打开下单页面进行下单。解决使用原生方式下单
+                                        if (!TextUtils.isEmpty(goodsInfo.goods_detail_url)) {
+                                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                                            //携带自生成的 ext_order_no 作为参数方便回跳作为查询参数,查询订单信息
+                                            String ext_order_no = UUID.randomUUID().toString();
+                                            String url = goodsInfo.goods_detail_url + "&ext_order_no=" + ext_order_no;
+                                            intent.setData(Uri.parse(url));
+                                            getContext().startActivity(intent);
+                                        } else {
+                                            Toast.makeText(getContext(), "商品详情地址为空", Toast.LENGTH_SHORT).show();
+                                        }
+                                        break;
+                                    case 1: // 本地支付
+                                        goodsFragment.showGoodsOrderDialog(goodsInfo);
+                                        break;
+                                }
+                            }
+                        });
+
+                        builder.setNegativeButton("取消", null);
+                        builder.show();
+
+                    }
+                        break;
+                    default:
                         break;
                 }
             }
@@ -98,7 +132,13 @@ public class GoodsAdapter extends BaseQuickAdapter<GoodsInfoData.GoodsInfo, Base
             builder.append(text);
             builder.setSpan(sizeSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             RelativeSizeSpan sizeSpan2 = new RelativeSizeSpan(1.0f);
-            builder.setSpan(sizeSpan2,  1, text.length()-2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if(text.length() > 2){
+                builder.setSpan(sizeSpan2,  1, text.length()-2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            else{
+                builder.setSpan(sizeSpan2,  1, text.length()-1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+
             RelativeSizeSpan sizeSpan3 = new RelativeSizeSpan(0.7f);
             builder.setSpan(sizeSpan3, text.length()-2, text.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             price.setText(builder);
@@ -112,7 +152,12 @@ public class GoodsAdapter extends BaseQuickAdapter<GoodsInfoData.GoodsInfo, Base
             builder1.append(text1);
             builder1.setSpan(sizeSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             RelativeSizeSpan sizeSpan2 = new RelativeSizeSpan(1.0f);
-            builder1.setSpan(sizeSpan2, 1, text1.length() - 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            if(text1.length() > 2){
+                builder1.setSpan(sizeSpan2, 1, text1.length() - 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            else{
+                builder1.setSpan(sizeSpan2, 1, text1.length() - 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
             RelativeSizeSpan sizeSpan3 = new RelativeSizeSpan(0.7f);
             builder1.setSpan(sizeSpan3, text1.length() - 2, text1.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             if (is_have_discount_price) {

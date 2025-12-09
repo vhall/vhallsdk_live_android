@@ -111,7 +111,16 @@ class GoodsCardPop @JvmOverloads constructor(private val mContext: Context, var 
             val sizeSpan3 = RelativeSizeSpan(0.8f)
             builder.setSpan(sizeSpan3, text.length - 2, text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
-        binding.tvPrice.setText(builder)
+        //覆盖状态,隐藏价格（0-不覆盖，1-覆盖原有价格/配置）
+        if(goodsInfo.covered_status == 1){
+            binding.tvPrice.setText(goodsInfo.covered_price)
+        }else{
+            binding.tvPrice.setText(builder)
+        }
+
+        if(goodsInfo.sale_status == 0){
+            binding.tvPrice.setText("售罄")
+        }
     }
 
     fun getCurCardGoodsInfo():GoodsInfo?{
