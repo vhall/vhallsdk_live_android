@@ -12,32 +12,32 @@ android {
         versionName "$app_version"
     }
 
-    signingConfigs {
-        release {
-            storeFile file("vhall_android_app.keystore")
-            storePassword '123456'
-            keyAlias 'yanting lin'
-            keyPassword '123456'
-        }
-        debug {
-            storeFile file("vhall_android_app.keystore")
-            storePassword '123456'
-            keyAlias 'yanting lin'
-            keyPassword '123456'
-        }
-    }
+//    signingConfigs {
+////        release {
+////            storeFile file("vhall_android_app.keystore")
+////            storePassword ''
+////            keyAlias ''
+////            keyPassword ''
+////        }
+////        debug {
+////            storeFile file("vhall_android_app.keystore")
+////            storePassword ''
+////            keyAlias ''
+////            keyPassword ''
+////        }
+//    }
 
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
 
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
     }
 
