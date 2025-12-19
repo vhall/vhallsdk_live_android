@@ -22,6 +22,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
+import com.vhall.business.data.RequestDataCallbackV2;
 import com.vhall.business.data.WebinarInfo;
 import com.vhall.uimodule.R;
 import com.vhall.uimodule.utils.DensityUtils;

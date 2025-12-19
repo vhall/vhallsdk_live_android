@@ -1,15 +1,20 @@
 package com.vhall.uimodule.watch.goods;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.RelativeSizeSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +25,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
+import com.alipay.sdk.app.PayTask;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
@@ -38,15 +44,29 @@ import com.vhall.uimodule.watch.coupon.CouponListDialog;
 import com.vhall.uimodule.watch.coupon.OnCouponSelectedListener;
 import com.vhall.uimodule.widget.AmountView;
 import com.vhall.uimodule.widget.OutDialogBuilder;
+
 import com.vhall.vhss.data.CouponInfoData;
 import com.vhall.vhss.data.GoodsInfoData;
 import com.vhall.vhss.data.GoodsOrderSetting;
 import com.vhall.vhss.data.OrderInfoData;
+import com.vhall.vhss.data.WXPayParamData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import com.tencent.mm.opensdk.constants.Build;
+import com.tencent.mm.opensdk.modelbiz.SubscribeMessage;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.modelpay.PayReq;
+
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+
+import com.alipay.sdk.app.AuthTask;
+import com.alipay.sdk.app.PayTask;
+
+import org.json.JSONObject;
 
 public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickListener {
     public GoodsInfoData.GoodsInfo goodsInfo;
@@ -55,6 +75,7 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
     private AmountView mAmountView;
     private TextView tvCoupon;
     private int mAmount = 1;
+//    private IWXAPI api;
     private String mPayType;//0 wx  1 ali
     private GoodsServer goodsServer;
     private CouponInfoData.CouponItem selectedCoupon;
@@ -108,6 +129,20 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
                     public void goodsPriceShow(GoodsInfoData.GoodsInfo goodsInfo,String goods_list_cdn_url){}
                 })
             .build();
+
+
+        //用于同步购买商品
+        goodsServer.setGoodsBuyNotice(goodsInfo.goods_id, "buy", goodsInfo.business_uid.toString(), new RequestDataCallbackV2<String>() {
+            @Override
+            public void onSuccess(String data) {
+
+            }
+
+            @Override
+            public void onError(int errorCode, String errorMsg) {
+
+            }
+        });
     }
 
     @Override
@@ -157,6 +192,20 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
         }, 500); // 延时3s 执行TimeTask的run方法
     }
 
+    @SuppressLint("HandlerLeak")
+    private Handler mHandler = new Handler() {
+        @SuppressWarnings("unused")
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1: {
+                    break;
+                }
+                default:
+                    break;
+            }
+        };
+    };
+
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.tv_cancel) {
@@ -180,7 +229,11 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
                         coupon_user_ids.add(selectedCoupon.coupon_user_id);
                     }
                     getActivity().showLoading(null, "创建订单中");
-                    goodsServer.createOrder(goodsInfo.goods_id,
+
+
+
+                    //此方法获取原生支付参数。本地集成微信和支付宝SDK进行支付
+                    goodsServer.goodsCreateOrderByNative(goodsInfo.goods_id,
                             mAmount,
                             goodsInfo.buy_type,
                             pay_Amount,
@@ -188,25 +241,68 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
                             et_name.getText().toString(),
                             et_phone.getText().toString(),
                             et_mark.getText().toString(),
-                            "ios",
+                            "andorid",
                             coupon_user_ids,
                             new RequestDataCallbackV2<OrderInfoData>() {
-//                        goodsServer.createOrder(params, new RequestDataCallbackV2<OrderInfoData>() {
                                 @Override
                                 public void onSuccess(OrderInfoData data) {
                                     getActivity().finishLoading();
-                                    //唤起支付页面
-                                    goodsServer.payOrder(getContext(),data, new RequestDataCallbackV2<String>() {
-                                        @Override
-                                        public void onSuccess(String data) {
+                                    try {
+                                        if(mPayType == "WEIXIN"){ // 微信支付
+                                            JSONObject jsonObject = new JSONObject(data.order_url);
+                                            WXPayParamData payParam = new WXPayParamData( jsonObject );
+                                            IWXAPI api = WXAPIFactory.createWXAPI(getContext(), payParam.appId, true);
+                                            // 检查是否注册成功
+                                            if (!api.registerApp(payParam.appId)) {
+                                                // 注册失败
+                                                Toast.makeText(getContext(), "发送支付请求失败", Toast.LENGTH_SHORT).show();
+                                            }
+                                            PayReq request = new PayReq();
+                                            request.appId = payParam.appId;
+                                            request.partnerId = payParam.partnerId;
+                                            request.prepayId= payParam.prepayId;
+                                            request.packageValue = payParam.packAge;
+                                            request.nonceStr=payParam.nonceStr;
+                                            request.timeStamp= payParam.timeStamp;
+                                            request.sign= payParam.paySign;
 
-                                        }
+                                            // 在调用 sendReq 前检查
+                                            if (!api.isWXAppInstalled()) {
+                                                // 微信未安装
+                                                Toast.makeText(getContext(), "发送支付请求失败", Toast.LENGTH_SHORT).show();
+                                            }
 
-                                        @Override
-                                        public void onError(int errorCode, String errorMsg) {
-                                            Toast.makeText(getContext(), "未安装应用", Toast.LENGTH_SHORT).show();
+                                            boolean ret = api.sendReq(request);
+                                            if(!ret){
+                                                Toast.makeText(getContext(), "发送支付请求失败", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }else if(mPayType == "ALIPAY"){
+                                            final String orderInfo = data.order_url;
+
+                                            final Runnable payRunnable = new Runnable() {
+
+                                                @Override
+                                                public void run() {
+                                                    Activity activity= getActivity();
+                                                    PayTask alipay = new PayTask(activity);
+                                                    Map<String, String> result = alipay.payV2(orderInfo, true);
+                                                    Log.i("msp", result.toString());
+
+                                                    Message msg = new Message();
+                                                    msg.what = 1;
+                                                    msg.obj = result;
+                                                    mHandler.sendMessage(msg);
+                                                }
+                                            };
+
+                                            // 必须异步调用
+                                            Thread payThread = new Thread(payRunnable);
+                                            payThread.start();
                                         }
-                                    });
+                                    }
+                                    catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
                                 }
                                 @Override
                                 public void onError(int errorCode, String errorMsg) {
@@ -214,6 +310,43 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
                                     Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
                                 }
                             });
+
+
+                    // 此方法是获取微吼H5支付连接，通过 URL Scheme 方式进行唤起微信进行支付
+//                    goodsServer.createOrder(goodsInfo.goods_id,
+//                            mAmount,
+//                            goodsInfo.buy_type,
+//                            pay_Amount,
+//                            mPayType,
+//                            et_name.getText().toString(),
+//                            et_phone.getText().toString(),
+//                            et_mark.getText().toString(),
+//                            "ios",
+//                            coupon_user_ids,
+//                            new RequestDataCallbackV2<OrderInfoData>() {
+//                                @Override
+//                                public void onSuccess(OrderInfoData data) {
+//                                    getActivity().finishLoading();
+//                                    //唤起支付页面
+//                                    goodsServer.payOrder(getContext(),data, new RequestDataCallbackV2<String>() {
+//                                        @Override
+//                                        public void onSuccess(String data) {
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onError(int errorCode, String errorMsg) {
+//                                            Toast.makeText(getContext(), "未安装应用", Toast.LENGTH_SHORT).show();
+//                                        }
+//                                    });
+//                                }
+//                                @Override
+//                                public void onError(int errorCode, String errorMsg) {
+//                                    getActivity().finishLoading();
+//                                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
+//                                }
+//                            });
+
                 }
                     break;
                 case 3: {//自定义支付

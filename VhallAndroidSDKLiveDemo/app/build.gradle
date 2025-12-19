@@ -23,6 +23,21 @@ android {
         }
     }
 
+    signingConfigs {
+        release {
+            storeFile file("vhall_android_app.keystore")
+            storePassword '123456'
+            keyAlias 'yanting lin'
+            keyPassword '123456'
+        }
+        debug {
+            storeFile file("vhall_android_app.keystore")
+            storePassword '123456'
+            keyAlias 'yanting lin'
+            keyPassword '123456'
+        }
+    }
+
     buildFeatures {
         viewBinding true
     }
@@ -48,6 +63,7 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':uilibs')
     implementation 'com.alibaba:fastjson:1.2.73'
+    api 'com.tencent.mm.opensdk:wechat-sdk-android:6.8.34'
 }
 repositories {
     mavenCentral()

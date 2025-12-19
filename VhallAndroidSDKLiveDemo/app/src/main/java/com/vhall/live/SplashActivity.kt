@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.vhall.business.VhallSDK
-import com.vhall.live.databinding.ActivitySplashBinding
+import com.vhall.vhlive.databinding.ActivitySplashBinding
 import com.vhall.uimodule.login.LoginActivity
 import com.vhall.uimodule.main.MainActivity
 import kotlinx.coroutines.delay

@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.vhall.live">
+    package="com.vhall.vhlive">
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
+
+    <queries>
+        <package android:name="com.tencent.mm" />
+    </queries>
 
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:name=".VhallApplication"
+        android:name="com.vhall.live.VhallApplication"
         tools:replace="android:allowBackup"
         android:theme="@style/Theme.SaasSdkDemo">
         <activity
-            android:name=".SplashActivity"
+            android:name="com.vhall.live.SplashActivity"
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
@@ -27,6 +31,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="com.vhlive.wxapi.WXPayEntryActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:exported="true"
+            android:taskAffinity="com.vhall.vhlive"
+            android:launchMode="singleTask">
+        </activity>
+
     </application>
 
 </manifest>
