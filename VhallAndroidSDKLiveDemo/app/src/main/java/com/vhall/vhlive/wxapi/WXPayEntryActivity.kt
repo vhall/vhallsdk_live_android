@@ -1,4 +1,4 @@
-package com.vhlive.wxapi
+package com.vhall.vhlive.wxapi
 
 import android.app.Activity
 import android.content.Intent
