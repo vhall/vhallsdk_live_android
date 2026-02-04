@@ -243,6 +243,8 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
                             et_mark.getText().toString(),
                             "andorid",
                             coupon_user_ids,
+                            "",
+                            "",
                             new RequestDataCallbackV2<OrderInfoData>() {
                                 @Override
                                 public void onSuccess(OrderInfoData data) {
