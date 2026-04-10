@@ -1,14 +1,12 @@
 package com.vhall.uimodule.publish
 
 import android.app.AlertDialog
-import android.content.pm.ActivityInfo
 import android.hardware.Camera
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.vhall.beautify.VHBeautifyKit
-import com.vhall.business.Broadcast
 import com.vhall.business.ChatServer
 import com.vhall.business.ErrorCode
 import com.vhall.business.MessageServer
@@ -24,7 +22,7 @@ import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase
 import com.vhall.uimodule.databinding.FragmentPublishBinding
 import com.vhall.uimodule.widget.OutDialog
-import com.vhall.uimodule.widget.OutDialogBuilder
+import com.vhall.business_pusher.Broadcast
 
 
 class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBinding::inflate) {
@@ -137,7 +135,7 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
 
         mViewBinding.btnChangeFilter.setOnClickListener {
             VHBeautifyKit.getInstance().setBeautifyEnable(true)
-            iFaceBeautySwitch!!.changeVisibility()
+            iFaceBeautySwitch!!.changeVisibility();
         }
     }
 
@@ -146,7 +144,7 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
      * https://saas-doc.vhall.com/opendocs/show/1227
      */
     private fun initPublish() {
-        // Broadcast.Builder() 设置推流参数
+        //设置推流参数
         getBroadcast()!!.setWebinarInfo(webinarInfo)
     }
 
@@ -171,7 +169,6 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
         getBroadcast()?.start(object :RequestCallback{
             override fun onSuccess() {
                 isStart = true;
-//                    startBroadcastSuccess(true)
             }
 
             override fun onError(errorCode: Int, errorMsg: String?) {
@@ -190,7 +187,6 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
         VhallSDK.finishBroadcast(
             broId,
             broToken,
-            getBroadcast(),
             false,
             object : RequestCallback {
                 override fun onSuccess() {
@@ -199,7 +195,7 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
                     showMsg(reason)
                 }
             })
-        //V2版本stop默认会关闭摄像头。
+        //停止推流。V2版本stop默认会关闭摄像头。
         getBroadcast()?.stop();
         //V2版本可以重新开启摄像头或者根据业务状态显示遮罩图。
         getBroadcast()?.setVideoCapture(isCameraOpen);
@@ -233,7 +229,6 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
         }
     }
     override fun onDestroy() {
-        //mViewBinding.cameraview.releaseCapture()
         getBroadcast()?.destroy() // broadcast内部释放时会调用cameraview.releaseCapture()方法，外层不需要进行释放
         super.onDestroy()
     }
@@ -306,7 +301,7 @@ class PublishFragment : BaseFragment<FragmentPublishBinding>(FragmentPublishBind
                 .setContext(mContext)//使用V2版本必传参数
                 .isBuildV2(isV2)//V2版本提供更可靠的推流稳定性，V2版本开通需联系技术支持人员进行咨询。
                 .setLicenseKey("")//使用V2版本集成到您的app中是，需要联系技术支持人员协助开通获取license信息。
-                .setLicenseUrl("")//使用V2版本集成到您的app中是，需要联系技术支持人员协助开通获取license信息。
+                .setLicenseUrl("")
             broadcast = builder.build()
         }
         return broadcast

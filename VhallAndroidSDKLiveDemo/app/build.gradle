@@ -32,6 +32,28 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 //            signingConfig signingConfigs.release
+            //使用美颜打包时移除多余资源文件减小打包体积
+            applicationVariants.all { variant ->
+                variant.mergeAssetsProvider.configure {
+                    doLast {
+                        delete(fileTree(dir: outputDir,
+                                includes: ['model/ai_bgseg_green.bundle',
+                                           'model/ai_face_processor_lite.bundle',
+                                           'model/ai_hairseg.bundle',
+                                           'model/ai_face_processor.bundle',
+                                           'model/ai_hand_processor.bundle',
+                                           'model/ai_human_processor_mb_fast.bundle',
+                                           'model/ai_human_processor.bundle',
+                                           'graphics/controller_cpp.bundle',
+                                           'graphics/fuzzytoonfilter.bundle',
+                                           'graphics/body_slim.bundle',
+                                           'graphics/face_makeup.bundle',
+                                           'graphics/tongue.bundle',
+                                           'graphics/fxaa.bundle']))
+                    }
+                }
+            }
+
         }
 
         debug {
@@ -40,17 +62,12 @@ android {
 //            signingConfig signingConfigs.release
         }
     }
-
-
-
     buildFeatures {
         viewBinding true
     }
-
     kotlinOptions {
         jvmTarget = '1.8'
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -58,12 +75,8 @@ android {
     lintOptions {
         abortOnError false
     }
-
-    packagingOptions{
-        exclude 'META-INF/beans.xml'
-    }
-
 }
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation project(':uilibs')

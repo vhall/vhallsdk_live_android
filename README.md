@@ -23,18 +23,18 @@ allprojects {
  在uilib里面添加 具体使用依赖
 
 ```
- //SaaSSDK
-    api 'com.github.vhall.android.library:vh-saas-sdk:6.19.3'
-    api 'com.github.vhall.android.library:vh-saas-interactive:6.19.3'
-    //投屏相关
-    api 'com.github.vhall.android.library:vh-saas-sdk-support:2.0.1'
-    
-    
-    //美颜相关 使用高级美颜添加 不用可以不写
-   api 'com.github.vhall.android.base:vhall-beautify-faceunity:1.1.7'
-
-    //美颜demoUI 建议自己按照自己需求实现 使用高级美颜添加 不用可以不写
-    api 'com.github.vhall.android.library:vhall-beautify-kit-support:1.1.2'
+    //*************** 微吼直播SDK 可根据微吼直播官网文档版本升级 ************************//
+    //微吼直播基础核心模块（必选），直播观看/回放观看依赖库
+    api 'com.github.vhall.android.library:vh-saas-sdk:6.30.0'
+    //互动连麦依赖库（可选）
+    api 'com.github.vhall.android.library:vh-saas-interactive:6.30.0'
+    //发起端直播推流依赖库（可选）
+    api 'com.github.vhall.android.library:vh-saas-pusher:6.30.0'
+    //如果需要美颜必须配置vhall-beautify-faceunity依赖（可选）
+    api 'com.github.vhall.android.base:vhall-beautify-faceunity:1.2.0'
+    //美颜demoUI 建议自己按照自己需求实现（可选）
+    api 'com.github.vhall.android.library:vhall-beautify-kit-support:1.1.6'
+    //*****************************************************************************//
 
     
 ```
@@ -47,6 +47,10 @@ allprojects {
 
 
 二、版本更新信息：
+
+版本：v6.30.0 更新时间 2026.04.10
+
+1. 【优化】将直播推流模块拆分为vh-saas-pusher，降低集成过程中依赖库大小。
 
 版本：v6.29.15 更新时间 2026.03.18
 
