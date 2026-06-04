@@ -13,18 +13,18 @@ android {
     }
 
 //    signingConfigs {
-////        release {
-////            storeFile file("vhall_android_app.keystore")
-////            storePassword ''
-////            keyAlias ''
-////            keyPassword ''
-////        }
-////        debug {
-////            storeFile file("vhall_android_app.keystore")
-////            storePassword ''
-////            keyAlias ''
-////            keyPassword ''
-////        }
+//        release {
+//            storeFile file("vhall_android_app.keystore")
+//            storePassword ''
+//            keyAlias ''
+//            keyPassword ''
+//        }
+//        debug {
+//            storeFile file("vhall_android_app.keystore")
+//            storePassword ''
+//            keyAlias ''
+//            keyPassword ''
+//        }
 //    }
 
     buildTypes {

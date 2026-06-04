@@ -196,6 +196,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             "",
             "",
             true,
+            "",
             object : LoadWebinarInfoCallback {
                 override fun onError(p0: Int, errorMsg: String?) {
                     finishLoading()
