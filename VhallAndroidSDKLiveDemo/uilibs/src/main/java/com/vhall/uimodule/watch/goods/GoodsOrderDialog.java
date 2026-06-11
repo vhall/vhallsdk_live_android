@@ -132,7 +132,7 @@ public class GoodsOrderDialog extends BaseBottomDialog implements View.OnClickLi
 
 
         //用于同步购买商品
-        goodsServer.setGoodsBuyNotice(goodsInfo.goods_id, "buy",webinarInfo.user_id, goodsInfo.business_uid.toString(), new RequestDataCallbackV2<String>() {
+        goodsServer.setGoodsBuyNotice(goodsInfo.goods_id,"popup_buy" ,"buy",webinarInfo.user_id, goodsInfo.business_uid.toString(), new RequestDataCallbackV2<String>() {
             @Override
             public void onSuccess(String data) {
 

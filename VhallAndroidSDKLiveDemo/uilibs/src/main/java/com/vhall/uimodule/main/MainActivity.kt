@@ -196,7 +196,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             "",
             "",
             true,
-            "",
+            "join_by_android_app",
             object : LoadWebinarInfoCallback {
                 override fun onError(p0: Int, errorMsg: String?) {
                     finishLoading()
