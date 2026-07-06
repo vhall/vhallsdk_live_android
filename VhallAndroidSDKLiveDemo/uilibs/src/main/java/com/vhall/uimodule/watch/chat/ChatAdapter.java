@@ -2,6 +2,7 @@ package com.vhall.uimodule.watch.chat;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -12,11 +13,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.viewholder.BaseViewHolder;
@@ -68,6 +72,35 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
             e.printStackTrace();
         }
     }
+
+
+    private void getDefaultLevelIcon(@NonNull BaseViewHolder viewHolder,String level){
+        ImageView vipView = viewHolder.getView(R.id.tv_member_level);
+        boolean isOutRange = true;
+        try {
+            int num = Integer.parseInt(level);
+            isOutRange = num < 0 || num > 22;
+        } catch (NumberFormatException e) {
+            // 转数字失败（字母、空、符号），同样判定超出范围
+            isOutRange = true;
+        }
+        if (!isOutRange) {
+            // 在范围内，动态加载对应vip图
+            String resName = "vip" + level;
+            int resId = mContext.getResources().getIdentifier(resName, "mipmap", mContext.getPackageName());
+            if (resId > 0) {
+                vipView.setVisibility(View.VISIBLE);
+                vipView.setImageResource(resId);
+            }
+        }
+    }
+
+
+    private String getCustomLevelIcon(String level){
+        return this.webinarInfo.memberLevel.getLevelIconUrl(level);
+    }
+
+
 
     @Override
     protected void convert(@NonNull BaseViewHolder viewHolder, ChatMessageData messageData) {
@@ -223,6 +256,24 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
                 ssb.setSpan(new RadiusBackgroundSpan(Color.parseColor(roleBgColor), 18, Color.parseColor(roleColor)), name.length(), ssb.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
                 ssb.setSpan(new AbsoluteSizeSpan(11, true), name.length(), ssb.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
             }
+            ImageView vipView = viewHolder.getView(R.id.tv_member_level);
+            vipView.setVisibility(View.GONE);
+            if(this.webinarInfo.memberLevel.status == 1){
+                if(TextUtils.equals(this.webinarInfo.memberLevel.getType(), "default")){
+                    this.getDefaultLevelIcon(viewHolder,String.valueOf(chatInfo.member_level));
+                }else{
+                    String url = this.getCustomLevelIcon(String.valueOf(chatInfo.member_level));
+                    if(url != null){
+                        RequestOptions requestOptions = RequestOptions.bitmapTransform(new RoundedCorners(7))
+                                .placeholder(R.mipmap.vip1)
+                                .override(30, 15);
+                        ImageView tv_member_level = viewHolder.getView(R.id.tv_member_level);
+                        Glide.with(mContext).load(url).apply(requestOptions).into(tv_member_level);
+                        vipView.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
             viewHolder.setText(R.id.tv_name, ssb);
             RequestOptions requestOptions = RequestOptions.bitmapTransform(new CircleCrop()).placeholder(R.mipmap.icon_avatar);
             ImageView iv_avatar = viewHolder.getView(R.id.iv_avatar);

@@ -13,6 +13,7 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
 import com.vhall.business.VhallSDK
 import com.vhall.business.data.WatchAuthInfo
+import com.vhall.business.data.WebinarChatMemberLevel
 import com.vhall.business.data.WebinarInfo
 import com.vhall.business.data.source.WebinarInfoDataSource
 import com.vhall.business.data.source.WebinarInfoDataSource.LoadWebinarInfoCallback
@@ -197,6 +198,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             "",
             true,
             "join_by_android_app",
+            "3",
             object : LoadWebinarInfoCallback {
                 override fun onError(p0: Int, errorMsg: String?) {
                     finishLoading()
@@ -215,7 +217,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                                     100
                                 )
                             )
-                                WatchLiveActivity.startActivity(mContext, info)
+                            //获取聊天成员显示等级标签状态
+                                VhallSDK.getMemberLevel(mViewBinding.edWatchId.text.toString(),object:WebinarInfoDataSource.InitBeforeUnionCallback{
+                                    override fun onError(errorCode: Int, errorMsg: String?) {
+                                        //do not implements this interface signature
+                                    }
+                                    override fun onSucceed(level: WebinarChatMemberLevel?) {
+                                        info.memberLevel = level;
+                                        WatchLiveActivity.startActivity(mContext, info)
+                                    }
+                                } )
                         }
                         2 -> {
                             WatchBaseWarmUpActivity.startActivityForResult(this@MainActivity, info)

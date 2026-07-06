@@ -16,6 +16,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <ImageView
+        android:id="@+id/tv_member_level"
+        android:layout_width="@dimen/dimen_30dp"
+        android:layout_height="@dimen/dimen_15dp"
+        android:layout_marginStart="@dimen/dimen_8dp"
+        android:textColor="@color/color_8c"
+        android:textSize="@dimen/dimen_14sp"
+        app:layout_constraintStart_toEndOf="@id/iv_avatar"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+
     <TextView
         android:id="@+id/tv_name"
         android:layout_width="wrap_content"
@@ -24,8 +35,8 @@
         android:text="2019新潮搭配推201"
         android:textColor="@color/color_8c"
         android:textSize="@dimen/dimen_14sp"
-        app:layout_constraintStart_toEndOf="@id/iv_avatar"
-        app:layout_constraintTop_toTopOf="@id/iv_avatar" />
+        app:layout_constraintStart_toEndOf="@id/tv_member_level"
+        app:layout_constraintTop_toTopOf="@id/tv_member_level" />
 
     <TextView
         android:id="@+id/tv_time"
