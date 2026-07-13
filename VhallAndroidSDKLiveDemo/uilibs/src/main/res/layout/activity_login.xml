@@ -145,6 +145,15 @@
             android:layout_marginStart="@dimen/dimen_10dp"
             android:checked="true"
             android:text="@string/app_id_login" />
+
+        <RadioButton
+            android:id="@+id/email_login"
+            style="@style/MyLoginCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/dimen_10dp"
+            android:checked="false"
+            android:text="@string/app_email_login" />
     </RadioGroup>
 
     <TextView

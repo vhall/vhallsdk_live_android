@@ -55,6 +55,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
     private var ownForbid = false
     private var likePermission = 1
     private var likeNum = 0
+    private var bannedMode = 0; //0 禁言有感知  1 禁言无感知
     var clickLikeNumber = 0
     lateinit var chatAdapter: ChatAdapter
     lateinit var qaAdapter: QAAdapter
@@ -79,6 +80,10 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
             }
             likeNum = webinarInfo.like_num
             handsUp = webinarInfo.hands_up
+            bannedMode = webinarInfo.webinarInfoData.roomToolsStatusData.banned_mode
+            if(bannedMode == 1 && ownForbid){
+                canChat = true;
+            }
             setPublishIcon()
 //            if (webinarInfo.status == 4 || webinarInfo.status == 5)
 //                mViewBinding.ivMore.visibility=View.GONE
@@ -279,7 +284,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
                     //不是自己的公开回答显示
                     if (TextUtils.equals(questionData.join_id, webinarInfo.join_id)
                         || ((questionData.answer != null && !questionData.answer.content.isNullOrEmpty() && questionData.answer.is_open == 1))
-                    ) {
+                        || (questionData.is_open == 1 && !questionData.content.isNullOrEmpty())) {
                         val e = ChatMessageData()
                         e.chatInfo = chatInfo
                         qaAdapter.addData(e)
@@ -358,15 +363,35 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
                 }
                 EVENT_DISABLE_CHAT -> {
                     ownForbid = true
-                    showToast("您已被禁言")
-                    canChat = false
-                    setHint()
+                    if(bannedMode == 0){
+                        showToast("您已被禁言")
+                        canChat = false
+                        setHint()
+                    }
+                }
+                EVENT_BANNED_MODE_UPDATE->{
+                    bannedMode = messageInfo.banned_mode;
+                    //禁言无感知
+                    if(bannedMode == 1){
+                        //已经被禁言
+                        if(ownForbid){
+                            canChat = true;
+                            setHint();
+                        }
+                    }else{
+                        if(ownForbid){
+                            canChat = false;
+                            setHint();
+                        }
+                    }
                 }
                 EVENT_PERMIT_CHAT -> {
                     ownForbid = false
-                    showToast("您已被解除禁言")
-                    canChat = !allForbid
-                    setHint()
+                    if(bannedMode == 0){
+                        showToast("您已被解除禁言")
+                        canChat = !allForbid
+                        setHint()
+                    }
                 }
                 EVENT_INTERACTIVE_ALLOW_HAND -> {
                     showToast(if (messageInfo.status == 0) "举手按钮关闭" else "举手按钮开启")

@@ -111,7 +111,6 @@ public class GoodsAdapter extends BaseQuickAdapter<GoodsInfoData.GoodsInfo, Base
             }
         });
 
-
         viewHolder.setText(R.id.tv_idx, String.format("%02d", viewHolder.getAdapterPosition()+1));
         viewHolder.setText(R.id.tv_name, goodsInfo.name);
         viewHolder.setText(R.id.tv_description, goodsInfo.description);

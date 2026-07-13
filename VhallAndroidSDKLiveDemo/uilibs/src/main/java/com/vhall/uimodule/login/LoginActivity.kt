@@ -2,6 +2,7 @@ package com.vhall.uimodule.login
 
 
 import android.content.Intent
+import android.net.Uri
 import android.text.TextUtils
 import android.view.View
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +33,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
         mViewBinding.rgLogin.setOnCheckedChangeListener { group, checkedId ->
             if (checkedId == R.id.account_login) setAccountData()
             else if (checkedId == R.id.id_login) setThirdData()
+            else if (checkedId == R.id.email_login) setEmailAndNicknameData()
         }
         mViewBinding.tvJoin.setOnClickListener { loginClick() }
         mViewBinding.tvSign.setOnClickListener { SignConfigActivity.startActivity(mContext) }
@@ -43,7 +45,9 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
 
     private fun loginClick() = if (mViewBinding.accountLogin.isChecked) {
         loginByAccount()
-    } else {
+    } else if(mViewBinding.emailLogin.isChecked) {
+        emailAndNickNameLogin()
+    } else{
         loginByThirdId()
     }
 
@@ -56,9 +60,15 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
     private fun loginByAccount() {
         val text = mViewBinding.edAccount.text.toString()
         val text1 = mViewBinding.edPassword.text.toString()
+
+        //直接使用控制台登录账号
         if (!TextUtils.isEmpty(text) && !TextUtils.isEmpty(text1)) {
             VhallSDK.loginByAccount(text, text1, LoginCallbackInternal())
         }
+        //子账号升级位三方账号，使用此接口。
+//        if (!TextUtils.isEmpty(text) && !TextUtils.isEmpty(text1)) {
+//            VhallSDK.login(text, text1, LoginCallbackInternal())
+//        }
     }
 
     private fun loginByThirdId() {
@@ -69,6 +79,19 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
                 mViewBinding.edHead.text.toString(),
                 LoginCallbackInternal()
             )
+        }
+    }
+
+    private fun emailAndNickNameLogin(){
+        //昵称和邮箱观看时，可以不使用VhallSDK.loginByThirdId方法，仅在getWatchWebinarInfo方法中填写昵称和邮箱即可，减少用户注册过程。
+        if (!TextUtils.isEmpty(mViewBinding.edAccount.text) && !TextUtils.isEmpty(mViewBinding.edPassword.text)) {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("nickName", mViewBinding.edAccount.text.toString())
+            intent.putExtra("email", mViewBinding.edPassword.text.toString())
+            startActivity(intent)
+            finish()
+        }else{
+            showToast("昵称和Email不能为空")
         }
     }
 
@@ -124,6 +147,18 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
         mViewBinding.edHead.setText(url)
         mViewBinding.edAccount.hint = "三方用户ID"
         mViewBinding.edPassword.hint = getString(R.string.app_login_nickname)
+    }
+
+    private fun setEmailAndNicknameData(){
+        id = mViewBinding.edAccount.text.toString()
+        name = mViewBinding.edPassword.text.toString()
+        url = mViewBinding.edHead.text.toString()
+
+        mViewBinding.edHead.visibility = View.GONE
+        mViewBinding.edAccount.setText(account)
+        mViewBinding.edPassword.setText(passWord)
+        mViewBinding.edAccount.hint = "昵称"
+        mViewBinding.edPassword.hint = "邮箱"
     }
 
     inner class LoginCallbackInternal : UserInfoCallback {

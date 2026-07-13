@@ -2,6 +2,7 @@ package com.vhall.uimodule.main
 
 
 import android.content.Intent
+import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
@@ -15,6 +16,7 @@ import com.vhall.business.VhallSDK
 import com.vhall.business.data.WatchAuthInfo
 import com.vhall.business.data.WebinarChatMemberLevel
 import com.vhall.business.data.WebinarInfo
+import com.vhall.business.data.WebinarInfoRemote
 import com.vhall.business.data.source.WebinarInfoDataSource
 import com.vhall.business.data.source.WebinarInfoDataSource.LoadWebinarInfoCallback
 import com.vhall.business.data.source.WebinarInfoDataSource.WatchAuthCallback
@@ -24,11 +26,11 @@ import com.vhall.uimodule.base.BaseActivity
 import com.vhall.uimodule.dao.UserDataStore
 import com.vhall.uimodule.databinding.ActivityMainBinding
 import com.vhall.uimodule.login.LoginActivity
-import com.vhall.uimodule.watch.warmup.WatchBaseWarmUpActivity
-import com.vhall.uimodule.watch.warmup.WatchWarmUpActivity
-import com.vhall.uimodule.watch.WatchLiveActivity
 import com.vhall.uimodule.publish.PublishActivity
 import com.vhall.uimodule.utils.CommonUtil
+import com.vhall.uimodule.watch.WatchLiveActivity
+import com.vhall.uimodule.watch.warmup.WatchBaseWarmUpActivity
+import com.vhall.uimodule.watch.warmup.WatchWarmUpActivity
 import com.vhall.uimodule.webview.WebviewActivity
 import com.vhall.uimodule.widget.EditDialog
 import com.vhall.uimodule.widget.EditDialog.ClickLister
@@ -37,6 +39,10 @@ import com.vhall.zxing.client.android.CaptureActivity
 import kotlinx.coroutines.launch
 
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
+
+    var nickname:String = "";
+    var email:String = "";
+
     override fun initView() {
         super.initView()
         getData()
@@ -101,6 +107,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 launchQrcodeActivity()
             }
         })
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // 读取传递的字符串
+        val tempNick = intent.getStringExtra("nickName")
+        val tempEmail = intent.getStringExtra("email")
+        VLog.d("IntentTest", "nickName=$tempNick email=$tempEmail")
+
+        this.nickname = tempNick ?: ""
+        this.email = tempEmail ?: ""
+
     }
 
     private fun prepareJoin() {
@@ -194,11 +212,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     private fun doInitWatch() {
         VhallSDK.initWatch(
             mViewBinding.edWatchId.text.toString(),
-            "",
-            "",
+            this.email,
+            this.nickname,
             true,
-            "join_by_android_app",
-            "3",
+            "",
+            "2",
             object : LoadWebinarInfoCallback {
                 override fun onError(p0: Int, errorMsg: String?) {
                     finishLoading()
@@ -217,16 +235,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                                     100
                                 )
                             )
-                            //获取聊天成员显示等级标签状态
-                                VhallSDK.getMemberLevel(mViewBinding.edWatchId.text.toString(),object:WebinarInfoDataSource.InitBeforeUnionCallback{
-                                    override fun onError(errorCode: Int, errorMsg: String?) {
-                                        //do not implements this interface signature
-                                    }
-                                    override fun onSucceed(level: WebinarChatMemberLevel?) {
-                                        info.memberLevel = level;
-                                        WatchLiveActivity.startActivity(mContext, info)
-                                    }
-                                } )
+                            WatchLiveActivity.startActivity(mContext, info)
                         }
                         2 -> {
                             WatchBaseWarmUpActivity.startActivityForResult(this@MainActivity, info)

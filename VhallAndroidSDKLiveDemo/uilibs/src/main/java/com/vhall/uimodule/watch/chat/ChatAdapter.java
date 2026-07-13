@@ -311,7 +311,7 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
                             }
                         } else {
                             String textContent = chatInfo.msgData.text;
-                            if (VhallSDK.getUserId().equals(chatInfo.msgData.target_id)) {
+                            if (!VhallSDK.getUserId().isEmpty() && VhallSDK.getUserId().equals(chatInfo.msgData.target_id)) {
                                 builder.insert(0, "私聊消息---");
                                 if (textContent.endsWith("\n")) {
                                     textContent.replace("\n", "");
