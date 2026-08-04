@@ -258,7 +258,7 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
             }
             ImageView vipView = viewHolder.getView(R.id.tv_member_level);
             vipView.setVisibility(View.GONE);
-            if(this.webinarInfo.memberLevel.status == 1){
+            if(this.webinarInfo.memberLevel != null && this.webinarInfo.memberLevel.status == 1){
                 if(TextUtils.equals(this.webinarInfo.memberLevel.getType(), "default")){
                     this.getDefaultLevelIcon(viewHolder,String.valueOf(chatInfo.member_level));
                 }else{

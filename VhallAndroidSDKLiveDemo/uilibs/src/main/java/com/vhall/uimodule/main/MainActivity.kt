@@ -14,9 +14,7 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
 import com.vhall.business.VhallSDK
 import com.vhall.business.data.WatchAuthInfo
-import com.vhall.business.data.WebinarChatMemberLevel
 import com.vhall.business.data.WebinarInfo
-import com.vhall.business.data.WebinarInfoRemote
 import com.vhall.business.data.source.WebinarInfoDataSource
 import com.vhall.business.data.source.WebinarInfoDataSource.LoadWebinarInfoCallback
 import com.vhall.business.data.source.WebinarInfoDataSource.WatchAuthCallback

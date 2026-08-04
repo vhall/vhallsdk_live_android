@@ -25,7 +25,7 @@ public interface IBase {
     String SHOW_GOODS_CARD = "SHOW_GOODS_CARD";//显示商品卡片
     String SHOW_GOODS_TAB = "SHOW_GOODS_TAB";//显示商品卡片
     String SHOW_GOODS_DETAILS = "SHOW_GOODS_DETAILS";//显示商品详情
-
+    String GOODS_SETTING_INFO = "GOODS_SETTING_INFO";//商品设置
     default void showToast(String s) {
         ToastUtils.Companion.showToast(s);
     }

@@ -17,7 +17,6 @@ import android.text.TextUtils
 import android.text.style.ForegroundColorSpan
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.bumptech.glide.request.RequestOptions
@@ -30,12 +29,10 @@ import com.vhall.business.VhallSDK
 import com.vhall.business.data.RequestDataCallbackV2
 import com.vhall.business.data.WebinarInfo
 import com.vhall.business.data.source.WebinarInfoDataSource
-import com.vhall.business.module.exam.ExamMessageCallBack
 import com.vhall.business.module.exam.ExamServer
 import com.vhall.uimodule.R
 import com.vhall.uimodule.base.BaseActivity
 import com.vhall.uimodule.base.BaseBottomDialog
-import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase.*
 import com.vhall.uimodule.databinding.ActivityWatchLiveBinding
 import com.vhall.uimodule.utils.ActivityUtils
@@ -61,11 +58,11 @@ import com.vhall.uimodule.watch.watchplayback.WatchPlaybackFragment
 import com.vhall.uimodule.widget.ExtendTextView
 import com.vhall.vhss.data.GoodsInfoData
 import com.vhall.vhss.data.GoodsInfoData.GoodsInfo
+import com.vhall.vhss.data.GoodsOrderSetting
 import com.vhall.vhss.data.RecordChaptersData
 import com.vhall.vhss.data.RecordsData
 import org.json.JSONException
 import org.json.JSONObject
-import java.util.Objects
 
 class WatchLiveActivity :
     BaseActivity<ActivityWatchLiveBinding>(ActivityWatchLiveBinding::inflate) {
@@ -436,6 +433,11 @@ class WatchLiveActivity :
                     showGoodsPop(extras as GoodsInfo, mViewBinding.flCard)
                 }
             }
+            GOODS_SETTING_INFO->{
+                if(extras != null ){
+                    goodsSetting(extras as GoodsOrderSetting, mViewBinding.flCard)
+                }
+            }
             SHOW_GOODS_DETAILS -> {//商品详情
                 if(extras != null ){
                     goodsFragment.showGoodsDetailsDialog(extras as GoodsInfo)
@@ -664,9 +666,14 @@ class WatchLiveActivity :
         }
     }
 
-    fun getHistory(page: Int, msgId: String?, callback: ChatServer.ChatRecordCallback) {
-        watchLiveFragment?.getHistory(page, msgId, callback)
+    fun getHistory(page: Int, role:String, msgId: String?,callback: ChatServer.ChatRecordCallback) {
+        watchLiveFragment?.getHistory(page, role, msgId, callback)
         watchPlaybackFragment?.getHistory(page, msgId, callback)
+    }
+
+    fun getHistoryFromSender(page: Int, sender:String, msgId: String?,callback: ChatServer.ChatRecordCallback) {
+        watchLiveFragment?.getHistoryFromSender(page,  msgId, sender,callback)
+        watchPlaybackFragment?.getHistoryFromSender(page, msgId, sender, callback)
     }
 
     fun seekTo(time: Int) {
@@ -787,6 +794,11 @@ class WatchLiveActivity :
                 }
             })
     }
+
+    public fun goodsSetting(setting: GoodsOrderSetting,view:View){
+        goodsCardPop?.updateGrabDescription(setting.grab_description);
+    }
+
     //显示商品推屏卡片
     public fun showGoodsPop(goodsInfo: GoodsInfoData.GoodsInfo, view:View){
         val location = IntArray(2)

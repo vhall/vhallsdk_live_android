@@ -1,5 +1,6 @@
 package com.vhall.uimodule.watch.goods
 
+import android.content.ClipDescription
 import android.content.Context
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -77,6 +78,10 @@ class GoodsCardPop @JvmOverloads constructor(private val mContext: Context, var 
         return true
     }
 
+    fun updateGrabDescription(description: String){
+        binding?.buyContext?.text = description;
+    }
+
     fun updateUI(goodsInfo: GoodsInfo) {
         this.goodsInfo = goodsInfo
         binding.tvName.setText(goodsInfo.name)
@@ -105,11 +110,16 @@ class GoodsCardPop @JvmOverloads constructor(private val mContext: Context, var 
         }
         else{
             builder.append(text)
+            val textLen = text.length
             binding.tvL.visibility=View.VISIBLE
-            val sizeSpan2 = RelativeSizeSpan(1.0f)
-            builder.setSpan(sizeSpan2, 1, text.length - 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            val sizeSpan3 = RelativeSizeSpan(0.8f)
-            builder.setSpan(sizeSpan3, text.length - 2, text.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            if (textLen > 3) { // 保证 1 < textLen-2
+                val sizeSpan2 = RelativeSizeSpan(1.0f)
+                builder.setSpan(sizeSpan2, 1, textLen - 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            if (textLen >= 2) {
+                val sizeSpan3 = RelativeSizeSpan(0.8f)
+                builder.setSpan(sizeSpan3, textLen - 2, textLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
         //覆盖状态,隐藏价格（0-不覆盖，1-覆盖原有价格/配置）
         if(goodsInfo.covered_status == 1){

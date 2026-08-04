@@ -1,6 +1,5 @@
 package com.vhall.uimodule.watch.chat
 
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.TextUtils
@@ -16,18 +15,21 @@ import com.vhall.business.ChatServer.ChatInfo
 import com.vhall.business.ChatServer.ChatRecordCallback
 import com.vhall.business.MessageServer.*
 import com.vhall.business.data.RequestCallback
+import com.vhall.business.data.RequestDataCallbackV2
 import com.vhall.business.data.WebinarInfo
 import com.vhall.uimodule.R
-import com.vhall.uimodule.base.BaseBottomDialog
 import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase.*
 import com.vhall.uimodule.databinding.FragmentChatBinding
 import com.vhall.uimodule.watch.WatchLiveActivity
-import com.vhall.uimodule.watch.card.CardDialog
+import com.vhall.uimodule.watch.chapters.ChaptersFragment
 import com.vhall.uimodule.watch.gift.GiftListDialog
+import com.vhall.uimodule.widget.ChatSetting
 import com.vhall.uimodule.widget.WatchMorePop
+import com.vhall.vhss.data.PermissionData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 import kotlin.math.max
@@ -60,6 +62,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
     lateinit var chatAdapter: ChatAdapter
     lateinit var qaAdapter: QAAdapter
     private var watchMorePop: WatchMorePop? = null
+    private var isWatchRole:Boolean = false;//只看主办方
     var handsUp = "1"
     override fun initView() {
         val activity: WatchLiveActivity = activity as WatchLiveActivity
@@ -107,6 +110,54 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
             val giftListDialog = GiftListDialog(mContext, webinarInfo.vss_room_id)
             giftListDialog.show()
         }
+        if(!webinarInfo.chatReCommand.isNullOrEmpty()){
+            mViewBinding.chatReCommand.visibility = View.VISIBLE;
+            mViewBinding.chatReCommand.text ="[精选] " + webinarInfo.chatReCommand;
+        }
+        mViewBinding.chatSetting.setOnClickListener{
+            VhallSDK.getPermissions(
+                webinarInfo.webinar_id,
+                webinarInfo.hostId,
+                object : RequestDataCallbackV2<PermissionData?> {
+                    override fun onSuccess(data: PermissionData?) {
+                        try {
+                            if( data?.show_host_only == 1 || data?.show_chat_only == 1 || data?.show_effect == 1){
+                                var dlg = ChatSetting(mContext,
+                                    defaultWatchHost = isWatchRole,
+                                    showOnlyWatchHost = data.show_host_only == 1,
+                                    defaultWatchContext = false,
+                                    showWatchContext = data.show_chat_only == 1,
+                                    defaultHideEffect = false,
+                                    showEffect = data.show_effect == 1
+                                );
+                                dlg.setOnDismissListener {
+                                    if(data?.show_host_only == 1){
+                                        val watchContext = dlg.getWatchContextStatus()
+                                        val hideEffect = dlg.getHideEffectStatus()
+                                        if(isWatchRole != dlg.getWatchHostStatus()){
+                                            isWatchRole = dlg.getWatchHostStatus()
+                                            page = 1;
+                                            msgId = "";
+                                            // 清空数据源
+                                            chatAdapter.data.clear() // 通知刷新
+                                            chatAdapter.notifyDataSetChanged()
+                                            getChatHistory(activity, if (isWatchRole) "1" else "0")
+                                        }
+                                    }
+                                }
+
+                                dlg.show();
+                            }else{
+                                showToast("消息筛选已被禁用")
+                            }
+                        } catch (e: JSONException) {
+                            e.printStackTrace()
+                        }
+                    }
+                    override fun onError(errorCode: Int, errorMsg: String) {
+                    }
+                })
+        }
         mViewBinding.ivMore.setOnClickListener {
             val location = IntArray(2)
             mViewBinding.ivMore.getLocationOnScreen(location)
@@ -124,7 +175,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
         }
         mViewBinding.refreshLayout.setOnRefreshListener {
             if (type.equals("chat"))
-                getChatHistory(activity)
+                getChatHistory(activity, if (this.isWatchRole) "1" else "0")
             else {
                 mViewBinding.refreshLayout.isRefreshing = false
                 showToast("没有更多数据了")
@@ -152,7 +203,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
         lifecycleScope.launch {
             delay(300)
             if (type.equals("chat"))
-                getChatHistory(activity)
+                getChatHistory(activity, if (isWatchRole) "1" else "0")
             else
                 getQaHistory()
         }
@@ -208,39 +259,76 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
         setHint()
     }
 
-    private fun getChatHistory(activity: WatchLiveActivity) {
-        activity.getHistory(page, msgId, object : ChatServer.ChatRecordCallback {
-            override fun onDataLoaded(list: MutableList<ChatInfo>?) {
-                mViewBinding.refreshLayout.isRefreshing = false
-                if (!list.isNullOrEmpty()) {
-                    msgId = list[list.size - 1].msg_id
-                    list.reverse()
-                    val chatMessageDataList: MutableList<ChatMessageData> = arrayListOf()
-                    for (chatInfo in list) {
-                        if (null != chatInfo.msgData && !TextUtils.isEmpty(chatInfo.msgData.target_id) && !VhallSDK.getUserId()
-                                .equals(chatInfo.msgData.target_id)
-                        ) {
-                            //demo过滤非面向自己的私聊消息
-                            continue
+    private fun getChatHistory(activity: WatchLiveActivity, watchHost: String) {
+        if(watchHost == "1"){
+            var sender = this.webinarInfo.webinarInfoData.webinar.userinfo.user_id;//主持人id
+            activity.getHistoryFromSender(page, sender, msgId, object : ChatServer.ChatRecordCallback {
+                override fun onDataLoaded(list: MutableList<ChatInfo>?) {
+                    mViewBinding.refreshLayout.isRefreshing = false
+                    if (!list.isNullOrEmpty()) {
+                        msgId = list[list.size - 1].msg_id
+                        list.reverse()
+                        val chatMessageDataList: MutableList<ChatMessageData> = arrayListOf()
+                        for (chatInfo in list) {
+                            if (null != chatInfo.msgData && !TextUtils.isEmpty(chatInfo.msgData.target_id) && !VhallSDK.getUserId()
+                                    .equals(chatInfo.msgData.target_id)
+                            ) {
+                                //demo过滤非面向自己的私聊消息
+                                continue
+                            }
+                            val e = ChatMessageData()
+                            e.chatInfo = chatInfo
+                            chatMessageDataList.add(e)
                         }
-                        val e = ChatMessageData()
-                        e.chatInfo = chatInfo
-                        chatMessageDataList.add(e)
+                        chatAdapter.addData(0, chatMessageDataList)
+                        if (1 == page) {
+                            mViewBinding.recycleView.scrollToPosition(chatAdapter.itemCount - 1)
+                        }
+                        page++
                     }
-                    chatAdapter.addData(0, chatMessageDataList)
-                    if (1 == page) {
-                        mViewBinding.recycleView.scrollToPosition(chatAdapter.itemCount - 1)
-                    }
-                    page++
                 }
-            }
 
-            override fun onFailed(p0: Int, p1: String?) {
-                mViewBinding.refreshLayout.isRefreshing = false
-                showToast("聊天历史:"+p1)
-            }
+                override fun onFailed(p0: Int, p1: String?) {
+                    mViewBinding.refreshLayout.isRefreshing = false
+                    showToast("聊天历史:"+p1)
+                }
 
-        })
+            })
+        }else{
+            activity.getHistory(page,watchHost, msgId, object : ChatServer.ChatRecordCallback {
+                override fun onDataLoaded(list: MutableList<ChatInfo>?) {
+                    mViewBinding.refreshLayout.isRefreshing = false
+                    if (!list.isNullOrEmpty()) {
+                        msgId = list[list.size - 1].msg_id
+                        list.reverse()
+                        val chatMessageDataList: MutableList<ChatMessageData> = arrayListOf()
+                        for (chatInfo in list) {
+                            if (null != chatInfo.msgData && !TextUtils.isEmpty(chatInfo.msgData.target_id) && !VhallSDK.getUserId()
+                                    .equals(chatInfo.msgData.target_id)
+                            ) {
+                                //demo过滤非面向自己的私聊消息
+                                continue
+                            }
+                            val e = ChatMessageData()
+                            e.chatInfo = chatInfo
+                            chatMessageDataList.add(e)
+                        }
+                        chatAdapter.addData(0, chatMessageDataList)
+                        if (1 == page) {
+                            mViewBinding.recycleView.scrollToPosition(chatAdapter.itemCount - 1)
+                        }
+                        page++
+                    }
+                }
+
+                override fun onFailed(p0: Int, p1: String?) {
+                    mViewBinding.refreshLayout.isRefreshing = false
+                    showToast("聊天历史:"+p1)
+                }
+
+            })
+        }
+
     }
 
     private fun getQaHistory() {
@@ -271,6 +359,9 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
                 if (type.equals("chat")) {
                     val e = ChatMessageData()
                     e.chatInfo = chatInfo
+                    if(isWatchRole && e.chatInfo.account_id != webinarInfo.webinarInfoData.webinar.userinfo.user_id){
+                        return;
+                    }
                     chatAdapter.addData(e)
                     if (chatAdapter.itemCount > 0)
                         mViewBinding.recycleView.smoothScrollToPosition(chatAdapter.itemCount - 1)
@@ -345,6 +436,13 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
                         if (chatAdapter.itemCount > 0)
                             mViewBinding.recycleView.smoothScrollToPosition(chatAdapter.itemCount - 1)
                     }
+                }
+                EVENT_CHAT_DEL_RE_COMMEND-> {
+                    mViewBinding.chatReCommand.visibility = View.GONE;
+                }
+                EVENT_CHAT_SET_RE_COMMEND->{
+                    mViewBinding.chatReCommand.visibility = View.VISIBLE;
+                    mViewBinding.chatReCommand.text = "[精选] " + messageInfo.content;
                 }
                 EVENT_CHAT_FORBID_ALL -> {
                     //问答状态 根据全体禁言判断 如果开启禁言则根据 qa_status判断 1开启 0关闭  如果关闭全体禁言 则直接开启问答

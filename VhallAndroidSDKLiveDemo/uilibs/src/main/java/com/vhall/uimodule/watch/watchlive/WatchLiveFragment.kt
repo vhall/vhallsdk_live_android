@@ -139,6 +139,7 @@ class WatchLiveFragment :
                 .chatCallback(chatCallBack)
                 .messageCallback(messageCallBack)
                 .context(mContext)
+                .connectTimeoutMils(10000)
                 .build()
         watchLive.setWebinarInfo(webinarInfo)
         watchLive.scaleType = IVHVideoPlayer.DRAW_MODE_ASPECTFIT
@@ -178,10 +179,7 @@ class WatchLiveFragment :
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }
-                Constants.Event.EVENT_VIDEO_SIZE_CHANGED -> Log.i(
-                    "",
-                    msg!!
-                )
+                Constants.Event.EVENT_VIDEO_SIZE_CHANGED -> watchLive.mute();
                 ErrorCode.ERROR_LOGIN_MORE -> {
                     showToast(msg)
                     activity?.finish()
@@ -210,14 +208,33 @@ class WatchLiveFragment :
      * @param limit       获取条目数量，最大100
      * @param msg_id      获取条目数量，聊天记录 锚点消息id,此参数存在时anchor_path 参数必须存在
      * @param anchor_path 锚点方向，up 向上查找，down 向下查找,此参数存在时 msg_id 参数必须存在
-     * @param is_role     0：不筛选主办方 1：筛选主办方 默认是0
+     * @param isRole     0：不筛选主办方即全部 1：筛选主办方 默认是0
      */
-    fun getHistory(page: Int, msgId: String?, callback: ChatServer.ChatRecordCallback) {
+    fun getHistory(page: Int, isRole:String, msgId: String?,callback: ChatServer.ChatRecordCallback) {
         watchLive.acquireChatRecord(
             page,
             100,
             msgId,
             "down",
+            isRole,
+            callback
+        )
+    }
+
+    /**
+     * 获取当前房间聊天列表
+     *
+     * @param page        获取条目节点，默认为1
+     * @param msg_id      获取条目数量，聊天记录 锚点消息id,此参数存在时anchor_path 参数必须存在
+     * @param sender_id   发送方id，指定过滤发送用户聊天。空为拉取所有用户聊天
+     */
+    fun getHistoryFromSender(page: Int,  msgId: String?, senderId:String?,callback: ChatServer.ChatRecordCallback) {
+        watchLive.acquireChatRecord(
+            page,
+            100,
+            msgId,
+            "down",
+            senderId,
             "0",
             callback
         )
@@ -226,6 +243,7 @@ class WatchLiveFragment :
     fun sendChat(msg: String) {
         watchLive.sendChat(msg, object : RequestCallback {
             override fun onError(p0: Int, p1: String?) {
+                //如果开启了聊天无感知，并且用户被禁言，此处会报错，需要用过判断banned_mode控制聊天信息在聊天区域显示
                 showToast(p1)
             }
 

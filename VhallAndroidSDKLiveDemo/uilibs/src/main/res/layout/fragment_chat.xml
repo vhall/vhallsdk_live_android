@@ -4,6 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/chat_re_command"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="[精选]"
+            android:textSize="16sp"
+            android:textColor="@color/black"
+            android:background="@color/color_FC9600"
+            android:visibility="gone"
+            android:singleLine="true"
+            android:ellipsize="end"
+            />
+    </LinearLayout>
+
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
@@ -37,6 +57,8 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent">
 
+
+
         <ImageView
             android:id="@+id/iv_avatar"
             android:layout_width="@dimen/dimen_30dp"
@@ -44,6 +66,12 @@
             android:layout_marginStart="@dimen/dimen_20dp"
             android:layout_marginEnd="@dimen/dimen_10dp"
             android:background="@mipmap/icon_avatar" />
+
+        <Button
+            android:layout_width="@dimen/dimen_30dp"
+            android:layout_height="@dimen/dimen_30dp"
+            android:id="@+id/chat_setting"
+            android:background="@drawable/chat_setting"></Button>
 
         <TextView
             android:id="@+id/tv_chat"

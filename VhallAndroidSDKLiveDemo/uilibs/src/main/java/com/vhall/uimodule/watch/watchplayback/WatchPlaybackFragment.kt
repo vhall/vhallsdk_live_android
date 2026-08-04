@@ -268,6 +268,27 @@ class WatchPlaybackFragment :
      * @param page        获取条目节点，默认为1
      * @param limit       获取条目数量，最大100
      * @param msg_id      获取条目数量，聊天记录 锚点消息id,此参数存在时anchor_path 参数必须存在
+     * @param senderId    发送者id
+     */
+    fun getHistoryFromSender(page: Int, msgId: String?, senderId: String,callback: ChatServer.ChatRecordCallback) {
+        watchPlayback.requestCommentHistory(
+            webinarInfo.webinar_id,
+            100,
+            page,
+            msgId,
+            "down",
+            senderId,
+            "0",
+            callback
+        )
+    }
+
+    /**
+     * 获取当前房间聊天列表
+     *
+     * @param page        获取条目节点，默认为1
+     * @param limit       获取条目数量，最大100
+     * @param msg_id      获取条目数量，聊天记录 锚点消息id,此参数存在时anchor_path 参数必须存在
      * @param anchor_path 锚点方向，up 向上查找，down 向下查找,此参数存在时 msg_id 参数必须存在
      * @param is_role     0：不筛选主办方 1：筛选主办方 默认是0
      */

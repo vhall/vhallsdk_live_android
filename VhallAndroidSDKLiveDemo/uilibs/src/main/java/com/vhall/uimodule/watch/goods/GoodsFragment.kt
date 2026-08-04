@@ -21,6 +21,7 @@ import com.vhall.uimodule.watch.WatchLiveActivity
 import com.vhall.uimodule.watch.coupon.CouponListDialog
 import com.vhall.vhss.data.GoodsInfoData
 import com.vhall.vhss.data.GoodsInfoData.GoodsInfo
+import com.vhall.vhss.data.GoodsOrderSetting
 import com.vhall.vhss.data.OrderInfoData
 import java.util.UUID
 
@@ -45,8 +46,8 @@ class GoodsFragment : BaseFragment<FragmentGoodsBinding>(FragmentGoodsBinding::i
 
     private var goodsDetailsDialog: GoodsDetailsDialog? = null
     private var goodsOrderDialog: GoodsOrderDialog? = null
-
     private var curCardGoodsInfo: GoodsInfo? = null
+
 
     override fun initView() {
         val activity: WatchLiveActivity = activity as WatchLiveActivity
@@ -171,12 +172,23 @@ class GoodsFragment : BaseFragment<FragmentGoodsBinding>(FragmentGoodsBinding::i
                     mViewBinding.refreshLayout.isRefreshing = false
                     if (data != null) {
                         goodsAdapter.setList(data.list)
-                        (activity as WatchLiveActivity).call( IBase.SHOW_GOODS_TAB, if ( data.list.count()>0 ) "show_goods_tab" else "hide_goods_tab" ,null)
+                        (activity as WatchLiveActivity).call( IBase.SHOW_GOODS_TAB, if (data.list.isNotEmpty()) "show_goods_tab" else "hide_goods_tab" ,null)
                         if(load){
                             //加载商品页弹出推屏商品
                             for(goodsInfo in data.list){
                                 if(goodsInfo.push_status == 1){
-                                    showGoodsCard(goodsInfo);
+                                    goodsServer?.getGoodsOrderSetting(object : RequestDataCallbackV2<GoodsOrderSetting?>{
+                                        override fun onSuccess(setting: GoodsOrderSetting?) {
+                                            showGoodsCard(goodsInfo);
+                                            if (setting != null) {
+                                                updateGoodsSetting(setting)
+                                            };
+                                        }
+
+                                        override fun onError(p0: Int, p1: String?) {
+
+                                        }
+                                    })
                                     break
                                 }
                             }
@@ -192,6 +204,10 @@ class GoodsFragment : BaseFragment<FragmentGoodsBinding>(FragmentGoodsBinding::i
     public fun showGoodsCard(goodsInfo:GoodsInfo){
         curCardGoodsInfo = goodsInfo
         (activity as WatchLiveActivity).call(IBase.SHOW_GOODS_CARD, "", goodsInfo)
+    }
+
+    public fun updateGoodsSetting(goodsSettingInfo:GoodsOrderSetting){
+        (activity as WatchLiveActivity).call(IBase.GOODS_SETTING_INFO, "", goodsSettingInfo)
     }
 
     public fun showGoodsDetailsDialog(goodsInfo: GoodsInfo?){
