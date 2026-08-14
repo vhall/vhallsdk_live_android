@@ -56,14 +56,15 @@ import java.util.List;
 public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolder> {
     private Context mContext;
     WebinarInfo webinarInfo;
+    private int chatNicknameEncryption;
     private SurveyServer mSurveyServer;
     private FragmentActivity activity;
     public ChatAdapter(Context context, WebinarInfo webinarInfo, FragmentActivity activity) {
         super(R.layout.item_chat_list);
+        this.chatNicknameEncryption = 0;
         mContext = context;
         this.webinarInfo = webinarInfo;
         this.activity = activity;
-
         try {
             mSurveyServer = new SurveyServer.Builder()
                     .webinarInfo(webinarInfo)
@@ -73,6 +74,10 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
         }
     }
 
+    public void chatNicknameEncryption(int encryption){
+        this.chatNicknameEncryption = encryption;
+        notifyDataSetChanged();
+    }
 
     private void getDefaultLevelIcon(@NonNull BaseViewHolder viewHolder,String level){
         ImageView vipView = viewHolder.getView(R.id.tv_member_level);
@@ -139,6 +144,9 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
             String name;
             iv_msg.setVisibility(View.GONE);
             name = CommonUtil.getLimitString(msgInfo.nick_name, 8) + " ";
+            if(this.chatNicknameEncryption == 1 && (msgInfo.role != "1" && msgInfo.senderId != webinarInfo.getWebinarInfoData().join_info.third_party_user_id)){
+                name = CommonUtil.getLimitString(msgInfo.nick_name, 2) + "..";
+            }
             SpannableStringBuilder ssb = new SpannableStringBuilder(showRoleText);
             if (!TextUtils.isEmpty(showRoleText)) {
                 ssb.setSpan(new RadiusBackgroundSpan(Color.parseColor(roleBgColor), 18, Color.parseColor(roleColor)), 0, ssb.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -250,6 +258,9 @@ public class ChatAdapter extends BaseQuickAdapter<ChatMessageData, BaseViewHolde
             viewHolder.getView(R.id.group_chat).setVisibility(View.VISIBLE);
             viewHolder.getView(R.id.group_msg).setVisibility(View.GONE);
             String name = CommonUtil.getLimitString(chatInfo.user_name, 8)+" ";
+            if(this.chatNicknameEncryption == 1 && (chatInfo.roleName != "1" && chatInfo.account_id != webinarInfo.getWebinarInfoData().join_info.third_party_user_id)){
+                name = CommonUtil.getLimitString(chatInfo.user_name, 2)+"..";
+            }
             SpannableStringBuilder ssb = new SpannableStringBuilder(name);
             if (!TextUtils.isEmpty(showRoleText)) {
                 ssb.append(showRoleText);

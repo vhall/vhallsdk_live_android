@@ -17,8 +17,10 @@
             android:textSize="16sp"
             android:textColor="@color/black"
             android:background="@color/color_FC9600"
+            android:padding="@dimen/dp_10"
             android:visibility="gone"
             android:singleLine="true"
+            android:maxLines="2"
             android:ellipsize="end"
             />
     </LinearLayout>

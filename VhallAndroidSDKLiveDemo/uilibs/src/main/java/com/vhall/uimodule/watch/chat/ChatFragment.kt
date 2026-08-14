@@ -16,13 +16,14 @@ import com.vhall.business.ChatServer.ChatRecordCallback
 import com.vhall.business.MessageServer.*
 import com.vhall.business.data.RequestCallback
 import com.vhall.business.data.RequestDataCallbackV2
+import com.vhall.business.data.WebinarChatMsgRecommend
 import com.vhall.business.data.WebinarInfo
 import com.vhall.uimodule.R
 import com.vhall.uimodule.base.BaseFragment
 import com.vhall.uimodule.base.IBase.*
 import com.vhall.uimodule.databinding.FragmentChatBinding
+import com.vhall.uimodule.utils.CommonUtil
 import com.vhall.uimodule.watch.WatchLiveActivity
-import com.vhall.uimodule.watch.chapters.ChaptersFragment
 import com.vhall.uimodule.watch.gift.GiftListDialog
 import com.vhall.uimodule.widget.ChatSetting
 import com.vhall.uimodule.widget.WatchMorePop
@@ -63,6 +64,8 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
     lateinit var qaAdapter: QAAdapter
     private var watchMorePop: WatchMorePop? = null
     private var isWatchRole:Boolean = false;//只看主办方
+    private var chatNicknameEncryption:Int = 0;//聊天加密
+    private var chatRecommendConfig:WebinarChatMsgRecommend? = null;
     var handsUp = "1"
     override fun initView() {
         val activity: WatchLiveActivity = activity as WatchLiveActivity
@@ -72,7 +75,6 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
             type = it.getString(TYPE)
             chatAdapter = ChatAdapter(mContext, webinarInfo,activity)
             qaAdapter = QAAdapter(mContext, webinarInfo)
-            initConfig()
             allForbid = webinarInfo.chatAllForbid
             ownForbid = webinarInfo.chatOwnForbid
             canChat = !allForbid && !ownForbid
@@ -92,7 +94,7 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
 //                mViewBinding.ivMore.visibility=View.GONE
             setLikeNum(webinarInfo.like_num)
             setHint()
-
+            initConfig()
         }
         val requestOptions: RequestOptions =
             RequestOptions.bitmapTransform(CircleCrop()).placeholder(R.mipmap.icon_avatar)
@@ -110,10 +112,8 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
             val giftListDialog = GiftListDialog(mContext, webinarInfo.vss_room_id)
             giftListDialog.show()
         }
-        if(!webinarInfo.chatReCommand.isNullOrEmpty()){
-            mViewBinding.chatReCommand.visibility = View.VISIBLE;
-            mViewBinding.chatReCommand.text ="[精选] " + webinarInfo.chatReCommand;
-        }
+
+
         mViewBinding.chatSetting.setOnClickListener{
             VhallSDK.getPermissions(
                 webinarInfo.webinar_id,
@@ -226,6 +226,39 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
         }
     }
 
+    private fun brToNewLine(text: String?): String {
+        if (text.isNullOrEmpty()) return ""
+        // 正则：匹配 <br> <br > <br/> <br />，忽略大小写
+        val regex = Regex("<br\\s*\\/?>", RegexOption.IGNORE_CASE)
+        return text.replace(regex, "\n")
+    }
+
+    private fun getChatRecommendText(recommend: WebinarChatMsgRecommend):String{
+        var context = "【精选】";
+        when(recommend.role_name){
+            "1"->{
+                context = context + "主持人：" + recommend.chat_msg_recommend;
+            }
+            "2"->{
+                if(this.chatNicknameEncryption == 1){
+                    var name = CommonUtil.getLimitString(recommend.nick_name, 2) + "**";
+                    context = context + " " + name + recommend.chat_msg_recommend;
+                }else{
+                    var name = CommonUtil.getLimitString(recommend.nick_name, 8);
+                    context = context + " " + recommend.nick_name + ": " + recommend.chat_msg_recommend;
+                }
+            }
+            "3"->{
+                context = context + "助理：" + recommend.chat_msg_recommend;
+            }
+            "4"->{
+                context = context + "嘉宾：" + recommend.chat_msg_recommend;
+            }
+        }
+        context = brToNewLine(context)
+        return context;
+    }
+
     private fun setHint() {
         if (type.equals("chat"))
             if (!canChat)
@@ -241,7 +274,28 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
     }
 
     private fun initConfig() {
-
+        VhallSDK.getPermissions(
+            webinarInfo.webinar_id,
+            webinarInfo.hostId,
+            object : RequestDataCallbackV2<PermissionData?> {
+                override fun onSuccess(data: PermissionData?) {
+                    try {
+                        data?.chat_nickname_encryption?.let {
+                            chatAdapter.chatNicknameEncryption(it)
+                            chatNicknameEncryption = data.chat_nickname_encryption;
+                            webinarInfo?.chatReCommand?.chat_msg_recommend.let {
+                                mViewBinding.chatReCommand.visibility = View.VISIBLE;
+                                chatRecommendConfig = webinarInfo.chatReCommand;
+                                mViewBinding.chatReCommand.text = getChatRecommendText(webinarInfo.chatReCommand);
+                            }
+                        };
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                    }
+                }
+                override fun onError(errorCode: Int, errorMsg: String) {
+                }
+            })
     }
     public fun setPermissions(permissions:JSONObject){
         likePermission = permissions.optString("ui.watch_hide_like").toInt()
@@ -439,10 +493,19 @@ class ChatFragment : BaseFragment<FragmentChatBinding>(FragmentChatBinding::infl
                 }
                 EVENT_CHAT_DEL_RE_COMMEND-> {
                     mViewBinding.chatReCommand.visibility = View.GONE;
+                    mViewBinding.chatReCommand.text = "";
                 }
                 EVENT_CHAT_SET_RE_COMMEND->{
+                    this.chatRecommendConfig = messageInfo.chat_msg_recommend;
                     mViewBinding.chatReCommand.visibility = View.VISIBLE;
-                    mViewBinding.chatReCommand.text = "[精选] " + messageInfo.content;
+                    mViewBinding.chatReCommand.text = getChatRecommendText(messageInfo.chat_msg_recommend);
+                }
+                EVENT_CHAT_NICKNAME_ENCRYPTION->{
+                    chatAdapter.chatNicknameEncryption(messageInfo.chat_nickname_encryption);
+                    chatNicknameEncryption = messageInfo.chat_nickname_encryption;
+                    if( mViewBinding.chatReCommand.visibility == View.VISIBLE && this.chatRecommendConfig != null){
+                        mViewBinding.chatReCommand.text = getChatRecommendText(this.chatRecommendConfig!!);
+                    }
                 }
                 EVENT_CHAT_FORBID_ALL -> {
                     //问答状态 根据全体禁言判断 如果开启禁言则根据 qa_status判断 1开启 0关闭  如果关闭全体禁言 则直接开启问答
